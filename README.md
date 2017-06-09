@@ -4,7 +4,7 @@
 
 ## [Documentation]
 
-[Documentation]: https://japaric.github.io/cortex-m-hal/cortex_m_hal
+[Documentation]: https://japaric.github.io/cortex-m-hal/cortex_m_hal/index.html
 
 ## License
 
