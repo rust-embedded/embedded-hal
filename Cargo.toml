@@ -1,0 +1,14 @@
+[package]
+authors = ["Jorge Aparicio <jorge@japaric.io>"]
+categories = ["asynchronous", "embedded", "hardware-support", "no-std"]
+description = "Minimal Hardware Abstraction Layer for Cortex-M microcontrollers"
+documentation = "https://docs.rs/cortex-m-hal"
+keywords = ["arm", "cortex-m", "hal", "I/O"]
+license = "MIT OR Apache-2.0"
+name = "cortex-m-hal"
+repository = "https://github.com/japaric/cortex-m-hal"
+version = "0.1.0"
+
+[dependencies.nb]
+git = "https://github.com/japaric/nb"
+optional = false
