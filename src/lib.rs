@@ -1,4 +1,4 @@
-//! A minimal Hardware Abstraction Layer (HAL) for Cortex-M microcontrollers
+//! A minimal Hardware Abstraction Layer (HAL) for embedded systems
 //!
 //! **NOTE** The HAL is in design phase. Expect the API to change in non
 //! backward compatible ways without previous notice.
@@ -115,10 +115,9 @@
 //! [`stm32f103xx`]: https://crates.io/crates/stm32f103xx
 //!
 //! ``` ignore
-//! //! An implementation of the `cortex-m-hal` for the STM32F103xx
-//! //! microcontrollers
+//! //! An implementation of the `embedded-hal` for STM32F103xx microcontrollers
 //!
-//! extern crate cortex_m_hal as hal;
+//! extern crate embedded_hal as hal;
 //! extern crate nb;
 //!
 //! // device crate
@@ -210,7 +209,7 @@
 //! fashion:
 //!
 //! ``` ignore
-//! extern crate cortex_m_hal as hal;
+//! extern crate embedded_hal as hal;
 //!
 //! #[macro_use]
 //! extern crate nb;
@@ -234,7 +233,7 @@
 //! second. Second task: loop back data over the serial interface.
 //!
 //! ``` ignore
-//! extern crate cortex_m_hal as hal;
+//! extern crate embedded_hal as hal;
 //!
 //! extern crate futures;
 //! extern crate stm32f103xx_hal_impl;
@@ -321,7 +320,7 @@
 //! is not yet in the compiler.
 //!
 //! ``` ignore
-//! extern crate cortex_m_hal as hal;
+//! extern crate embedded_hal as hal;
 //!
 //! extern crate stm32f103xx_hal_impl;
 //!
@@ -381,7 +380,7 @@
 //! - Write a whole buffer in blocking fashion.
 //!
 //! ``` ignore
-//! extern crate cortex_m_hal as hal;
+//! extern crate embedded_hal as hal;
 //!
 //! use hal::prelude::*;
 //!
@@ -400,7 +399,7 @@
 //! - Blocking read with timeout
 //!
 //! ``` ignore
-//! extern crate cortex_m_hal as hal;
+//! extern crate embedded_hal as hal;
 //!
 //! use hal::prelude::*;
 //!
@@ -447,7 +446,7 @@
 //! - Asynchronous SPI transfer
 //!
 //! ``` ignore
-//! extern crate cortex_m_hal as hal;
+//! extern crate embedded_hal as hal;
 //!
 //! /// Transfers a byte buffer of size N
 //! ///
@@ -473,7 +472,7 @@
 //! - Buffered serial interface with periodic flushing in interrupt handler
 //!
 //! ``` ignore
-//! extern crate cortex_m_hal as hal;
+//! extern crate embedded_hal as hal;
 //! extern crate nb;
 //!
 //! use hal::prelude::*;

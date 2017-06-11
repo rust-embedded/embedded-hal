@@ -1,10 +1,10 @@
-# `cortex-m-hal`
+# `embedded-hal`
 
-> A minimal Hardware Abstraction Layer (HAL) for Cortex-M microcontrollers
+> A minimal Hardware Abstraction Layer (HAL) for embedded systems
 
 ## [Documentation]
 
-[Documentation]: https://japaric.github.io/cortex-m-hal/cortex_m_hal/index.html
+[Documentation]: https://japaric.github.io/embedded-hal/embedded_hal/index.html
 
 ## License
 
