@@ -739,7 +739,10 @@ pub enum Direction {
 }
 
 /// Serial interface
-pub trait Serial {
+///
+/// Some serial interfaces support different data sizes (8 bits, 9 bits, etc.);
+/// This can be encoded in this trait via the `Word` type parameter.
+pub trait Serial<Word> {
     /// Serial interface error
     ///
     /// Possible errors
@@ -748,11 +751,11 @@ pub trait Serial {
     ///   not read in a timely manner
     type Error;
 
-    /// Reads a single byte from the serial interface
-    fn read(&self) -> nb::Result<u8, Self::Error>;
+    /// Reads a single word from the serial interface
+    fn read(&self) -> nb::Result<Word, Self::Error>;
 
-    /// Writes a single byte to the serial interface
-    fn write(&self, byte: u8) -> nb::Result<(), Self::Error>;
+    /// Writes a single word to the serial interface
+    fn write(&self, word: Word) -> nb::Result<(), Self::Error>;
 }
 
 /// Serial Peripheral Interface (full duplex master mode)
