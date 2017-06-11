@@ -39,6 +39,7 @@
 //!
 //! ## Traits
 //!
+//! -- opened issue: https://github.com/japaric/nb/issues/2
 //! The HAL is specified using traits to allow generic programming. These traits
 //! traits will make use of the [`nb`][] [crate] (*please go read that crate
 //! documentation before continuing*) to abstract over the asynchronous model
@@ -50,7 +51,8 @@
 //! Here's how a HAL trait may look like:
 //!
 //! ``` rust
-//! extern crate nb;
+//! extern crate futures;
+//! use futures::Async;
 //!
 //! /// A serial interface
 //! pub trait Serial {
@@ -58,22 +60,21 @@
 //!     type Error;
 //!
 //!     /// Reads a single byte
-//!     fn read(&self) -> nb::Result<u8, Self::Error>;
+//!     fn read(&self) -> Async<Result<u8, Self::Error>>;
 //!
 //!     /// Writes a single byte
-//!     fn write(&self, byte: u8) -> nb::Result<(), Self::Error>;
+//!     fn write(&self, byte: u8) -> Async<Result<(), Self::Error>>;
 //! }
 //! ```
 //!
-//! The `nb::Result` enum is used to add a [`WouldBlock`] variant to the errors
-//! of the serial interface. As we'll see below this extra error variant lets
-//! this single API operate in a blocking manner, or in a non-blocking manner
-//! compatible with `futures` and with the `await` operator.
+//! The `Async` enum contains a [`NotReady`] variant of the serial interface. As we'll see below
+//! this extra error variant lets this single API operate in a blocking manner, or in a
+//! non-blocking manner compatible with `futures` and with the `await` operator.
 //!
-//! [`WouldBlock`]: https://japaric.github.io/nb/nb/enum.Error.html
+//! [`NotReady`]: https://docs.rs/futures/0.1.14/futures/enum.Async.html
 //!
 //! Some traits, like the one shown below, may expose possibly blocking APIs
-//! that can't fail. In those cases `nb::Result<_, !>` should be used.
+//! that can't fail. In those cases simply use `Async<Value>`
 //!
 //! ``` ignore
 //! /// A timer used for timeouts
@@ -97,7 +98,7 @@
 //!     fn set_timeout<T>(&self, ticks: T) where T: Into<Self::Time>;
 //!
 //!     /// "waits" until the timer times out
-//!     fn wait(&self) -> nb::Result<(), !>;
+//!     fn wait(&self) -> Async<()>
 //! }
 //! ```
 //!
@@ -118,12 +119,13 @@
 //! //! An implementation of the `embedded-hal` for STM32F103xx microcontrollers
 //!
 //! extern crate embedded_hal as hal;
-//! extern crate nb;
+//! extern crate futures;
 //!
 //! // device crate
 //! extern crate stm32f103xx;
 //!
 //! use core::ops::Deref;
+//! use futures::Async::{self, Ready, NotReady};
 //!
 //! /// A serial interface
 //! // NOTE generic over the USART peripheral. This works with USART1, USART2
@@ -142,22 +144,22 @@
 //! impl<'a, U> hal::Serial for Serial<'a, U> {
 //!     type Error = Error;
 //!
-//!     fn read(&self) -> nb::Result<u8, Error> {
+//!     fn read(&self) -> Async<Result<u8, Error>> {
 //!         // read the status register
 //!         let sr = self.sr.read();
 //!
 //!         if sr.ovr().bit_is_set() {
 //!             // Error: Buffer overrun
-//!             Err(nb::Error::Other(Error::Overrun))
+//!             Ready(Err(Error::Overrun))
 //!         } else if .. {
 //!             // Other error conditions
 //!             ..
 //!         } else if sr.rxne().bit_is_set() {
 //!             // Data available: read the data register
-//!             Ok(self.dr.read())
+//!             Ready(Ok(self.dr.read()))
 //!         } else {
 //!             // No data available yet
-//!             Err(nb::Error::WouldBlock)
+//!             NotReady
 //!         }
 //!     }
 //!
@@ -228,6 +230,9 @@
 //! ```
 //!
 //! ### `futures`
+//! - Not sure what do do for "futures" section... since we should be already future ready
+//!   so this whole section may need to be deleted.
+//! - Also... isn't `await` supposed to just "work" with futures?
 //!
 //! An example of running two tasks concurrently. First task: blink an LED every
 //! second. Second task: loop back data over the serial interface.
