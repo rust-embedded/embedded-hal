@@ -58,10 +58,10 @@
 //!     type Error;
 //!
 //!     /// Reads a single byte
-//!     fn read(&self) -> nb::Result<u8, Self::Error>;
+//!     fn read(&mut self) -> nb::Result<u8, Self::Error>;
 //!
 //!     /// Writes a single byte
-//!     fn write(&self, byte: u8) -> nb::Result<(), Self::Error>;
+//!     fn write(&mut self, byte: u8) -> nb::Result<(), Self::Error>;
 //! }
 //! ```
 //!
@@ -85,16 +85,16 @@
 //!     fn get_timeout(&self) -> Self::Time;
 //!
 //!     /// Pauses the timer
-//!     fn pause(&self);
+//!     fn pause(&mut self);
 //!
 //!     /// Restarts the timer count
-//!     fn restart(&self);
+//!     fn restart(&mut self);
 //!
 //!     /// Resumes the timer count
-//!     fn resume(&self);
+//!     fn resume(&mut self);
 //!
 //!     /// Sets a new timeout
-//!     fn set_timeout<T>(&self, ticks: T) where T: Into<Self::Time>;
+//!     fn set_timeout<T>(&mut self, ticks: T) where T: Into<Self::Time>;
 //!
 //!     /// "waits" until the timer times out
 //!     fn wait(&self) -> nb::Result<(), !>;
@@ -142,7 +142,7 @@
 //! impl<'a, U> hal::Serial for Serial<'a, U> {
 //!     type Error = Error;
 //!
-//!     fn read(&self) -> nb::Result<u8, Error> {
+//!     fn read(&mut self) -> nb::Result<u8, Error> {
 //!         // read the status register
 //!         let sr = self.sr.read();
 //!
@@ -161,7 +161,7 @@
 //!         }
 //!     }
 //!
-//!     fn write(&self, byte: u8) -> nb::Result<(), Error> {
+//!     fn write(&mut self, byte: u8) -> nb::Result<(), Error> {
 //!         // Very similar to the above implementation
 //!         ..
 //!     }
@@ -187,8 +187,8 @@
 //! static USART1: Mutex<_> = Mutex::new(..);
 //!
 //! impl hal::Serial for Serial {
-//!     fn read(&self) -> Result<u8, nb::Error<Error>> {
-//!         hal::Serial::read(&Serial(USART1.lock()))
+//!     fn read(&mut self) -> Result<u8, nb::Error<Error>> {
+//!         hal::Serial::read(&mut Serial(USART1.lock()))
 //!     }
 //! }
 //! ```
@@ -218,7 +218,7 @@
 //!
 //! use stm32f103xx_hal_impl::Serial;
 //!
-//! let serial = Serial(usart1);
+//! let mut serial = Serial(usart1);
 //!
 //! for byte in b"Hello, world!" {
 //!     // NOTE `block!` blocks until `serial.write()` completes and returns
@@ -259,7 +259,7 @@
 //! /// `futures` version of `Serial.read`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn read<S>(serial: &S) -> impl Future<Item = u8, Error = Error>
+//! fn read<S>(serial: &mut S) -> impl Future<Item = u8, Error = Error>
 //! where
 //!     S: hal::Serial,
 //! {
@@ -271,7 +271,7 @@
 //! /// `futures` version of `Serial.write`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn write<S>(byte: u8) -> impl Future<Item = (), Error = Error>
+//! fn write<S>(serial: &mut S, byte: u8) -> impl Future<Item = (), Error = Error>
 //! where
 //!     S: hal::Serial,
 //! {
@@ -282,11 +282,11 @@
 //!
 //! // HAL implementers
 //! let timer = Timer(tim3);
-//! let serial = Serial(usart1);
+//! let mut serial = Serial(usart1);
 //!
 //! // Tasks
 //! let mut blinky = future::loop_fn(true, |_| {
-//!     wait(timer).map(|_| {
+//!     wait(&timer).map(|_| {
 //!         if state {
 //!             Led.on();
 //!         } else {
@@ -298,7 +298,7 @@
 //! });
 //!
 //! let mut loopback = future::loop_fn((), |_| {
-//!     read(serial).and_then(|byte| {
+//!     read(&mut serial).and_then(|byte| {
 //!         write(serial, byte)
 //!     }).map(|_| {
 //!         Loop::Continue(())
@@ -332,7 +332,7 @@
 //!
 //! // HAL implementers
 //! let timer = Timer(tim3);
-//! let serial = Serial(usart1);
+//! let mut serial = Serial(usart1);
 //!
 //! // Tasks
 //! let mut blinky = (|| {
@@ -384,7 +384,7 @@
 //!
 //! use hal::prelude::*;
 //!
-//! fn write_all<S>(serial: &S, buffer: &[u8]) -> Result<(), S::Error>
+//! fn write_all<S>(serial: &mut S, buffer: &[u8]) -> Result<(), S::Error>
 //! where
 //!     S: hal::Serial
 //! {
@@ -410,8 +410,8 @@
 //! }
 //!
 //! fn read_with_timeout(
-//!     serial: &S,
-//!     timer: &T,
+//!     serial: &mut S,
+//!     timer: &mut T,
 //!     timeout: T::Ticks,
 //! ) -> Result<u8, Error<S::Error>>
 //! where
@@ -454,7 +454,7 @@
 //! /// slave device
 //! #[async]
 //! fn transfer<const N: usize, S>(
-//!     spi: &S,
+//!     spi: &mut S,
 //!     mut buffer: [u8; N],
 //! ) -> Result<[u8; N], S::Error>
 //! where
@@ -477,7 +477,7 @@
 //!
 //! use hal::prelude::*;
 //!
-//! fn flush(serial: &S, cb: &mut CircularBuffer) -> Result<(), S::Error>
+//! fn flush(serial: &mut S, cb: &mut CircularBuffer) -> Result<(), S::Error>
 //! where
 //!     S: hal::Serial,
 //! {
@@ -524,7 +524,7 @@
 //!     let serial = SERIAL.lock();
 //!     let buffer = BUFFER.lock();
 //!
-//!     flush(&serial, &mut buffer).unwrap();
+//!     flush(&mut serial, &mut buffer).unwrap();
 //! }
 //! ```
 //!
@@ -553,7 +553,7 @@
 //! ``` ignore
 //! frequency!(apb1, 8_000_000); // Hz
 //!
-//! let timer: impl Timer = ..;
+//! let mut timer: impl Timer = ..;
 //!
 //! // All these are equivalent
 //! timer.set_timeout(apb1::Ticks(8_000));
@@ -580,7 +580,7 @@ pub mod prelude;
 /// / events
 ///
 /// ``` ignore
-/// let capture: impl Capture = ..;
+/// let mut capture: impl Capture = ..;
 ///
 /// capture.set_resolution(1.ms());
 ///
@@ -623,16 +623,16 @@ pub trait Capture {
     ) -> nb::Result<Self::Capture, Self::Error>;
 
     /// Disables a capture `channel`
-    fn disable(&self, channel: Self::Channel);
+    fn disable(&mut self, channel: Self::Channel);
 
     /// Enables a capture `channel`
-    fn enable(&self, channel: Self::Channel);
+    fn enable(&mut self, channel: Self::Channel);
 
     /// Returns the current resolution
     fn get_resolution(&self) -> Self::Time;
 
     /// Sets the resolution of the capture timer
-    fn set_resolution<R>(&self, resolution: R)
+    fn set_resolution<R>(&mut self, resolution: R)
     where
         R: Into<Self::Time>;
 }
@@ -644,7 +644,7 @@ pub trait Capture {
 /// Use this interface to control the power output of some actuator
 ///
 /// ``` ignore
-/// let pwm: impl Pwm = ..;
+/// let mut pwm: impl Pwm = ..;
 ///
 /// pwm.set_period(1.khz().invert());
 ///
@@ -673,10 +673,10 @@ pub trait Pwm {
     type Duty;
 
     /// Disables a PWM `channel`
-    fn disable(&self, channel: Self::Channel);
+    fn disable(&mut self, channel: Self::Channel);
 
     /// Enables a PWM `channel`
-    fn enable(&self, channel: Self::Channel);
+    fn enable(&mut self, channel: Self::Channel);
 
     /// Returns the current PWM period
     fn get_period(&self) -> Self::Time;
@@ -688,10 +688,10 @@ pub trait Pwm {
     fn get_max_duty(&self) -> Self::Duty;
 
     /// Sets a new duty cycle
-    fn set_duty(&self, channel: Self::Channel, duty: Self::Duty);
+    fn set_duty(&mut self, channel: Self::Channel, duty: Self::Duty);
 
     /// Sets a new PWM period
-    fn set_period<P>(&self, period: P)
+    fn set_period<P>(&mut self, period: P)
     where
         P: Into<Self::Time>;
 }
@@ -704,7 +704,7 @@ pub trait Pwm {
 ///
 /// ``` ignore
 /// let qei: impl Qei = ..;
-/// let timer: impl Timer = ..;
+/// let mut timer: impl Timer = ..;
 ///
 /// timer.pause();
 /// timer.restart();
@@ -752,10 +752,10 @@ pub trait Serial<Word> {
     type Error;
 
     /// Reads a single word from the serial interface
-    fn read(&self) -> nb::Result<Word, Self::Error>;
+    fn read(&mut self) -> nb::Result<Word, Self::Error>;
 
     /// Writes a single word to the serial interface
-    fn write(&self, word: Word) -> nb::Result<(), Self::Error>;
+    fn write(&mut self, word: Word) -> nb::Result<(), Self::Error>;
 }
 
 /// Serial Peripheral Interface (full duplex master mode)
@@ -783,10 +783,10 @@ pub trait Spi<Word> {
     ///
     /// **NOTE** A word must be sent to the slave before attempting to call this
     /// method.
-    fn read(&self) -> nb::Result<Word, Self::Error>;
+    fn read(&mut self) -> nb::Result<Word, Self::Error>;
 
     /// Sends a word to the slave
-    fn send(&self, word: Word) -> nb::Result<(), Self::Error>;
+    fn send(&mut self, word: Word) -> nb::Result<(), Self::Error>;
 }
 
 /// Timer used for timeouts
@@ -796,7 +796,7 @@ pub trait Spi<Word> {
 /// You can use this timer to create delays
 ///
 /// ``` ignore
-/// let timer: impl Timer = ..;
+/// let mut timer: impl Timer = ..;
 ///
 /// timer.pause();
 /// timer.restart();
@@ -815,16 +815,16 @@ pub trait Timer {
     fn get_timeout(&self) -> Self::Time;
 
     /// Pauses the timer
-    fn pause(&self);
+    fn pause(&mut self);
 
     /// Restarts the timer count to zero
-    fn restart(&self);
+    fn restart(&mut self);
 
     /// Resumes the timer count
-    fn resume(&self);
+    fn resume(&mut self);
 
     /// Sets a new timeout
-    fn set_timeout<T>(&self, timeout: T)
+    fn set_timeout<T>(&mut self, timeout: T)
     where
         T: Into<Self::Time>;
 
