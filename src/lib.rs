@@ -571,6 +571,7 @@
 extern crate nb;
 
 pub mod prelude;
+pub mod serial;
 
 /// Input capture
 ///
@@ -736,26 +737,6 @@ pub enum Direction {
     Downcounting,
     /// 1, 2, 3
     Upcounting,
-}
-
-/// Serial interface
-///
-/// Some serial interfaces support different data sizes (8 bits, 9 bits, etc.);
-/// This can be encoded in this trait via the `Word` type parameter.
-pub trait Serial<Word> {
-    /// Serial interface error
-    ///
-    /// Possible errors
-    ///
-    /// - *overrun*, the previous received data was overwritten because it was
-    ///   not read in a timely manner
-    type Error;
-
-    /// Reads a single word from the serial interface
-    fn read(&self) -> nb::Result<Word, Self::Error>;
-
-    /// Writes a single word to the serial interface
-    fn write(&self, word: Word) -> nb::Result<(), Self::Error>;
 }
 
 /// Serial Peripheral Interface (full duplex master mode)
