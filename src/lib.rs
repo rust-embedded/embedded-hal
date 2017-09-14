@@ -403,14 +403,16 @@
 //!
 //! ``` ignore
 //! extern crate embedded_hal as hal;
+//! #[macro_use]
+//! extern crate nb;
 //!
 //! use hal::prelude::*;
 //!
 //! fn write_all<S>(serial: &S, buffer: &[u8]) -> Result<(), S::Error>
 //! where
-//!     S: hal::Serial
+//!     S: hal::serial::Write<u8>
 //! {
-//!     for byte in buffer {
+//!     for &byte in buffer {
 //!         block!(serial.write(byte))?;
 //!     }
 //!
