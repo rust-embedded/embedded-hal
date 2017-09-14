@@ -117,6 +117,7 @@
 //! ``` ignore
 //! //! An implementation of the `embedded-hal` for STM32F103xx microcontrollers
 //!
+//! extern crate core;
 //! extern crate embedded_hal as hal;
 //! extern crate nb;
 //!
@@ -130,40 +131,50 @@
 //! // and USART3
 //! pub struct Serial<'a, U>(pub &'a U)
 //! where
-//!     U: Deref<stm32f103xx::usart1::RegisterBlock> + 'static;
+//!     U: Deref<Target=stm32f103xx::usart1::RegisterBlock> + 'static;
 //!
 //! /// Serial interface error
 //! pub enum Error {
 //!     /// Buffer overrun
 //!     Overrun,
-//!     ..
+//!     // add more error variants here
 //! }
 //!
-//! impl<'a, U> hal::Serial for Serial<'a, U> {
+//! impl<'a, U> hal::serial::Read<u8> for Serial<'a, U>
+//!     where
+//!         U: Deref<Target=stm32f103xx::usart1::RegisterBlock> + 'static
+//! {
 //!     type Error = Error;
 //!
 //!     fn read(&self) -> nb::Result<u8, Error> {
 //!         // read the status register
-//!         let sr = self.sr.read();
+//!         let sr = self.0.sr.read();
 //!
-//!         if sr.ovr().bit_is_set() {
+//!         if sr.ore().bit_is_set() {
 //!             // Error: Buffer overrun
 //!             Err(nb::Error::Other(Error::Overrun))
-//!         } else if .. {
-//!             // Other error conditions
-//!             ..
-//!         } else if sr.rxne().bit_is_set() {
+//!         }
+//!         // Add additional `else if` statements to check for other errors
+//!         else if sr.rxne().bit_is_set() {
 //!             // Data available: read the data register
-//!             Ok(self.dr.read())
-//!         } else {
+//!             Ok(self.0.dr.read().bits() as u8)
+//!         }
+//!         else {
 //!             // No data available yet
 //!             Err(nb::Error::WouldBlock)
 //!         }
 //!     }
+//! }
+//!
+//! impl<'a, U> hal::serial::Write<u8> for Serial<'a, U>
+//!     where
+//!         U: Deref<Target=stm32f103xx::usart1::RegisterBlock> + 'static
+//! {
+//!     type Error = Error;
 //!
 //!     fn write(&self, byte: u8) -> nb::Result<(), Error> {
 //!         // Very similar to the above implementation
-//!         ..
+//!         Ok(())
 //!     }
 //! }
 //! ```
