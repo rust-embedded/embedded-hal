@@ -258,16 +258,22 @@
 //! extern crate nb;
 //!
 //! use hal::prelude::*;
+//! use futures::{
+//!     future,
+//!     Async,
+//!     Future,
+//! };
+//! use futures::future::Loop;
 //! use stm32f103xx_hal_impl::{Serial, Timer};
 //!
 //! /// `futures` version of `Timer.wait`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn wait<T>(timer: &T) -> impl Future<Item = (), Error = !>
+//! fn wait<T>(timer: T) -> impl Future<Item = (), Error = !>
 //! where
 //!     T: hal::Timer,
 //! {
-//!     future::poll_fn(|| {
+//!     future::poll_fn(move || {
 //!         Ok(Async::Ready(try_nb!(timer.wait())))
 //!     })
 //! }
@@ -275,11 +281,11 @@
 //! /// `futures` version of `Serial.read`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn read<S>(serial: &S) -> impl Future<Item = u8, Error = Error>
+//! fn read<S>(serial: S) -> impl Future<Item = u8, Error = S::Error>
 //! where
-//!     S: hal::Serial,
+//!     S: hal::serial::Read<u8>,
 //! {
-//!     future::poll_fn(|| {
+//!     future::poll_fn(move || {
 //!         Ok(Async::Ready(try_nb!(serial.read())))
 //!     })
 //! }
@@ -287,11 +293,11 @@
 //! /// `futures` version of `Serial.write`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn write<S>(byte: u8) -> impl Future<Item = (), Error = Error>
+//! fn write<S>(serial: S, byte: u8) -> impl Future<Item = (), Error = S::Error>
 //! where
-//!     S: hal::Serial,
+//!     S: hal::serial::Write<u8>,
 //! {
-//!     future::poll_fn(|| {
+//!     future::poll_fn(move || {
 //!         Ok(Async::Ready(try_nb!(serial.write(byte))))
 //!     })
 //! }
@@ -301,7 +307,7 @@
 //! let serial = Serial(usart1);
 //!
 //! // Tasks
-//! let mut blinky = future::loop_fn(true, |_| {
+//! let mut blinky = future::loop_fn(true, |state| {
 //!     wait(timer).map(|_| {
 //!         if state {
 //!             Led.on();
