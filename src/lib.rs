@@ -190,16 +190,21 @@
 //! implementation:
 //!
 //! ``` ignore
+//! extern crate embedded_hal as hal;
+//! extern crate nb;
+//!
 //! /// A synchronized serial interface
 //! // NOTE This is a global singleton
-//! pub struct Serial1;
+//! pub struct Serial1(Mutex<..>);
 //!
 //! // NOTE private
 //! static USART1: Mutex<_> = Mutex::new(..);
 //!
-//! impl hal::Serial for Serial {
-//!     fn read(&self) -> Result<u8, nb::Error<Error>> {
-//!         hal::Serial::read(&Serial(USART1.lock()))
+//! impl hal::serial::Read<u8> for Serial1 {
+//!     type Error = !;
+//!
+//!     fn read(&self) -> Result<u8, nb::Error<Self::Error>> {
+//!         hal::serial::Read::read(&Serial1(USART1.lock()))
 //!     }
 //! }
 //! ```
