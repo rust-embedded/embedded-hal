@@ -660,21 +660,21 @@ pub trait Capture {
     /// NOTE that you must multiply the returned value by the *resolution* of
     /// this `Capture` interface to get a human time unit (e.g. seconds)
     fn capture(
-        &self,
+        &mut self,
         channel: Self::Channel,
     ) -> nb::Result<Self::Capture, Self::Error>;
 
     /// Disables a capture `channel`
-    fn disable(&self, channel: Self::Channel);
+    fn disable(&mut self, channel: Self::Channel);
 
     /// Enables a capture `channel`
-    fn enable(&self, channel: Self::Channel);
+    fn enable(&mut self, channel: Self::Channel);
 
     /// Returns the current resolution
     fn get_resolution(&self) -> Self::Time;
 
     /// Sets the resolution of the capture timer
-    fn set_resolution<R>(&self, resolution: R)
+    fn set_resolution<R>(&mut self, resolution: R)
     where
         R: Into<Self::Time>;
 }
@@ -715,10 +715,10 @@ pub trait Pwm {
     type Duty;
 
     /// Disables a PWM `channel`
-    fn disable(&self, channel: Self::Channel);
+    fn disable(&mut self, channel: Self::Channel);
 
     /// Enables a PWM `channel`
-    fn enable(&self, channel: Self::Channel);
+    fn enable(&mut self, channel: Self::Channel);
 
     /// Returns the current PWM period
     fn get_period(&self) -> Self::Time;
@@ -730,10 +730,10 @@ pub trait Pwm {
     fn get_max_duty(&self) -> Self::Duty;
 
     /// Sets a new duty cycle
-    fn set_duty(&self, channel: Self::Channel, duty: Self::Duty);
+    fn set_duty(&mut self, channel: Self::Channel, duty: Self::Duty);
 
     /// Sets a new PWM period
-    fn set_period<P>(&self, period: P)
+    fn set_period<P>(&mut self, period: P)
     where
         P: Into<Self::Time>;
 }
@@ -805,10 +805,10 @@ pub trait Spi<Word> {
     ///
     /// **NOTE** A word must be sent to the slave before attempting to call this
     /// method.
-    fn read(&self) -> nb::Result<Word, Self::Error>;
+    fn read(&mut self) -> nb::Result<Word, Self::Error>;
 
     /// Sends a word to the slave
-    fn send(&self, word: Word) -> nb::Result<(), Self::Error>;
+    fn send(&mut self, word: Word) -> nb::Result<(), Self::Error>;
 }
 
 /// Timer used for timeouts
@@ -837,16 +837,16 @@ pub trait Timer {
     fn get_timeout(&self) -> Self::Time;
 
     /// Pauses the timer
-    fn pause(&self);
+    fn pause(&mut self);
 
     /// Restarts the timer count to zero
-    fn restart(&self);
+    fn restart(&mut self);
 
     /// Resumes the timer count
-    fn resume(&self);
+    fn resume(&mut self);
 
     /// Sets a new timeout
-    fn set_timeout<T>(&self, timeout: T)
+    fn set_timeout<T>(&mut self, timeout: T)
     where
         T: Into<Self::Time>;
 
