@@ -508,9 +508,9 @@
 //!
 //! use hal::prelude::*;
 //!
-//! fn flush(serial: &S, cb: &mut CircularBuffer) -> Result<(), S::Error>
+//! fn flush<S>(serial: &S, cb: &mut CircularBuffer) -> Result<(), S::Error>
 //! where
-//!     S: hal::Serial,
+//!     S: hal::serial::Write<u8>,
 //! {
 //!     loop {
 //!         if let Some(byte) = cb.peek() {
@@ -532,12 +532,12 @@
 //!
 //! // NOTE private
 //! static BUFFER: Mutex<CircularBuffer> = ..;
-//! static SERIAL: Mutex<impl hal::Serial> = ..;
+//! static SERIAL: Mutex<impl hal::serial::Write<u8>> = ..;
 //!
 //! impl BufferedSerial {
-//!     pub fn write(&self, byte: u8) {
+//!     pub fn write(&self, bytes: &[u8]) {
 //!         let mut buffer = BUFFER.lock();
-//!         for byte in byte {
+//!         for byte in bytes {
 //!             buffer.push(*byte).unwrap();
 //!         }
 //!     }
@@ -545,10 +545,9 @@
 //!     pub fn write_all(&self, bytes: &[u8]) {
 //!         let mut buffer = BUFFER.lock();
 //!         for byte in bytes {
-//!             cb.push(*byte).unwrap();
+//!             buffer.push(*byte).unwrap();
 //!         }
 //!     }
-//!
 //! }
 //!
 //! fn interrupt_handler() {
