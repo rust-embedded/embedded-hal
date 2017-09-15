@@ -424,23 +424,24 @@
 //!
 //! ``` ignore
 //! extern crate embedded_hal as hal;
+//! extern crate nb;
 //!
 //! use hal::prelude::*;
 //!
 //! enum Error<E> {
 //!     /// Serial interface error
-//!     Serial(E)
+//!     Serial(E),
 //!     TimedOut,
 //! }
 //!
-//! fn read_with_timeout(
+//! fn read_with_timeout<S, T>(
 //!     serial: &S,
 //!     timer: &T,
-//!     timeout: T::Ticks,
+//!     timeout: T::Time,
 //! ) -> Result<u8, Error<S::Error>>
 //! where
 //!     T: hal::Timer,
-//!     S: hal::Serial,
+//!     S: hal::serial::Read<u8>,
 //! {
 //!     timer.pause();
 //!     timer.restart();
@@ -457,6 +458,12 @@
 //!         }
 //!
 //!         match timer.wait() {
+//!             Err(nb::Error::Other(e)) => {
+//!                 // The error type specified by `timer.wait()` is `!`, which
+//!                 // means no error can actually occur. The Rust compiler
+//!                 // still forces us to provide this match arm, though.
+//!                 e
+//!             },
 //!             Err(nb::Error::WouldBlock) => continue,
 //!             Ok(()) => {
 //!                 timer.pause();
