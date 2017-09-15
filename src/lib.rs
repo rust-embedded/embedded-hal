@@ -85,16 +85,16 @@
 //!     fn get_timeout(&self) -> Self::Time;
 //!
 //!     /// Pauses the timer
-//!     fn pause(&self);
+//!     fn pause(&mut self);
 //!
 //!     /// Restarts the timer count
-//!     fn restart(&self);
+//!     fn restart(&mut self);
 //!
 //!     /// Resumes the timer count
-//!     fn resume(&self);
+//!     fn resume(&mut self);
 //!
 //!     /// Sets a new timeout
-//!     fn set_timeout<T>(&self, ticks: T) where T: Into<Self::Time>;
+//!     fn set_timeout<T>(&mut self, ticks: T) where T: Into<Self::Time>;
 //!
 //!     /// "waits" until the timer times out
 //!     fn wait(&self) -> nb::Result<(), !>;
@@ -146,7 +146,7 @@
 //! {
 //!     type Error = Error;
 //!
-//!     fn read(&self) -> nb::Result<u8, Error> {
+//!     fn read(&mut self) -> nb::Result<u8, Error> {
 //!         // read the status register
 //!         let sr = self.0.sr.read();
 //!
@@ -172,7 +172,7 @@
 //! {
 //!     type Error = Error;
 //!
-//!     fn write(&self, byte: u8) -> nb::Result<(), Error> {
+//!     fn write(&mut self, byte: u8) -> nb::Result<(), Error> {
 //!         // Very similar to the above implementation
 //!         Ok(())
 //!     }
@@ -203,7 +203,7 @@
 //! impl hal::serial::Read<u8> for Serial1 {
 //!     type Error = !;
 //!
-//!     fn read(&self) -> Result<u8, nb::Error<Self::Error>> {
+//!     fn read(&mut self) -> Result<u8, nb::Error<Self::Error>> {
 //!         hal::serial::Read::read(&Serial(&*USART1.lock()))
 //!     }
 //! }
@@ -419,7 +419,7 @@
 //!
 //! use hal::prelude::*;
 //!
-//! fn write_all<S>(serial: &S, buffer: &[u8]) -> Result<(), S::Error>
+//! fn write_all<S>(serial: &mut S, buffer: &[u8]) -> Result<(), S::Error>
 //! where
 //!     S: hal::serial::Write<u8>
 //! {
@@ -446,8 +446,8 @@
 //! }
 //!
 //! fn read_with_timeout<S, T>(
-//!     serial: &S,
-//!     timer: &T,
+//!     serial: &mut S,
+//!     timer: &mut T,
 //!     timeout: T::Time,
 //! ) -> Result<u8, Error<S::Error>>
 //! where
@@ -519,7 +519,7 @@
 //!
 //! use hal::prelude::*;
 //!
-//! fn flush<S>(serial: &S, cb: &mut CircularBuffer) -> Result<(), S::Error>
+//! fn flush<S>(serial: &mut S, cb: &mut CircularBuffer) -> Result<(), S::Error>
 //! where
 //!     S: hal::serial::Write<u8>,
 //! {
@@ -565,7 +565,7 @@
 //!     let serial = SERIAL.lock();
 //!     let buffer = BUFFER.lock();
 //!
-//!     flush(&serial, &mut buffer).unwrap();
+//!     flush(&mut serial, &mut buffer).unwrap();
 //! }
 //! ```
 //!
