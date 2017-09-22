@@ -195,7 +195,7 @@
 //!
 //! /// A synchronized serial interface
 //! // NOTE This is a global singleton
-//! pub struct Serial1(Mutex<..>);
+//! pub struct Serial1;
 //!
 //! // NOTE private
 //! static USART1: Mutex<_> = Mutex::new(..);
@@ -204,7 +204,7 @@
 //!     type Error = !;
 //!
 //!     fn read(&self) -> Result<u8, nb::Error<Self::Error>> {
-//!         hal::serial::Read::read(&Serial1(USART1.lock()))
+//!         hal::serial::Read::read(&Serial(&*USART1.lock()))
 //!     }
 //! }
 //! ```
@@ -269,36 +269,47 @@
 //! /// `futures` version of `Timer.wait`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn wait<T>(timer: T) -> impl Future<Item = (), Error = !>
+//! fn wait<T>(timer: T) -> impl Future<Item = T, Error = !>
 //! where
 //!     T: hal::Timer,
 //! {
-//!     future::poll_fn(move || {
-//!         Ok(Async::Ready(try_nb!(timer.wait())))
+//!     future::loop_fn(timer, |timer| {
+//!         match timer.wait() {
+//!             Ok(())                     => Ok(Loop::Break(timer)),
+//!             Err(nb::Error::WouldBlock) => Ok(Loop::Continue(timer)),
+//!         }
 //!     })
 //! }
 //!
 //! /// `futures` version of `Serial.read`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn read<S>(serial: S) -> impl Future<Item = u8, Error = S::Error>
+//! fn read<S>(serial: S) -> impl Future<Item = (S, u8), Error = S::Error>
 //! where
 //!     S: hal::serial::Read<u8>,
 //! {
-//!     future::poll_fn(move || {
-//!         Ok(Async::Ready(try_nb!(serial.read())))
+//!     future::loop_fn(serial, |mut serial| {
+//!         match serial.read() {
+//!             Ok(byte)                     => Ok(Loop::Break((serial, byte))),
+//!             Err(nb::Error::WouldBlock)   => Ok(Loop::Continue(serial)),
+//!             Err(nb::Error::Other(error)) => Err(error),
+//!         }
 //!     })
 //! }
 //!
 //! /// `futures` version of `Serial.write`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn write<S>(serial: S, byte: u8) -> impl Future<Item = (), Error = S::Error>
+//! fn write<S>(serial: S, byte: u8) -> impl Future<Item = S, Error = S::Error>
 //! where
 //!     S: hal::serial::Write<u8>,
 //! {
-//!     future::poll_fn(move || {
-//!         Ok(Async::Ready(try_nb!(serial.write(byte))))
+//!     future::loop_fn(serial, move |mut serial| {
+//!         match serial.write(byte) {
+//!             Ok(())                       => Ok(Loop::Break(serial)),
+//!             Err(nb::Error::WouldBlock)   => Ok(Loop::Continue(serial)),
+//!             Err(nb::Error::Other(error)) => Err(error),
+//!         }
 //!     })
 //! }
 //!
