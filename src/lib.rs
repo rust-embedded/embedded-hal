@@ -40,7 +40,7 @@
 //! ## Traits
 //!
 //! The HAL is specified using traits to allow generic programming. These traits
-//! traits will make use of the [`nb`][] [crate] (*please go read that crate
+//! traits will make use of the [`nb`][] [crate][] (*please go read that crate
 //! documentation before continuing*) to abstract over the asynchronous model
 //! and to also provide a blocking operation mode.
 //!
