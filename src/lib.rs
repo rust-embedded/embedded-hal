@@ -851,5 +851,5 @@ pub trait Timer {
         T: Into<Self::Time>;
 
     /// "Waits" until the timer times out
-    fn wait(&self) -> nb::Result<(), !>;
+    fn wait(&mut self) -> nb::Result<(), !>;
 }
