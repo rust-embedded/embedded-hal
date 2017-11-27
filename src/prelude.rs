@@ -8,5 +8,5 @@ pub use ::Pwm as _embedded_hal_Pwm;
 pub use ::Qei as _embedded_hal_Qei;
 pub use ::serial::Read as _embedded_hal_serial_Read;
 pub use ::serial::Write as _embedded_hal_serial_Write;
-pub use ::Spi as _embedded_hal_Spi;
+pub use ::spi::FullDuplex as _embedded_hal_spi_FullDuplex;
 pub use ::Timer as _embedded_hal_Timer;

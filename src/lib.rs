@@ -615,6 +615,7 @@ extern crate nb;
 pub mod blocking;
 pub mod prelude;
 pub mod serial;
+pub mod spi;
 
 /// Input capture
 ///
@@ -780,37 +781,6 @@ pub enum Direction {
     Downcounting,
     /// 1, 2, 3
     Upcounting,
-}
-
-/// Serial Peripheral Interface (full duplex master mode)
-///
-/// # Notes
-///
-/// - It's the task of the user of this interface to manage the slave select
-///   lines
-///
-/// - Due to how full duplex SPI works each `send` call must be followed by a
-///   `read` call to avoid overruns.
-///
-/// - Some SPIs can work with 8-bit *and* 16-bit words. You can overload this
-///   trait with different `Word` types to allow operation in both modes.
-pub trait Spi<Word> {
-    /// An enumeration of SPI errors
-    ///
-    /// Possible errors
-    ///
-    /// - *overrun*, the shift register was not `read` between two consecutive
-    ///   `send` calls.
-    type Error;
-
-    /// Reads the word stored in the shift register
-    ///
-    /// **NOTE** A word must be sent to the slave before attempting to call this
-    /// method.
-    fn read(&mut self) -> nb::Result<Word, Self::Error>;
-
-    /// Sends a word to the slave
-    fn send(&mut self, word: Word) -> nb::Result<(), Self::Error>;
 }
 
 /// Timer used for timeouts
