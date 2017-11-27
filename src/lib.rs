@@ -609,8 +609,10 @@
 #![feature(never_type)]
 #![no_std]
 
+#[macro_use]
 extern crate nb;
 
+pub mod blocking;
 pub mod prelude;
 pub mod serial;
 
