@@ -613,6 +613,7 @@
 extern crate nb;
 
 pub mod blocking;
+pub mod digital;
 pub mod prelude;
 pub mod serial;
 pub mod spi;
