@@ -1,16 +1,29 @@
 //! Blocking SPI API
 
-pub use spi::{FullDuplex, Mode, Phase, Polarity};
+pub use spi::{Mode, Phase, Polarity};
 
-/// Transfers bytes to the slave, returns the bytes received from the slave
-pub fn transfer<'a, S>(spi: &mut S, bytes: &'a mut [u8]) -> Result<&'a [u8], S::Error>
+/// Blocking full duplex
+pub trait FullDuplex<W> {
+    /// An enumeration of SPI errors
+    type Error;
+
+    /// Sends `words` to the slave. Returns the `words` received from the slave
+    fn transfer<'w>(&mut self, words: &'w mut [W]) -> Result<&'w [W], Self::Error>;
+
+    /// Sends `words` to the slave, ignoring all the incoming words
+    fn write(&mut self, words: &[W]) -> Result<(), Self::Error>;
+}
+
+/// Transfers words to the slave, returns the words received from the slave
+pub fn transfer<'w, S, W>(spi: &mut S, words: &'w mut [W]) -> Result<&'w [W], S::Error>
 where
-    S: FullDuplex<u8>,
+    S: ::spi::FullDuplex<W>,
+    W: Clone,
 {
-    for byte in bytes.iter_mut() {
-        block!(spi.send(*byte))?;
-        *byte = block!(spi.read())?;
+    for word in words.iter_mut() {
+        block!(spi.send(word.clone()))?;
+        *word = block!(spi.read())?;
     }
 
-    Ok(bytes)
+    Ok(words)
 }
