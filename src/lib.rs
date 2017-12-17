@@ -742,6 +742,32 @@ pub trait Pwm {
         P: Into<Self::Time>;
 }
 
+/// A single PWM channel / pin
+///
+/// See `Pwm` for details
+pub trait PwmPin {
+    /// Type for the `duty` methods
+    ///
+    /// The implementer is free to choose a float / percentage representation
+    /// (e.g. `0.0 .. 1.0`) or an integer representation (e.g. `0 .. 65535`)
+    type Duty;
+
+    /// Disables a PWM `channel`
+    fn disable(&mut self);
+
+    /// Enables a PWM `channel`
+    fn enable(&mut self);
+
+    /// Returns the current duty cycle
+    fn get_duty(&self) -> Self::Duty;
+
+    /// Returns the maximum duty cycle value
+    fn get_max_duty(&self) -> Self::Duty;
+
+    /// Sets a new duty cycle
+    fn set_duty(&mut self, duty: Self::Duty);
+}
+
 /// Quadrature encoder interface
 ///
 /// # Examples
