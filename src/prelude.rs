@@ -5,6 +5,7 @@
 
 pub use ::Capture as _embedded_hal_Capture;
 pub use ::Pwm as _embedded_hal_Pwm;
+pub use ::PwmPin as _embedded_hal_PwmPin;
 pub use ::Qei as _embedded_hal_Qei;
 pub use ::Timer as _embedded_hal_Timer;
 pub use ::digital::OutputPin as _embedded_hal_digital_OutputPin;
