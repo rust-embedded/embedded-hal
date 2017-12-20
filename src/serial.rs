@@ -26,4 +26,7 @@ pub trait Write<Word> {
 
     /// Writes a single word to the serial interface
     fn write(&mut self, word: Word) -> nb::Result<(), Self::Error>;
+
+    /// Ensures that none of the previously written words are still buffered
+    fn flush(&mut self) -> nb::Result<(), Self::Error>;
 }
