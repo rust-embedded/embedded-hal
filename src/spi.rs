@@ -34,8 +34,8 @@ pub trait FullDuplex<Word> {
     fn send(&mut self, word: Word) -> nb::Result<(), Self::Error>;
 }
 
-/// DMA Transfer mode
-pub trait DmaTransfer<Word> {
+/// DMA Write mode
+pub trait DmaWrite<Word> {
     /// Return type
     type Transfer: dma::Transfer + ?Sized;
 
@@ -43,11 +43,23 @@ pub trait DmaTransfer<Word> {
     fn send_dma<Buffer, Payload>(self, words: &'static mut Buffer) -> Self::Transfer
     where
         Buffer: Unsize<[Word]>;
+}
+
+/// DMA Write mode
+pub trait DmaRead<Word> {
+    /// Return type
+    type Transfer: dma::Transfer + ?Sized;
 
     /// Recieve `words` from the slave.
     fn recieve_dma<Buffer, Payload>(self, words: &'static mut Buffer) -> Self::Transfer
     where
         Buffer: Unsize<[Word]>;
+}
+
+/// DMA Write mode
+pub trait DmaReadWrite<Word> {
+    /// Return type
+    type Transfer: dma::Transfer + ?Sized;
 
     /// Send and recieve from the slave.
     fn transfer_dma<Buffer, Payload>(
