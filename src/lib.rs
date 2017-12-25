@@ -607,6 +607,7 @@
 #![deny(missing_docs)]
 #![deny(warnings)]
 #![feature(never_type)]
+#![feature(unsize)]
 #![no_std]
 
 #[macro_use]
@@ -617,6 +618,7 @@ pub mod digital;
 pub mod prelude;
 pub mod serial;
 pub mod spi;
+pub mod dma;
 
 /// Input capture
 ///
