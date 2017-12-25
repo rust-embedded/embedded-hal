@@ -17,7 +17,7 @@ pub enum Error {
 /// DMA Transfer future
 pub trait Transfer {
     /// Return type
-    type Item: ?Sized;
+    type Item;
     /// Return type
     type Payload;
 
@@ -28,7 +28,5 @@ pub trait Transfer {
     fn is_done(&self) -> Result<bool, Error>;
 
     /// Block
-    fn wait(self) -> Result<(Static<Self::Item>, Self::Payload), Error>
-    where
-        Self::Item: Sized;
+    fn wait(self) -> Result<(Self::Item, Self::Payload), Error>;
 }
