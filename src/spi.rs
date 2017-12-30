@@ -1,6 +1,7 @@
 //! Serial Peripheral Interface
-
+use core::marker::Unsize;
 use nb;
+use dma;
 
 /// Full duplex (master mode)
 ///
@@ -31,6 +32,46 @@ pub trait FullDuplex<Word> {
 
     /// Sends a word to the slave
     fn send(&mut self, word: Word) -> nb::Result<(), Self::Error>;
+}
+
+/// DMA Write mode
+pub trait DmaWrite<B, Word>
+where
+    Self: Sized,
+    B: Unsize<[Word]> + 'static
+{
+    /// Sends `words` to the slave.
+    type Transfer: dma::Transfer<Item = &'static mut B, Payload = Self>;
+
+    /// Sends `words` to the slave.
+    fn send_dma(self, words: &'static mut B) -> Self::Transfer;
+}
+
+
+/// DMA Write mode
+pub trait DmaRead<Word> {
+    /// Return type
+    type Transfer: dma::Transfer + ?Sized;
+
+    /// Recieve `words` from the slave.
+    fn recieve_dma<Buffer, Payload>(self, words: &'static mut Buffer) -> Self::Transfer
+    where
+        Buffer: Unsize<[Word]>;
+}
+
+/// DMA Write mode
+pub trait DmaReadWrite<Word> {
+    /// Return type
+    type Transfer: dma::Transfer + ?Sized;
+
+    /// Send and recieve from the slave.
+    fn transfer_dma<Buffer, Payload>(
+        self,
+        tx_words: &'static mut Buffer,
+        rx_words: &'static mut Buffer,
+    ) -> Self::Transfer
+    where
+        Buffer: Unsize<[Word]>;
 }
 
 /// Clock polarity
