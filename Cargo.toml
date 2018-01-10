@@ -10,5 +10,4 @@ repository = "https://github.com/japaric/embedded-hal"
 version = "0.1.0"
 
 [dependencies.nb]
-git = "https://github.com/japaric/nb"
-optional = false
+version = "0.1.0"
