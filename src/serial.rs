@@ -8,11 +8,6 @@ use nb;
 /// This can be encoded in this trait via the `Word` type parameter.
 pub trait Read<Word> {
     /// Read error
-    ///
-    /// Possible errors
-    ///
-    /// - *overrun*, the previous received data was overwritten because it was
-    ///   not read in a timely manner
     type Error;
 
     /// Reads a single word from the serial interface

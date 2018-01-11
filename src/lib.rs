@@ -1,27 +1,27 @@
-//! A minimal Hardware Abstraction Layer (HAL) for embedded systems
+//! A Hardware Abstraction Layer (HAL) for embedded systems
 //!
-//! **NOTE** The HAL is in design phase. Expect the API to change in non
-//! backward compatible ways without previous notice.
+//! **NOTE** Some parts of the HAL are still in design phase. That part of the API is "feature
+//! gated" behind the "unstable" Cargo feature. Expect that part of the API to change in non
+//! backward compatible ways, or even disappear, without previous notice (i.e. in patch releases).
 //!
 //! # Design goals
 //!
 //! The HAL
 //!
-//! - Must *erase* device specific details. Neither register, register blocks or
-//!   magic values should appear in the API.
+//! - Must *erase* device specific details. Neither register, register blocks or magic values should
+//! appear in the API.
 //!
-//! - Must be generic *within* a device and *across* devices. The API to use a
-//!   serial interface must be the same regardless of whether the
-//!   implementation uses the USART1 or UART4 peripheral of a device or the
-//!   UART0 peripheral of another device.
+//! - Must be generic *within* a device and *across* devices. The API to use a serial interface must
+//! be the same regardless of whether the implementation uses the USART1 or UART4 peripheral of a
+//! device or the UART0 peripheral of another device.
 //!
-//! - Must *not* be tied to a specific asynchronous model. The API should be
-//!   usable in blocking mode, with the `futures` model, with an async/await
-//!   model or with a callback model.
+//! - Where possible must *not* be tied to a specific asynchronous model. The API should be usable
+//! in blocking mode, with the `futures` model, with an async/await model or with a callback model.
+//! (cf. the [`nb`] crate)
 //!
-//! - Must be minimal, and thus easy to implement and zero cost, yet highly
-//!   composable. People that want higher level abstraction should *prefer
-//!   to use this HAL* rather than *re-implement* register manipulation code.
+//! - Must be minimal, and thus easy to implement and zero cost, yet highly composable. People that
+//! want higher level abstraction should *prefer to use this HAL* rather than *re-implement*
+//! register manipulation code.
 //!
 //! # Out of scope
 //!
@@ -39,10 +39,9 @@
 //!
 //! ## Traits
 //!
-//! The HAL is specified using traits to allow generic programming. These traits
-//! traits will make use of the [`nb`][] crate (*please go read that crate
-//! documentation before continuing*) to abstract over the asynchronous model
-//! and to also provide a blocking operation mode.
+//! The HAL is specified using traits to allow generic programming. These traits make use of the
+//! [`nb`][] crate (*please go read that crate documentation before continuing*) to abstract over
+//! the asynchronous model and to also provide a blocking operation mode.
 //!
 //! [`nb`]: https://crates.io/crates/nb
 //!
@@ -65,14 +64,14 @@
 //! ```
 //!
 //! The `nb::Result` enum is used to add a [`WouldBlock`] variant to the errors
-//! of the serial interface. As we'll see below this extra error variant lets
-//! this single API operate in a blocking manner, or in a non-blocking manner
-//! compatible with `futures` and with the `await!` operator.
+//! of the serial interface. As explained in the documentation of the `nb` crate this single API,
+//! when paired with the macros in the `nb` crate, can operate in a blocking manner, or in a
+//! non-blocking manner compatible with `futures` and with the `await!` operator.
 //!
 //! [`WouldBlock`]: https://docs.rs/nb/0.1.0/nb/enum.Error.html
 //!
-//! Some traits, like the one shown below, may expose possibly blocking APIs
-//! that can't fail. In those cases `nb::Result<_, !>` should be used.
+//! Some traits, like the one shown below, may expose possibly blocking APIs that can't fail. In
+//! those cases `nb::Result<_, !>` is used.
 //!
 //! ```
 //! #![feature(never_type)]
@@ -81,23 +80,7 @@
 //!
 //! /// A timer used for timeouts
 //! pub trait Timer {
-//!     /// A time unit that can be convert to a human time unit
-//!     type Time;
-//!
-//!     /// Gets the current timer timeout
-//!     fn get_timeout(&self) -> Self::Time;
-//!
-//!     /// Pauses the timer
-//!     fn pause(&mut self);
-//!
-//!     /// Restarts the timer count
-//!     fn restart(&mut self);
-//!
-//!     /// Resumes the timer count
-//!     fn resume(&mut self);
-//!
-//!     /// Sets a new timeout
-//!     fn set_timeout<T>(&mut self, ticks: T) where T: Into<Self::Time>;
+//!     // ..
 //!
 //!     /// "waits" until the timer times out
 //!     fn wait(&self) -> nb::Result<(), !>;
@@ -108,19 +91,19 @@
 //!
 //! ## Implementation
 //!
-//! The HAL traits should be implemented for device crates generated via
-//! [`svd2rust`] to maximize code reuse.
+//! The HAL traits should be implemented for device crates generated via [`svd2rust`] to maximize
+//! code reuse.
 //!
 //! [`svd2rust`]: https://crates.io/crates/svd2rust
 //!
-//! Shown below is an implementation of the HAL traits for the [`stm32f30x`]
-//! crate. This single implementation will work for *any* microcontroller in the
-//! STM32F30x family.
+//! Shown below is an implementation of some of the HAL traits for the [`stm32f30x`] crate. This
+//! single implementation will work for *any* microcontroller in the STM32F30x family.
 //!
 //! [`stm32f30x`]: https://crates.io/crates/stm32f30x
 //!
 //! ```
-//! //! An implementation of the `embedded-hal` for STM32F30x microcontrollers
+//! // crate: stm32f30x-hal
+//! //! An implementation of the `embedded-hal` traits for STM32F30x microcontrollers
 //!
 //! extern crate embedded_hal as hal;
 //! extern crate nb;
@@ -141,7 +124,7 @@
 //! pub enum Error {
 //!     /// Buffer overrun
 //!     Overrun,
-//!     // omitted other error variants
+//!     // omitted: other error variants
 //! }
 //!
 //! impl hal::serial::Read<u8> for Serial<USART1> {
@@ -210,7 +193,7 @@
 //! # fn main() {
 //! let mut serial: Serial1 = {
 //!     // ..
-//!     # Serial1
+//! #   Serial1
 //! };
 //!
 //! for byte in b"Hello, world!" {
@@ -221,12 +204,12 @@
 //! # }
 //!
 //! # mod stm32f30x_hal {
-//! #   pub struct Serial1;
-//! #   impl Serial1 {
-//! #       pub fn write(&mut self, _: u8) -> ::nb::Result<(), !> {
-//! #           Ok(())
-//! #       }
-//! #   }
+//! #     pub struct Serial1;
+//! #     impl Serial1 {
+//! #         pub fn write(&mut self, _: u8) -> ::nb::Result<(), !> {
+//! #             Ok(())
+//! #         }
+//! #     }
 //! # }
 //! ```
 //!
@@ -263,9 +246,7 @@
 //! {
 //!     let mut timer = Some(timer);
 //!     future::poll_fn(move || {
-//!         if let Some(ref mut timer) = timer {
-//!             try_nb!(timer.wait());
-//!         }
+//!         try_nb!(timer.as_mut().unwrap().wait());
 //!
 //!         Ok(Async::Ready(timer.take().unwrap()))
 //!     })
@@ -301,51 +282,51 @@
 //!     })
 //! }
 //!
-//! # fn main() {
-//! // HAL implementers
-//! let timer: Timer6 = {
-//!     // ..
-//!     # Timer6
-//! };
-//! let serial: Serial1 = {
-//!     // ..
-//!     # Serial1
-//! };
-//! let led: Led = {
-//!     // ..
-//!     # Led
-//! };
+//! fn main() {
+//!     // HAL implementers
+//!     let timer: Timer6 = {
+//!         // ..
+//! #       Timer6
+//!     };
+//!     let serial: Serial1 = {
+//!         // ..
+//! #       Serial1
+//!     };
+//!     let led: Led = {
+//!         // ..
+//! #       Led
+//!     };
 //!
-//! // Tasks
-//! let mut blinky = future::loop_fn::<_, (), _, _>(
-//!     (led, timer, true),
-//!     |(mut led, mut timer, state)| {
-//!         wait(timer).map(move |timer| {
-//!             if state {
-//!                 led.on();
-//!             } else {
-//!                 led.off();
-//!             }
+//!     // Tasks
+//!     let mut blinky = future::loop_fn::<_, (), _, _>(
+//!         (led, timer, true),
+//!         |(mut led, mut timer, state)| {
+//!             wait(timer).map(move |timer| {
+//!                 if state {
+//!                     led.on();
+//!                 } else {
+//!                     led.off();
+//!                 }
 //!
-//!             Loop::Continue((led, timer, !state))
+//!                 Loop::Continue((led, timer, !state))
+//!             })
+//!         });
+//!
+//!     let mut loopback = future::loop_fn::<_, (), _, _>(serial, |mut serial| {
+//!         read(serial).and_then(|(serial, byte)| {
+//!             write(serial, byte)
+//!         }).map(|serial| {
+//!             Loop::Continue(serial)
 //!         })
 //!     });
 //!
-//! let mut loopback = future::loop_fn::<_, (), _, _>(serial, |mut serial| {
-//!     read(serial).and_then(|(serial, byte)| {
-//!         write(serial, byte)
-//!     }).map(|serial| {
-//!         Loop::Continue(serial)
-//!     })
-//! });
-//!
-//! // Event loop
-//! loop {
-//!     blinky.poll().unwrap(); // NOTE(unwrap) E = !
-//!     loopback.poll().unwrap();
-//!     break;
+//!     // Event loop
+//!     loop {
+//!         blinky.poll().unwrap(); // NOTE(unwrap) E = !
+//!         loopback.poll().unwrap();
+//! #       break;
+//!     }
 //! }
-//! # }
 //!
 //! # mod stm32f30x_hal {
 //! #     pub struct Timer6;
@@ -402,15 +383,15 @@
 //!     // HAL implementers
 //!     let mut timer: Timer6 = {
 //!         // ..
-//!         # Timer6
+//! #       Timer6
 //!     };
 //!     let mut serial: Serial1 = {
 //!         // ..
-//!         # Serial1
+//! #       Serial1
 //!     };
 //!     let mut led: Led = {
 //!         // ..
-//!         # Led
+//! #       Led
 //!     };
 //!
 //!     // Tasks
@@ -466,8 +447,10 @@
 //!
 //! ## Generic programming and higher level abstractions
 //!
-//! The HAL has been kept minimal on purpose to encourage building **generic**
-//! higher level abstractions on top of it.
+//! The core of the HAL has been kept minimal on purpose to encourage building **generic** higher
+//! level abstractions on top of it. Some higher level abstractions that pick an asynchronous model
+//! or that have blocking behavior and that are deemed useful to build other abstractions can be
+//! found in the `blocking` module and, in the future, in the `futures` and `async` modules.
 //!
 //! Some examples:
 //!
@@ -475,7 +458,7 @@
 //! methods with default implementation to allow specialization, but they have
 //! been written as functions to keep things simple.
 //!
-//! - Write a whole buffer in blocking a fashion.
+//! - Write a whole buffer to a serial device in blocking a fashion.
 //!
 //! ```
 //! extern crate embedded_hal as hal;
@@ -498,7 +481,7 @@
 //! # fn main() {}
 //! ```
 //!
-//! - Blocking read with timeout
+//! - Blocking serial read with timeout
 //!
 //! ```
 //! extern crate embedded_hal as hal;
@@ -625,11 +608,11 @@
 //! // NOTE private
 //! static BUFFER1: Mutex<CircularBuffer> = {
 //!     // ..
-//!     # Mutex(CircularBuffer)
+//! #   Mutex(CircularBuffer)
 //! };
 //! static SERIAL1: Mutex<Serial1> = {
 //!     // ..
-//!     # Mutex(Serial1)
+//! #   Mutex(Serial1)
 //! };
 //!
 //! impl BufferedSerial1 {
@@ -702,18 +685,51 @@ pub mod spi;
 /// You can use this interface to measure the period of (quasi) periodic signals
 /// / events
 ///
-/// ``` ignore
-/// let capture: impl Capture = ..;
-///
-/// capture.set_resolution(1.ms());
-///
-/// let before = block!(capture.capture()).unwrap();
-/// let after = block!(capture.capture()).unwrap();
-///
-/// let period = after.wrapping_sub(before);
-///
-/// println!("Period: {} ms", period);
 /// ```
+/// # #![feature(never_type)]
+///
+/// extern crate embedded_hal as hal;
+/// #[macro_use(block)]
+/// extern crate nb;
+///
+/// use hal::prelude::*;
+///
+/// fn main() {
+///     let mut capture: Capture1 = {
+///         // ..
+/// #       Capture1
+///     };
+///
+///     capture.set_resolution(1.ms());
+///
+///     let before = block!(capture.capture(Channel::_1)).unwrap();
+///     let after = block!(capture.capture(Channel::_1)).unwrap();
+///
+///     let period = after.wrapping_sub(before);
+///
+///     println!("Period: {} ms", period);
+/// }
+///
+/// # struct MilliSeconds(u32);
+/// # trait U32Ext { fn ms(self) -> MilliSeconds; }
+/// # impl U32Ext for u32 { fn ms(self) -> MilliSeconds { MilliSeconds(self) } }
+/// # struct Capture1;
+/// # enum Channel { _1 }
+/// # impl hal::Capture for Capture1 {
+/// #     type Capture = u16;
+/// #     type Channel = Channel;
+/// #     type Error = !;
+/// #     type Time = MilliSeconds;
+/// #     fn capture(&mut self, _: Channel) -> ::nb::Result<u16, !> { Ok(0) }
+/// #     fn disable(&mut self, _: Channel) { unimplemented!() }
+/// #     fn enable(&mut self, _: Channel) { unimplemented!() }
+/// #     fn get_resolution(&self) -> MilliSeconds { unimplemented!() }
+/// #     fn set_resolution<T>(&mut self, _: T) where T: Into<MilliSeconds> {}
+/// # }
+/// ```
+#[cfg(feature = "unstable")]
+// reason: pre-singletons API. With singletons a `CapturePin` (cf. `PwmPin`) trait seems more
+// appropriate
 pub trait Capture {
     /// Enumeration of `Capture` errors
     ///
@@ -766,19 +782,49 @@ pub trait Capture {
 ///
 /// Use this interface to control the power output of some actuator
 ///
-/// ``` ignore
-/// let pwm: impl Pwm = ..;
-///
-/// pwm.set_period(1.khz().invert());
-///
-/// let max_duty = pwm.get_max_duty();
-///
-/// // brightest LED
-/// pwm.set_duty(Channel::_1, max_duty);
-///
-/// // dimmer LED
-/// pwm.set_duty(Channel::_2, max_duty / 4);
 /// ```
+/// extern crate embedded_hal as hal;
+///
+/// use hal::prelude::*;
+///
+/// fn main() {
+///     let mut pwm: Pwm1 = {
+///         // ..
+/// #       Pwm1
+///     };
+///
+///     pwm.set_period(1.khz());
+///
+///     let max_duty = pwm.get_max_duty();
+///
+///     // brightest LED
+///     pwm.set_duty(Channel::_1, max_duty);
+///
+///     // dimmer LED
+///     pwm.set_duty(Channel::_2, max_duty / 4);
+/// }
+///
+/// # struct KiloHertz(u32);
+/// # trait U32Ext { fn khz(self) -> KiloHertz; }
+/// # impl U32Ext for u32 { fn khz(self) -> KiloHertz { KiloHertz(self) } }
+/// # enum Channel { _1, _2 }
+/// # struct Pwm1;
+/// # impl hal::Pwm for Pwm1 {
+/// #     type Channel = Channel;
+/// #     type Time = KiloHertz;
+/// #     type Duty = u16;
+/// #     fn disable(&mut self, _: Channel) { unimplemented!() }
+/// #     fn enable(&mut self, _: Channel) { unimplemented!() }
+/// #     fn get_duty(&self, _: Channel) -> u16 { unimplemented!() }
+/// #     fn get_max_duty(&self) -> u16 { 0 }
+/// #     fn set_duty(&mut self, _: Channel, _: u16) {}
+/// #     fn get_period(&self) -> KiloHertz { unimplemented!() }
+/// #     fn set_period<T>(&mut self, _: T) where T: Into<KiloHertz> {}
+/// # }
+/// ```
+#[cfg(feature = "unstable")]
+// reason: pre-singletons API. The `PwmPin` trait seems more useful because it models independent
+// PWM channels. Here a certain number of channels are multiplexed in a single implementer.
 pub trait Pwm {
     /// Enumeration of channels that can be used with this `Pwm` interface
     ///
@@ -851,22 +897,60 @@ pub trait PwmPin {
 ///
 /// You can use this interface to measure the speed of a motor
 ///
-/// ``` ignore
-/// let qei: impl Qei = ..;
-/// let timer: impl Timer = ..;
-///
-/// timer.pause();
-/// timer.restart();
-/// timer.set_timeout(1.s());
-///
-/// let before = qei.count();
-/// timer.resume();
-/// block!(timer.wait());
-/// let after = qei.count();
-///
-/// let speed = after.wrapping_sub(before);
-/// println!("Speed: {} pulses per second", speed);
 /// ```
+/// # #![feature(never_type)]
+/// extern crate embedded_hal as hal;
+/// #[macro_use(block)]
+/// extern crate nb;
+///
+/// use hal::prelude::*;
+///
+/// fn main() {
+///     let mut qei: Qei1 = {
+///         // ..
+/// #       Qei1
+///     };
+///     let mut timer: Timer6 = {
+///         // ..
+/// #       Timer6
+///     };
+///
+///     timer.pause();
+///     timer.restart();
+///     timer.set_timeout(1.s());
+///
+///     let before = qei.count();
+///     timer.resume();
+///     block!(timer.wait());
+///     let after = qei.count();
+///
+///     let speed = after.wrapping_sub(before);
+///     println!("Speed: {} pulses per second", speed);
+/// }
+///
+/// # struct Seconds(u32);
+/// # trait U32Ext { fn s(self) -> Seconds; }
+/// # impl U32Ext for u32 { fn s(self) -> Seconds { Seconds(self) } }
+/// # struct Qei1;
+/// # impl hal::Qei for Qei1 {
+/// #     type Count = u16;
+/// #     fn count(&self) -> u16 { 0 }
+/// #     fn direction(&self) -> ::hal::Direction { unimplemented!() }
+/// # }
+/// # struct Timer6;
+/// # impl hal::Timer for Timer6 {
+/// #     type Time = Seconds;
+/// #     fn get_timeout(&self) -> Seconds { unimplemented!() }
+/// #     fn pause(&mut self) {}
+/// #     fn restart(&mut self) {}
+/// #     fn resume(&mut self) {}
+/// #     fn set_timeout<T>(&mut self, _: T) where T: Into<Seconds> {}
+/// #     fn wait(&mut self) -> ::nb::Result<(), !> { Ok(()) }
+/// # }
+/// ```
+#[cfg(feature = "unstable")]
+// reason: needs to be re-evaluated in the new singletons world. At the very least this needs a
+// reference implementation
 pub trait Qei {
     /// The type of the value returned by `count`
     type Count;
@@ -880,6 +964,8 @@ pub trait Qei {
 
 /// Count direction
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[cfg(feature = "unstable")]
+// reason: part of the unstable `Qei` interface
 pub enum Direction {
     /// 3, 2, 1
     Downcounting,
@@ -893,17 +979,52 @@ pub enum Direction {
 ///
 /// You can use this timer to create delays
 ///
-/// ``` ignore
-/// let timer: impl Timer = ..;
+/// ```
+/// # #![feature(never_type)]
+/// extern crate embedded_hal as hal;
+/// #[macro_use(block)]
+/// extern crate nb;
 ///
-/// timer.pause();
-/// timer.restart();
-/// timer.set_timeout(1.s());
+/// use hal::prelude::*;
 ///
-/// Led.on();
-/// timer.resume();
-/// block!(timer.wait()); // blocks for 1 second
-/// Led.off();
+/// fn main() {
+///     let mut led: Led = {
+///         // ..
+/// #       Led
+///     };
+///     let mut timer: Timer6 = {
+///         // ..
+/// #       Timer6
+///     };
+///
+///     timer.pause();
+///     timer.restart();
+///     timer.set_timeout(1.s());
+///
+///     Led.on();
+///     timer.resume();
+///     block!(timer.wait()); // blocks for 1 second
+///     Led.off();
+/// }
+///
+/// # struct Seconds(u32);
+/// # trait U32Ext { fn s(self) -> Seconds; }
+/// # impl U32Ext for u32 { fn s(self) -> Seconds { Seconds(self) } }
+/// # struct Led;
+/// # impl Led {
+/// #     pub fn off(&mut self) {}
+/// #     pub fn on(&mut self) {}
+/// # }
+/// # struct Timer6;
+/// # impl hal::Timer for Timer6 {
+/// #     type Time = Seconds;
+/// #     fn get_timeout(&self) -> Seconds { unimplemented!() }
+/// #     fn pause(&mut self) {}
+/// #     fn restart(&mut self) {}
+/// #     fn resume(&mut self) {}
+/// #     fn set_timeout<T>(&mut self, _: T) where T: Into<Seconds> {}
+/// #     fn wait(&mut self) -> ::nb::Result<(), !> { Ok(()) }
+/// # }
 /// ```
 pub trait Timer {
     /// A time unit that can be converted into a human time unit (e.g. seconds)
