@@ -17,4 +17,4 @@ stm32f30x = { git = "https://github.com/japaric/stm32f30x" }
 futures = "0.1.17"
 
 [features]
-unstable = ["nb/unstable"]
+unproven = ["nb/unstable"]

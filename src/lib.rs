@@ -1,8 +1,11 @@
 //! A Hardware Abstraction Layer (HAL) for embedded systems
 //!
-//! **NOTE** Some parts of the HAL are still in design phase. That part of the API is "feature
-//! gated" behind the "unstable" Cargo feature. Expect that part of the API to change in non
-//! backward compatible ways, or even disappear, without previous notice (i.e. in patch releases).
+//! **NOTE** This HAL is still is active development. Expect the traits presented here to be
+//! tweaked, split or be replaced wholesale before being stabilized, i.e. before hitting the 1.0.0
+//! release. That being said there's a part of the HAL that's currently considered unproven and is
+//! hidden behind an "unproven" Cargo feature. This API is even more volatile and it's exempt from
+//! semver rules: it can change in a non-backward compatible fashion or even disappear in between
+//! patch releases.
 //!
 //! # Design goals
 //!
@@ -727,7 +730,7 @@ pub mod spi;
 /// #     fn set_resolution<T>(&mut self, _: T) where T: Into<MilliSeconds> {}
 /// # }
 /// ```
-#[cfg(feature = "unstable")]
+#[cfg(feature = "unproven")]
 // reason: pre-singletons API. With singletons a `CapturePin` (cf. `PwmPin`) trait seems more
 // appropriate
 pub trait Capture {
@@ -822,7 +825,7 @@ pub trait Capture {
 /// #     fn set_period<T>(&mut self, _: T) where T: Into<KiloHertz> {}
 /// # }
 /// ```
-#[cfg(feature = "unstable")]
+#[cfg(feature = "unproven")]
 // reason: pre-singletons API. The `PwmPin` trait seems more useful because it models independent
 // PWM channels. Here a certain number of channels are multiplexed in a single implementer.
 pub trait Pwm {
@@ -948,7 +951,7 @@ pub trait PwmPin {
 /// #     fn wait(&mut self) -> ::nb::Result<(), !> { Ok(()) }
 /// # }
 /// ```
-#[cfg(feature = "unstable")]
+#[cfg(feature = "unproven")]
 // reason: needs to be re-evaluated in the new singletons world. At the very least this needs a
 // reference implementation
 pub trait Qei {
@@ -964,8 +967,8 @@ pub trait Qei {
 
 /// Count direction
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-#[cfg(feature = "unstable")]
-// reason: part of the unstable `Qei` interface
+#[cfg(feature = "unproven")]
+// reason: part of the unproven `Qei` interface
 pub enum Direction {
     /// 3, 2, 1
     Downcounting,

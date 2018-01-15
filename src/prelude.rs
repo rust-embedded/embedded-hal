@@ -3,12 +3,12 @@
 //! The traits have been renamed to avoid collisions with other items when
 //! performing a glob import.
 
-#[cfg(feature = "unstable")]
+#[cfg(feature = "unproven")]
 pub use ::Capture as _embedded_hal_Capture;
-#[cfg(feature = "unstable")]
+#[cfg(feature = "unproven")]
 pub use ::Pwm as _embedded_hal_Pwm;
 pub use ::PwmPin as _embedded_hal_PwmPin;
-#[cfg(feature = "unstable")]
+#[cfg(feature = "unproven")]
 pub use ::Qei as _embedded_hal_Qei;
 pub use ::Timer as _embedded_hal_Timer;
 pub use ::blocking::delay::DelayMs as _embedded_hal_blocking_delay_DelayMs;
