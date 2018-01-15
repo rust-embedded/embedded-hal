@@ -7,7 +7,7 @@
 //! provide blocking functionality. Note that you can also use the `Timer` trait to implement
 //! blocking delays.
 
-/// Microsecond delay
+/// Millisecond delay
 ///
 /// `UXX` denotes the range type of the delay time. `UXX` can be `u8`, `u16`, etc. A single type can
 /// implement this trait for different types of `UXX`.
@@ -16,7 +16,7 @@ pub trait DelayMs<UXX> {
     fn delay_ms(&mut self, ms: UXX);
 }
 
-/// Millisecond delay
+/// Microsecond delay
 ///
 /// `UXX` denotes the range type of the delay time. `UXX` can be `u8`, `u16`, etc. A single type can
 /// implement this trait for different types of `UXX`.
