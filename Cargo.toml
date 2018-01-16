@@ -3,12 +3,18 @@ authors = ["Jorge Aparicio <jorge@japaric.io>"]
 categories = ["asynchronous", "embedded", "hardware-support", "no-std"]
 description = "Minimal Hardware Abstraction Layer for embedded systems"
 documentation = "https://docs.rs/embedded-hal"
-keywords = ["hal", "I/O"]
+keywords = ["hal", "IO"]
 license = "MIT OR Apache-2.0"
 name = "embedded-hal"
 repository = "https://github.com/japaric/embedded-hal"
 version = "0.1.0"
 
 [dependencies.nb]
-git = "https://github.com/japaric/nb"
-optional = false
+version = "0.1.1"
+
+[dev-dependencies]
+stm32f30x = { git = "https://github.com/japaric/stm32f30x" }
+futures = "0.1.17"
+
+[features]
+unproven = ["nb/unstable"]

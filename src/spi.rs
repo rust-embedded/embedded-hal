@@ -6,21 +6,14 @@ use nb;
 ///
 /// # Notes
 ///
-/// - It's the task of the user of this interface to manage the slave select
-///   lines
+/// - It's the task of the user of this interface to manage the slave select lines
 ///
-/// - Due to how full duplex SPI works each `send` call must be followed by a
-///   `read` call to avoid overruns.
+/// - Due to how full duplex SPI works each `read` call must be preceded by a `send` call.
 ///
-/// - Some SPIs can work with 8-bit *and* 16-bit words. You can overload this
-///   trait with different `Word` types to allow operation in both modes.
+/// - Some SPIs can work with 8-bit *and* 16-bit words. You can overload this trait with different
+/// `Word` types to allow operation in both modes.
 pub trait FullDuplex<Word> {
     /// An enumeration of SPI errors
-    ///
-    /// Possible errors
-    ///
-    /// - *overrun*, the shift register was not `read` between two consecutive
-    ///   `send` calls.
     type Error;
 
     /// Reads the word stored in the shift register

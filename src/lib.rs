@@ -1,55 +1,72 @@
-//! A minimal Hardware Abstraction Layer (HAL) for embedded systems
+//! A Hardware Abstraction Layer (HAL) for embedded systems
 //!
-//! **NOTE** The HAL is in design phase. Expect the API to change in non
-//! backward compatible ways without previous notice.
+//! **NOTE** This HAL is still is active development. Expect the traits presented here to be
+//! tweaked, split or be replaced wholesale before being stabilized, i.e. before hitting the 1.0.0
+//! release. That being said there's a part of the HAL that's currently considered unproven and is
+//! hidden behind an "unproven" Cargo feature. This API is even more volatile and it's exempt from
+//! semver rules: it can change in a non-backward compatible fashion or even disappear in between
+//! patch releases.
 //!
 //! # Design goals
 //!
 //! The HAL
 //!
-//! - Must *erase* device specific details. Neither register, register blocks or
-//!   magic values should appear in the API.
+//! - Must *erase* device specific details. Neither register, register blocks or magic values should
+//! appear in the API.
 //!
-//! - Must be generic *within* a device and *across* devices. The API to use a
-//!   serial interface must be the same regardless of whether the
-//!   implementation uses the USART1 or UART4 peripheral of a device or the
-//!   UART0 peripheral of another device.
+//! - Must be generic *within* a device and *across* devices. The API to use a serial interface must
+//! be the same regardless of whether the implementation uses the USART1 or UART4 peripheral of a
+//! device or the UART0 peripheral of another device.
 //!
-//! - Must *not* be tied to a specific asynchronous model. The API should be
-//!   usable in blocking mode, with the `futures` model, with an async/await
-//!   model or with a callback model.
+//! - Where possible must *not* be tied to a specific asynchronous model. The API should be usable
+//! in blocking mode, with the `futures` model, with an async/await model or with a callback model.
+//! (cf. the [`nb`] crate)
 //!
-//! - Must be minimal, and thus easy to implement and zero cost, yet highly
-//!   composable. People that want higher level abstraction should *prefer
-//!   to use this HAL* rather than *re-implement* register manipulation code.
+//! - Must be minimal, and thus easy to implement and zero cost, yet highly composable. People that
+//! want higher level abstraction should *prefer to use this HAL* rather than *re-implement*
+//! register manipulation code.
+//!
+//! - Serve as a foundation for building an ecosystem of platform agnostic drivers. Here driver
+//! means a library crate that lets a target platform interface an external device like a digital
+//! sensor or a wireless transceiver. The advantage of this system is that by writing the driver as
+//! a generic library on top of `embedded-hal` driver authors can support any number of target
+//! platforms (e.g. Cortex-M microcontrollers, AVR microcontrollers, embedded Linux, etc.). The
+//! advantage for application developers is that by adopting `embedded-hal` they can unlock all
+//! these drivers for their platform.
 //!
 //! # Out of scope
 //!
-//! - Initialization and configuration stuff like "ensure this serial interface
-//!   and that SPI interface are not using the same pins". The HAL will focus on
-//!   *doing I/O.*
+//! - Initialization and configuration stuff like "ensure this serial interface and that SPI
+//! interface are not using the same pins". The HAL will focus on *doing I/O*.
 //!
 //! # Reference implementation
 //!
-//! The [`blue-pill`] crate contains a reference implementation of this HAL.
+//! The [`stm32f30x-hal`] crate contains a reference implementation of this HAL.
 //!
-//! [`blue-pill`]: https://github.com/japaric/blue-pill
+//! [`stm32f30x-hal`]: https://crates.io/crates/stm32f30x-hal/0.1.0
+//!
+//! # Platform agnostic drivers
+//!
+//! You can find platform agnostic drivers built on top of `embedded-hal` on crates.io by [searching
+//! for the *embedded-hal* keyword](https://crates.io/keywords/embedded-hal).
+//!
+//! If you writing a platform agnostic driver yourself you are highly encouraged to [add the
+//! embedded-hal keyword](https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata)
+//! to your crate before publishing it!
 //!
 //! # Detailed design
 //!
 //! ## Traits
 //!
-//! The HAL is specified using traits to allow generic programming. These traits
-//! traits will make use of the [`nb`][] [crate][] (*please go read that crate
-//! documentation before continuing*) to abstract over the asynchronous model
-//! and to also provide a blocking operation mode.
+//! The HAL is specified as traits to allow generic programming. These traits make use of the
+//! [`nb`][] crate (*please go read that crate documentation before continuing*) to abstract over
+//! the asynchronous model and to also provide a blocking operation mode.
 //!
-//! [`nb`]: https://github.com/japaric/nb
-//! [crate]: https://japaric.github.io/nb/nb/
+//! [`nb`]: https://crates.io/crates/nb
 //!
 //! Here's how a HAL trait may look like:
 //!
-//! ``` rust
+//! ```
 //! extern crate nb;
 //!
 //! /// A serial interface
@@ -58,155 +75,114 @@
 //!     type Error;
 //!
 //!     /// Reads a single byte
-//!     fn read(&self) -> nb::Result<u8, Self::Error>;
+//!     fn read(&mut self) -> nb::Result<u8, Self::Error>;
 //!
 //!     /// Writes a single byte
-//!     fn write(&self, byte: u8) -> nb::Result<(), Self::Error>;
+//!     fn write(&mut self, byte: u8) -> nb::Result<(), Self::Error>;
 //! }
 //! ```
 //!
 //! The `nb::Result` enum is used to add a [`WouldBlock`] variant to the errors
-//! of the serial interface. As we'll see below this extra error variant lets
-//! this single API operate in a blocking manner, or in a non-blocking manner
-//! compatible with `futures` and with the `await` operator.
+//! of the serial interface. As explained in the documentation of the `nb` crate this single API,
+//! when paired with the macros in the `nb` crate, can operate in a blocking manner, or in a
+//! non-blocking manner compatible with `futures` and with the `await!` operator.
 //!
-//! [`WouldBlock`]: https://japaric.github.io/nb/nb/enum.Error.html
+//! [`WouldBlock`]: https://docs.rs/nb/0.1.0/nb/enum.Error.html
 //!
-//! Some traits, like the one shown below, may expose possibly blocking APIs
-//! that can't fail. In those cases `nb::Result<_, !>` should be used.
+//! Some traits, like the one shown below, may expose possibly blocking APIs that can't fail. In
+//! those cases `nb::Result<_, !>` is used.
 //!
-//! ``` ignore
-//! /// A timer used for timeouts
-//! pub trait Timer {
-//!     /// A time unit that can be convert to a human time unit
-//!     type Time;
+//! ```
+//! #![feature(never_type)]
 //!
-//!     /// Gets the current timer timeout
-//!     fn get_timeout(&self) -> Self::Time;
+//! extern crate nb;
 //!
-//!     /// Pauses the timer
-//!     fn pause(&mut self);
+//! /// A count down timer
+//! pub trait CountDown {
+//!     // ..
 //!
-//!     /// Restarts the timer count
-//!     fn restart(&mut self);
-//!
-//!     /// Resumes the timer count
-//!     fn resume(&mut self);
-//!
-//!     /// Sets a new timeout
-//!     fn set_timeout<T>(&mut self, ticks: T) where T: Into<Self::Time>;
-//!
-//!     /// "waits" until the timer times out
-//!     fn wait(&self) -> nb::Result<(), !>;
+//!     /// "waits" until the count down is over
+//!     fn wait(&mut self) -> nb::Result<(), !>;
 //! }
+//!
+//! # fn main() {}
 //! ```
 //!
-//! ## Implementation
+//! ## Suggested implementation
 //!
-//! The HAL traits should be implemented for device crates generated via
-//! [`svd2rust`] to maximize code reuse.
+//! The HAL traits should be implemented for device crates generated via [`svd2rust`] to maximize
+//! code reuse.
 //!
 //! [`svd2rust`]: https://crates.io/crates/svd2rust
 //!
-//! Shown below is an implementation of the HAL traits for the [`stm32f103xx`]
-//! crate. This single implementation will work for *any* microcontroller in the
-//! STM32F103 family.
+//! Shown below is an implementation of some of the HAL traits for the [`stm32f30x`] crate. This
+//! single implementation will work for *any* microcontroller in the STM32F30x family.
 //!
-//! [`stm32f103xx`]: https://crates.io/crates/stm32f103xx
+//! [`stm32f30x`]: https://crates.io/crates/stm32f30x
 //!
-//! ``` ignore
-//! //! An implementation of the `embedded-hal` for STM32F103xx microcontrollers
+//! ```
+//! // crate: stm32f30x-hal
+//! //! An implementation of the `embedded-hal` traits for STM32F30x microcontrollers
 //!
-//! extern crate core;
 //! extern crate embedded_hal as hal;
 //! extern crate nb;
 //!
 //! // device crate
-//! extern crate stm32f103xx;
+//! extern crate stm32f30x;
 //!
-//! use core::ops::Deref;
+//! use stm32f30x::USART1;
 //!
 //! /// A serial interface
-//! // NOTE generic over the USART peripheral. This works with USART1, USART2
-//! // and USART3
-//! pub struct Serial<'a, U>(pub &'a U)
-//! where
-//!     U: Deref<Target=stm32f103xx::usart1::RegisterBlock> + 'static;
+//! // NOTE generic over the USART peripheral
+//! pub struct Serial<USART> { usart: USART }
+//!
+//! // convenience type alias
+//! pub type Serial1 = Serial<USART1>;
 //!
 //! /// Serial interface error
 //! pub enum Error {
 //!     /// Buffer overrun
 //!     Overrun,
-//!     // add more error variants here
+//!     // omitted: other error variants
 //! }
 //!
-//! impl<'a, U> hal::serial::Read<u8> for Serial<'a, U>
-//!     where
-//!         U: Deref<Target=stm32f103xx::usart1::RegisterBlock> + 'static
-//! {
+//! impl hal::serial::Read<u8> for Serial<USART1> {
 //!     type Error = Error;
 //!
 //!     fn read(&mut self) -> nb::Result<u8, Error> {
 //!         // read the status register
-//!         let sr = self.0.sr.read();
+//!         let isr = self.usart.isr.read();
 //!
-//!         if sr.ore().bit_is_set() {
+//!         if isr.ore().bit_is_set() {
 //!             // Error: Buffer overrun
 //!             Err(nb::Error::Other(Error::Overrun))
 //!         }
-//!         // Add additional `else if` statements to check for other errors
-//!         else if sr.rxne().bit_is_set() {
+//!         // omitted: checks for other errors
+//!         else if isr.rxne().bit_is_set() {
 //!             // Data available: read the data register
-//!             Ok(self.0.dr.read().bits() as u8)
-//!         }
-//!         else {
+//!             Ok(self.usart.rdr.read().bits() as u8)
+//!         } else {
 //!             // No data available yet
 //!             Err(nb::Error::WouldBlock)
 //!         }
 //!     }
 //! }
 //!
-//! impl<'a, U> hal::serial::Write<u8> for Serial<'a, U>
-//!     where
-//!         U: Deref<Target=stm32f103xx::usart1::RegisterBlock> + 'static
-//! {
+//! impl hal::serial::Write<u8> for Serial<USART1> {
 //!     type Error = Error;
 //!
 //!     fn write(&mut self, byte: u8) -> nb::Result<(), Error> {
-//!         // Very similar to the above implementation
-//!         Ok(())
+//!         // Similar to the `read` implementation
+//!         # Ok(())
+//!     }
+//!
+//!     fn flush(&mut self) -> nb::Result<(), Error> {
+//!         // Similar to the `read` implementation
+//!         # Ok(())
 //!     }
 //! }
-//! ```
 //!
-//! Furthermore the above implementation of `hal::Serial` is generic over the
-//! USART peripheral instance and will work with peripherals USART1, USART2,
-//! USART3, etc.
-//!
-//! Note that the above implementation uses a newtype over a *reference* to the
-//! USART register block. This pushes the concern of synchronization to the user
-//! of the `Serial` abstraction. However it's also possible to *erase* that
-//! reference by handling the synchronization within the `hal::Serial`
-//! implementation:
-//!
-//! ``` ignore
-//! extern crate embedded_hal as hal;
-//! extern crate nb;
-//!
-//! /// A synchronized serial interface
-//! // NOTE This is a global singleton
-//! pub struct Serial1;
-//!
-//! // NOTE private
-//! static USART1: Mutex<_> = Mutex::new(..);
-//!
-//! impl hal::serial::Read<u8> for Serial1 {
-//!     type Error = !;
-//!
-//!     fn read(&mut self) -> Result<u8, nb::Error<Self::Error>> {
-//!         hal::serial::Read::read(&Serial(&*USART1.lock()))
-//!     }
-//! }
+//! # fn main() {}
 //! ```
 //!
 //! ## Intended usage
@@ -215,32 +191,45 @@
 //! with `futures` or with the `await` operator using the [`block!`],
 //! [`try_nb!`] and [`await!`] macros respectively.
 //!
-//! [`block!`]: https://japaric.github.io/nb/nb/macro.block.html
-//! [`try_nb!`]: https://japaric.github.io/nb/nb/macro.try_nb.html
-//! [`await!`]: https://japaric.github.io/nb/nb/macro.await.html
+//! [`block!`]: https://docs.rs/nb/0.1.0/nb/macro.block.html
+//! [`try_nb!`]: https://docs.rs/nb/0.1.0/nb/index.html#how-to-use-this-crate
+//! [`await!`]: https://docs.rs/nb/0.1.0/nb/index.html#how-to-use-this-crate
 //!
 //! ### Blocking mode
 //!
 //! An example of sending a string over the serial interface in a blocking
 //! fashion:
 //!
-//! ``` ignore
-//! extern crate embedded_hal as hal;
-//!
-//! #[macro_use]
+//! ```
+//! # #![feature(never_type)]
+//! extern crate embedded_hal;
+//! #[macro_use(block)]
 //! extern crate nb;
 //!
-//! extern crate stm32f103xx_hal_impl;
+//! use stm32f30x_hal::Serial1;
+//! use embedded_hal::serial::Write;
 //!
-//! use stm32f103xx_hal_impl::Serial;
-//!
-//! let serial = Serial(usart1);
+//! # fn main() {
+//! let mut serial: Serial1 = {
+//!     // ..
+//! #   Serial1
+//! };
 //!
 //! for byte in b"Hello, world!" {
 //!     // NOTE `block!` blocks until `serial.write()` completes and returns
 //!     // `Result<(), Error>`
-//!     block!(serial.write()).unwrap();
+//!     block!(serial.write(*byte)).unwrap();
 //! }
+//! # }
+//!
+//! # mod stm32f30x_hal {
+//! #     pub struct Serial1;
+//! #     impl Serial1 {
+//! #         pub fn write(&mut self, _: u8) -> ::nb::Result<(), !> {
+//! #             Ok(())
+//! #         }
+//! #     }
+//! # }
 //! ```
 //!
 //! ### `futures`
@@ -248,13 +237,14 @@
 //! An example of running two tasks concurrently. First task: blink an LED every
 //! second. Second task: loop back data over the serial interface.
 //!
-//! ``` ignore
+//! ```
+//! #![feature(conservative_impl_trait)]
+//! #![feature(never_type)]
+//!
 //! extern crate embedded_hal as hal;
-//!
 //! extern crate futures;
-//! extern crate stm32f103xx_hal_impl;
 //!
-//! #[macro_use]
+//! #[macro_use(try_nb)]
 //! extern crate nb;
 //!
 //! use hal::prelude::*;
@@ -264,145 +254,218 @@
 //!     Future,
 //! };
 //! use futures::future::Loop;
-//! use stm32f103xx_hal_impl::{Serial, Timer};
+//! use stm32f30x_hal::{Led, Serial1, Timer6};
 //!
-//! /// `futures` version of `Timer.wait`
+//! /// `futures` version of `CountDown.wait`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn wait<T>(timer: T) -> impl Future<Item = T, Error = !>
+//! fn wait<T>(mut timer: T) -> impl Future<Item = T, Error = !>
 //! where
-//!     T: hal::Timer,
+//!     T: hal::timer::CountDown,
 //! {
-//!     future::loop_fn(timer, |timer| {
-//!         match timer.wait() {
-//!             Ok(())                     => Ok(Loop::Break(timer)),
-//!             Err(nb::Error::WouldBlock) => Ok(Loop::Continue(timer)),
-//!         }
+//!     let mut timer = Some(timer);
+//!     future::poll_fn(move || {
+//!         try_nb!(timer.as_mut().unwrap().wait());
+//!
+//!         Ok(Async::Ready(timer.take().unwrap()))
 //!     })
 //! }
 //!
 //! /// `futures` version of `Serial.read`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn read<S>(serial: S) -> impl Future<Item = (S, u8), Error = S::Error>
+//! fn read<S>(mut serial: S) -> impl Future<Item = (S, u8), Error = S::Error>
 //! where
 //!     S: hal::serial::Read<u8>,
 //! {
-//!     future::loop_fn(serial, |mut serial| {
-//!         match serial.read() {
-//!             Ok(byte)                     => Ok(Loop::Break((serial, byte))),
-//!             Err(nb::Error::WouldBlock)   => Ok(Loop::Continue(serial)),
-//!             Err(nb::Error::Other(error)) => Err(error),
-//!         }
+//!     let mut serial = Some(serial);
+//!     future::poll_fn(move || {
+//!         let byte = try_nb!(serial.as_mut().unwrap().read());
+//!
+//!         Ok(Async::Ready((serial.take().unwrap(), byte)))
 //!     })
 //! }
 //!
 //! /// `futures` version of `Serial.write`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn write<S>(serial: S, byte: u8) -> impl Future<Item = S, Error = S::Error>
+//! fn write<S>(mut serial: S, byte: u8) -> impl Future<Item = S, Error = S::Error>
 //! where
 //!     S: hal::serial::Write<u8>,
 //! {
-//!     future::loop_fn(serial, move |mut serial| {
-//!         match serial.write(byte) {
-//!             Ok(())                       => Ok(Loop::Break(serial)),
-//!             Err(nb::Error::WouldBlock)   => Ok(Loop::Continue(serial)),
-//!             Err(nb::Error::Other(error)) => Err(error),
-//!         }
+//!     let mut serial = Some(serial);
+//!     future::poll_fn(move || {
+//!         try_nb!(serial.as_mut().unwrap().write(byte));
+//!
+//!         Ok(Async::Ready(serial.take().unwrap()))
 //!     })
 //! }
 //!
-//! // HAL implementers
-//! let timer = Timer(tim3);
-//! let serial = Serial(usart1);
+//! fn main() {
+//!     // HAL implementers
+//!     let timer: Timer6 = {
+//!         // ..
+//! #       Timer6
+//!     };
+//!     let serial: Serial1 = {
+//!         // ..
+//! #       Serial1
+//!     };
+//!     let led: Led = {
+//!         // ..
+//! #       Led
+//!     };
 //!
-//! // Tasks
-//! let mut blinky = future::loop_fn(true, |state| {
-//!     wait(timer).map(|_| {
-//!         if state {
-//!             Led.on();
-//!         } else {
-//!             Led.off();
-//!         }
+//!     // Tasks
+//!     let mut blinky = future::loop_fn::<_, (), _, _>(
+//!         (led, timer, true),
+//!         |(mut led, mut timer, state)| {
+//!             wait(timer).map(move |timer| {
+//!                 if state {
+//!                     led.on();
+//!                 } else {
+//!                     led.off();
+//!                 }
 //!
-//!         Loop::Continue(!state)
+//!                 Loop::Continue((led, timer, !state))
+//!             })
+//!         });
+//!
+//!     let mut loopback = future::loop_fn::<_, (), _, _>(serial, |mut serial| {
+//!         read(serial).and_then(|(serial, byte)| {
+//!             write(serial, byte)
+//!         }).map(|serial| {
+//!             Loop::Continue(serial)
+//!         })
 //!     });
-//! });
 //!
-//! let mut loopback = future::loop_fn((), |_| {
-//!     read(serial).and_then(|byte| {
-//!         write(serial, byte)
-//!     }).map(|_| {
-//!         Loop::Continue(())
-//!     });
-//! });
-//!
-//! // Event loop
-//! loop {
-//!     blinky().poll().unwrap(); // NOTE(unwrap) E = !
-//!     loopback().poll().unwrap();
+//!     // Event loop
+//!     loop {
+//!         blinky.poll().unwrap(); // NOTE(unwrap) E = !
+//!         loopback.poll().unwrap();
+//! #       break;
+//!     }
 //! }
+//!
+//! # mod stm32f30x_hal {
+//! #     pub struct Timer6;
+//! #     impl ::hal::timer::CountDown for Timer6 {
+//! #         type Time = ();
+//! #
+//! #         fn start<T>(&mut self, _: T) where T: Into<()> {}
+//! #         fn wait(&mut self) -> ::nb::Result<(), !> { Err(::nb::Error::WouldBlock) }
+//! #     }
+//! #
+//! #     pub struct Serial1;
+//! #     impl ::hal::serial::Read<u8> for Serial1 {
+//! #         type Error = !;
+//! #         fn read(&mut self) -> ::nb::Result<u8, !> { Err(::nb::Error::WouldBlock) }
+//! #     }
+//! #     impl ::hal::serial::Write<u8> for Serial1 {
+//! #         type Error = !;
+//! #         fn flush(&mut self) -> ::nb::Result<(), !> { Err(::nb::Error::WouldBlock) }
+//! #         fn write(&mut self, _: u8) -> ::nb::Result<(), !> { Err(::nb::Error::WouldBlock) }
+//! #     }
+//! #
+//! #     pub struct Led;
+//! #     impl Led {
+//! #         pub fn off(&mut self) {}
+//! #         pub fn on(&mut self) {}
+//! #     }
+//! # }
 //! ```
 //!
 //! ### `await`
 //!
 //! Same example as above but using `await!` instead of `futures`.
 //!
-//! **NOTE** The `await!` macro requires language support for generators, which
-//! is not yet in the compiler.
+//! ```
+//! #![feature(generator_trait)]
+//! #![feature(generators)]
+//! # #![feature(never_type)]
 //!
-//! ``` ignore
 //! extern crate embedded_hal as hal;
 //!
-//! extern crate stm32f103xx_hal_impl;
-//!
-//! #[macro_use]
+//! #[macro_use(await)]
 //! extern crate nb;
 //!
+//! use std::ops::Generator;
+//!
 //! use hal::prelude::*;
-//! use stm32f103xx_hal_impl::{Serial, Timer};
+//! use stm32f30x_hal::{Led, Serial1, Timer6};
 //!
-//! // HAL implementers
-//! let timer = Timer(tim3);
-//! let serial = Serial(usart1);
+//! fn main() {
+//!     // HAL implementers
+//!     let mut timer: Timer6 = {
+//!         // ..
+//! #       Timer6
+//!     };
+//!     let mut serial: Serial1 = {
+//!         // ..
+//! #       Serial1
+//!     };
+//!     let mut led: Led = {
+//!         // ..
+//! #       Led
+//!     };
 //!
-//! // Tasks
-//! let mut blinky = (|| {
-//!     let mut state = false;
-//!     loop {
-//!         // `await!` means "suspend / yield here" instead of "block until
-//!         // completion"
-//!         await!(timer.wait()).unwrap(); // NOTE(unwrap) E = !
+//!     // Tasks
+//!     let mut blinky = (move || {
+//!         let mut state = false;
+//!         loop {
+//!             // `await!` means "suspend / yield here" instead of "block until
+//!             // completion"
+//!             await!(timer.wait()).unwrap(); // NOTE(unwrap) E = !
 //!
-//!         state = !state;
+//!             state = !state;
 //!
-//!         if state {
-//!              Led.on();
-//!         } else {
-//!              Led.off();
+//!             if state {
+//!                 led.on();
+//!             } else {
+//!                 led.off();
+//!             }
 //!         }
-//!     }
-//! })();
+//!     });
 //!
-//! let mut loopback = (|| {
+//!     let mut loopback = (move || {
+//!         loop {
+//!             let byte = await!(serial.read()).unwrap();
+//!             await!(serial.write(byte)).unwrap();
+//!         }
+//!     });
+//!
+//!     // Event loop
 //!     loop {
-//!         let byte = await!(serial.read()).unwrap();
-//!         await!(serial.write(byte)).unwrap();
+//!         blinky.resume();
+//!         loopback.resume();
+//!         # break;
 //!     }
-//! })();
-//!
-//! // Event loop
-//! loop {
-//!     blinky.resume();
-//!     serial.resume();
 //! }
+//!
+//! # mod stm32f30x_hal {
+//! #   pub struct Serial1;
+//! #   impl Serial1 {
+//! #       pub fn read(&mut self) -> ::nb::Result<u8, !> { Err(::nb::Error::WouldBlock) }
+//! #       pub fn write(&mut self, _: u8) -> ::nb::Result<(), !> { Err(::nb::Error::WouldBlock) }
+//! #   }
+//! #   pub struct Timer6;
+//! #   impl Timer6 {
+//! #       pub fn wait(&mut self) -> ::nb::Result<(), !> { Err(::nb::Error::WouldBlock) }
+//! #   }
+//! #   pub struct Led;
+//! #   impl Led {
+//! #       pub fn off(&mut self) {}
+//! #       pub fn on(&mut self) {}
+//! #   }
+//! # }
 //! ```
 //!
 //! ## Generic programming and higher level abstractions
 //!
-//! The HAL has been kept minimal on purpose to encourage building **generic**
-//! higher level abstractions on top of it.
+//! The core of the HAL has been kept minimal on purpose to encourage building **generic** higher
+//! level abstractions on top of it. Some higher level abstractions that pick an asynchronous model
+//! or that have blocking behavior and that are deemed useful to build other abstractions can be
+//! found in the `blocking` module and, in the future, in the `futures` and `async` modules.
 //!
 //! Some examples:
 //!
@@ -410,11 +473,11 @@
 //! methods with default implementation to allow specialization, but they have
 //! been written as functions to keep things simple.
 //!
-//! - Write a whole buffer in blocking fashion.
+//! - Write a whole buffer to a serial device in blocking a fashion.
 //!
-//! ``` ignore
+//! ```
 //! extern crate embedded_hal as hal;
-//! #[macro_use]
+//! #[macro_use(block)]
 //! extern crate nb;
 //!
 //! use hal::prelude::*;
@@ -429,11 +492,13 @@
 //!
 //!     Ok(())
 //! }
+//!
+//! # fn main() {}
 //! ```
 //!
-//! - Blocking read with timeout
+//! - Blocking serial read with timeout
 //!
-//! ``` ignore
+//! ```
 //! extern crate embedded_hal as hal;
 //! extern crate nb;
 //!
@@ -451,19 +516,17 @@
 //!     timeout: T::Time,
 //! ) -> Result<u8, Error<S::Error>>
 //! where
-//!     T: hal::Timer,
+//!     T: hal::timer::CountDown,
 //!     S: hal::serial::Read<u8>,
 //! {
-//!     timer.pause();
-//!     timer.restart();
-//!     timer.set_timeout(timeout);
-//!     timer.resume();
+//!     timer.start(timeout);
 //!
 //!     loop {
 //!         match serial.read() {
+//!             // raise error
 //!             Err(nb::Error::Other(e)) => return Err(Error::Serial(e)),
 //!             Err(nb::Error::WouldBlock) => {
-//!                 // no data available, check the timer below
+//!                 // no data available yet, check the timer below
 //!             },
 //!             Ok(byte) => return Ok(byte),
 //!         }
@@ -473,61 +536,74 @@
 //!                 // The error type specified by `timer.wait()` is `!`, which
 //!                 // means no error can actually occur. The Rust compiler
 //!                 // still forces us to provide this match arm, though.
-//!                 e
+//!                 unreachable!()
 //!             },
+//!             // no timeout yet, try again
 //!             Err(nb::Error::WouldBlock) => continue,
-//!             Ok(()) => {
-//!                 timer.pause();
-//!                 return Err(Error::TimedOut);
-//!             },
+//!             Ok(()) => return Err(Error::TimedOut),
 //!         }
 //!     }
 //! }
+//!
+//! # fn main() {}
 //! ```
 //!
 //! - Asynchronous SPI transfer
 //!
-//! ``` ignore
+//! ```
+//! #![feature(conservative_impl_trait)]
+//! #![feature(generators)]
+//! #![feature(generator_trait)]
+//!
 //! extern crate embedded_hal as hal;
+//! #[macro_use(await)]
+//! extern crate nb;
+//!
+//! use std::ops::Generator;
 //!
 //! /// Transfers a byte buffer of size N
 //! ///
 //! /// Returns the same byte buffer but filled with the data received from the
 //! /// slave device
-//! #[async]
-//! fn transfer<const N: usize, S>(
-//!     spi: &S,
-//!     mut buffer: [u8; N],
-//! ) -> Result<[u8; N], S::Error>
+//! fn transfer<S, B>(
+//!     mut spi: S,
+//!     mut buffer: [u8; 16], // NOTE this should be generic over the size of the array
+//! ) -> impl Generator<Return = Result<(S, [u8; 16]), S::Error>, Yield = ()>
 //! where
-//!     S: hal::Spi,
+//!     S: hal::spi::FullDuplex<u8>,
 //! {
-//!     for byte in &mut buffer {
-//!         await!(spi.send(byte))?;
-//!         *byte = await!(spi.receive())?;
-//!     }
+//!     move || {
+//!         let n = buffer.len();
+//!         for i in 0..n {
+//!             await!(spi.send(buffer[i]))?;
+//!             buffer[i] = await!(spi.read())?;
+//!         }
 //!
-//!     buffer
+//!         Ok((spi, buffer))
+//!     }
 //! }
+//!
+//! # fn main() {}
 //! ```
 //!
 //! - Buffered serial interface with periodic flushing in interrupt handler
 //!
-//! ``` ignore
+//! ```
+//! # #![feature(never_type)]
 //! extern crate embedded_hal as hal;
 //! extern crate nb;
 //!
 //! use hal::prelude::*;
 //!
-//! fn flush<S>(serial: &mut S, cb: &mut CircularBuffer) -> Result<(), S::Error>
+//! fn flush<S>(serial: &mut S, cb: &mut CircularBuffer)
 //! where
-//!     S: hal::serial::Write<u8>,
+//!     S: hal::serial::Write<u8, Error = !>,
 //! {
 //!     loop {
 //!         if let Some(byte) = cb.peek() {
 //!             match serial.write(*byte) {
-//!                 Err(nb::Error::Other(e)) => return Err(e),
-//!                 Err(nb::Error::WouldBlock) => return Ok(()),
+//!                 Err(nb::Error::Other(_)) => unreachable!(),
+//!                 Err(nb::Error::WouldBlock) => return,
 //!                 Ok(()) => {}, // keep flushing data
 //!             }
 //!         }
@@ -539,70 +615,66 @@
 //! // The stuff below could be in some other crate
 //!
 //! /// Global singleton
-//! pub struct BufferedSerial;
+//! pub struct BufferedSerial1;
 //!
 //! // NOTE private
-//! static BUFFER: Mutex<CircularBuffer> = ..;
-//! static SERIAL: Mutex<impl hal::serial::Write<u8>> = ..;
+//! static BUFFER1: Mutex<CircularBuffer> = {
+//!     // ..
+//! #   Mutex(CircularBuffer)
+//! };
+//! static SERIAL1: Mutex<Serial1> = {
+//!     // ..
+//! #   Mutex(Serial1)
+//! };
 //!
-//! impl BufferedSerial {
-//!     pub fn write(&self, bytes: &[u8]) {
-//!         let mut buffer = BUFFER.lock();
-//!         for byte in bytes {
-//!             buffer.push(*byte).unwrap();
-//!         }
+//! impl BufferedSerial1 {
+//!     pub fn write(&self, byte: u8) {
+//!         self.write_all(&[byte])
 //!     }
 //!
 //!     pub fn write_all(&self, bytes: &[u8]) {
-//!         let mut buffer = BUFFER.lock();
+//!         let mut buffer = BUFFER1.lock();
 //!         for byte in bytes {
-//!             buffer.push(*byte).unwrap();
+//!             buffer.push(*byte).expect("buffer overrun");
 //!         }
+//!         // omitted: pend / enable interrupt_handler
 //!     }
 //! }
 //!
 //! fn interrupt_handler() {
-//!     let serial = SERIAL.lock();
-//!     let buffer = BUFFER.lock();
+//!     let mut serial = SERIAL1.lock();
+//!     let mut buffer = BUFFER1.lock();
 //!
-//!     flush(&mut serial, &mut buffer).unwrap();
+//!     flush(&mut *serial, &mut buffer);
 //! }
+//!
+//! # struct Mutex<T>(T);
+//! # impl<T> Mutex<T> {
+//! #     fn lock(&self) -> RefMut<T> { unimplemented!() }
+//! # }
+//! # struct RefMut<'a, T>(&'a mut T) where T: 'a;
+//! # impl<'a, T> ::std::ops::Deref for RefMut<'a, T> {
+//! #     type Target = T;
+//! #     fn deref(&self) -> &T { self.0 }
+//! # }
+//! # impl<'a, T> ::std::ops::DerefMut for RefMut<'a, T> {
+//! #     fn deref_mut(&mut self) -> &mut T { self.0 }
+//! # }
+//! # struct Serial1;
+//! # impl ::hal::serial::Write<u8> for Serial1 {
+//! #   type Error = !;
+//! #   fn write(&mut self, _: u8) -> nb::Result<(), !> { Err(::nb::Error::WouldBlock) }
+//! #   fn flush(&mut self) -> nb::Result<(), !> { Err(::nb::Error::WouldBlock) }
+//! # }
+//! # struct CircularBuffer;
+//! # impl CircularBuffer {
+//! #   pub fn peek(&mut self) -> Option<&u8> { None }
+//! #   pub fn pop(&mut self) -> Option<u8> { None }
+//! #   pub fn push(&mut self, _: u8) -> Result<(), ()> { Ok(()) }
+//! # }
+//!
+//! # fn main() {}
 //! ```
-//!
-//! # A note on time units
-//!
-//! Implementers of this HAL are encouraged to use *application agnostic* time
-//! units in their implementations. Is it usually the case that the application
-//! will want to pick the clock frequencies of the different peripherals so
-//! using a unit like `apb1::Ticks` instead of `Seconds` lets the application
-//! perform the conversions cheaply without register / memory accesses.
-//!
-//! For example: a `Timer` implementation uses the peripheral TIM1 which is
-//! connected to the APB1 bus. This implementation uses the time unit
-//! `apb1::Ticks` where 1 tick is equal to `1 / apb1::FREQUENCY` seconds where
-//! `apb1::FREQUENCY` is picked by the application.
-//!
-//! Now each application can declare the `apb1::FREQUENCY` using a macro that
-//! expands into conversions (implementations of [the `From` trait]) from human
-//! time units like `Milliseconds` to `apb1::Ticks`.
-//!
-//! [the `From` trait]: https://doc.rust-lang.org/core/convert/trait.From.html
-//!
-//! With this setup the application can use human time units with the `Timer`
-//! API:
-//!
-//! ``` ignore
-//! frequency!(apb1, 8_000_000); // Hz
-//!
-//! let timer: impl Timer = ..;
-//!
-//! // All these are equivalent
-//! timer.set_timeout(apb1::Ticks(8_000));
-//! timer.set_timeout(Milliseconds(1));
-//! timer.set_timeout(1.ms());
-//! ```
-//!
-//! See the [`blue-pill`] crate for an example implementation of this approach.
 
 #![deny(missing_docs)]
 #![deny(warnings)]
@@ -617,6 +689,7 @@ pub mod digital;
 pub mod prelude;
 pub mod serial;
 pub mod spi;
+pub mod timer;
 
 /// Input capture
 ///
@@ -625,18 +698,51 @@ pub mod spi;
 /// You can use this interface to measure the period of (quasi) periodic signals
 /// / events
 ///
-/// ``` ignore
-/// let capture: impl Capture = ..;
-///
-/// capture.set_resolution(1.ms());
-///
-/// let before = block!(capture.capture()).unwrap();
-/// let after = block!(capture.capture()).unwrap();
-///
-/// let period = after.wrapping_sub(before);
-///
-/// println!("Period: {} ms", period);
 /// ```
+/// # #![feature(never_type)]
+///
+/// extern crate embedded_hal as hal;
+/// #[macro_use(block)]
+/// extern crate nb;
+///
+/// use hal::prelude::*;
+///
+/// fn main() {
+///     let mut capture: Capture1 = {
+///         // ..
+/// #       Capture1
+///     };
+///
+///     capture.set_resolution(1.ms());
+///
+///     let before = block!(capture.capture(Channel::_1)).unwrap();
+///     let after = block!(capture.capture(Channel::_1)).unwrap();
+///
+///     let period = after.wrapping_sub(before);
+///
+///     println!("Period: {} ms", period);
+/// }
+///
+/// # struct MilliSeconds(u32);
+/// # trait U32Ext { fn ms(self) -> MilliSeconds; }
+/// # impl U32Ext for u32 { fn ms(self) -> MilliSeconds { MilliSeconds(self) } }
+/// # struct Capture1;
+/// # enum Channel { _1 }
+/// # impl hal::Capture for Capture1 {
+/// #     type Capture = u16;
+/// #     type Channel = Channel;
+/// #     type Error = !;
+/// #     type Time = MilliSeconds;
+/// #     fn capture(&mut self, _: Channel) -> ::nb::Result<u16, !> { Ok(0) }
+/// #     fn disable(&mut self, _: Channel) { unimplemented!() }
+/// #     fn enable(&mut self, _: Channel) { unimplemented!() }
+/// #     fn get_resolution(&self) -> MilliSeconds { unimplemented!() }
+/// #     fn set_resolution<T>(&mut self, _: T) where T: Into<MilliSeconds> {}
+/// # }
+/// ```
+#[cfg(feature = "unproven")]
+// reason: pre-singletons API. With singletons a `CapturePin` (cf. `PwmPin`) trait seems more
+// appropriate
 pub trait Capture {
     /// Enumeration of `Capture` errors
     ///
@@ -663,10 +769,7 @@ pub trait Capture {
     ///
     /// NOTE that you must multiply the returned value by the *resolution* of
     /// this `Capture` interface to get a human time unit (e.g. seconds)
-    fn capture(
-        &mut self,
-        channel: Self::Channel,
-    ) -> nb::Result<Self::Capture, Self::Error>;
+    fn capture(&mut self, channel: Self::Channel) -> nb::Result<Self::Capture, Self::Error>;
 
     /// Disables a capture `channel`
     fn disable(&mut self, channel: Self::Channel);
@@ -689,19 +792,49 @@ pub trait Capture {
 ///
 /// Use this interface to control the power output of some actuator
 ///
-/// ``` ignore
-/// let pwm: impl Pwm = ..;
-///
-/// pwm.set_period(1.khz().invert());
-///
-/// let max_duty = pwm.get_max_duty();
-///
-/// // brightest LED
-/// pwm.set_duty(Channel::_1, max_duty);
-///
-/// // dimmer LED
-/// pwm.set_duty(Channel::_2, max_duty / 4);
 /// ```
+/// extern crate embedded_hal as hal;
+///
+/// use hal::prelude::*;
+///
+/// fn main() {
+///     let mut pwm: Pwm1 = {
+///         // ..
+/// #       Pwm1
+///     };
+///
+///     pwm.set_period(1.khz());
+///
+///     let max_duty = pwm.get_max_duty();
+///
+///     // brightest LED
+///     pwm.set_duty(Channel::_1, max_duty);
+///
+///     // dimmer LED
+///     pwm.set_duty(Channel::_2, max_duty / 4);
+/// }
+///
+/// # struct KiloHertz(u32);
+/// # trait U32Ext { fn khz(self) -> KiloHertz; }
+/// # impl U32Ext for u32 { fn khz(self) -> KiloHertz { KiloHertz(self) } }
+/// # enum Channel { _1, _2 }
+/// # struct Pwm1;
+/// # impl hal::Pwm for Pwm1 {
+/// #     type Channel = Channel;
+/// #     type Time = KiloHertz;
+/// #     type Duty = u16;
+/// #     fn disable(&mut self, _: Channel) { unimplemented!() }
+/// #     fn enable(&mut self, _: Channel) { unimplemented!() }
+/// #     fn get_duty(&self, _: Channel) -> u16 { unimplemented!() }
+/// #     fn get_max_duty(&self) -> u16 { 0 }
+/// #     fn set_duty(&mut self, _: Channel, _: u16) {}
+/// #     fn get_period(&self) -> KiloHertz { unimplemented!() }
+/// #     fn set_period<T>(&mut self, _: T) where T: Into<KiloHertz> {}
+/// # }
+/// ```
+#[cfg(feature = "unproven")]
+// reason: pre-singletons API. The `PwmPin` trait seems more useful because it models independent
+// PWM channels. Here a certain number of channels are multiplexed in a single implementer.
 pub trait Pwm {
     /// Enumeration of channels that can be used with this `Pwm` interface
     ///
@@ -774,22 +907,53 @@ pub trait PwmPin {
 ///
 /// You can use this interface to measure the speed of a motor
 ///
-/// ``` ignore
-/// let qei: impl Qei = ..;
-/// let timer: impl Timer = ..;
-///
-/// timer.pause();
-/// timer.restart();
-/// timer.set_timeout(1.s());
-///
-/// let before = qei.count();
-/// timer.resume();
-/// block!(timer.wait());
-/// let after = qei.count();
-///
-/// let speed = after.wrapping_sub(before);
-/// println!("Speed: {} pulses per second", speed);
 /// ```
+/// # #![feature(never_type)]
+/// extern crate embedded_hal as hal;
+/// #[macro_use(block)]
+/// extern crate nb;
+///
+/// use hal::prelude::*;
+///
+/// fn main() {
+///     let mut qei: Qei1 = {
+///         // ..
+/// #       Qei1
+///     };
+///     let mut timer: Timer6 = {
+///         // ..
+/// #       Timer6
+///     };
+///
+///
+///     let before = qei.count();
+///     timer.start(1.s());
+///     block!(timer.wait());
+///     let after = qei.count();
+///
+///     let speed = after.wrapping_sub(before);
+///     println!("Speed: {} pulses per second", speed);
+/// }
+///
+/// # struct Seconds(u32);
+/// # trait U32Ext { fn s(self) -> Seconds; }
+/// # impl U32Ext for u32 { fn s(self) -> Seconds { Seconds(self) } }
+/// # struct Qei1;
+/// # impl hal::Qei for Qei1 {
+/// #     type Count = u16;
+/// #     fn count(&self) -> u16 { 0 }
+/// #     fn direction(&self) -> ::hal::Direction { unimplemented!() }
+/// # }
+/// # struct Timer6;
+/// # impl hal::timer::CountDown for Timer6 {
+/// #     type Time = Seconds;
+/// #     fn start<T>(&mut self, _: T) where T: Into<Seconds> {}
+/// #     fn wait(&mut self) -> ::nb::Result<(), !> { Ok(()) }
+/// # }
+/// ```
+#[cfg(feature = "unproven")]
+// reason: needs to be re-evaluated in the new singletons world. At the very least this needs a
+// reference implementation
 pub trait Qei {
     /// The type of the value returned by `count`
     type Count;
@@ -803,52 +967,11 @@ pub trait Qei {
 
 /// Count direction
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[cfg(feature = "unproven")]
+// reason: part of the unproven `Qei` interface
 pub enum Direction {
     /// 3, 2, 1
     Downcounting,
     /// 1, 2, 3
     Upcounting,
-}
-
-/// Timer used for timeouts
-///
-/// # Examples
-///
-/// You can use this timer to create delays
-///
-/// ``` ignore
-/// let timer: impl Timer = ..;
-///
-/// timer.pause();
-/// timer.restart();
-/// timer.set_timeout(1.s());
-///
-/// Led.on();
-/// timer.resume();
-/// block!(timer.wait()); // blocks for 1 second
-/// Led.off();
-/// ```
-pub trait Timer {
-    /// A time unit that can be converted into a human time unit (e.g. seconds)
-    type Time;
-
-    /// Returns the current timeout
-    fn get_timeout(&self) -> Self::Time;
-
-    /// Pauses the timer
-    fn pause(&mut self);
-
-    /// Restarts the timer count to zero
-    fn restart(&mut self);
-
-    /// Resumes the timer count
-    fn resume(&mut self);
-
-    /// Sets a new timeout
-    fn set_timeout<T>(&mut self, timeout: T)
-    where
-        T: Into<Self::Time>;
-
-    /// "Waits" until the timer times out
-    fn wait(&mut self) -> nb::Result<(), !>;
 }
