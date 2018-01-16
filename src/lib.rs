@@ -26,23 +26,39 @@
 //! want higher level abstraction should *prefer to use this HAL* rather than *re-implement*
 //! register manipulation code.
 //!
+//! - Serve as a foundation for building an ecosystem of platform agnostic drivers. Here driver
+//! means a library crate that lets a target platform interface an external device like a digital
+//! sensor or a wireless transceiver. The advantage of this system is that by writing the driver as
+//! a generic library on top of `embedded-hal` driver authors can support any number of target
+//! platforms (e.g. Cortex-M microcontrollers, AVR microcontrollers, embedded Linux, etc.). The
+//! advantage for application developers is that by adopting `embedded-hal` they can unlock all
+//! these drivers for their platform.
+//!
 //! # Out of scope
 //!
-//! - Initialization and configuration stuff like "ensure this serial interface
-//!   and that SPI interface are not using the same pins". The HAL will focus on
-//!   *doing I/O.*
+//! - Initialization and configuration stuff like "ensure this serial interface and that SPI
+//! interface are not using the same pins". The HAL will focus on *doing I/O*.
 //!
 //! # Reference implementation
 //!
-//! The [`f3`] crate contains a reference implementation of this HAL.
+//! The [`stm32f30x-hal`] crate contains a reference implementation of this HAL.
 //!
-//! [`f3`]: https://crates.io/crates/f3/0.5.0
+//! [`stm32f30x-hal`]: https://crates.io/crates/stm32f30x-hal/0.1.0
+//!
+//! # Platform agnostic drivers
+//!
+//! You can find platform agnostic drivers built on top of `embedded-hal` on crates.io by [searching
+//! for the *embedded-hal* keyword](https://crates.io/keywords/embedded-hal).
+//!
+//! If you writing a platform agnostic driver yourself you are highly encouraged to [add the
+//! embedded-hal keyword](https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata)
+//! to your crate before publishing it!
 //!
 //! # Detailed design
 //!
 //! ## Traits
 //!
-//! The HAL is specified using traits to allow generic programming. These traits make use of the
+//! The HAL is specified as traits to allow generic programming. These traits make use of the
 //! [`nb`][] crate (*please go read that crate documentation before continuing*) to abstract over
 //! the asynchronous model and to also provide a blocking operation mode.
 //!
@@ -86,13 +102,13 @@
 //!     // ..
 //!
 //!     /// "waits" until the count down is over
-//!     fn wait(&self) -> nb::Result<(), !>;
+//!     fn wait(&mut self) -> nb::Result<(), !>;
 //! }
 //!
 //! # fn main() {}
 //! ```
 //!
-//! ## Implementation
+//! ## Suggested implementation
 //!
 //! The HAL traits should be implemented for device crates generated via [`svd2rust`] to maximize
 //! code reuse.
