@@ -81,11 +81,11 @@
 //!
 //! extern crate nb;
 //!
-//! /// A timer used for timeouts
-//! pub trait Timer {
+//! /// A count down timer
+//! pub trait CountDown {
 //!     // ..
 //!
-//!     /// "waits" until the timer times out
+//!     /// "waits" until the count down is over
 //!     fn wait(&self) -> nb::Result<(), !>;
 //! }
 //!
@@ -240,12 +240,12 @@
 //! use futures::future::Loop;
 //! use stm32f30x_hal::{Led, Serial1, Timer6};
 //!
-//! /// `futures` version of `Timer.wait`
+//! /// `futures` version of `CountDown.wait`
 //! ///
 //! /// This returns a future that must be polled to completion
 //! fn wait<T>(mut timer: T) -> impl Future<Item = T, Error = !>
 //! where
-//!     T: hal::Timer,
+//!     T: hal::timer::CountDown,
 //! {
 //!     let mut timer = Some(timer);
 //!     future::poll_fn(move || {
@@ -333,14 +333,10 @@
 //!
 //! # mod stm32f30x_hal {
 //! #     pub struct Timer6;
-//! #     impl ::hal::Timer for Timer6 {
+//! #     impl ::hal::timer::CountDown for Timer6 {
 //! #         type Time = ();
 //! #
-//! #         fn get_timeout(&self) {}
-//! #         fn pause(&mut self) {}
-//! #         fn restart(&mut self) {}
-//! #         fn resume(&mut self) {}
-//! #         fn set_timeout<T>(&mut self, _: T) where T: Into<()> {}
+//! #         fn start<T>(&mut self, _: T) where T: Into<()> {}
 //! #         fn wait(&mut self) -> ::nb::Result<(), !> { Err(::nb::Error::WouldBlock) }
 //! #     }
 //! #
@@ -504,13 +500,10 @@
 //!     timeout: T::Time,
 //! ) -> Result<u8, Error<S::Error>>
 //! where
-//!     T: hal::Timer,
+//!     T: hal::timer::CountDown,
 //!     S: hal::serial::Read<u8>,
 //! {
-//!     timer.pause();
-//!     timer.restart();
-//!     timer.set_timeout(timeout);
-//!     timer.resume();
+//!     timer.start(timeout);
 //!
 //!     loop {
 //!         match serial.read() {
@@ -680,6 +673,7 @@ pub mod digital;
 pub mod prelude;
 pub mod serial;
 pub mod spi;
+pub mod timer;
 
 /// Input capture
 ///
@@ -759,10 +753,7 @@ pub trait Capture {
     ///
     /// NOTE that you must multiply the returned value by the *resolution* of
     /// this `Capture` interface to get a human time unit (e.g. seconds)
-    fn capture(
-        &mut self,
-        channel: Self::Channel,
-    ) -> nb::Result<Self::Capture, Self::Error>;
+    fn capture(&mut self, channel: Self::Channel) -> nb::Result<Self::Capture, Self::Error>;
 
     /// Disables a capture `channel`
     fn disable(&mut self, channel: Self::Channel);
@@ -918,12 +909,9 @@ pub trait PwmPin {
 /// #       Timer6
 ///     };
 ///
-///     timer.pause();
-///     timer.restart();
-///     timer.set_timeout(1.s());
 ///
 ///     let before = qei.count();
-///     timer.resume();
+///     timer.start(1.s());
 ///     block!(timer.wait());
 ///     let after = qei.count();
 ///
@@ -941,13 +929,9 @@ pub trait PwmPin {
 /// #     fn direction(&self) -> ::hal::Direction { unimplemented!() }
 /// # }
 /// # struct Timer6;
-/// # impl hal::Timer for Timer6 {
+/// # impl hal::timer::CountDown for Timer6 {
 /// #     type Time = Seconds;
-/// #     fn get_timeout(&self) -> Seconds { unimplemented!() }
-/// #     fn pause(&mut self) {}
-/// #     fn restart(&mut self) {}
-/// #     fn resume(&mut self) {}
-/// #     fn set_timeout<T>(&mut self, _: T) where T: Into<Seconds> {}
+/// #     fn start<T>(&mut self, _: T) where T: Into<Seconds> {}
 /// #     fn wait(&mut self) -> ::nb::Result<(), !> { Ok(()) }
 /// # }
 /// ```
@@ -974,82 +958,4 @@ pub enum Direction {
     Downcounting,
     /// 1, 2, 3
     Upcounting,
-}
-
-/// Timer used for timeouts
-///
-/// # Examples
-///
-/// You can use this timer to create delays
-///
-/// ```
-/// # #![feature(never_type)]
-/// extern crate embedded_hal as hal;
-/// #[macro_use(block)]
-/// extern crate nb;
-///
-/// use hal::prelude::*;
-///
-/// fn main() {
-///     let mut led: Led = {
-///         // ..
-/// #       Led
-///     };
-///     let mut timer: Timer6 = {
-///         // ..
-/// #       Timer6
-///     };
-///
-///     timer.pause();
-///     timer.restart();
-///     timer.set_timeout(1.s());
-///
-///     Led.on();
-///     timer.resume();
-///     block!(timer.wait()); // blocks for 1 second
-///     Led.off();
-/// }
-///
-/// # struct Seconds(u32);
-/// # trait U32Ext { fn s(self) -> Seconds; }
-/// # impl U32Ext for u32 { fn s(self) -> Seconds { Seconds(self) } }
-/// # struct Led;
-/// # impl Led {
-/// #     pub fn off(&mut self) {}
-/// #     pub fn on(&mut self) {}
-/// # }
-/// # struct Timer6;
-/// # impl hal::Timer for Timer6 {
-/// #     type Time = Seconds;
-/// #     fn get_timeout(&self) -> Seconds { unimplemented!() }
-/// #     fn pause(&mut self) {}
-/// #     fn restart(&mut self) {}
-/// #     fn resume(&mut self) {}
-/// #     fn set_timeout<T>(&mut self, _: T) where T: Into<Seconds> {}
-/// #     fn wait(&mut self) -> ::nb::Result<(), !> { Ok(()) }
-/// # }
-/// ```
-pub trait Timer {
-    /// A time unit that can be converted into a human time unit (e.g. seconds)
-    type Time;
-
-    /// Returns the current timeout
-    fn get_timeout(&self) -> Self::Time;
-
-    /// Pauses the timer
-    fn pause(&mut self);
-
-    /// Restarts the timer count to zero
-    fn restart(&mut self);
-
-    /// Resumes the timer count
-    fn resume(&mut self);
-
-    /// Sets a new timeout
-    fn set_timeout<T>(&mut self, timeout: T)
-    where
-        T: Into<Self::Time>;
-
-    /// "Waits" until the timer times out
-    fn wait(&mut self) -> nb::Result<(), !>;
 }

@@ -10,7 +10,7 @@ pub use ::Pwm as _embedded_hal_Pwm;
 pub use ::PwmPin as _embedded_hal_PwmPin;
 #[cfg(feature = "unproven")]
 pub use ::Qei as _embedded_hal_Qei;
-pub use ::Timer as _embedded_hal_Timer;
+pub use ::timer::CountDown as _embedded_hal_timer_CountDown;
 pub use ::blocking::delay::DelayMs as _embedded_hal_blocking_delay_DelayMs;
 pub use ::blocking::delay::DelayUs as _embedded_hal_blocking_delay_DelayUs;
 pub use ::digital::OutputPin as _embedded_hal_digital_OutputPin;
