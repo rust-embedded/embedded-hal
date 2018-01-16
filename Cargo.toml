@@ -13,7 +13,7 @@ version = "0.1.0"
 version = "0.1.1"
 
 [dev-dependencies]
-stm32f30x = { git = "https://github.com/japaric/stm32f30x" }
+stm32f30x = "0.6.0"
 futures = "0.1.17"
 
 [features]
