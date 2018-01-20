@@ -1,6 +1,6 @@
 # `embedded-hal`
 
-> A minimal Hardware Abstraction Layer (HAL) for embedded systems
+>  A Hardware Abstraction Layer (HAL) for embedded systems
 
 ## [Documentation]
 
