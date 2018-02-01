@@ -17,9 +17,9 @@ pub trait OutputPin {
 
 /// Single digital input pin
 pub trait InputPin {
-    /// Is the output pin high?
+    /// Is the input pin high?
     fn is_high(&self) -> bool;
 
-    /// Is the output pin low?
+    /// Is the input pin low?
     fn is_low(&self) -> bool;
 }
