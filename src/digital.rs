@@ -14,3 +14,12 @@ pub trait OutputPin {
     /// Sets the pin high
     fn set_high(&mut self);
 }
+
+/// Single digital input pin
+pub trait InputPin {
+    /// Is the input pin high?
+    fn is_high(&self) -> bool;
+
+    /// Is the input pin low?
+    fn is_low(&self) -> bool;
+}

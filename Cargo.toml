@@ -1,5 +1,8 @@
 [package]
-authors = ["Jorge Aparicio <jorge@japaric.io>"]
+authors = [
+	"Jorge Aparicio <jorge@japaric.io>",
+	"Jonathan 'theJPster' Pallant <github@thejpster.org.uk>"
+]
 categories = ["asynchronous", "embedded", "hardware-support", "no-std"]
 description = " A Hardware Abstraction Layer (HAL) for embedded systems "
 documentation = "https://docs.rs/embedded-hal"
@@ -7,7 +10,7 @@ keywords = ["hal", "IO"]
 license = "MIT OR Apache-2.0"
 name = "embedded-hal"
 repository = "https://github.com/japaric/embedded-hal"
-version = "0.1.0"
+version = "0.1.1"
 
 [dependencies.nb]
 version = "0.1.1"
