@@ -16,6 +16,7 @@ pub trait OutputPin {
 }
 
 /// Single digital input pin
+#[cfg(feature = "unproven")]
 pub trait InputPin {
     /// Is the input pin high?
     fn is_high(&self) -> bool;
