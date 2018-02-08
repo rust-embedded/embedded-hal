@@ -13,6 +13,16 @@ pub use ::Qei as _embedded_hal_Qei;
 pub use ::timer::CountDown as _embedded_hal_timer_CountDown;
 pub use ::blocking::delay::DelayMs as _embedded_hal_blocking_delay_DelayMs;
 pub use ::blocking::delay::DelayUs as _embedded_hal_blocking_delay_DelayUs;
+pub use ::blocking::i2c::{
+    Read as _embedded_hal_blocking_i2c_Read,
+    Write as _embedded_hal_blocking_i2c_Write,
+    WriteRead as _embedded_hal_blocking_i2c_WriteRead,
+};
+pub use ::blocking::serial::Write as _embedded_hal_blocking_serial_Write;
+pub use ::blocking::spi::{
+    Transfer as _embedded_hal_blocking_spi_Transfer,
+    Write as _embedded_hal_blocking_spi_Write,
+};
 pub use ::digital::OutputPin as _embedded_hal_digital_OutputPin;
 #[cfg(feature = "unproven")]
 pub use ::digital::InputPin as _embedded_hal_digital_InputPin;
