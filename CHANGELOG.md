@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v0.1.2] - 2018-02-14
+
+### Added
+
+- Unproven `blocking::serial::*` traits
+
 ## [v0.1.1] - 2018-02-06
 
 ### Added
@@ -17,5 +23,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/japaric/embedded-hal/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/japaric/embedded-hal/compare/v0.1.2...HEAD
+[v0.1.2]: https://github.com/japaric/embedded-hal/compare/v0.1.1...v0.1.2
 [v0.1.1]: https://github.com/japaric/embedded-hal/compare/v0.1.0...v0.1.1
