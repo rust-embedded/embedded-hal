@@ -9,6 +9,7 @@ documentation = "https://docs.rs/embedded-hal"
 keywords = ["hal", "IO"]
 license = "MIT OR Apache-2.0"
 name = "embedded-hal"
+readme = "README.md"
 repository = "https://github.com/japaric/embedded-hal"
 version = "0.1.2"
 
