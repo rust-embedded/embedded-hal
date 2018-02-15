@@ -42,9 +42,10 @@ implementations should be reported on the corresponding issue.
 
 To leave the unproven state at least *two* implementations of the trait(s) for different platforms
 (ideally, the two platforms should be from different vendors) and *one* generic driver built on top
-of the trait(s) must be demonstrated. If, instead, reports indicate that the proposed trait(s) can't
-be implemented for a certain platform then the trait(s) will be removed and we'll go back to the
-drawing board.
+of the trait(s), or alternatively one demo program that exercises the trait (via generic function /
+trait object), *should* be demonstrated. If, instead, reports indicate that the proposed trait(s)
+can't be implemented for a certain platform then the trait(s) will be removed and we'll go back to
+the drawing board.
 
 Issues used to track unproven APIs will be labeled as `unproven-api`s in the issue tracker and they
 may also include the labels `needs-impl` and `needs-driver` to signal what's required for them to
@@ -54,6 +55,12 @@ move to the set of proven traits.
 
 These are (WIP) implementations of `embedded-hal` for various platforms. Feel free to send a PR
 adding yours to the list!
+
+You may be able to find even more implementations by searching for the [`embedded-hal-impl`] keyword
+an crates.io. If you publish a `embedded-hal` implementation to crates.io please use that keyword to
+let others more easily find your crate!
+
+[`embedded-hal-impl`]: https://crates.io/keywords/embedded-hal-driver
 
 ### Linux
 
@@ -94,17 +101,15 @@ adding yours to the list!
 
 [`tm4c123x-hal`]: https://github.com/thejpster/tm4c123x-hal
 
-You may be able to find even more implementations by searching for the [`embedded-hal-impl`] keyword
-an crates.io. If you publish a `embedded-hal` implementation to crates.io please use that keyword to
-let others more easily find your crate!
-
-[`embedded-hal-impl`]: https://crates.io/keywords/embedded-hal-driver
-
 ## Drivers
 
 These are (WIP) platform agnostic drivers that can be used with any of the above implementations to
 interface all sort of external devices like sensors and actuators. Feel free to send a PR adding
 yours to the list!
+
+You may be able to find even more implementations by searching for the [`embedded-hal-driver`]
+keyword an crates.io. If you publish a driver to crates.io please use that keyword to let others
+more easily find your crate!
 
 - [`l3gd20`]. Gyroscope
 
@@ -137,10 +142,6 @@ yours to the list!
 - [`si7021`]. Humidity and temperature sensor
 
 [`si7021`]: https://github.com/wose/si7021
-
-You may be able to find even more implementations by searching for the [`embedded-hal-driver`]
-keyword an crates.io. If you publish a driver to crates.io please use that keyword to let others
-more easily find your crate!
 
 [`embedded-hal-driver`]: https://crates.io/keywords/embedded-hal-driver
 
