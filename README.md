@@ -87,7 +87,7 @@ let others more easily find your crate!
 
 - [`stm32f103xx-hal`]. Contains examples that can be run on the [Blue pill] and similar boards.
 
-[`stm32f103xx-hal`]: https://github.com/japaric/stm32f103xx
+[`stm32f103xx-hal`]: https://github.com/japaric/stm32f103xx-hal
 [Blue pill]: wiki.stm32duino.com/index.php?title=Blue_Pill
 
 - [`stm32f30x-hal`]. Check the [`f3`] crate for examples that can be run on the STM32F3DISCOVERY.
