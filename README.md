@@ -73,8 +73,8 @@ let others more easily find your crate!
 
 - [`nrf51-hal`]. Check the [`microbit`] crate for examples that can be run on the [micro:bit]
 
-[`nrf51-hal`]: https://github.com/therealprof/nrf51-hal
-[`microbit`]: https://github.com/therealprof/microbit
+[`nrf51-hal`]: https://crates.io/crates/nrf51-hal
+[`microbit`]: https://crates.io/crates/microbit
 [micro:bit]: http://microbit.org/
 
 ### NXP
@@ -121,7 +121,7 @@ more easily find your crate!
 
 - [`mag3110`]. Magnetometer
 
-[`mag3110`]: https://github.com/therealprof/mag3110
+[`mag3110`]: https://crates.io/crates/mag3110
 
 - [`mfrc522`].` RFID reader / writer
 
