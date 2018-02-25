@@ -25,7 +25,12 @@ pub trait OutputPin {
         }
     }
     
-    /// Toggles the pin state
+    /// Gets pin's state
+    fn get_state(&self) -> bool {
+        !self.is_low()
+    }
+    
+    /// Toggles pin's state
     fn toggle(&mut self) {
         if self.is_low() {
             self.set_high();
@@ -43,4 +48,9 @@ pub trait InputPin {
 
     /// Is the input pin low?
     fn is_low(&self) -> bool;
+    
+    /// Gets pin's state
+    fn get_state(&self) -> bool {
+        !self.is_low()
+    }
 }
