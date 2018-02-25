@@ -12,7 +12,27 @@ pub trait OutputPin {
     fn set_low(&mut self);
 
     /// Sets the pin high
-    fn set_high(&mut self);
+    fn set_high(&mut self) {
+        !self.is_low()
+    }
+
+    /// Sets the pin to state
+    fn set_state(&mut self, state: bool) {
+        if state {
+            self.set_high();
+        } else {
+            self.set_low();
+        }
+    }
+    
+    /// Toggles the pin state
+    fn toggle(&mut self) {
+        if self.is_low() {
+            self.set_high();
+        } else {
+            self.set_low();
+        }
+    }
 }
 
 /// Single digital input pin
