@@ -76,3 +76,31 @@ pub mod write {
         }
     }
 }
+
+/// Blocking write (iterator version)
+#[cfg(feature = "unproven")]
+pub mod write_iter {
+    /// Default implementation of `blocking::spi::WriteIter<W>` for implementers of
+    /// `spi::FullDuplex<W>`
+    pub trait Default<W>: ::spi::FullDuplex<W> {}
+
+    impl<W, S> ::blocking::spi::WriteIter<W> for S
+    where
+        S: Default<W>,
+        W: Clone,
+    {
+        type Error = S::Error;
+
+        fn write_iter<WI>(&mut self, words: WI) -> Result<(), S::Error>
+        where
+            WI: IntoIterator<Item = W>,
+        {
+            for word in words.into_iter() {
+                block!(self.send(word.clone()))?;
+                block!(self.read())?;
+            }
+
+            Ok(())
+        }
+    }
+}
