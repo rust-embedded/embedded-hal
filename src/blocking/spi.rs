@@ -18,6 +18,18 @@ pub trait Write<W> {
     fn write(&mut self, words: &[W]) -> Result<(), Self::Error>;
 }
 
+/// Blocking write (iterator version)
+#[cfg(feature = "unproven")]
+pub trait WriteIter<W> {
+    /// Error type
+    type Error;
+
+    /// Sends `words` to the slave, ignoring all the incoming words
+    fn write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
+    where
+        WI: IntoIterator<Item = W>;
+}
+
 /// Blocking transfer
 pub mod transfer {
     /// Default implementation of `blocking::spi::Transfer<W>` for implementers of
