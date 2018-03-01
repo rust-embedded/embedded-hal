@@ -685,6 +685,7 @@
 extern crate nb;
 
 pub mod blocking;
+pub mod can;
 pub mod digital;
 pub mod prelude;
 pub mod serial;
