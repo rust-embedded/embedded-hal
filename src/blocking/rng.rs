@@ -1,6 +1,7 @@
 //! Blocking hardware random number generator
 
 /// Blocking read
+#[cfg(feature = "unproven")]
 pub trait Read {
     /// Error type
     type Error;
