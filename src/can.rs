@@ -22,6 +22,10 @@ pub trait CanInterface : BaseCanInterface<can_utils::CanFrame> {}
 #[cfg(feature = "unproven")]
 /// Exactly what it sounds like, it's a HAL for CAN-FD interfaces to allow generic drivers.
 pub trait CanFdInterface : BaseCanInterface<can_utils::CanFdFrame> {
+  /// Returns true iff this interface is able to send and receive, but not send error or overload
+  /// frames.
+  fn in_restricted_operation_mode(&self) -> bool;
+
   /// Returns true iff the hardware supports CAN-FD.
   fn supports_can_fd(&self) -> bool;
 
@@ -107,9 +111,6 @@ pub trait BaseCanInterface<Frame> {
   fn set_data_speed_raw(&mut self, timing_parameters: CanBitTimingParameters);
 
   /// Gets the speed of whichever clock controls the CAN interface.
-  ///
-  /// This is not intended to be used by consumers of this API, it is merely a convenience to
-  /// allow default implementations of `set_speed` and `set_data_speed`.
   fn relevant_clock_speed(&self) -> MegaHertz;
 
   /// This returns the largest timing values the hardware can accept.
@@ -124,13 +125,6 @@ pub trait BaseCanInterface<Frame> {
   /// feature even on a regular CAN bus, check your local documentation closely to see if you
   /// have such a mode (though it may have a different name), otherwise return false.
   fn in_bus_monitoring_mode(&self) -> bool;
-
-  /// Returns true iff this interface is able to send and receive, but not send error or overload
-  /// frames.
-  ///
-  /// Restricted Operation Mode is defined in CAN-FD, regular CAN implementations should just
-  /// return false.
-  fn in_restricted_operation_mode(&self) -> bool;
 
   /// Gets the number of unused slots in the hardware message filter bank.
   ///
