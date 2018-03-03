@@ -22,6 +22,12 @@ pub trait CanInterface : BaseCanInterface<can_utils::CanFrame> {}
 #[cfg(feature = "unproven")]
 /// Exactly what it sounds like, it's a HAL for CAN-FD interfaces to allow generic drivers.
 pub trait CanFdInterface : BaseCanInterface<can_utils::CanFdFrame> {
+  /// Sets the bit timing parameters for the data phase of CAN-FD frames.
+  ///
+  /// If this function is never called the implementation must
+  /// default to the parameters provided for the arbitration phase.
+  fn set_data_speed(&mut self, timing_parameters: CanBitTimingParameters);
+
   /// Returns true iff this interface is able to send and receive, but not send error or overload
   /// frames.
   fn in_restricted_operation_mode(&self) -> bool;
@@ -47,68 +53,10 @@ pub trait BaseCanInterface<Frame> {
 
   /// Sets the bit timing parameters for the bus (for CAN-FD these are the parameters for the arbitration phase).
   ///
-  /// This function queries the system for (or just knows) the relevant clock frequency and then
-  /// uses it and `nominal_bitrate` to compute seg1 and seg2 such that the bit is sampled at
-  /// `sample_point`.  It then passes these computed values to `set_data_speed_raw`.
-  ///
-  /// If this is a CAN-FD interface and the data phase speed registers are at their reset values,
-  /// implementations should set the data phase parameters to match the values provided here.
-  ///
-  /// Drivers should call either this function or `set_speed_raw`.
-  ///
-  /// Implementation hint: you can use can_utils::timing_calculator to convert
-  /// these parameters to a CanBitTimingParameters
-  ///
-  /// * `nominal_bitrate` - The bus-wide bitrate, eg 250kbps.
-  /// * `sample_point` - The target point in the bit for the interface to sample at (in tenths of a percent).
-  /// * `jump_width` - The number of time quanta by which the system adjusts seg1 and seg2 as it synchronizes with the bus (1 is a good default).
-  fn set_speed(&mut self,
-               nominal_bitrate: BitsPerSecond,
-               sample_point: BitSamplePoint,
-               jump_width: SegmentLength);
-
-  /// Sets the bit timing parameters for the bus (for CAN-FD these are the parameters for the arbitration phase).
-  ///
-  /// If this is a CAN-FD interface and the data phase speed registers are at their reset values,
-  /// implementations should set the data phase parameters to match the values provided here.
-  ///
-  /// Drivers should call either this function or `set_speed`.  If this is a CAN-FD interface the
-  /// driver should set the arbitration phase parameters before the data phase parameters, just in
-  /// case the HAL implementation is doing something silly like resetting the data parameters when
-  /// new arbitration parameters arrive.
-  ///
-  /// The raw version of `set_speed` might not sanity check to ensure that the provided
-  /// segments correspond to a reasonable sample point or a reasonable bitrate, use with care.
-  fn set_speed_raw(&mut self, timing_parameters: CanBitTimingParameters);
-
-  /// Sets the bit timing parameters for the data phase of CAN-FD frames.
-  ///
-  /// If neither this function nor `set_data_speed_raw` are ever called the implementation must
-  /// default to the parameters provided for the arbitration phase.
-  ///
-  /// This function queries the system for (or just knows) the relevant clock frequency and then
-  /// uses it and `nominal_bitrate` to compute seg1 and seg2 such that the bit is sampled at
-  /// `sample_point`.  It then passes these computed values to `set_data_speed_raw`.
-  ///
-  /// Implementation hint: you can use can_utils::timing_calculator to convert
-  /// these parameters to a CanBitTimingParameters
-  ///
-  /// * `nominal_bitrate` - The bus-wide data segment bitrate, eg 250kbps.
-  /// * `sample_point` - The target point in the bit for the interface to sample at (in tenths of a percent).
-  /// * `jump_width` - The number of time quanta by which the system adjusts seg1 and seg2 as it synchronizes with the bus (1 is a good default).
-  fn set_data_speed(&mut self,
-                    nominal_bitrate: BitsPerSecond,
-                    sample_point: BitSamplePoint,
-                    jump_width: SegmentLength);
-
-  /// Sets the bit timing parameters for the data phase of CAN-FD frames.
-  ///
-  /// If neither this function nor `set_data_speed` are ever called the implementation must
-  /// default to the parameters provided for the arbitration phase.
-  ///
-  /// The raw version of `set_data_speed` might not sanity check to ensure that the provided
-  /// segments correspond to a reasonable sample point or a reasonable bitrate, use with care.
-  fn set_data_speed_raw(&mut self, timing_parameters: CanBitTimingParameters);
+  /// Implementation Note: If this is a CAN-FD interface and the data phase speed registers are at
+  /// their reset values, implementations should set the data phase parameters to match the values
+  /// provided here.
+  fn set_speed(&mut self, timing_parameters: CanBitTimingParameters);
 
   /// Gets the speed of whichever clock controls the CAN interface.
   fn relevant_clock_speed(&self) -> MegaHertz;
