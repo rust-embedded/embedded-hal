@@ -13,6 +13,10 @@ readme = "README.md"
 repository = "https://github.com/japaric/embedded-hal"
 version = "0.1.2"
 
+[dependencies.can-utils]
+optional = true
+version = "0.1.4"
+
 [dependencies.nb]
 version = "0.1.1"
 
@@ -21,4 +25,4 @@ stm32f30x = "0.6.0"
 futures = "0.1.17"
 
 [features]
-unproven = ["nb/unstable"]
+unproven = ["can-utils", "nb/unstable"]
