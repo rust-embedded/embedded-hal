@@ -17,15 +17,23 @@ use nb;
 
 #[cfg(feature = "unproven")]
 /// Exactly what it sounds like, it's a HAL for CAN interfaces to allow generic drivers.
-pub trait CanInterface<Frame> {
-  /// Whatever error type the implementation finds useful.
-  type Error;  // TODO: think about if this would be better as another type parameter.
+pub trait CanInterface : BaseCanInterface<can_utils::CanFrame> {}
 
+#[cfg(feature = "unproven")]
+/// Exactly what it sounds like, it's a HAL for CAN-FD interfaces to allow generic drivers.
+pub trait CanFdInterface : BaseCanInterface<can_utils::CanFdFrame> {
   /// Returns true iff the hardware supports CAN-FD.
   fn supports_can_fd(&self) -> bool;
 
   /// Returns true iff the hardware supports ISO-CAN-FD (a fixed version of CAN-FD).
   fn supports_iso_can_fd(&self) -> bool;
+}
+
+#[cfg(feature = "unproven")]
+/// Declares the common functionalities between CAN interfaces and CAN-FD interfaces.
+pub trait BaseCanInterface<Frame> {
+  /// Whatever error type the implementation finds useful.
+  type Error;  // TODO: think about if this would be better as another type parameter.
 
   /// Maybe populates buf with a frame from the bus, and returns if it did so.
   fn receive(&mut self, buf: &mut Frame) -> nb::Result<bool, Self::Error>;
