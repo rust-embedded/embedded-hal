@@ -85,6 +85,11 @@ let others more easily find your crate!
 
 ### ST Microelectronics
 
+- [`stm32f042-hal`]. Contains examples that can be run on the [Nucleo-F042K6] and similar boards.
+
+[`stm32f042-hal`]: https://crates.io/crates/stm32f042-hal
+[Nucleo-F042K6]: http://www.st.com/en/evaluation-tools/nucleo-f042k6.html
+
 - [`stm32f103xx-hal`]. Contains examples that can be run on the [Blue pill] and similar boards.
 
 [`stm32f103xx-hal`]: https://github.com/japaric/stm32f103xx-hal
