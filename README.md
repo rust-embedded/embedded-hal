@@ -128,7 +128,7 @@ more easily find your crate!
 
 [`mag3110`]: https://crates.io/crates/mag3110
 
-- [`mfrc522`].` RFID reader / writer
+- [`mfrc522`]. RFID reader / writer
 
 [`mfrc522`]: https://crates.io/crates/mfrc522
 
@@ -147,6 +147,10 @@ more easily find your crate!
 - [`si7021`]. Humidity and temperature sensor
 
 [`si7021`]: https://github.com/wose/si7021
+
+- [`mcp3425`]. 16-bit ADC
+
+[`mcp3425`]: https://github.com/dbrgn/mcp3425-rs/
 
 [`embedded-hal-driver`]: https://crates.io/keywords/embedded-hal-driver
 
