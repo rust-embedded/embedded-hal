@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["Read","Read half of a serial interface"],["Write","Write half of a serial interface"]]});
