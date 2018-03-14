@@ -23,6 +23,8 @@ pub use ::blocking::spi::{
     Transfer as _embedded_hal_blocking_spi_Transfer,
     Write as _embedded_hal_blocking_spi_Write,
 };
+#[cfg(feature = "unproven")]
+pub use ::blocking::rng::Read as _embedded_hal_blocking_rng_Read;
 pub use ::digital::OutputPin as _embedded_hal_digital_OutputPin;
 #[cfg(feature = "unproven")]
 pub use ::digital::InputPin as _embedded_hal_digital_InputPin;
