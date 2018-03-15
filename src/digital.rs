@@ -3,7 +3,9 @@
 /// Single digital output pin
 pub trait OutputPin {
     /// Is the output pin high?
-    fn is_high(&self) -> bool;
+    fn is_high(&self) -> bool {
+        !self.is_low()
+    }
 
     /// Is the output pin low?
     fn is_low(&self) -> bool;
@@ -13,6 +15,29 @@ pub trait OutputPin {
 
     /// Sets the pin high
     fn set_high(&mut self);
+
+    /// Sets the pin to state
+    fn set_state(&mut self, state: bool) {
+        if state {
+            self.set_high();
+        } else {
+            self.set_low();
+        }
+    }
+    
+    /// Gets pin's state
+    fn get_state(&self) -> bool {
+        !self.is_low()
+    }
+    
+    /// Toggles pin's state
+    fn toggle(&mut self) {
+        if self.is_low() {
+            self.set_high();
+        } else {
+            self.set_low();
+        }
+    }
 }
 
 /// Single digital input pin
@@ -23,4 +48,9 @@ pub trait InputPin {
 
     /// Is the input pin low?
     fn is_low(&self) -> bool;
+    
+    /// Gets pin's state
+    fn get_state(&self) -> bool {
+        !self.is_low()
+    }
 }
