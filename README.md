@@ -83,6 +83,12 @@ let others more easily find your crate!
 
 [`lpc82x-hal`]: https://github.com/braun-robotics/rust-lpc82x-hal
 
+- [`mkw41z-hal`]. Check the [`frdm-kw41z`] crate for examples that can be run on the NXP [FRDM-KW41Z] boards
+
+[`mkw41z-hal`]: https://crates.io/crates/mkw41z-hal
+[`frdm-kw41z`]: https://crates.io/crates/frdm-kw41z
+[FRDM-KW41Z]: https://www.nxp.com/products/processors-and-microcontrollers/arm-based-processors-and-mcus/kinetis-cortex-m-mcus/w-serieswireless-conn.m0-plus-m4/freedom-development-kit-for-kinetis-kw41z-31z-21z-mcus:FRDM-KW41Z
+
 ### ST Microelectronics
 
 - [`stm32f042-hal`]. Contains examples that can be run on the [Nucleo-F042K6] and similar boards.
