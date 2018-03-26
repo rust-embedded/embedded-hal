@@ -77,3 +77,17 @@ pub trait CountDown {
 
 /// Marker trait that indicates that a timer is periodic
 pub trait Periodic {}
+
+/// Trait for cancelable countdowns.
+pub trait Cancel : CountDown {
+    /// Error returned when a countdown can't be canceled.
+    type Error;
+
+    /// Tries to cancel this countdown.
+    ///
+    /// # Errors
+    ///
+    /// An error will be returned if the countdown has already been canceled or was never started.
+    /// An error is also returned if the countdown is not `Periodic` and has already expired.
+    fn cancel(&mut self) -> Result<(), Self::Error>;
+}
