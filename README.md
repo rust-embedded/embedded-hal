@@ -60,7 +60,7 @@ You may be able to find even more implementations by searching for the [`embedde
 an crates.io. If you publish a `embedded-hal` implementation to crates.io please use that keyword to
 let others more easily find your crate!
 
-[`embedded-hal-impl`]: https://crates.io/keywords/embedded-hal-driver
+[`embedded-hal-impl`]: https://crates.io/keywords/embedded-hal-impl
 
 ### Linux
 
