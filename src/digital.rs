@@ -24,3 +24,11 @@ pub trait InputPin {
     /// Is the input pin low?
     fn is_low(&self) -> bool;
 }
+
+pub trait IoPin {
+    type Input: InputPin + IoPin<Input = Self::Input, Output = Self::Output>;
+    type Output: OutputPin + IoPin<Input = Self::Input, Output = Self::Output>;
+
+    fn into_input(self) -> Self::Input;
+    fn into_output(self) -> Self::Output;
+}
