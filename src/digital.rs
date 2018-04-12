@@ -11,13 +11,26 @@ pub trait OutputPin {
 
 /// Output pin that can read its output state
 #[cfg(feature = "unproven")]
-trait StatefulOutputPin: OutputPin {
+trait StatefulOutputPin {
     /// Is the pin set to high?
     fn is_set_high(&self) -> bool;
 
     /// Is the pin set to low?
     fn is_set_low(&self) -> bool;
+}
 
+/// Output pin that can be toggled
+#[cfg(feature = "unproven")]
+trait ToggleableOutputPin {
+    /// Toggle pin output
+    fn toggle(&mut self);
+}
+
+/// If you can read **and** write the output state, a pin is
+/// toggleable by software. You may override the `toggle()` method
+/// with a hardware implementation.
+#[cfg(feature = "unproven")]
+impl<PIN: OutputPin + StatefulOutputPin> ToggleableOutputPin for PIN {
     /// Toggle pin output
     fn toggle(&mut self) {
         if self.is_set_low() {
