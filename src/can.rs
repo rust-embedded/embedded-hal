@@ -44,10 +44,16 @@ pub trait Frame {
 }
 
 /// A Can-FD Frame
+///
+/// A "ordinary" Can-Frame must also be representable by this type.
 #[cfg(feature = "unproven")]
 pub trait FdFrame {
     /// The Id type of this Frame
     type Id: Id;
+
+    /// Returns true if this frame would/has be(en) transmitted as a Can-Fd frame.
+    /// Returns false if this frame would/has be(en) transmitted as a "ordinary" Can frame.
+    fn is_fd_frame(&self) -> bool;
 
     /// Returns the Can-ID
     fn id(&self) -> Self::Id;
@@ -67,7 +73,7 @@ pub trait Interface {
     /// The Interface Error type
     type Error;
 
-    /// Read the available `Frame` with the highest priority (lowest ID).
+    /// Return the available `Frame` with the highest priority (lowest ID).
     ///
     /// NOTE: Can-FD Frames will not be received using this function.
     fn receive(&mut self) -> nb::Result<Self::Frame, Self::Error>;
@@ -75,39 +81,31 @@ pub trait Interface {
     /// Put a `Frame` in the transmit buffer (or a free mailbox).
     ///
     /// If the buffer is full, this function will try to replace a lower priority `Frame`
-    /// and return it.
+    /// and return it. This is to avoid the priority inversion problem.
     fn transmit(&mut self, frame: &Self::Frame) -> nb::Result<Option<Self::Frame>, Self::Error>;
 
-    /// Put a `Frame` in the transmit buffer (or a free mailbox).
-    ///
-    /// A high priority `Frame` is prone to being blocked when this function is used.
-    fn transmit_without_priority(&mut self, frame: &Self::Frame) -> nb::Result<(), Self::Error>;
+    /// Returns true if a call to `transmit(frame)` (and if the interface supports Can-FD)
+    /// `transmit_fd(fd_frame)` would return a `Frame` or `WouldBlock`.
+    fn transmit_buffer_full(&self) -> bool;
 
 }
 
-/// A CAN-FD interface
+/// A CAN interface also supporting Can-FD
 #[cfg(feature = "unproven")]
-pub trait FdInterface {
+pub trait FdInterface: Interface {
     /// The Can Frame this Interface operates on
-    type Frame: FdFrame;
-
-    /// The Interface Error type
-    type Error;
+    type FdFrame: FdFrame;
 
     /// Read the available `FdFrame` with the highest priority (lowest ID).
-    ///
-    /// NOTE: ordinary Can Frames will not be received using this function.
-    fn receive_fd(&mut self) -> nb::Result<Self::Frame, Self::Error>;
+    fn receive(&mut self) -> nb::Result<Self::FdFrame, Self::Error>;
 
     /// Put a `FdFrame` in the transmit buffer (or a free mailbox).
     ///
     /// If the buffer is full, this function will try to replace a lower priority `FdFrame`
-    /// and return it.
-    fn transmit_fd(&mut self, frame: &Self::Frame) -> nb::Result<Option<Self::Frame>, Self::Error>;
+    /// and return it. This is to avoid the priority inversion problem.
+    fn transmit(&mut self, frame: &Self::FdFrame) -> nb::Result<Option<Self::FdFrame>, Self::Error>;
 
-    /// Put a `FdFrame` in the transmit buffer (or a free mailbox).
-    ///
-    /// A high priority `FdFrame` is prone to being blocked when this function is used.
-    fn transmit_fd_without_priority(&mut self, frame: &Self::Frame) -> nb::Result<(), Self::Error>;
-
+    /// Returns true if a call to `transmit(frame)` or `transmit_fd(fd_frame)`
+    /// would return a `FdFrame` or `WouldBlock`.
+    fn transmit_buffer_full(&self) -> bool;
 }
