@@ -1,39 +1,47 @@
 //! Controller Area Network
 
-use core::convert::TryInto;
-use core::convert::TryFrom;
-
 use nb;
 
 /// A type that can either be `BaseId` or `ExtendedId`
 #[cfg(feature = "unproven")]
-pub trait Id: Sized {
-    /// The BaseId variant
-    type BaseId: BaseId + Into<Self> + TryFrom<Self>;
+pub trait Id {
+    /// The (11-bit) BaseId variant.
+    type BaseId;
 
-    /// The ExtendedId variant
-    type ExtendedId: ExtendedId + Into<Self> + TryFrom<Self>;
+    /// The (29-bit) ExtendedId variant.
+    type ExtendedId;
+
+    /// Returns `Some(base_id)` if this Can-ID is 11-bit.
+    /// Returns `None` if this Can-ID is 29-bit.
+    fn base_id(&self) -> Option<Self::BaseId>;
+
+    /// Returns `Some(extended_id)` if this Can-ID is 29-bit.
+    /// Returns `None` if this Can-ID is 11-bit.
+    fn extended_id(&self) -> Option<Self::ExtendedId>;
 }
 
-/// A Can (11-bit) ID
-#[cfg(feature = "unproven")]
-pub trait BaseId: Sized {
-    /// A generic ID type that encapsulate this type
-    type Id: Id + From<Self> + TryInto<Self>;
-}
-
-/// A Can Extended (28-bit) ID
-#[cfg(feature = "unproven")]
-pub trait ExtendedId: Sized {
-    /// A generic ID type that encapsulate this type
-    type Id: Id + From<Self> + TryInto<Self>;
-}
 
 /// A Can Frame
 #[cfg(feature = "unproven")]
 pub trait Frame {
     /// The Id type of this Frame
     type Id: Id;
+
+    /// Returns true if this `Frame` is a remote frame
+    fn is_remote_frame(&self) -> bool;
+
+    /// Returns true if this `Frame` is a data frame
+    fn is_data_frame(&self) -> bool;
+
+    /// Returns true if this `Frame` is a extended id frame
+    fn is_base_id_frame(&self) -> bool {
+        self.id().base_id().is_some()
+    }
+
+    /// Returns true if this `Frame` is a extended id frame
+    fn is_extended_id_frame(&self) -> bool {
+        self.id().extended_id().is_some()
+    }
 
     /// Returns the Can-ID
     fn id(&self) -> Self::Id;
@@ -54,6 +62,22 @@ pub trait FdFrame {
     /// Returns true if this frame would/has be(en) transmitted as a Can-Fd frame.
     /// Returns false if this frame would/has be(en) transmitted as a "ordinary" Can frame.
     fn is_fd_frame(&self) -> bool;
+
+    /// Returns true if this `Frame` is a remote frame
+    fn is_remote_frame(&self) -> bool;
+
+    /// Returns true if this `Frame` is a data frame
+    fn is_data_frame(&self) -> bool;
+
+    /// Returns true if this `Frame` is a extended id frame
+    fn is_base_id_frame(&self) -> bool {
+        self.id().base_id().is_some()
+    }
+
+    /// Returns true if this `Frame` is a extended id frame
+    fn is_extended_id_frame(&self) -> bool {
+        self.id().extended_id().is_some()
+    }
 
     /// Returns the Can-ID
     fn id(&self) -> Self::Id;
