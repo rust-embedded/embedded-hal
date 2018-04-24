@@ -20,6 +20,55 @@ pub trait Id {
     fn extended_id(&self) -> Option<Self::ExtendedId>;
 }
 
+/// A type that will either accept or filter a `Frame`.
+/// The filtering is done solely on the `ID` of the `Frame`.
+#[cfg(feature = "unproven")]
+pub trait Filter {
+    /// The Id type this filter works on
+    type Id: Id;
+
+    /// Constructs a filter that only accepts `Frame`s with the provided identifier.
+    fn from_id(id: Self::Id) -> Self;
+
+    /// Constructs a filter that will accept any `Frame`.
+    fn accept_all() -> Self;
+
+    /// Constructs a filter that will accept any `Frame` with extended `Id`.
+    fn accept_extended_id() -> Self;
+
+    /// Constructs a filter that will accept any `Frame` with base`Id`.
+    fn accept_base_id() -> Self;
+
+    /// Create a `Filter` from a filter/mask combination.
+    ///
+    /// *Note: When filtering base id any rule put on `bit_pos >= 11` will (for implementers: must) be ignored*
+    ///
+    /// ### Panic
+    /// (for implementers: must) panic if mask have bits equal to `1` for bit_position `>= 29`.
+    fn from_mask(mask: u32, filter: u32, accept_base_id: bool, accept_extended_id: bool) -> Self;
+
+    /// Apply a filter rule on a specific bit.
+    ///
+    /// *Note: When filtering base id any rule put on `bit_pos >= 11` will (for implementers: must) be ignored*
+    ///
+    /// ### Panic
+    /// (for implementers: must) panic if `bit_pos >= 29`.
+    fn set_filter_bit(&mut self, bit_pos: u8, bit_state: bool);
+
+    /// Apply a filter rule on a specific bit.
+    ///
+    /// *Note: When filtering base id any rule put on `bit_pos >= 11` will (for implementers: must) be ignored*
+    ///
+    /// ### Panic
+    /// (for implementers: must) panic if `bit_pos >= 29`.
+    fn clear_filter_bit(&mut self, bit_pos: u8);
+
+    /// Returns `true` if the `Frame` would have been accepted by this filter.
+    /// Returns `false` if the `Frame` would have been filtered by this filter.
+    fn accept<T: Frame<Id=Self::Id>>(&self, frame: T) -> bool;
+
+}
+
 
 /// A Can Frame
 #[cfg(feature = "unproven")]
@@ -91,8 +140,14 @@ pub trait FdFrame {
 /// A CAN interface
 #[cfg(feature = "unproven")]
 pub trait Interface {
+    /// The Id type that works with this `Interface`
+    type Id: Id;
+
     /// The Can Frame this Interface operates on
-    type Frame: Frame;
+    type Frame: Frame<Id = Self::Id>;
+
+    /// The Filter type used in this `Interface`
+    type Filter: Filter<Id = Self::Id>;
 
     /// The Interface Error type
     type Error;
@@ -111,6 +166,17 @@ pub trait Interface {
     /// Returns true if a call to `transmit(frame)` (and if the interface supports Can-FD)
     /// `transmit_fd(fd_frame)` would return a `Frame` or `WouldBlock`.
     fn transmit_buffer_full(&self) -> bool;
+
+    /// Set the can controller in a mode where it only accept frames matching the given filter.
+    ///
+    /// If there exists several receive buffers, this filter will be applied for all of them.
+    ///
+    /// *Note: Even after this method has been called, there may still be `Frame`s in the receive buffer with
+    /// identifiers that would not been received with this `Filter`.*
+    fn set_filter(&mut self, filter: Self::Filter);
+
+    /// Set the can controller in a mode where it will accept all frames.
+    fn clear_filter(&mut self);
 
 }
 
