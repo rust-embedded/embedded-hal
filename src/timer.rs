@@ -1,6 +1,7 @@
 //! Timers
 
 use nb;
+use void::Void;
 
 /// A count down timer
 ///
@@ -17,7 +18,6 @@ use nb;
 /// You can use this timer to create delays
 ///
 /// ```
-/// # #![feature(never_type)]
 /// extern crate embedded_hal as hal;
 /// #[macro_use(block)]
 /// extern crate nb;
@@ -40,6 +40,8 @@ use nb;
 ///     Led.off();
 /// }
 ///
+/// # extern crate void;
+/// # use void::Void;
 /// # struct Seconds(u32);
 /// # trait U32Ext { fn s(self) -> Seconds; }
 /// # impl U32Ext for u32 { fn s(self) -> Seconds { Seconds(self) } }
@@ -52,7 +54,7 @@ use nb;
 /// # impl hal::timer::CountDown for Timer6 {
 /// #     type Time = Seconds;
 /// #     fn start<T>(&mut self, _: T) where T: Into<Seconds> {}
-/// #     fn wait(&mut self) -> ::nb::Result<(), !> { Ok(()) }
+/// #     fn wait(&mut self) -> ::nb::Result<(), Void> { Ok(()) }
 /// # }
 /// ```
 pub trait CountDown {
@@ -72,7 +74,7 @@ pub trait CountDown {
     /// finishes.
     /// - Otherwise the behavior of calling `wait` after the last call returned `Ok` is UNSPECIFIED.
     /// Implementers are suggested to panic on this scenario to signal a programmer error.
-    fn wait(&mut self) -> nb::Result<(), !>;
+    fn wait(&mut self) -> nb::Result<(), Void>;
 }
 
 /// Marker trait that indicates that a timer is periodic

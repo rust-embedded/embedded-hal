@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v0.2.0] - 2018-05-11
+
+### Changed
+
+- [breaking-change] The signature of `CountDown.wait` changed; it now returns `nb::Result<(),
+  Void>`. Where [`Void`] is the stable alternative to the never type, `!`, provided by the stable
+  [`void`] crate. Implementations of the `CountDown` trait will have to be updated to use the new
+  signature. With this change this crate compiles on the stable and beta channels.
+
+[`Void`]: https://docs.rs/void/1.0.2/void/enum.Void.html
+[`void`]: https://crates.io/crates/void
+
 ## [v0.1.2] - 2018-02-14
 
 ### Added
@@ -23,6 +35,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/japaric/embedded-hal/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/japaric/embedded-hal/compare/v0.2.0...HEAD
+[v0.2.0]: https://github.com/japaric/embedded-hal/compare/v0.1.2...v0.2.0
 [v0.1.2]: https://github.com/japaric/embedded-hal/compare/v0.1.1...v0.1.2
 [v0.1.1]: https://github.com/japaric/embedded-hal/compare/v0.1.0...v0.1.1
