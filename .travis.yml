@@ -3,6 +3,14 @@ language: rust
 matrix:
   include:
     - env: TARGET=x86_64-unknown-linux-gnu
+
+    - env: TARGET=thumbv6m-none-eabi
+      rust: beta
+
+    - env: TARGET=thumbv7m-none-eabi
+      rust: beta
+
+    - env: TARGET=x86_64-unknown-linux-gnu
       rust: nightly
 
 before_install: set -e
@@ -25,9 +33,8 @@ before_cache:
 
 branches:
   only:
-    - auto
-    - master
-    - try
+    - staging
+    - trying
 
 notifications:
   email:

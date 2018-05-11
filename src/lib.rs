@@ -90,19 +90,20 @@
 //! [`WouldBlock`]: https://docs.rs/nb/0.1.0/nb/enum.Error.html
 //!
 //! Some traits, like the one shown below, may expose possibly blocking APIs that can't fail. In
-//! those cases `nb::Result<_, !>` is used.
+//! those cases `nb::Result<_, Void>` is used.
 //!
 //! ```
-//! #![feature(never_type)]
-//!
 //! extern crate nb;
+//! extern crate void;
+//!
+//! use void::Void;
 //!
 //! /// A count down timer
 //! pub trait CountDown {
 //!     // ..
 //!
 //!     /// "waits" until the count down is over
-//!     fn wait(&mut self) -> nb::Result<(), !>;
+//!     fn wait(&mut self) -> nb::Result<(), Void>;
 //! }
 //!
 //! # fn main() {}
@@ -201,7 +202,6 @@
 //! fashion:
 //!
 //! ```
-//! # #![feature(never_type)]
 //! extern crate embedded_hal;
 //! #[macro_use(block)]
 //! extern crate nb;
@@ -223,9 +223,11 @@
 //! # }
 //!
 //! # mod stm32f30x_hal {
+//! #     extern crate void;
+//! #     use self::void::Void;
 //! #     pub struct Serial1;
 //! #     impl Serial1 {
-//! #         pub fn write(&mut self, _: u8) -> ::nb::Result<(), !> {
+//! #         pub fn write(&mut self, _: u8) -> ::nb::Result<(), Void> {
 //! #             Ok(())
 //! #         }
 //! #     }
@@ -238,11 +240,9 @@
 //! second. Second task: loop back data over the serial interface.
 //!
 //! ```
-//! #![feature(conservative_impl_trait)]
-//! #![feature(never_type)]
-//!
 //! extern crate embedded_hal as hal;
 //! extern crate futures;
+//! extern crate void;
 //!
 //! #[macro_use(try_nb)]
 //! extern crate nb;
@@ -255,11 +255,12 @@
 //! };
 //! use futures::future::Loop;
 //! use stm32f30x_hal::{Led, Serial1, Timer6};
+//! use void::Void;
 //!
 //! /// `futures` version of `CountDown.wait`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn wait<T>(mut timer: T) -> impl Future<Item = T, Error = !>
+//! fn wait<T>(mut timer: T) -> impl Future<Item = T, Error = Void>
 //! where
 //!     T: hal::timer::CountDown,
 //! {
@@ -341,30 +342,32 @@
 //!
 //!     // Event loop
 //!     loop {
-//!         blinky.poll().unwrap(); // NOTE(unwrap) E = !
+//!         blinky.poll().unwrap(); // NOTE(unwrap) E = Void
 //!         loopback.poll().unwrap();
 //! #       break;
 //!     }
 //! }
 //!
 //! # mod stm32f30x_hal {
+//! #     extern crate void;
+//! #     use self::void::Void;
 //! #     pub struct Timer6;
 //! #     impl ::hal::timer::CountDown for Timer6 {
 //! #         type Time = ();
 //! #
 //! #         fn start<T>(&mut self, _: T) where T: Into<()> {}
-//! #         fn wait(&mut self) -> ::nb::Result<(), !> { Err(::nb::Error::WouldBlock) }
+//! #         fn wait(&mut self) -> ::nb::Result<(), Void> { Err(::nb::Error::WouldBlock) }
 //! #     }
 //! #
 //! #     pub struct Serial1;
 //! #     impl ::hal::serial::Read<u8> for Serial1 {
-//! #         type Error = !;
-//! #         fn read(&mut self) -> ::nb::Result<u8, !> { Err(::nb::Error::WouldBlock) }
+//! #         type Error = Void;
+//! #         fn read(&mut self) -> ::nb::Result<u8, Void> { Err(::nb::Error::WouldBlock) }
 //! #     }
 //! #     impl ::hal::serial::Write<u8> for Serial1 {
-//! #         type Error = !;
-//! #         fn flush(&mut self) -> ::nb::Result<(), !> { Err(::nb::Error::WouldBlock) }
-//! #         fn write(&mut self, _: u8) -> ::nb::Result<(), !> { Err(::nb::Error::WouldBlock) }
+//! #         type Error = Void;
+//! #         fn flush(&mut self) -> ::nb::Result<(), Void> { Err(::nb::Error::WouldBlock) }
+//! #         fn write(&mut self, _: u8) -> ::nb::Result<(), Void> { Err(::nb::Error::WouldBlock) }
 //! #     }
 //! #
 //! #     pub struct Led;
@@ -382,7 +385,6 @@
 //! ```
 //! #![feature(generator_trait)]
 //! #![feature(generators)]
-//! # #![feature(never_type)]
 //!
 //! extern crate embedded_hal as hal;
 //!
@@ -415,7 +417,7 @@
 //!         loop {
 //!             // `await!` means "suspend / yield here" instead of "block until
 //!             // completion"
-//!             await!(timer.wait()).unwrap(); // NOTE(unwrap) E = !
+//!             await!(timer.wait()).unwrap(); // NOTE(unwrap) E = Void
 //!
 //!             state = !state;
 //!
@@ -436,21 +438,23 @@
 //!
 //!     // Event loop
 //!     loop {
-//!         blinky.resume();
-//!         loopback.resume();
+//!         unsafe { blinky.resume(); }
+//!         unsafe { loopback.resume(); }
 //!         # break;
 //!     }
 //! }
 //!
 //! # mod stm32f30x_hal {
+//! #   extern crate void;
+//! #   use self::void::Void;
 //! #   pub struct Serial1;
 //! #   impl Serial1 {
-//! #       pub fn read(&mut self) -> ::nb::Result<u8, !> { Err(::nb::Error::WouldBlock) }
-//! #       pub fn write(&mut self, _: u8) -> ::nb::Result<(), !> { Err(::nb::Error::WouldBlock) }
+//! #       pub fn read(&mut self) -> ::nb::Result<u8, Void> { Err(::nb::Error::WouldBlock) }
+//! #       pub fn write(&mut self, _: u8) -> ::nb::Result<(), Void> { Err(::nb::Error::WouldBlock) }
 //! #   }
 //! #   pub struct Timer6;
 //! #   impl Timer6 {
-//! #       pub fn wait(&mut self) -> ::nb::Result<(), !> { Err(::nb::Error::WouldBlock) }
+//! #       pub fn wait(&mut self) -> ::nb::Result<(), Void> { Err(::nb::Error::WouldBlock) }
 //! #   }
 //! #   pub struct Led;
 //! #   impl Led {
@@ -589,15 +593,16 @@
 //! - Buffered serial interface with periodic flushing in interrupt handler
 //!
 //! ```
-//! # #![feature(never_type)]
 //! extern crate embedded_hal as hal;
 //! extern crate nb;
+//! extern crate void;
 //!
 //! use hal::prelude::*;
+//! use void::Void;
 //!
 //! fn flush<S>(serial: &mut S, cb: &mut CircularBuffer)
 //! where
-//!     S: hal::serial::Write<u8, Error = !>,
+//!     S: hal::serial::Write<u8, Error = Void>,
 //! {
 //!     loop {
 //!         if let Some(byte) = cb.peek() {
@@ -662,9 +667,9 @@
 //! # }
 //! # struct Serial1;
 //! # impl ::hal::serial::Write<u8> for Serial1 {
-//! #   type Error = !;
-//! #   fn write(&mut self, _: u8) -> nb::Result<(), !> { Err(::nb::Error::WouldBlock) }
-//! #   fn flush(&mut self) -> nb::Result<(), !> { Err(::nb::Error::WouldBlock) }
+//! #   type Error = Void;
+//! #   fn write(&mut self, _: u8) -> nb::Result<(), Void> { Err(::nb::Error::WouldBlock) }
+//! #   fn flush(&mut self) -> nb::Result<(), Void> { Err(::nb::Error::WouldBlock) }
 //! # }
 //! # struct CircularBuffer;
 //! # impl CircularBuffer {
@@ -678,11 +683,11 @@
 
 #![deny(missing_docs)]
 #![deny(warnings)]
-#![feature(never_type)]
 #![no_std]
 
 #[macro_use]
 extern crate nb;
+extern crate void;
 
 pub mod blocking;
 pub mod digital;
@@ -699,8 +704,6 @@ pub mod timer;
 /// / events
 ///
 /// ```
-/// # #![feature(never_type)]
-///
 /// extern crate embedded_hal as hal;
 /// #[macro_use(block)]
 /// extern crate nb;
@@ -723,6 +726,8 @@ pub mod timer;
 ///     println!("Period: {} ms", period);
 /// }
 ///
+/// # extern crate void;
+/// # use void::Void;
 /// # struct MilliSeconds(u32);
 /// # trait U32Ext { fn ms(self) -> MilliSeconds; }
 /// # impl U32Ext for u32 { fn ms(self) -> MilliSeconds { MilliSeconds(self) } }
@@ -731,9 +736,9 @@ pub mod timer;
 /// # impl hal::Capture for Capture1 {
 /// #     type Capture = u16;
 /// #     type Channel = Channel;
-/// #     type Error = !;
+/// #     type Error = Void;
 /// #     type Time = MilliSeconds;
-/// #     fn capture(&mut self, _: Channel) -> ::nb::Result<u16, !> { Ok(0) }
+/// #     fn capture(&mut self, _: Channel) -> ::nb::Result<u16, Void> { Ok(0) }
 /// #     fn disable(&mut self, _: Channel) { unimplemented!() }
 /// #     fn enable(&mut self, _: Channel) { unimplemented!() }
 /// #     fn get_resolution(&self) -> MilliSeconds { unimplemented!() }
@@ -908,7 +913,6 @@ pub trait PwmPin {
 /// You can use this interface to measure the speed of a motor
 ///
 /// ```
-/// # #![feature(never_type)]
 /// extern crate embedded_hal as hal;
 /// #[macro_use(block)]
 /// extern crate nb;
@@ -935,6 +939,8 @@ pub trait PwmPin {
 ///     println!("Speed: {} pulses per second", speed);
 /// }
 ///
+/// # extern crate void;
+/// # use void::Void;
 /// # struct Seconds(u32);
 /// # trait U32Ext { fn s(self) -> Seconds; }
 /// # impl U32Ext for u32 { fn s(self) -> Seconds { Seconds(self) } }
@@ -948,7 +954,7 @@ pub trait PwmPin {
 /// # impl hal::timer::CountDown for Timer6 {
 /// #     type Time = Seconds;
 /// #     fn start<T>(&mut self, _: T) where T: Into<Seconds> {}
-/// #     fn wait(&mut self) -> ::nb::Result<(), !> { Ok(()) }
+/// #     fn wait(&mut self) -> ::nb::Result<(), Void> { Ok(()) }
 /// # }
 /// ```
 #[cfg(feature = "unproven")]
