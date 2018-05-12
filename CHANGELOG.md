@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-## [v0.2.0] - 2018-05-11
+## [v0.2.0] - 2018-05-12
+
+### Added
+
+- A `ToggeableOutputPin` trait has been added. This trait contains a single method: `toggle` that
+  can be used to toggle the state of a push-pull pin.
 
 ### Changed
 
@@ -18,6 +23,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [`Void`]: https://docs.rs/void/1.0.2/void/enum.Void.html
 [`void`]: https://crates.io/crates/void
+
+- [breaking-change] the `OutputPin.is_{low,high}` methods have been moved into its own trait
+  `StatefulOutputPin` and renamed to `is_set_{low,high}`.
+
+- It has been clarified in the documentation that `OutputPin` must be implemented for push-pull
+  output pins (and e.g. not for open drain output pins).
 
 ## [v0.1.2] - 2018-02-14
 

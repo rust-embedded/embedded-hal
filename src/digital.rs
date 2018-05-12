@@ -1,21 +1,31 @@
 //! Digital I/O
 
-/// Single digital output pin
+/// Single digital push-pull output pin
 pub trait OutputPin {
-    /// Sets the pin low
+    /// Drives the pin low
+    ///
+    /// *NOTE* the actual electrical state of the pin may not actually be low, e.g. due to external
+    /// electrical sources
     fn set_low(&mut self);
 
-    /// Sets the pin high
+    /// Drives the pin high
+    ///
+    /// *NOTE* the actual electrical state of the pin may not actually be high, e.g. due to external
+    /// electrical sources
     fn set_high(&mut self);
 }
 
-/// Output pin that can read its output state
+/// Push-pull output pin that can read its output state
 #[cfg(feature = "unproven")]
 pub trait StatefulOutputPin {
-    /// Is the pin set to high?
+    /// Is the pin in drive high mode?
+    ///
+    /// *NOTE* this does *not* read the electrical state of the pin
     fn is_set_high(&self) -> bool;
 
-    /// Is the pin set to low?
+    /// Is the pin in drive low mode?
+    ///
+    /// *NOTE* this does *not* read the electrical state of the pin
     fn is_set_low(&self) -> bool;
 }
 
