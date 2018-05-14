@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v0.2.1] - 2018-05-14
+
+### Changed
+
+- Auto-generated documentation (docs.rs) now includes the unproven traits.
+
 ## [v0.2.0] - 2018-05-12
 
 ### Added
@@ -46,7 +52,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/japaric/embedded-hal/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/japaric/embedded-hal/compare/v0.2.1...HEAD
+[v0.2.1]: https://github.com/japaric/embedded-hal/compare/v0.2.0...v0.2.1
 [v0.2.0]: https://github.com/japaric/embedded-hal/compare/v0.1.2...v0.2.0
 [v0.1.2]: https://github.com/japaric/embedded-hal/compare/v0.1.1...v0.1.2
 [v0.1.1]: https://github.com/japaric/embedded-hal/compare/v0.1.0...v0.1.1
