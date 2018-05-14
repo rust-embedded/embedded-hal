@@ -2,6 +2,8 @@
 
 use nb;
 
+pub use embedded_hal::timer::Periodic;
+
 /// A count down timer
 ///
 /// # Contract
@@ -74,6 +76,3 @@ pub trait CountDown {
     /// Implementers are suggested to panic on this scenario to signal a programmer error.
     fn wait(&mut self) -> nb::Result<(), !>;
 }
-
-/// Marker trait that indicates that a timer is periodic
-pub trait Periodic {}
