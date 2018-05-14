@@ -36,6 +36,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - It has been clarified in the documentation that `OutputPin` must be implemented for push-pull
   output pins (and e.g. not for open drain output pins).
 
+## [v0.1.3] - 2018-05-14
+
+### Changed
+
+- Re-export most / unchanged traits from embedded-hal v0.2.x to allow inter-operation between HAL
+  implementations and drivers that are using different minor versions.
+
 ## [v0.1.2] - 2018-02-14
 
 ### Added
