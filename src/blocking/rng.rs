@@ -1,6 +1,8 @@
 //! Blocking hardware random number generator
 
 /// Blocking read
+///
+/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
 #[cfg(feature = "unproven")]
 pub trait Read {
     /// Error type

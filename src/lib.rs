@@ -698,6 +698,8 @@ pub mod timer;
 
 /// Input capture
 ///
+/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
+///
 /// # Examples
 ///
 /// You can use this interface to measure the period of (quasi) periodic signals
@@ -792,6 +794,8 @@ pub trait Capture {
 }
 
 /// Pulse Width Modulation
+///
+/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
 ///
 /// # Examples
 ///
@@ -908,6 +912,8 @@ pub trait PwmPin {
 
 /// Quadrature encoder interface
 ///
+/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
+///
 /// # Examples
 ///
 /// You can use this interface to measure the speed of a motor
@@ -972,6 +978,8 @@ pub trait Qei {
 }
 
 /// Count direction
+///
+/// *This enumeration is available if embedded-hal is built with the `"unproven"` feature.*
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[cfg(feature = "unproven")]
 // reason: part of the unproven `Qei` interface
