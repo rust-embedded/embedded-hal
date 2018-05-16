@@ -6,6 +6,6 @@
 
 pub mod delay;
 pub mod i2c;
+pub mod rng;
 pub mod serial;
 pub mod spi;
-pub mod rng;
