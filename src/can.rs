@@ -205,10 +205,6 @@ pub trait FdTransmitter: FdInterface + Receiver {
     /// If the buffer is full, this function will try to replace a lower priority `FdFrame`
     /// and return it. This is to avoid the priority inversion problem.
     fn transmit(&mut self, frame: &Self::FdFrame) -> nb::Result<Option<Self::FdFrame>, Self::Error>;
-
-    /// Returns true if a call to `transmit(frame)` or `transmit_fd(fd_frame)`
-    /// would return a `FdFrame` or `WouldBlock`.
-    fn transmit_buffer_full(&self) -> bool;
 }
 
 /// A CAN-FD interface that is able to receive frames.
