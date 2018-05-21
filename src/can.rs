@@ -65,8 +65,7 @@ pub trait Filter {
 
     /// Returns `true` if the `Frame` would have been accepted by this filter.
     /// Returns `false` if the `Frame` would have been filtered by this filter.
-    fn accept<T: Frame<Id=Self::Id>>(&self, frame: T) -> bool;
-
+    fn accepts<T: Frame<Id=Self::Id>>(&self, frame: T) -> bool;
 }
 
 
