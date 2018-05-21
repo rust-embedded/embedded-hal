@@ -138,6 +138,8 @@ pub trait FdFrame {
 
 
 /// A CAN interface
+///
+/// May be a `Transmitter`, `Receiver` or both.
 #[cfg(feature = "unproven")]
 pub trait Interface {
     /// The Id type that works with this `Interface`
@@ -146,17 +148,16 @@ pub trait Interface {
     /// The Can Frame this Interface operates on
     type Frame: Frame<Id = Self::Id>;
 
-    /// The Filter type used in this `Interface`
-    type Filter: Filter<Id = Self::Id>;
-
     /// The Interface Error type
     type Error;
 
-    /// Return the available `Frame` with the highest priority (lowest ID).
-    ///
-    /// NOTE: Can-FD Frames will not be received using this function.
-    fn receive(&mut self) -> nb::Result<Self::Frame, Self::Error>;
+    /// The Filter type used in this `Interface`
+    type Filter: Filter<Id = Self::Id>;
+}
 
+/// A CAN interface that is able to transmit frames.
+#[cfg(feature = "unproven")]
+pub trait Transmitter: Interface {
     /// Put a `Frame` in the transmit buffer (or a free mailbox).
     ///
     /// If the buffer is full, this function will try to replace a lower priority `Frame`
@@ -166,6 +167,14 @@ pub trait Interface {
     /// Returns true if a call to `transmit(frame)` (and if the interface supports Can-FD)
     /// `transmit_fd(fd_frame)` would return a `Frame` or `WouldBlock`.
     fn transmit_buffer_full(&self) -> bool;
+}
+
+/// A CAN interface that is able to receive frames.
+pub trait Receiver: Interface {
+    /// Return the available `Frame` with the highest priority (lowest ID).
+    ///
+    /// NOTE: Can-FD Frames will not be received using this function.
+    fn receive(&mut self) -> nb::Result<Self::Frame, Self::Error>;
 
     /// Set the can controller in a mode where it only accept frames matching the given filter.
     ///
@@ -177,18 +186,20 @@ pub trait Interface {
 
     /// Set the can controller in a mode where it will accept all frames.
     fn clear_filter(&mut self);
-
 }
 
 /// A CAN interface also supporting Can-FD
+///
+/// May be a `FdTransmitter`, `FdReceiver` or both.
 #[cfg(feature = "unproven")]
 pub trait FdInterface: Interface {
     /// The Can Frame this Interface operates on
     type FdFrame: FdFrame;
+}
 
-    /// Read the available `FdFrame` with the highest priority (lowest ID).
-    fn receive(&mut self) -> nb::Result<Self::FdFrame, Self::Error>;
-
+/// A CAN-FD interface that is able to transmit frames.
+#[cfg(feature = "unproven")]
+pub trait FdTransmitter: FdInterface + Receiver {
     /// Put a `FdFrame` in the transmit buffer (or a free mailbox).
     ///
     /// If the buffer is full, this function will try to replace a lower priority `FdFrame`
@@ -198,4 +209,10 @@ pub trait FdInterface: Interface {
     /// Returns true if a call to `transmit(frame)` or `transmit_fd(fd_frame)`
     /// would return a `FdFrame` or `WouldBlock`.
     fn transmit_buffer_full(&self) -> bool;
+}
+
+/// A CAN-FD interface that is able to receive frames.
+pub trait FdReceiver: FdInterface + Transmitter {
+    /// Read the available `FdFrame` with the highest priority (lowest ID).
+    fn receive(&mut self) -> nb::Result<Self::FdFrame, Self::Error>;
 }
