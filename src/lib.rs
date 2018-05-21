@@ -695,6 +695,7 @@ pub mod prelude;
 pub mod serial;
 pub mod spi;
 pub mod timer;
+#[cfg(feature = "unproven")]
 pub mod can;
 
 /// Input capture

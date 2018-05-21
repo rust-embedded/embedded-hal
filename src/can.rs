@@ -172,6 +172,7 @@ pub trait Transmitter: Interface {
 }
 
 /// A CAN interface that is able to receive frames.
+#[cfg(feature = "unproven")]
 pub trait Receiver: Interface {
     /// Return the available `Frame` with the highest priority (lowest ID).
     ///
@@ -210,6 +211,7 @@ pub trait FdTransmitter: FdInterface + Receiver {
 }
 
 /// A CAN-FD interface that is able to receive frames.
+#[cfg(feature = "unproven")]
 pub trait FdReceiver: FdInterface + Transmitter {
     /// Read the available `FdFrame` with the highest priority (lowest ID).
     fn receive(&mut self) -> nb::Result<Self::FdFrame, Self::Error>;
