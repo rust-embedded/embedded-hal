@@ -141,10 +141,6 @@ pub trait Transmitter: Interface {
     /// If the buffer is full, this function will try to replace a lower priority `Frame`
     /// and return it. This is to avoid the priority inversion problem.
     fn transmit(&mut self, frame: &Self::Frame) -> nb::Result<Option<Self::Frame>, Self::Error>;
-
-    /// Returns true if a call to `transmit(frame)` (and if the interface supports Can-FD)
-    /// `transmit_fd(fd_frame)` would return a `Frame` or `WouldBlock`.
-    fn transmit_buffer_full(&self) -> bool;
 }
 
 /// A CAN interface that is able to receive frames.
