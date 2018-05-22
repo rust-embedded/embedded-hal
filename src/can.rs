@@ -142,9 +142,6 @@ pub trait Transmitter: Interface {
     /// and return it. This is to avoid the priority inversion problem.
     fn transmit(&mut self, frame: &Self::Frame) -> nb::Result<Option<Self::Frame>, Self::Error>;
 
-    /// Returns true if there exists a pending transmit matching this filter.
-    fn pending_transmit(&self, filter: &Self::Filter) -> bool;
-
     /// Returns true if a call to `transmit(frame)` (and if the interface supports Can-FD)
     /// `transmit_fd(fd_frame)` would return a `Frame` or `WouldBlock`.
     fn transmit_buffer_full(&self) -> bool;
