@@ -1,4 +1,9 @@
 //! Blocking I2C API
+//!
+//! Slave addresses used by this API are 7-bit I2C addresses ranging from 0 to 127.
+//!
+//! Operations on 10-bit slave addresses are not supported by the API yet (but applications might
+//! be able to emulate some operations).
 
 /// Blocking read
 pub trait Read {
@@ -17,7 +22,7 @@ pub trait Read {
     /// Where
     ///
     /// - `ST` = start condition
-    /// - `SAD+R` = slave address with 8th bit set to 1
+    /// - `SAD+R` = slave address followed by bit 1 to indicate reading
     /// - `SAK` = slave acknowledge
     /// - `Bi` = ith byte of data
     /// - `MAK` = master acknowledge
@@ -43,7 +48,7 @@ pub trait Write {
     /// Where
     ///
     /// - `ST` = start condition
-    /// - `SAD+W` = slave address with 8th bit set to 0
+    /// - `SAD+W` = slave address followed by bit 0 to indicate writing
     /// - `SAK` = slave acknowledge
     /// - `Bi` = ith byte of data
     /// - `SP` = stop condition
@@ -68,11 +73,11 @@ pub trait WriteRead {
     /// Where
     ///
     /// - `ST` = start condition
-    /// - `SAD+W` = slave address with 8th bit set to 0
+    /// - `SAD+W` = slave address followed by bit 0 to indicate writing
     /// - `SAK` = slave acknowledge
     /// - `Oi` = ith outgoing byte of data
     /// - `SR` = repeated start condition
-    /// - `SAD+R` = slave address with 8th bit set to 1
+    /// - `SAD+R` = slave address followed by bit 1 to indicate reading
     /// - `Ii` = ith incoming byte of data
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
