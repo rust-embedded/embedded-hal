@@ -18,6 +18,18 @@ pub trait Write<W> {
     fn write(&mut self, words: &[W]) -> Result<(), Self::Error>;
 }
 
+/// Blocking write (iterator version)
+#[cfg(feature = "unproven")]
+pub trait WriteIter<W> {
+    /// Error type
+    type Error;
+
+    /// Sends `words` to the slave, ignoring all the incoming words
+    fn write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
+    where
+        WI: IntoIterator<Item = W>;
+}
+
 /// Blocking transfer
 pub mod transfer {
     /// Default implementation of `blocking::spi::Transfer<W>` for implementers of
@@ -56,6 +68,34 @@ pub mod write {
 
         fn write(&mut self, words: &[W]) -> Result<(), S::Error> {
             for word in words {
+                block!(self.send(word.clone()))?;
+                block!(self.read())?;
+            }
+
+            Ok(())
+        }
+    }
+}
+
+/// Blocking write (iterator version)
+#[cfg(feature = "unproven")]
+pub mod write_iter {
+    /// Default implementation of `blocking::spi::WriteIter<W>` for implementers of
+    /// `spi::FullDuplex<W>`
+    pub trait Default<W>: ::spi::FullDuplex<W> {}
+
+    impl<W, S> ::blocking::spi::WriteIter<W> for S
+    where
+        S: Default<W>,
+        W: Clone,
+    {
+        type Error = S::Error;
+
+        fn write_iter<WI>(&mut self, words: WI) -> Result<(), S::Error>
+        where
+            WI: IntoIterator<Item = W>,
+        {
+            for word in words.into_iter() {
                 block!(self.send(word.clone()))?;
                 block!(self.read())?;
             }

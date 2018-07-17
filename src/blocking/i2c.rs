@@ -55,6 +55,22 @@ pub trait Write {
     fn write(&mut self, addr: u8, bytes: &[u8]) -> Result<(), Self::Error>;
 }
 
+/// Blocking write (iterator version)
+#[cfg(feature = "unproven")]
+pub trait WriteIter {
+    /// Error type
+    type Error;
+
+    /// Sends bytes to slave with address `addr`
+    ///
+    /// # I2C Events (contract)
+    ///
+    /// Same as `Write`
+    fn write<B>(&mut self, addr: u8, bytes: B) -> Result<(), Self::Error>
+    where
+        B: IntoIterator<Item = u8>;
+}
+
 /// Blocking write + read
 pub trait WriteRead {
     /// Error type
@@ -88,4 +104,26 @@ pub trait WriteRead {
         bytes: &[u8],
         buffer: &mut [u8],
     ) -> Result<(), Self::Error>;
+}
+
+/// Blocking write (iterator version) + read
+#[cfg(feature = "unproven")]
+pub trait WriteIterRead {
+    /// Error type
+    type Error;
+
+    /// Sends bytes to slave with address `addr` and then reads enough bytes to fill `buffer` *in a
+    /// single transaction*
+    ///
+    /// # I2C Events (contract)
+    ///
+    /// Same as the `WriteRead` trait
+    fn write_iter_read<B>(
+        &mut self,
+        address: u8,
+        bytes: B,
+        buffer: &mut [u8],
+    ) -> Result<(), Self::Error>
+        where
+        B: IntoIterator<Item = u8>;
 }
