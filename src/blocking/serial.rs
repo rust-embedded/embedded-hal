@@ -1,6 +1,5 @@
 //! Blocking serial API
 
-
 /// Write half of a serial interface (blocking variant)
 pub trait Write<Word> {
     /// The type of error that can occur when writing
@@ -20,7 +19,6 @@ pub trait Write<Word> {
     fn bflush(&mut self) -> Result<(), Self::Error>;
 }
 
-
 /// Blocking serial write
 pub mod write {
     /// Marker trait to opt into default blocking write implementation
@@ -34,12 +32,11 @@ pub mod write {
     pub trait Default<Word>: ::serial::Write<Word> {}
 
     impl<S, Word> ::blocking::serial::Write<Word> for S
-        where
-            S   : Default<Word>,
-            Word: Clone,
+    where
+        S: Default<Word>,
+        Word: Clone,
     {
         type Error = S::Error;
-
 
         fn bwrite_all(&mut self, buffer: &[Word]) -> Result<(), Self::Error> {
             for word in buffer {
