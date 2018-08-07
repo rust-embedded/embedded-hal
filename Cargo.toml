@@ -1,7 +1,7 @@
 [package]
 authors = [
-  "Jorge Aparicio <jorge@japaric.io>",
   "Jonathan 'theJPster' Pallant <github@thejpster.org.uk>"
+  "Jorge Aparicio <jorge@japaric.io>",
 ]
 categories = ["asynchronous", "embedded", "hardware-support", "no-std"]
 description = " A Hardware Abstraction Layer (HAL) for embedded systems "
