@@ -107,7 +107,7 @@ pub trait ToggleableOutputPin {
 /// let mut pin = MyPin { state: false };
 /// pin.toggle().unwrap();
 /// assert!(pin.is_set_high());
-/// pin.toggle();
+/// pin.toggle().unwrap();
 /// assert!(pin.is_set_low());
 /// ```
 #[cfg(feature = "unproven")]
