@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- A `FallibleOutputPin` trait has been added. It is a version of the `OutputPin` trait
+  where the methods return a `Result` type as setting an output pin could potentially fail.
+  The current `OutputPin` method signatures will become deprecated in a future version and
+  will be replaced by the ones defined in `FallibleOutputPin`.
+  After that, the `FallibleOutputPin` trait will be removed.
+  See [here](https://github.com/rust-embedded/embedded-hal/issues/95) for more info.
+
 ### Changed
 
 - [breaking-change] The unproven InputPin trait methods are now fallible, as reading an input

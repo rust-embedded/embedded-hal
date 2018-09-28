@@ -15,6 +15,25 @@ pub trait OutputPin {
     fn set_high(&mut self);
 }
 
+/// Single digital push-pull output pin
+/// (Fallible version. The OutputPin trait will adopt this interface in the future)
+pub trait FallibleOutputPin {
+    /// Error type
+    type Error;
+
+    /// Drives the pin low
+    ///
+    /// *NOTE* the actual electrical state of the pin may not actually be low, e.g. due to external
+    /// electrical sources
+    fn set_low(&mut self) -> Result<(), Self::Error>;
+
+    /// Drives the pin high
+    ///
+    /// *NOTE* the actual electrical state of the pin may not actually be high, e.g. due to external
+    /// electrical sources
+    fn set_high(&mut self) -> Result<(), Self::Error>;
+}
+
 /// Push-pull output pin that can read its output state
 ///
 /// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
