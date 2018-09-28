@@ -113,9 +113,11 @@ pub mod toggleable {
 /// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
 #[cfg(feature = "unproven")]
 pub trait InputPin {
+    type Error;
+
     /// Is the input pin high?
-    fn is_high(&self) -> bool;
+    fn is_high(&self) -> Result<bool, Self::Error>;
 
     /// Is the input pin low?
-    fn is_low(&self) -> bool;
+    fn is_low(&self) -> Result<bool, Self::Error>;
 }
