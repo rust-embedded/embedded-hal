@@ -695,6 +695,7 @@ pub mod prelude;
 pub mod serial;
 pub mod spi;
 pub mod timer;
+pub mod watchdog;
 
 /// Input capture
 ///
