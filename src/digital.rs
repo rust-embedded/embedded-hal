@@ -82,11 +82,11 @@ pub trait ToggleableOutputPin {
 /// impl FallibleOutputPin for MyPin {
 ///    type Error = void::Void;
 ///
-///    fn set_low(&mut self) -> Result<(), Self::Error>{
+///    fn set_low(&mut self) -> Result<(), Self::Error> {
 ///        self.state = false;
 ///        Ok(())
 ///    }
-///    fn set_high(&mut self) -> Result<(), Self::Error>{
+///    fn set_high(&mut self) -> Result<(), Self::Error> {
 ///        self.state = true;
 ///        Ok(())
 ///    }
@@ -126,7 +126,7 @@ pub mod toggleable {
         type Error = P::Error;
 
         /// Toggle pin output
-        fn toggle(&mut self) -> Result<(), Self::Error>{
+        fn toggle(&mut self) -> Result<(), Self::Error> {
             if self.is_set_low() {
                 self.set_high()
             } else {
