@@ -15,6 +15,6 @@ main() {
         echo OK
 }
 
-if [ $TRAVIS_BRANCH = master ]; then
+if [ "$TRAVIS_EVENT_TYPE" == "push" ] && [ "$TRAVIS_BRANCH" == "master" ]; then
     main
 fi
