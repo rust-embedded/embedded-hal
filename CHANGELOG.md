@@ -18,8 +18,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- [breaking-change] The unproven InputPin trait methods are now fallible, as reading an input
-  could potentially fail.
+- [breaking-change] The unproven `InputPin` trait methods are now fallible, as reading an input
+  could potentially fail. Similarly, the methods in the unproven `ToggleableOutputPin` trait
+  are now also fallible.
   See [here](https://github.com/rust-embedded/embedded-hal/issues/95) for more info.
 
 ## [v0.2.1] - 2018-05-14
