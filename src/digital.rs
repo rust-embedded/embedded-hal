@@ -1,6 +1,7 @@
 //! Digital I/O
 
 /// Single digital push-pull output pin
+#[cfg(not(feature = "use-fallible-digital-traits"))]
 pub trait OutputPin {
     /// Drives the pin low
     ///
@@ -16,8 +17,11 @@ pub trait OutputPin {
 }
 
 /// Single digital push-pull output pin
-/// (Fallible version. The OutputPin trait will adopt this interface in the future)
-pub trait FallibleOutputPin {
+/// (Fallible version. This will become the default after the next release)
+///
+/// *This trait is available if embedded-hal is built with the `"use-fallible-digital-traits"` feature.*
+#[cfg(feature = "use-fallible-digital-traits")]
+pub trait OutputPin {
     /// Error type
     type Error;
 
@@ -71,7 +75,7 @@ pub trait ToggleableOutputPin {
 /// toggleable by software.
 ///
 /// ```
-/// use embedded_hal::digital::{FallibleOutputPin, StatefulOutputPin, ToggleableOutputPin};
+/// use embedded_hal::digital::{OutputPin, StatefulOutputPin, ToggleableOutputPin};
 /// use embedded_hal::digital::toggleable;
 ///
 /// /// A virtual output pin that exists purely in software
@@ -79,7 +83,18 @@ pub trait ToggleableOutputPin {
 ///     state: bool
 /// }
 ///
-/// impl FallibleOutputPin for MyPin {
+/// #[cfg(not(feature = "use-fallible-digital-traits"))]
+/// impl OutputPin for MyPin {
+///    fn set_low(&mut self){
+///        self.state = false;
+///    }
+///    fn set_high(&mut self){
+///        self.state = true;
+///    }
+/// }
+///
+/// #[cfg(feature = "use-fallible-digital-traits")]
+/// impl OutputPin for MyPin {
 ///    type Error = void::Void;
 ///
 ///    fn set_low(&mut self) -> Result<(), Self::Error> {
@@ -112,13 +127,32 @@ pub trait ToggleableOutputPin {
 /// ```
 #[cfg(feature = "unproven")]
 pub mod toggleable {
-    use super::{FallibleOutputPin, StatefulOutputPin, ToggleableOutputPin};
+    use super::{OutputPin, StatefulOutputPin, ToggleableOutputPin};
 
     /// Software-driven `toggle()` implementation.
     ///
     /// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
-    pub trait Default: FallibleOutputPin + StatefulOutputPin {}
+    pub trait Default: OutputPin + StatefulOutputPin {}
 
+    #[cfg(not(feature = "use-fallible-digital-traits"))]
+    impl<P> ToggleableOutputPin for P
+    where
+        P: Default,
+    {
+        type Error = void::Void;
+
+        /// Toggle pin output
+        fn toggle(&mut self) -> Result<(), Self::Error> {
+            if self.is_set_low() {
+                self.set_high();
+            } else {
+                self.set_low();
+            }
+            Ok(())
+        }
+    }
+
+    #[cfg(feature = "use-fallible-digital-traits")]
     impl<P> ToggleableOutputPin for P
     where
         P: Default,

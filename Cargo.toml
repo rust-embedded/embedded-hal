@@ -26,6 +26,7 @@ futures = "0.1.17"
 
 [features]
 unproven = ["nb/unstable"]
+use-fallible-digital-traits = []
 
 [package.metadata.docs.rs]
 features = ["unproven"]
