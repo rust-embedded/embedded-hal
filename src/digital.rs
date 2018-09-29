@@ -41,7 +41,7 @@ pub trait OutputPin {
 /// Push-pull output pin that can read its output state
 ///
 /// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
-#[cfg(feature = "unproven")]
+#[cfg(all(feature = "unproven", not(feature = "use-fallible-digital-traits")))]
 pub trait StatefulOutputPin {
     /// Is the pin in drive high mode?
     ///
@@ -52,6 +52,24 @@ pub trait StatefulOutputPin {
     ///
     /// *NOTE* this does *not* read the electrical state of the pin
     fn is_set_low(&self) -> bool;
+}
+
+/// Push-pull output pin that can read its output state
+/// (Fallible version. This will become the default after the next release)
+///
+/// *This trait is available if embedded-hal is built with the `"unproven"` and
+/// `"use-fallible-digital-traits"` features.*
+#[cfg(all(feature = "unproven", feature = "use-fallible-digital-traits"))]
+pub trait StatefulOutputPin : OutputPin {
+    /// Is the pin in drive high mode?
+    ///
+    /// *NOTE* this does *not* read the electrical state of the pin
+    fn is_set_high(&self) -> Result<bool, Self::Error>;
+
+    /// Is the pin in drive low mode?
+    ///
+    /// *NOTE* this does *not* read the electrical state of the pin
+    fn is_set_low(&self) -> Result<bool, Self::Error>;
 }
 
 /// Output pin that can be toggled
@@ -107,6 +125,7 @@ pub trait ToggleableOutputPin {
 ///    }
 /// }
 ///
+/// #[cfg(not(feature = "use-fallible-digital-traits"))]
 /// impl StatefulOutputPin for MyPin {
 ///    fn is_set_low(&self) -> bool {
 ///        !self.state
@@ -116,14 +135,30 @@ pub trait ToggleableOutputPin {
 ///    }
 /// }
 ///
+/// #[cfg(feature = "use-fallible-digital-traits")]
+/// impl StatefulOutputPin for MyPin {
+///    fn is_set_low(&self) -> Result<bool, Self::Error> {
+///        Ok(!self.state)
+///    }
+///    fn is_set_high(&self) -> Result<bool, Self::Error> {
+///        Ok(self.state)
+///    }
+/// }
+///
 /// /// Opt-in to the software implementation.
 /// impl toggleable::Default for MyPin {}
 ///
 /// let mut pin = MyPin { state: false };
 /// pin.toggle().unwrap();
+/// #[cfg(not(feature = "use-fallible-digital-traits"))]
 /// assert!(pin.is_set_high());
+/// #[cfg(feature = "use-fallible-digital-traits")]
+/// assert!(pin.is_set_high().unwrap());
 /// pin.toggle().unwrap();
+/// #[cfg(not(feature = "use-fallible-digital-traits"))]
 /// assert!(pin.is_set_low());
+/// #[cfg(feature = "use-fallible-digital-traits")]
+/// assert!(pin.is_set_low().unwrap());
 /// ```
 #[cfg(feature = "unproven")]
 pub mod toggleable {
@@ -161,7 +196,7 @@ pub mod toggleable {
 
         /// Toggle pin output
         fn toggle(&mut self) -> Result<(), Self::Error> {
-            if self.is_set_low() {
+            if self.is_set_low()? {
                 self.set_high()
             } else {
                 self.set_low()
