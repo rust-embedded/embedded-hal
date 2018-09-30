@@ -161,15 +161,15 @@ pub trait ToggleableOutputPin {
 ///
 /// let mut pin = MyPin { state: false };
 /// pin.toggle().unwrap();
-/// #[cfg(not(feature = "use-fallible-digital-traits"))]
-/// assert!(pin.is_set_high());
 /// #[cfg(feature = "use-fallible-digital-traits")]
 /// assert!(pin.is_set_high().unwrap());
-/// pin.toggle().unwrap();
 /// #[cfg(not(feature = "use-fallible-digital-traits"))]
-/// assert!(pin.is_set_low());
+/// assert!(pin.is_set_high());
+/// pin.toggle().unwrap();
 /// #[cfg(feature = "use-fallible-digital-traits")]
 /// assert!(pin.is_set_low().unwrap());
+/// #[cfg(not(feature = "use-fallible-digital-traits"))]
+/// assert!(pin.is_set_low());
 /// ```
 #[cfg(feature = "unproven")]
 #[allow(deprecated)]
