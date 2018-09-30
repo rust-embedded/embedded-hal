@@ -17,6 +17,7 @@ pub use blocking::spi::{
 };
 #[cfg(feature = "unproven")]
 pub use digital::InputPin as _embedded_hal_digital_InputPin;
+#[allow(deprecated)]
 pub use digital::OutputPin as _embedded_hal_digital_OutputPin;
 #[cfg(feature = "unproven")]
 pub use digital::ToggleableOutputPin as _embedded_hal_digital_ToggleableOutputPin;

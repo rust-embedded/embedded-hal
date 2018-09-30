@@ -1,6 +1,12 @@
 //! Digital I/O
 
-/// Single digital push-pull output pin
+/// Single digital push-pull output pin. (Infallible version)
+///
+/// *This version of the trait is now deprecated. Please enable the
+/// `"use-fallible-digital-traits"` feature when building embedded-hal to use the new version.
+/// In the release after next one, this version will only be available when activating the
+/// `"use-infallible-digital-traits"` and it will be removed in the release after that one.*
+#[deprecated]
 #[cfg(not(feature = "use-fallible-digital-traits"))]
 pub trait OutputPin {
     /// Drives the pin low
@@ -41,6 +47,11 @@ pub trait OutputPin {
 /// Push-pull output pin that can read its output state
 ///
 /// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
+/// *This version of the trait is now deprecated. Please enable the
+/// `"use-fallible-digital-traits"` feature when building embedded-hal to use the new version.
+/// In the release after next one, this version will only be available when activating the
+/// `"use-infallible-digital-traits"` and it will be removed in the release after that one.*
+#[deprecated]
 #[cfg(all(feature = "unproven", not(feature = "use-fallible-digital-traits")))]
 pub trait StatefulOutputPin {
     /// Is the pin in drive high mode?
@@ -161,6 +172,7 @@ pub trait ToggleableOutputPin {
 /// assert!(pin.is_set_low().unwrap());
 /// ```
 #[cfg(feature = "unproven")]
+#[allow(deprecated)]
 pub mod toggleable {
     use super::{OutputPin, StatefulOutputPin, ToggleableOutputPin};
 
