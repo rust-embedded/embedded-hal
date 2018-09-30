@@ -9,13 +9,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- A fallible version of the `OutputPin` trait has been added. It is a version
-  where the methods return a `Result` type as setting an output pin could potentially fail.
-  The current `OutputPin` trait version is now marked as deprecated. The fallible version
-  is available throught the `use-fallible-digital-traits` feature. After this release,
-  the fallible version of `OutputPin` will be made the default and the infallible one
+- Fallible versions of the `OutputPin` and `StatefulOutputPin` traits have been added.
+  These are versions where the methods return a `Result` type as setting an output pin
+  could potentially fail.
+  The current trait versions are now marked as deprecated. The fallible version
+  is available through the `use-fallible-digital-traits` feature. After this release,
+  the fallible version of the traits will be made the default and the infallible one
   will only be available if activating the `use-infallible-digital-traits` feature.
   The infallible version of the trait will be removed in the relase after that one.
+  Both versions of the traits are mutually-exclusive.
   See [here](https://github.com/rust-embedded/embedded-hal/issues/95) for more info.
 
 ### Changed
