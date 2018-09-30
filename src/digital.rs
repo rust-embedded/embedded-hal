@@ -182,11 +182,14 @@ pub mod toggleable {
     pub trait Default: OutputPin + StatefulOutputPin {}
 
     #[cfg(not(feature = "use-fallible-digital-traits"))]
+    use void::Void;
+
+    #[cfg(not(feature = "use-fallible-digital-traits"))]
     impl<P> ToggleableOutputPin for P
     where
         P: Default,
     {
-        type Error = void::Void;
+        type Error = Void;
 
         /// Toggle pin output
         fn toggle(&mut self) -> Result<(), Self::Error> {
