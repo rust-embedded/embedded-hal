@@ -52,3 +52,27 @@ pub struct Mode {
     /// Clock phase
     pub phase: Phase,
 }
+
+/// Helper for CPOL = 0, CPHA = 0
+pub const MODE_0: Mode = Mode {
+    polarity: Polarity::IdleLow,
+    phase: Phase::CaptureOnFirstTransition,
+};
+
+/// Helper for CPOL = 0, CPHA = 1
+pub const MODE_1: Mode = Mode {
+    polarity: Polarity::IdleLow,
+    phase: Phase::CaptureOnSecondTransition,
+};
+
+/// Helper for CPOL = 1, CPHA = 0
+pub const MODE_2: Mode = Mode {
+    polarity: Polarity::IdleHigh,
+    phase: Phase::CaptureOnFirstTransition,
+};
+
+/// Helper for CPOL = 1, CPHA = 1
+pub const MODE_3: Mode = Mode {
+    polarity: Polarity::IdleHigh,
+    phase: Phase::CaptureOnSecondTransition,
+};
