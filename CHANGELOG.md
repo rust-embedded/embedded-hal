@@ -9,22 +9,25 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- Fallible versions of the `OutputPin` and `StatefulOutputPin` traits have been added.
+- Fallible versions of the digital `OutputPin`, `StatefulOutputPin`,
+  `ToggleableOutputPin` and `InputPin` traits have been added.
   These are versions where the methods return a `Result` type as setting an output pin
-  could potentially fail.
-  The current trait versions are now marked as deprecated. The fallible version
-  is available through the `use-fallible-digital-traits` feature. After this release,
-  the fallible version of the traits will be made the default and the infallible one
-  will only be available if activating the `use-infallible-digital-traits` feature.
-  The infallible version of the trait will be removed in the relase after that one.
+  and reading an input pin could potentially fail.
+  The fallible versions are available through the `use-fallible-digital-traits` feature.
+  After this release, the fallible versions of the traits will be made the default and
+  the infallible ones will only be available if activating the
+  `regress-infallible-digital-traits` feature.
+  These will be removed in the relase after that one.
   Both versions of the traits are mutually-exclusive.
   See [here](https://github.com/rust-embedded/embedded-hal/issues/95) for more info.
 
 ### Changed
 
-- [breaking-change] The unproven `InputPin` trait methods are now fallible, as reading an input
-  could potentially fail. Similarly, the methods in the unproven `ToggleableOutputPin` trait
-  are now also fallible.
+- The current infallible versions of the digital `OutputPin`, `StatefulOutputPin`,
+  `ToggleableOutputPin` and `InputPin` traits are now marked as deprecated.
+  In the next release, the infallible versions will only be available if activating the `regress-infallible-digital-traits` feature.
+  These will be removed in the relase after that one.
+  Both versions of the traits are mutually-exclusive.
   See [here](https://github.com/rust-embedded/embedded-hal/issues/95) for more info.
 
 ## [v0.2.1] - 2018-05-14

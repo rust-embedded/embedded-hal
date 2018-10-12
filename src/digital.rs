@@ -1,11 +1,11 @@
-//! Digital I/O
+//! Digital I/O.
+//!
+//! The infallible versions of the traits below are now deprecated. Please enable the
+//! `"use-fallible-digital-traits"` feature when building embedded-hal to use the new versions.
+//! In the release after next one, the infallible versions will only be available when activating the
+//! `"regress-infallible-digital-traits"` and they will be removed in the release after that one.*
 
-/// Single digital push-pull output pin. (Infallible version)
-///
-/// *This version of the trait is now deprecated. Please enable the
-/// `"use-fallible-digital-traits"` feature when building embedded-hal to use the new version.
-/// In the release after next one, this version will only be available when activating the
-/// `"use-infallible-digital-traits"` and it will be removed in the release after that one.*
+/// Single digital push-pull output pin. *(Infallible version)*
 #[deprecated]
 #[cfg(not(feature = "use-fallible-digital-traits"))]
 pub trait OutputPin {
@@ -22,10 +22,9 @@ pub trait OutputPin {
     fn set_high(&mut self);
 }
 
-/// Single digital push-pull output pin
-/// (Fallible version. This will become the default after the next release)
+/// Single digital push-pull output pin.
 ///
-/// *This trait is available if embedded-hal is built with the `"use-fallible-digital-traits"` feature.*
+/// *Fallible version. This will become the default after the next release.*
 #[cfg(feature = "use-fallible-digital-traits")]
 pub trait OutputPin {
     /// Error type
@@ -44,13 +43,9 @@ pub trait OutputPin {
     fn set_high(&mut self) -> Result<(), Self::Error>;
 }
 
-/// Push-pull output pin that can read its output state
+/// Push-pull output pin that can read its output state. *(Infallible version)*
 ///
 /// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
-/// *This version of the trait is now deprecated. Please enable the
-/// `"use-fallible-digital-traits"` feature when building embedded-hal to use the new version.
-/// In the release after next one, this version will only be available when activating the
-/// `"use-infallible-digital-traits"` and it will be removed in the release after that one.*
 #[deprecated]
 #[cfg(all(feature = "unproven", not(feature = "use-fallible-digital-traits")))]
 pub trait StatefulOutputPin {
@@ -66,10 +61,10 @@ pub trait StatefulOutputPin {
 }
 
 /// Push-pull output pin that can read its output state
-/// (Fallible version. This will become the default after the next release)
 ///
-/// *This trait is available if embedded-hal is built with the `"unproven"` and
-/// `"use-fallible-digital-traits"` features.*
+/// *Fallible version. This will become the default after the next release.*
+///
+/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
 #[cfg(all(feature = "unproven", feature = "use-fallible-digital-traits"))]
 pub trait StatefulOutputPin : OutputPin {
     /// Is the pin in drive high mode?
@@ -83,7 +78,9 @@ pub trait StatefulOutputPin : OutputPin {
     fn is_set_low(&self) -> Result<bool, Self::Error>;
 }
 
-/// Output pin that can be toggled
+/// Output pin that can be toggled.
+///
+/// *Fallible version. This will become the default after the next release.*
 ///
 /// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
 ///
@@ -91,7 +88,7 @@ pub trait StatefulOutputPin : OutputPin {
 /// both [OutputPin](trait.OutputPin.html) and
 /// [StatefulOutputPin](trait.StatefulOutputPin.html) are
 /// implemented. Otherwise, implement this using hardware mechanisms.
-#[cfg(feature = "unproven")]
+#[cfg(all(feature = "unproven", feature = "use-fallible-digital-traits"))]
 pub trait ToggleableOutputPin {
     /// Error type
     type Error;
@@ -100,10 +97,26 @@ pub trait ToggleableOutputPin {
     fn toggle(&mut self) -> Result<(), Self::Error>;
 }
 
+/// Output pin that can be toggled. *(Infallible version)*
+///
+/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
+///
+/// See [toggleable](toggleable) to use a software implementation if
+/// both [OutputPin](trait.OutputPin.html) and
+/// [StatefulOutputPin](trait.StatefulOutputPin.html) are
+/// implemented. Otherwise, implement this using hardware mechanisms.
+#[deprecated]
+#[cfg(all(feature = "unproven", not(feature = "use-fallible-digital-traits")))]
+pub trait ToggleableOutputPin {
+    /// Toggle pin output.
+    fn toggle(&mut self);
+}
+
 /// If you can read **and** write the output state, a pin is
 /// toggleable by software.
 ///
 /// ```
+/// #[allow(deprecated)]
 /// use embedded_hal::digital::{OutputPin, StatefulOutputPin, ToggleableOutputPin};
 /// use embedded_hal::digital::toggleable;
 ///
@@ -113,6 +126,7 @@ pub trait ToggleableOutputPin {
 /// }
 ///
 /// #[cfg(not(feature = "use-fallible-digital-traits"))]
+/// #[allow(deprecated)]
 /// impl OutputPin for MyPin {
 ///    fn set_low(&mut self){
 ///        self.state = false;
@@ -137,6 +151,7 @@ pub trait ToggleableOutputPin {
 /// }
 ///
 /// #[cfg(not(feature = "use-fallible-digital-traits"))]
+/// #[allow(deprecated)]
 /// impl StatefulOutputPin for MyPin {
 ///    fn is_set_low(&self) -> bool {
 ///        !self.state
@@ -160,16 +175,21 @@ pub trait ToggleableOutputPin {
 /// impl toggleable::Default for MyPin {}
 ///
 /// let mut pin = MyPin { state: false };
-/// pin.toggle().unwrap();
 /// #[cfg(feature = "use-fallible-digital-traits")]
-/// assert!(pin.is_set_high().unwrap());
+/// {
+///     pin.toggle().unwrap();
+///     assert!(pin.is_set_high().unwrap());
+///     pin.toggle().unwrap();
+///     assert!(pin.is_set_low().unwrap());
+/// }
 /// #[cfg(not(feature = "use-fallible-digital-traits"))]
-/// assert!(pin.is_set_high());
-/// pin.toggle().unwrap();
-/// #[cfg(feature = "use-fallible-digital-traits")]
-/// assert!(pin.is_set_low().unwrap());
-/// #[cfg(not(feature = "use-fallible-digital-traits"))]
-/// assert!(pin.is_set_low());
+/// {
+///     // deprecated
+///     pin.toggle();
+///     assert!(pin.is_set_high());
+///     pin.toggle();
+///     assert!(pin.is_set_low());
+/// }
 /// ```
 #[cfg(feature = "unproven")]
 #[allow(deprecated)]
@@ -182,23 +202,17 @@ pub mod toggleable {
     pub trait Default: OutputPin + StatefulOutputPin {}
 
     #[cfg(not(feature = "use-fallible-digital-traits"))]
-    use void::Void;
-
-    #[cfg(not(feature = "use-fallible-digital-traits"))]
     impl<P> ToggleableOutputPin for P
     where
         P: Default,
     {
-        type Error = Void;
-
         /// Toggle pin output
-        fn toggle(&mut self) -> Result<(), Self::Error> {
+        fn toggle(&mut self) {
             if self.is_set_low() {
                 self.set_high();
             } else {
                 self.set_low();
             }
-            Ok(())
         }
     }
 
@@ -220,10 +234,12 @@ pub mod toggleable {
     }
 }
 
-/// Single digital input pin
+/// Single digital input pin.
+///
+/// *Fallible version. This will become the default after the next release.*
 ///
 /// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
-#[cfg(feature = "unproven")]
+#[cfg(all(feature = "unproven", feature = "use-fallible-digital-traits"))]
 pub trait InputPin {
     /// Error type
     type Error;
@@ -233,4 +249,17 @@ pub trait InputPin {
 
     /// Is the input pin low?
     fn is_low(&self) -> Result<bool, Self::Error>;
+}
+
+/// Single digital input pin. *(Infallible version)*
+///
+/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
+#[deprecated]
+#[cfg(all(feature = "unproven", not(feature = "use-fallible-digital-traits")))]
+pub trait InputPin {
+    /// Is the input pin high?
+    fn is_high(&self) -> bool;
+
+    /// Is the input pin low?
+    fn is_low(&self) -> bool;
 }
