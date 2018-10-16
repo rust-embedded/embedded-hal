@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- [breaking-change] The digital `OutputPin`, `StatefulOutputPin`, `ToggleableOutputPin`
+  and `InputPin` traits have been replaced with fallible versions.
+  The methods now return a `Result` type as setting an output pin
+  and reading an input pin could potentially fail.
+  See [here](https://github.com/rust-embedded/embedded-hal/issues/95) for more info.
+
 ## [v0.2.1] - 2018-05-14
 
 ### Changed
