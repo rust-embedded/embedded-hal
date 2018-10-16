@@ -7,27 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-### Added
-
-- Fallible versions of the digital `OutputPin`, `StatefulOutputPin`,
-  `ToggleableOutputPin` and `InputPin` traits have been added.
-  These are versions where the methods return a `Result` type as setting an output pin
-  and reading an input pin could potentially fail.
-  The fallible versions are available through the `use-fallible-digital-traits` feature.
-  After this release, the fallible versions of the traits will be made the default and
-  the infallible ones will only be available if activating the
-  `regress-infallible-digital-traits` feature.
-  These will be removed in the relase after that one.
-  Both versions of the traits are mutually-exclusive.
-  See [here](https://github.com/rust-embedded/embedded-hal/issues/95) for more info.
-
 ### Changed
 
-- The current infallible versions of the digital `OutputPin`, `StatefulOutputPin`,
-  `ToggleableOutputPin` and `InputPin` traits are now marked as deprecated.
-  In the next release, the infallible versions will only be available if activating the `regress-infallible-digital-traits` feature.
-  These will be removed in the relase after that one.
-  Both versions of the traits are mutually-exclusive.
+- [breaking-change] The digital `OutputPin`, `StatefulOutputPin`, `ToggleableOutputPin`
+  and `InputPin` traits have been replaced with fallible versions.
+  The methods now return a `Result` type as setting an output pin
+  and reading an input pin could potentially fail.
   See [here](https://github.com/rust-embedded/embedded-hal/issues/95) for more info.
 
 ## [v0.2.1] - 2018-05-14
