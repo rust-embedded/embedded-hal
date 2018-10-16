@@ -17,22 +17,6 @@ matrix:
       rust: nightly
       if: (branch = staging OR branch = trying) OR (type = pull_request AND branch = master)
 
-    - env: TARGET=x86_64-unknown-linux-gnu FEATURES=unproven,use-fallible-digital-traits
-      if: (branch = staging OR branch = trying) OR (type = pull_request AND branch = master)
-
-    - env: TARGET=thumbv6m-none-eabi FEATURES=unproven,use-fallible-digital-traits
-      rust: beta
-      if: (branch = staging OR branch = trying) OR (type = pull_request AND branch = master)
-
-    - env: TARGET=thumbv7m-none-eabi FEATURES=unproven,use-fallible-digital-traits
-      rust: beta
-      if: (branch = staging OR branch = trying) OR (type = pull_request AND branch = master)
-
-    - env: TARGET=x86_64-unknown-linux-gnu FEATURES=unproven,use-fallible-digital-traits
-      rust: nightly
-      if: (branch = staging OR branch = trying) OR (type = pull_request AND branch = master)
-
-
 before_install: set -e
 
 install:
