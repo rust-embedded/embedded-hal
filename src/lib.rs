@@ -689,6 +689,7 @@
 extern crate nb;
 extern crate void;
 
+pub mod adc;
 pub mod blocking;
 pub mod digital;
 pub mod prelude;
