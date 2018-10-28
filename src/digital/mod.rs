@@ -7,7 +7,8 @@
 ///
 /// *This version of the trait is now deprecated. Please use the new `OutputPin` trait in
 /// `digital::v2::OutputPin`*.
-#[deprecated]
+#[deprecated(since = "0.2.2", note = "Deprecated because the methods cannot return errors. \
+                                      Users should use the traits in digital::v2.")]
 pub trait OutputPin {
     /// Drives the pin low
     ///
@@ -28,7 +29,8 @@ pub trait OutputPin {
 ///
 /// *This version of the trait is now deprecated. Please use the new `StatefulOutputPin` trait in
 /// `digital::v2::StatefulOutputPin`*.
-#[deprecated]
+#[deprecated(since = "0.2.2", note = "Deprecated because the methods cannot return errors. \
+                                      Users should use the traits in digital::v2.")]
 #[cfg(feature = "unproven")]
 pub trait StatefulOutputPin {
     /// Is the pin in drive high mode?
@@ -53,7 +55,8 @@ pub trait StatefulOutputPin {
 /// both [OutputPin](trait.OutputPin.html) and
 /// [StatefulOutputPin](trait.StatefulOutputPin.html) are
 /// implemented. Otherwise, implement this using hardware mechanisms.
-#[deprecated]
+#[deprecated(since = "0.2.2", note = "Deprecated because the methods cannot return errors. \
+                                      Users should use the traits in digital::v2.")]
 #[cfg(feature = "unproven")]
 pub trait ToggleableOutputPin {
     /// Toggle pin output.
@@ -102,7 +105,8 @@ pub trait ToggleableOutputPin {
 /// pin.toggle();
 /// assert!(pin.is_set_low());
 /// ```
-#[deprecated]
+#[deprecated(since = "0.2.2", note = "Deprecated because the methods cannot return errors. \
+                                      Users should use the traits in digital::v2.")]
 #[cfg(feature = "unproven")]
 pub mod toggleable {
     #[allow(deprecated)]
@@ -136,7 +140,8 @@ pub mod toggleable {
 ///
 /// *This version of the trait is now deprecated. Please use the new `InputPin` trait in
 /// `digital::v2::InputPin`*.
-#[deprecated]
+#[deprecated(since = "0.2.2", note = "Deprecated because the methods cannot return errors. \
+                                      Users should use the traits in digital::v2.")]
 #[cfg(feature = "unproven")]
 pub trait InputPin {
     /// Is the input pin high?
