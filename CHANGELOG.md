@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v0.2.2] - 2018-11-03
+
+### Added
+
+- Added the Rust Code of Conduct to this repository
+- The first ADC-related trait. This is a simple trait for one-shot conversions.
+- Iterator-based blocking write and write+read traits have been added to I2C and SPI.
+- New helper constants for SPI modes.
+- A new trait for a cancellable countdown.
+- New traits for watchdog timer management, including startup, feeding, and stopping.
+
+### Changed
+- Updated docs to clarify I2C address bit widths and expectations.
+
 ## [v0.2.1] - 2018-05-14
 
 ### Changed
