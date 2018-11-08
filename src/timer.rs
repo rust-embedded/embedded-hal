@@ -63,7 +63,6 @@ use void::Void;
 /// (concrete) `CountDown::Time` type:
 /// ```rust
 /// extern crate embedded_hal as hal;
-/// #[macro_use(block)]
 ///
 /// pub fn uses_timer<T, U>(t: T)
 /// where
