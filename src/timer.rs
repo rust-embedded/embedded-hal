@@ -64,7 +64,7 @@ use void::Void;
 /// ```rust
 /// extern crate embedded_hal as hal;
 ///
-/// pub fn uses_timer<T, U>(t: T)
+/// pub fn uses_timer<T, U>(t: &mut T)
 /// where
 ///     T: hal::timer::CountDown<Time=U>,
 ///     U: From<u32>,
