@@ -123,7 +123,7 @@
 //!
 //! ```
 //! // crate: stm32f30x-hal
-//! //! An implementation of the `embedded-hal` traits for STM32F30x microcontrollers
+//! // An implementation of the `embedded-hal` traits for STM32F30x microcontrollers
 //!
 //! extern crate embedded_hal as hal;
 //! extern crate nb;
