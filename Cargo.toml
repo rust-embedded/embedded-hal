@@ -26,6 +26,8 @@ futures = "0.1.17"
 
 [features]
 unproven = ["nb/unstable"]
+v1-compat = []
+v2-compat = []
 
 [package.metadata.docs.rs]
 features = ["unproven"]
