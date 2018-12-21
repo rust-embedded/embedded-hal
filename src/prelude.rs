@@ -3,6 +3,8 @@
 //! The traits have been renamed to avoid collisions with other items when
 //! performing a glob import.
 
+#[cfg(feature = "unproven")]
+pub use adc::OneShot as _embedded_hal_adc_OneShot;
 pub use blocking::delay::DelayMs as _embedded_hal_blocking_delay_DelayMs;
 pub use blocking::delay::DelayUs as _embedded_hal_blocking_delay_DelayUs;
 pub use blocking::i2c::{
@@ -27,6 +29,12 @@ pub use serial::Read as _embedded_hal_serial_Read;
 pub use serial::Write as _embedded_hal_serial_Write;
 pub use spi::FullDuplex as _embedded_hal_spi_FullDuplex;
 pub use timer::CountDown as _embedded_hal_timer_CountDown;
+#[cfg(feature = "unproven")]
+pub use watchdog::Watchdog as _embedded_hal_watchdog_Watchdog;
+#[cfg(feature = "unproven")]
+pub use watchdog::WatchdogDisable as _embedded_hal_watchdog_WatchdogDisable;
+#[cfg(feature = "unproven")]
+pub use watchdog::WatchdogEnable as _embedded_hal_watchdog_WatchdogEnable;
 #[cfg(feature = "unproven")]
 pub use Capture as _embedded_hal_Capture;
 #[cfg(feature = "unproven")]
