@@ -28,6 +28,8 @@ pub use digital::ToggleableOutputPin as _embedded_hal_digital_ToggleableOutputPi
 pub use serial::Read as _embedded_hal_serial_Read;
 pub use serial::Write as _embedded_hal_serial_Write;
 pub use spi::FullDuplex as _embedded_hal_spi_FullDuplex;
+#[cfg(feature = "unproven")]
+pub use spi::Send as _embedded_hal_spi_Send;
 pub use timer::CountDown as _embedded_hal_timer_CountDown;
 #[cfg(feature = "unproven")]
 pub use watchdog::Watchdog as _embedded_hal_watchdog_Watchdog;
