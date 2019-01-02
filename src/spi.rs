@@ -10,6 +10,9 @@ use nb;
 ///
 /// - Due to how full duplex SPI works each `read` call must be preceded by a `send` call.
 ///
+/// - `read` calls only return the data received with the last `send` call.
+/// Previously received data is discarded
+///
 /// - Some SPIs can work with 8-bit *and* 16-bit words. You can overload this trait with different
 /// `Word` types to allow operation in both modes.
 pub trait FullDuplex<Word> {
