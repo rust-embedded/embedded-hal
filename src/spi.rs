@@ -13,6 +13,9 @@ use nb;
 /// - `read` calls only return the data received with the last `send` call.
 /// Previously received data is discarded
 ///
+/// - Data is only guaranteed to be clocked out when the `read` call succeeds.
+/// The slave select line shouldn't be released before that.
+///
 /// - Some SPIs can work with 8-bit *and* 16-bit words. You can overload this trait with different
 /// `Word` types to allow operation in both modes.
 pub trait FullDuplex<Word> {
