@@ -31,6 +31,8 @@ pub trait FullDuplex<Word> {
 /// # Notes
 ///
 /// - It's the task of the user of this interface to manage the slave select lines
+///
+/// - The slave select line shouldn't be released before the `flush` call succeeds
 #[cfg(feature = "unproven")]
 pub trait Send<Word> {
     /// An enumeration of SPI errors
@@ -38,6 +40,9 @@ pub trait Send<Word> {
 
     /// Sends a word to the slave
     fn send(&mut self, word: Word) -> nb::Result<(), Self::Error>;
+
+    /// Ensures that none of the previously written words are still buffered
+    fn flush(&mut self) -> nb::Result<(), Self::Error>;
 }
 
 /// Write (master mode)
