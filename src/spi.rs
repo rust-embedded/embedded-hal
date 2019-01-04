@@ -42,7 +42,7 @@ pub trait Send<Word> {
     fn send(&mut self, word: Word) -> nb::Result<(), Self::Error>;
 
     /// Ensures that none of the previously written words are still buffered
-    fn flush(&mut self) -> nb::Result<(), Self::Error>;
+    fn completed(&mut self) -> nb::Result<(), Self::Error>;
 }
 
 /// Write (master mode)
