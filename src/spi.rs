@@ -47,33 +47,14 @@ pub trait Send<Word> {
 
 /// Write (master mode)
 #[cfg(feature = "unproven")]
-pub mod full_duplex {
-    /// Default implementation of `spi::FullDuplex<W>` for implementers of
-    /// `spi::Send<W>`
-    ///
-    /// Also needs a `send` method to return the byte read during the last send
-    pub trait Default<W>: ::spi::Send<W> {
-        /// Reads the word stored in the shift register
-        ///
-        /// **NOTE** A word must be sent to the slave before attempting to call this
-        /// method.
-        fn read(&mut self) -> nb::Result<W, Self::Error>;
+impl<W, E> Send<W> for FullDuplex<W, Error = E> {
+    type Error = E;
+    fn send(&mut self, word: W) -> nb::Result<(), Self::Error> {
+        self.send(word)
     }
 
-    impl<W, S> ::spi::FullDuplex<W> for S
-    where
-        S: Default<W>,
-        W: Clone,
-    {
-        type Error = S::Error;
-
-        fn read(&mut self) -> nb::Result<W, Self::Error> {
-            self.read()
-        }
-
-        fn send(&mut self, word: W) -> nb::Result<(), Self::Error> {
-            self.send(word)
-        }
+    fn completed(&mut self) -> nb::Result<(), Self::Error> {
+        self.read().map(|_| ())
     }
 }
 
