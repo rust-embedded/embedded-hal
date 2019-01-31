@@ -96,3 +96,37 @@ pub trait OneShot<ADC, Word, Pin: Channel<ADC>> {
     /// whatever channel underlies the pin.
     fn read(&mut self, pin: &mut Pin) -> nb::Result<Word, Self::Error>;
 }
+
+/// ADCs that allow cancellation of pending reads
+///
+/// This trait is useful when reads are not always executed to completion:
+///
+/// ```
+/// fn sample_while_pin_low(pin: ..., adc: ..., channel: ...) -> Result<Option<u16>, adc::Error> {
+///     while pin.is_high() {};
+///
+///     adc.cancel(); // Ensure that no old results from the previous invocation show up
+///     loop {
+///         match adc.read(channel) {
+///             Err(nb::WouldBlock) => continue,
+///             Err(x) => Err(x),
+///             Ok(n) => return Ok(Some(n)),
+///         }
+///         if pin.is_high() {
+///             return None;
+///         }
+///     }
+/// }
+/// ```
+#[cfg(feature = "unproven")]
+pub trait CancellableOneShot<ADC, Word, Pin: Channel<ADC>>: OneShot<ADC, Word, Pin, Channel<ADC>> {
+    /// Cancel any pending ADC reading
+    ///
+    /// If a previous reading was requested on this ADC but has not been picked up, cancel the
+    /// conversion and discard any result that might have been obtained.
+    ///
+    /// This is a no-op if no conversion was pending. Implementations must ensure that when `read`
+    /// is called after a `cancel`, the `read` does not return any value sampled before the
+    /// `cancel`.
+    fn cancel(&mut self);
+}
