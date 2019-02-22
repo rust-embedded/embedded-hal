@@ -392,6 +392,7 @@
 //! extern crate nb;
 //!
 //! use std::ops::Generator;
+//! use std::pin::Pin;
 //!
 //! use hal::prelude::*;
 //! use stm32f30x_hal::{Led, Serial1, Timer6};
@@ -438,8 +439,8 @@
 //!
 //!     // Event loop
 //!     loop {
-//!         unsafe { blinky.resume(); }
-//!         unsafe { loopback.resume(); }
+//!         Pin::new(&mut blinky).resume();
+//!         Pin::new(&mut loopback).resume();
 //!         # break;
 //!     }
 //! }
