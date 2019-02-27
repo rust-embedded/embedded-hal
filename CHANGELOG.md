@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   fallible and their methods now return a `Result` type as setting an output pin
   and reading an input pin could potentially fail.
   See [here](https://github.com/rust-embedded/embedded-hal/issues/95) for more info.
+- Compatibility shims between `digital::v1` and `digital::v2` traits allowing v1 traits
+  to be implicitly promoted to v2, and for v2 traits to be explicitly cast to v1 wrappers.
 
 ### Changed
 - The current versions of the `OutputPin`, `StatefulOutputPin`, `ToggleableOutputPin`
