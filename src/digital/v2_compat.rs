@@ -1,6 +1,5 @@
 //! v2 compatibility shims
-//! this module adds forward support to v1 digital traits
-//! only on of v1_compat or v2_compat may be included at a given time
+//! this module adds implicit forward support to v1 digital traits
 
 #[allow(deprecated)]
 use super::v1;

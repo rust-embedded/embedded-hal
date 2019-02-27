@@ -11,8 +11,6 @@ pub mod v1;
 // New / fallible traits
 pub mod v2;
 
-// Compatibility shims, only one can be active at a time to avoid recursive errors
-
 // v2 -> v1 compatibility wrappers
 // These require explicit casts from v2 -> v1
 pub mod v1_compat;
