@@ -93,7 +93,44 @@ mod tests {
     }
 
     #[test]
-    fn old_new() {
+    fn v2_v1_output_implicit() {
+        let i = OldOutputPinImpl{state: false};
+        let _c = NewOutputPinConsumer::new(i);
+    }
+
+    #[cfg(feature = "unproven")]
+    #[allow(deprecated)]
+    struct OldInputPinImpl { 
+        state: bool
+    }
+
+    #[cfg(feature = "unproven")]
+    #[allow(deprecated)]
+    impl v1::InputPin for OldInputPinImpl {
+        fn is_low(&self) -> bool {
+            !self.state
+        }
+        fn is_high(&self) -> bool {
+            self.state
+        }
+    }
+
+    #[cfg(feature = "unproven")]
+    struct NewInputPinConsumer<T: v2::InputPin> {
+        _pin: T,
+    }
+
+    #[cfg(feature = "unproven")]
+    impl <T>NewInputPinConsumer<T> 
+    where T: v2::InputPin {
+        pub fn new(pin: T) -> NewInputPinConsumer<T> {
+            NewInputPinConsumer{ _pin: pin }
+        }
+    }
+
+    #[cfg(feature = "unproven")]
+    #[test]
+    fn v2_v1_input_implicit() {
         let i = OldOutputPinImpl{state: false};
         let _c = NewOutputPinConsumer::new(i);
     }

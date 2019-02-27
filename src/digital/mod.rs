@@ -1,6 +1,7 @@
 //! Digital I/O
 //!
 //! 
+//!
 
 // Depreciated / infallible traits
 #[deprecated(since = "0.2.2", note = "Deprecated because the methods cannot return errors. \
@@ -12,12 +13,12 @@ pub mod v2;
 
 // Compatibility shims, only one can be active at a time to avoid recursive errors
 
-// v2 -> v1 compatibility shims
-#[cfg(feature = "v1-compat")]
+// v2 -> v1 compatibility wrappers
+// These require explicit casts from v2 -> v1
 pub mod v1_compat;
 
 // v1 -> v2 compatibility shims
-#[cfg(feature = "v2-compat")]
+// These are implicit over v1 implementations
 pub mod v2_compat;
 
 // Re-export old traits so this isn't a breaking change
