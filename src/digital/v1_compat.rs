@@ -11,6 +11,17 @@ pub struct OldOutputPin<T> {
     pin: T,
 }
 
+impl <T, ERR> OldOutputPin<T>
+where
+    T: v2::OutputPin<Error=ERR>,
+    ERR: core::fmt::Debug,
+{
+    /// Create a new OldOutputPin wrapper around a v2::OutputPin
+    pub fn new(pin: T) -> Self {
+        Self{pin}
+    }
+}
+
 impl <T, ERR> From<T> for OldOutputPin<T>
 where
     T: v2::OutputPin<Error=ERR>,
@@ -58,6 +69,18 @@ where
 #[cfg(feature = "unproven")]
 pub struct OldInputPin<T> {
     pin: T,
+}
+
+#[cfg(feature = "unproven")]
+impl <T, ERR> OldInputPin<T>
+where
+    T: v2::OutputPin<Error=ERR>,
+    ERR: core::fmt::Debug,
+{
+    /// Create an OldInputPin wrapper around a v2::InputPin
+    pub fn new(pin: T) -> Self {
+        Self{pin}
+    }
 }
 
 #[cfg(feature = "unproven")]
