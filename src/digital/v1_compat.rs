@@ -1,6 +1,7 @@
 //! v1 compatibility wrapper
 //! this module adds reverse support for v2 digital traits
-//! v2 traits must be explicitly cast to the v1 version using `.into()`.
+//! v2 traits must be explicitly cast to the v1 version using `.into()`,
+//! and will panic on internal errors
 
 #[allow(deprecated)]
 use super::v1;
@@ -38,6 +39,7 @@ where
 }
 
 /// Implementation of `v1::OutputPin` trait for fallible `v2::OutputPin` output pins
+/// where errors will panic.
 #[allow(deprecated)]
 impl <T, E> v1::OutputPin for OldOutputPin<T>
 where
@@ -72,6 +74,7 @@ where
 }
 
 /// Wrapper to allow fallible `v2::InputPin` traits to be converted to `v1::InputPin` traits
+/// where errors will panic.
 #[cfg(feature = "unproven")]
 pub struct OldInputPin<T> {
     pin: T,
