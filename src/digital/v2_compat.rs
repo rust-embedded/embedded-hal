@@ -5,7 +5,7 @@
 use super::v1;
 use super::v2;
 
-/// Implementation of v2 fallible OutputPin for v1 traits
+/// Implementation of fallible `v2::OutputPin` for `v1::OutputPin` traits
 #[allow(deprecated)]
 impl <T> v2::OutputPin for T 
 where
@@ -14,24 +14,22 @@ where
     // TODO: update to ! when never_type is stabilized
     type Error = ();
 
-    /// Toggle pin output
     fn set_low(&mut self) -> Result<(), Self::Error> {
         Ok(self.set_low())
     }
 
-     fn set_high(&mut self) -> Result<(), Self::Error> {
+    fn set_high(&mut self) -> Result<(), Self::Error> {
          Ok(self.set_high())
      }
 }
 
-/// Implementation of v2 fallible StatefulOutputPin for v1 digital traits
+/// Implementation of fallible `v2::StatefulOutputPin` for `v1::StatefulOutputPin` digital traits
 #[cfg(feature = "unproven")]
 #[allow(deprecated)]
 impl <T> v2::StatefulOutputPin for T
 where
     T: v1::StatefulOutputPin + v1::OutputPin,
 {
-    /// Toggle pin output
     fn is_set_low(&self) -> Result<bool, Self::Error> {
         Ok(self.is_set_low())
     }
@@ -41,6 +39,8 @@ where
      }
 }
 
+
+/// Implementation of fallible `v2::InputPin` for `v1::InputPin` digital traits
 #[cfg(feature = "unproven")]
 #[allow(deprecated)]
 impl <T> v2::InputPin for T
@@ -50,7 +50,6 @@ where
     // TODO: update to ! when never_type is stabilized
     type Error = ();
 
-    /// Toggle pin output
     fn is_low(&self) -> Result<bool, Self::Error> {
         Ok(self.is_low())
     }

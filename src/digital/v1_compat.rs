@@ -6,7 +6,7 @@
 use super::v1;
 use super::v2;
 
-/// Wrapper to allow v2 fallible OutputPin traits to be converted to v1 traits
+/// Wrapper to allow fallible `v2::OutputPin` traits to be converted to `v1::OutputPin` traits
 pub struct OldOutputPin<T> {
     pin: T,
 }
@@ -16,12 +16,12 @@ where
     T: v2::OutputPin<Error=E>,
     E: core::fmt::Debug,
 {
-    /// Create a new OldOutputPin wrapper around a v2::OutputPin
+    /// Create a new OldOutputPin wrapper around a `v2::OutputPin`
     pub fn new(pin: T) -> Self {
         Self{pin}
     }
 
-    /// Fetch a reference to the inner v2::OutputPin impl
+    /// Fetch a reference to the inner `v2::OutputPin` impl
     pub fn inner(&self) -> &T {
         &self.pin
     }
@@ -37,7 +37,7 @@ where
     }
 }
 
-/// Implementation of v1 OutputPin trait for v2 fallible output pins
+/// Implementation of `v1::OutputPin` trait for fallible `v2::OutputPin` output pins
 #[allow(deprecated)]
 impl <T, E> v1::OutputPin for OldOutputPin<T>
 where
@@ -71,7 +71,7 @@ where
     }
 }
 
-/// Wrapper to allow v2 fallible InputPin traits to be converted to v1 traits
+/// Wrapper to allow fallible `v2::InputPin` traits to be converted to `v1::InputPin` traits
 #[cfg(feature = "unproven")]
 pub struct OldInputPin<T> {
     pin: T,
@@ -88,7 +88,7 @@ where
         Self{pin}
     }
 
-    /// Fetch a reference to the inner v2::InputPin impl
+    /// Fetch a reference to the inner `v2::InputPin` impl
     pub fn inner(&self) -> &T {
         &self.pin
     }
