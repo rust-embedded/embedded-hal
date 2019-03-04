@@ -11,21 +11,26 @@ pub struct OldOutputPin<T> {
     pin: T,
 }
 
-impl <T, ERR> OldOutputPin<T>
+impl <T, E> OldOutputPin<T>
 where
-    T: v2::OutputPin<Error=ERR>,
-    ERR: core::fmt::Debug,
+    T: v2::OutputPin<Error=E>,
+    E: core::fmt::Debug,
 {
     /// Create a new OldOutputPin wrapper around a v2::OutputPin
     pub fn new(pin: T) -> Self {
         Self{pin}
     }
+
+    /// Fetch a reference to the inner v2::OutputPin impl
+    pub fn inner(&self) -> &T {
+        &self.pin
+    }
 }
 
-impl <T, ERR> From<T> for OldOutputPin<T>
+impl <T, E> From<T> for OldOutputPin<T>
 where
-    T: v2::OutputPin<Error=ERR>,
-    ERR: core::fmt::Debug,
+    T: v2::OutputPin<Error=E>,
+    E: core::fmt::Debug,
 {
     fn from(pin: T) -> Self {
         OldOutputPin{pin}
@@ -34,10 +39,10 @@ where
 
 /// Implementation of v1 OutputPin trait for v2 fallible output pins
 #[allow(deprecated)]
-impl <T, ERR> v1::OutputPin for OldOutputPin<T>
+impl <T, E> v1::OutputPin for OldOutputPin<T>
 where
-    T: v2::OutputPin<Error=ERR>,
-    ERR: core::fmt::Debug,
+    T: v2::OutputPin<Error=E>,
+    E: core::fmt::Debug,
 {
     fn set_low(&mut self) {
         self.pin.set_low().unwrap()
@@ -51,10 +56,10 @@ where
 /// Implementation of v1 StatefulOutputPin trait for v2 fallible pins
 #[cfg(feature = "unproven")]
 #[allow(deprecated)]
-impl <T, ERR> v1::StatefulOutputPin for OldOutputPin<T> 
+impl <T, E> v1::StatefulOutputPin for OldOutputPin<T> 
 where
-    T: v2::StatefulOutputPin<Error=ERR>,
-    ERR: core::fmt::Debug,
+    T: v2::StatefulOutputPin<Error=E>,
+    E: core::fmt::Debug,
 {
     fn is_set_low(&self) -> bool {
         self.pin.is_set_low().unwrap()
@@ -72,22 +77,27 @@ pub struct OldInputPin<T> {
 }
 
 #[cfg(feature = "unproven")]
-impl <T, ERR> OldInputPin<T>
+impl <T, E> OldInputPin<T>
 where
-    T: v2::OutputPin<Error=ERR>,
-    ERR: core::fmt::Debug,
+    T: v2::OutputPin<Error=E>,
+    E: core::fmt::Debug,
 {
     /// Create an OldInputPin wrapper around a v2::InputPin
     pub fn new(pin: T) -> Self {
         Self{pin}
     }
+
+    /// Fetch a reference to the inner v2::InputPin impl
+    pub fn inner(&self) -> &T {
+        &self.pin
+    }
 }
 
 #[cfg(feature = "unproven")]
-impl <T, ERR> From<T> for OldInputPin<T>
+impl <T, E> From<T> for OldInputPin<T>
 where
-    T: v2::InputPin<Error=ERR>,
-    ERR: core::fmt::Debug,
+    T: v2::InputPin<Error=E>,
+    E: core::fmt::Debug,
 {
     fn from(pin: T) -> Self {
         OldInputPin{pin}
@@ -97,10 +107,10 @@ where
 /// Implementation of v0.2 InputPin trait for v0.3 fallible pins
 #[cfg(feature = "unproven")]
 #[allow(deprecated)]
-impl <T, ERR> v1::InputPin for OldInputPin<T>
+impl <T, E> v1::InputPin for OldInputPin<T>
 where
-    T: v2::InputPin<Error=ERR>,
-    ERR: core::fmt::Debug,
+    T: v2::InputPin<Error=E>,
+    E: core::fmt::Debug,
 {
     fn is_low(&self) -> bool {
         self.pin.is_low().unwrap()
@@ -120,8 +130,12 @@ mod tests {
     use crate::digital::v1;
     use crate::digital::v2;
 
-    struct NewOutputPinImpl { 
-        state: bool
+    use crate::digital::v1::{InputPin, OutputPin};
+
+    #[derive(Clone)]
+    struct NewOutputPinImpl {
+        state: bool,
+        res: Result<(), ()>
     }
 
     impl v2::OutputPin for NewOutputPinImpl {
@@ -129,11 +143,11 @@ mod tests {
 
         fn set_low(&mut self) -> Result<(), Self::Error> {
             self.state = false;
-            Ok(())
+            self.res
         }
         fn set_high(&mut self) -> Result<(), Self::Error>{
             self.state = true;
-            Ok(())
+            self.res
         }
     }
 
@@ -153,13 +167,32 @@ mod tests {
 
     #[test]
     fn v1_v2_output_explicit() {
-        let i = NewOutputPinImpl{state: false};
+        let i = NewOutputPinImpl{state: false, res: Ok(())};
         let _c: OldOutputPinConsumer<OldOutputPin<_>> = OldOutputPinConsumer::new(i.into());
+    }
+
+    #[test]
+    fn v1_v2_output_state() {
+        let mut o: OldOutputPin<_> = NewOutputPinImpl{state: false, res: Ok(())}.into();
+
+        o.set_high();
+        assert_eq!(o.inner().state, true);
+
+        o.set_low();
+        assert_eq!(o.inner().state, false);   
+    }
+
+    #[test]
+    #[should_panic]
+    fn v1_v2_output_panic() {
+        let mut o: OldOutputPin<_> = NewOutputPinImpl{state: false, res: Err(())}.into();
+
+        o.set_high();
     }
 
     #[cfg(feature = "unproven")]
     struct NewInputPinImpl {
-        state: bool,
+        state: Result<bool, ()>,
     }
 
     #[cfg(feature = "unproven")]
@@ -167,10 +200,10 @@ mod tests {
         type Error = ();
 
         fn is_low(&self) -> Result<bool, Self::Error> {
-            Ok(!self.state)
+            self.state.map(|v| v == false)
         }
         fn is_high(&self) -> Result<bool, Self::Error>{
-            Ok(self.state)
+            self.state.map(|v| v == true)
         }
     }
 
@@ -193,8 +226,26 @@ mod tests {
     #[cfg(feature = "unproven")]
     #[test]
     fn v1_v2_input_explicit() {
-        let i = NewInputPinImpl{state: false};
+        let i = NewInputPinImpl{state: Ok(false)};
         let _c: OldInputPinConsumer<OldInputPin<_>> = OldInputPinConsumer::new(i.into());
+    }
+
+    #[cfg(feature = "unproven")]
+    #[test]
+    fn v1_v2_input_state() {
+        let i:  OldInputPin<_> = NewInputPinImpl{state: Ok(false)}.into();
+
+        assert_eq!(i.is_low(), true);
+        assert_eq!(i.is_high(), false);
+    }
+
+    #[cfg(feature = "unproven")]
+    #[test]
+    #[should_panic]
+    fn v1_v2_input_panic() {
+        let i:  OldInputPin<_> = NewInputPinImpl{state: Err(())}.into();
+
+        i.is_low();
     }
 
 }

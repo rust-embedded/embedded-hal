@@ -11,6 +11,7 @@ impl <T> v2::OutputPin for T
 where
     T: v1::OutputPin,
 {
+    // TODO: update to ! when never_type is stabilized
     type Error = ();
 
     /// Toggle pin output
@@ -46,6 +47,7 @@ impl <T> v2::InputPin for T
 where
     T: v1::InputPin
 {
+    // TODO: update to ! when never_type is stabilized
     type Error = ();
 
     /// Toggle pin output
@@ -97,6 +99,17 @@ mod tests {
         let _c = NewOutputPinConsumer::new(i);
     }
 
+    #[test]
+    fn v2_v1_output_state() {
+        let mut o = OldOutputPinImpl{state: false};
+        
+        v2::OutputPin::set_high(&mut o).unwrap();
+        assert_eq!(o.state, true);
+
+        v2::OutputPin::set_low(&mut o).unwrap();
+        assert_eq!(o.state, false);
+    }
+
     #[cfg(feature = "unproven")]
     #[allow(deprecated)]
     struct OldInputPinImpl { 
@@ -130,8 +143,16 @@ mod tests {
     #[cfg(feature = "unproven")]
     #[test]
     fn v2_v1_input_implicit() {
-        let i = OldOutputPinImpl{state: false};
-        let _c = NewOutputPinConsumer::new(i);
+        let i = OldInputPinImpl{state: false};
+        let _c = NewInputPinConsumer::new(i);
     }
 
+    #[cfg(feature = "unproven")]
+    #[test]
+    fn v2_v1_input_state() {
+        let mut i = OldInputPinImpl{state: false};
+        
+        assert_eq!(v2::InputPin::is_high(&mut i).unwrap(), false);
+        assert_eq!(v2::InputPin::is_low(&mut i).unwrap(), true);
+    }
 }

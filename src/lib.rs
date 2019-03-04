@@ -683,7 +683,7 @@
 //! ```
 
 #![deny(missing_docs)]
-//#![deny(warnings)]
+#![deny(warnings)]
 #![no_std]
 
 #[macro_use]
