@@ -23,7 +23,8 @@ where
     }
 
     /// Fetch a reference to the inner `v2::OutputPin` impl
-    pub fn inner(&self) -> &T {
+    #[cfg(test)]
+    fn inner(&self) -> &T {
         &self.pin
     }
 }
@@ -91,10 +92,6 @@ where
         Self{pin}
     }
 
-    /// Fetch a reference to the inner `v2::InputPin` impl
-    pub fn inner(&self) -> &T {
-        &self.pin
-    }
 }
 
 #[cfg(feature = "unproven")]
@@ -135,7 +132,7 @@ mod tests {
     use crate::digital::v1;
     use crate::digital::v2;
 
-    use crate::digital::v1::{InputPin, OutputPin};
+    use crate::digital::v1::OutputPin;
 
     #[derive(Clone)]
     struct NewOutputPinImpl {
@@ -194,6 +191,9 @@ mod tests {
 
         o.set_high();
     }
+
+    #[cfg(feature = "unproven")]
+    use crate::digital::v1::InputPin;
 
     #[cfg(feature = "unproven")]
     struct NewInputPinImpl {
