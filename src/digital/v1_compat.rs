@@ -53,7 +53,8 @@ where
     }
 }
 
-/// Implementation of v1 StatefulOutputPin trait for v2 fallible pins
+/// Implementation of `v1::StatefulOutputPin` trait for `v2::StatefulOutputPin` fallible pins
+/// where errors will panic.
 #[cfg(feature = "unproven")]
 #[allow(deprecated)]
 impl <T, E> v1::StatefulOutputPin for OldOutputPin<T> 
@@ -82,7 +83,7 @@ where
     T: v2::OutputPin<Error=E>,
     E: core::fmt::Debug,
 {
-    /// Create an OldInputPin wrapper around a v2::InputPin
+    /// Create an `OldInputPin` wrapper around a `v2::InputPin`.
     pub fn new(pin: T) -> Self {
         Self{pin}
     }
@@ -104,7 +105,8 @@ where
     }
 }
 
-/// Implementation of v0.2 InputPin trait for v0.3 fallible pins
+/// Implementation of `v1::InputPin` trait for `v2::InputPin` fallible pins
+/// where errors will panic.
 #[cfg(feature = "unproven")]
 #[allow(deprecated)]
 impl <T, E> v1::InputPin for OldInputPin<T>
