@@ -3,7 +3,7 @@
 //! 
 //!
 
-// Depreciated / infallible traits
+// Deprecated / infallible traits
 #[deprecated(since = "0.2.2", note = "Deprecated because the methods cannot return errors. \
                                       Users should use the traits in digital::v2.")]
 pub mod v1;
