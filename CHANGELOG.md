@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Added
+
+
+### Changed
+
+
+## [v0.2.3] - 2019-05-09
+
+### Added
 - A new version of the digital `OutputPin`, `StatefulOutputPin`, `ToggleableOutputPin`
   and `InputPin` traits has been added under `digital::v2`. These traits are now
   fallible and their methods now return a `Result` type as setting an output pin
