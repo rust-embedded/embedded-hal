@@ -122,6 +122,27 @@ pub mod toggleable {
     }
 }
 
+/// A digital output "port"
+///
+/// `Width` is the size of the port; it could be `u8` for an 8-bit parallel
+/// port, `u16` for a 16-bit one, etc.
+///
+/// **NOTE** The "port" doesn't necessarily has to match a hardware GPIO port;
+/// it could for instance be a 4-bit ports made up of non contiguous pins, say
+/// `PA0`, `PA3`, `PA10` and `PA13`.
+#[cfg(feature = "unproven")]
+pub trait OutputPort<Width> {
+    /// Error type
+    type Error;
+    /// Outputs `word` on the port pins
+    ///
+    /// # Contract
+    ///
+    /// The state of all the port pins will change atomically ("at the same time"). This usually
+    /// means that state of all the pins will be changed in a single register operation.
+    fn write(&mut self, word: Width) -> Result<(), Self::Error>;
+}
+
 /// Single digital input pin
 ///
 /// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
