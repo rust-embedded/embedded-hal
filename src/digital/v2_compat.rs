@@ -1,6 +1,6 @@
 //! v2 compatibility shims
 //! 
-//! this module adds implicit forward support to v1 digital traits
+//! This module adds implicit forward support to v1 digital traits,
 //! allowing v1 implementations to be directly used with v2 consumers.
 //! 
 //! ```
