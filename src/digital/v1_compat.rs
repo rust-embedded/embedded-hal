@@ -1,6 +1,6 @@
 //! v1 compatibility wrappers
 //! 
-//! this module provides wrappers to support use of v2 implementations with
+//! This module provides wrappers to support use of v2 implementations with
 //! v1 consumers. v2 traits must be explicitly cast to the v1 version using 
 //! `.into()`, and will panic on internal errors
 //! 
