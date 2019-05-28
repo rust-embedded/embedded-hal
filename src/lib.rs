@@ -905,6 +905,9 @@ pub trait PwmPin {
     fn enable(&mut self);
 
     /// Returns the current duty cycle
+    ///
+    /// While the pin is transitioning to the new duty cycle after a `set_duty` call, this may
+    /// return the old or the new duty cycle depending on the implementation.
     fn get_duty(&self) -> Self::Duty;
 
     /// Returns the maximum duty cycle value
