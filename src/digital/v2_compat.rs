@@ -1,5 +1,36 @@
 //! v2 compatibility shims
-//! this module adds implicit forward support to v1 digital traits
+//! 
+//! This module adds implicit forward support to v1 digital traits,
+//! allowing v1 implementations to be directly used with v2 consumers.
+//! 
+//! ```
+//! extern crate embedded_hal;
+//! use embedded_hal::digital::{v1, v2};
+//! 
+//! struct OldOutputPinImpl { }
+//! 
+//! impl v1::OutputPin for OldOutputPinImpl {
+//!     fn set_low(&mut self) { }
+//!     fn set_high(&mut self) { }
+//! }
+//! 
+//! struct NewOutputPinConsumer<T: v2::OutputPin> {
+//!     _pin: T,
+//! }
+//! 
+//! impl <T>NewOutputPinConsumer<T> 
+//! where T: v2::OutputPin {
+//!     pub fn new(pin: T) -> NewOutputPinConsumer<T> {
+//!         NewOutputPinConsumer{ _pin: pin }
+//!     }
+//! }
+//! 
+//! fn main() {
+//!     let pin = OldOutputPinImpl{};
+//!     let _consumer = NewOutputPinConsumer::new(pin);
+//! }
+//! ```
+//! 
 
 #[allow(deprecated)]
 use super::v1;

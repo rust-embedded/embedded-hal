@@ -1,7 +1,39 @@
-//! v1 compatibility wrapper
-//! this module adds reverse support for v2 digital traits
-//! v2 traits must be explicitly cast to the v1 version using `.into()`,
-//! and will panic on internal errors
+//! v1 compatibility wrappers
+//! 
+//! This module provides wrappers to support use of v2 implementations with
+//! v1 consumers. v2 traits must be explicitly cast to the v1 version using 
+//! `.into()`, and will panic on internal errors
+//! 
+//! ```
+//! extern crate embedded_hal;
+//! use embedded_hal::digital::{v1, v2, v1_compat::OldOutputPin};
+//! 
+//! struct NewOutputPinImpl {}
+//! 
+//! impl v2::OutputPin for NewOutputPinImpl {
+//!     type Error = ();
+//!     fn set_low(&mut self) -> Result<(), Self::Error> { Ok(()) }
+//!     fn set_high(&mut self) -> Result<(), Self::Error>{ Ok(()) }
+//! }
+//! 
+//! struct OldOutputPinConsumer<T: v1::OutputPin> {
+//!     _pin: T,
+//! }
+//! 
+//! impl <T>OldOutputPinConsumer<T> 
+//! where T: v1::OutputPin {
+//!     pub fn new(pin: T) -> OldOutputPinConsumer<T> {
+//!         OldOutputPinConsumer{ _pin: pin }
+//!     }
+//! }
+//! 
+//! fn main() {
+//!     let pin = NewOutputPinImpl{};
+//!     let _consumer: OldOutputPinConsumer<OldOutputPin<_>> = OldOutputPinConsumer::new(pin.into());
+//! }
+//! ```
+//! 
+
 
 #[allow(deprecated)]
 use super::v1;
