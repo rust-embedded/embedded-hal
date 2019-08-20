@@ -95,6 +95,7 @@
 //! ```
 //! extern crate nb;
 //!
+//! # use std as core;
 //! use core::convert::Infallible;
 //!
 //! /// A count down timer
@@ -222,7 +223,7 @@
 //! # }
 //!
 //! # mod stm32f30x_hal {
-//! #     use core::convert::Infallible;
+//! #     use std::convert::Infallible;
 //! #     pub struct Serial1;
 //! #     impl Serial1 {
 //! #         pub fn write(&mut self, _: u8) -> ::nb::Result<(), Infallible> {
@@ -252,7 +253,7 @@
 //! };
 //! use futures::future::Loop;
 //! use stm32f30x_hal::{Led, Serial1, Timer6};
-//! use core::convert::Infallible;
+//! use std::convert::Infallible;
 //!
 //! /// `futures` version of `CountDown.wait`
 //! ///
@@ -346,7 +347,7 @@
 //! }
 //!
 //! # mod stm32f30x_hal {
-//! #     use core::convert::Infallible;
+//! #     use std::convert::Infallible;
 //! #     pub struct Timer6;
 //! #     impl ::hal::timer::CountDown for Timer6 {
 //! #         type Time = ();
@@ -442,7 +443,7 @@
 //! }
 //!
 //! # mod stm32f30x_hal {
-//! #   use core::convert::Infallible;
+//! #   use std::convert::Infallible;
 //! #   pub struct Serial1;
 //! #   impl Serial1 {
 //! #       pub fn read(&mut self) -> ::nb::Result<u8, Infallible> { Err(::nb::Error::WouldBlock) }
@@ -589,6 +590,7 @@
 //! - Buffered serial interface with periodic flushing in interrupt handler
 //!
 //! ```
+//! # use std as core;
 //! extern crate embedded_hal as hal;
 //! extern crate nb;
 //!
@@ -724,7 +726,7 @@ pub mod watchdog;
 ///     println!("Period: {} ms", period);
 /// }
 ///
-/// # use core::convert::Infallible;
+/// # use std::convert::Infallible;
 /// # struct MilliSeconds(u32);
 /// # trait U32Ext { fn ms(self) -> MilliSeconds; }
 /// # impl U32Ext for u32 { fn ms(self) -> MilliSeconds { MilliSeconds(self) } }
@@ -940,7 +942,7 @@ pub trait PwmPin {
 ///     println!("Speed: {} pulses per second", speed);
 /// }
 ///
-/// # use core::convert::Infallible;
+/// # use std::convert::Infallible;
 /// # struct Seconds(u32);
 /// # trait U32Ext { fn s(self) -> Seconds; }
 /// # impl U32Ext for u32 { fn s(self) -> Seconds { Seconds(self) } }

@@ -40,7 +40,7 @@ use core::convert::Infallible;
 ///     Led.off();
 /// }
 ///
-/// # use core::convert::Infallible;
+/// # use std::convert::Infallible;
 /// # struct Seconds(u32);
 /// # trait U32Ext { fn s(self) -> Seconds; }
 /// # impl U32Ext for u32 { fn s(self) -> Seconds { Seconds(self) } }
