@@ -142,14 +142,15 @@ pub trait InputPin {
 ///
 /// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
 #[cfg(feature = "unproven")]
-pub trait InputOutputPin: InputPin + OutputPin {
+pub trait InputOutputPin<Error>: InputPin<Error = Error> + OutputPin<Error = Error> {
     /// Switch pin into output mode,
+    /// 
     /// Result::Ok value is true if pin mode was changed or false if pin already was in output mode.
     ///
     /// Expected behaviour after success result:
     /// - OutputPin functions should work as for ouptut pin
     /// - InputPin functions should return errors
-    fn mode_output(&mut self) -> Result<bool, Self::Error>;
+    fn mode_output(&mut self) -> Result<bool, Error>;
 
     /// Switch pin into input mode without activating any pull up/down resistors,
     /// Result::Ok value is true if pin mode was changed or false if pin already was in input mode.
@@ -157,5 +158,5 @@ pub trait InputOutputPin: InputPin + OutputPin {
     /// /// Expected behaviour after success result:
     /// - InputPin functions should work as for ouptut pin
     /// - OutputPin functions should return errors
-    fn mode_input(&mut self) -> Result<bool, Self::Error>;
+    fn mode_input(&mut self) -> Result<bool, Error>;
 }
