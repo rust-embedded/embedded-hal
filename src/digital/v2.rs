@@ -24,7 +24,7 @@ pub trait OutputPin {
 ///
 /// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
 #[cfg(feature = "unproven")]
-pub trait StatefulOutputPin : OutputPin {
+pub trait StatefulOutputPin: OutputPin {
     /// Is the pin in drive high mode?
     ///
     /// *NOTE* this does *not* read the electrical state of the pin
@@ -135,4 +135,27 @@ pub trait InputPin {
 
     /// Is the input pin low?
     fn is_low(&self) -> Result<bool, Self::Error>;
+}
+
+/// Describe pin that can switch its input/ouput mode on fly.
+/// Should be used to communicate with custom protocols based hardware.
+///
+/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
+#[cfg(feature = "unproven")]
+pub trait InputOutputPin: InputPin + OutputPin {
+    /// Switch pin into output mode,
+    /// Result::Ok value is true if pin mode was changed or false if pin already was in output mode.
+    ///
+    /// Expected behaviour after success result:
+    /// - OutputPin functions should work as for ouptut pin
+    /// - InputPin functions should return errors
+    fn mode_output(&mut self) -> Result<bool, Self::Error>;
+
+    /// Switch pin into input mode without activating any pull up/down resistors,
+    /// Result::Ok value is true if pin mode was changed or false if pin already was in input mode.
+    ///
+    /// /// Expected behaviour after success result:
+    /// - InputPin functions should work as for ouptut pin
+    /// - OutputPin functions should return errors
+    fn mode_input(&mut self) -> Result<bool, Self::Error>;
 }
