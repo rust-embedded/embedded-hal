@@ -66,9 +66,9 @@ pub trait WriteIter {
     /// # I2C Events (contract)
     ///
     /// Same as `Write`
-    fn write<B>(&mut self, addr: u8, bytes: B) -> Result<(), Self::Error>
+    fn write<'a, B>(&mut self, addr: u8, bytes: B) -> Result<(), Self::Error>
     where
-        B: IntoIterator<Item = u8>;
+        B: IntoIterator<Item = &'a u8>;
 }
 
 /// Blocking write + read
@@ -118,12 +118,12 @@ pub trait WriteIterRead {
     /// # I2C Events (contract)
     ///
     /// Same as the `WriteRead` trait
-    fn write_iter_read<B>(
+    fn write_iter_read<'a, B>(
         &mut self,
         address: u8,
         bytes: B,
         buffer: &mut [u8],
     ) -> Result<(), Self::Error>
         where
-        B: IntoIterator<Item = u8>;
+        B: IntoIterator<Item = &'a u8>;
 }
