@@ -141,7 +141,7 @@ pub trait InputPin {
 ///
 /// *This type is available if embedded-hal is built with the `"unproven"` feature.*
 #[cfg(feature = "unproven")]
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum PinState {
     /// Pin state low
     Low,
