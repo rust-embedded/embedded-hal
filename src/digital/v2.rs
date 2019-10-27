@@ -136,3 +136,34 @@ pub trait InputPin {
     /// Is the input pin low?
     fn is_low(&self) -> Result<bool, Self::Error>;
 }
+
+/// The states of a tri-state pin
+///
+/// *This type is available if embedded-hal is built with the `"unproven"` feature.*
+#[cfg(feature = "unproven")]
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum PinState {
+    /// Pin state low
+    Low,
+    /// Pin state high
+    High,
+    /// The pin is set to high impedance mode
+    Floating,
+}
+
+/// A tri-state (low, high, floating) pin
+///
+/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
+#[cfg(feature = "unproven")]
+pub trait TriStatePin {
+    /// Error type
+    type Error;
+
+    /// Changes the state of the pin
+    fn set(&mut self, state: PinState) -> Result<(), Self::Error>;
+
+    /// Gets the state of the pin.
+    ///
+    /// *NOTE* this does *not* read the electrical state of the pin
+    fn state(&self) -> Result<PinState, Self::Error>;
+}
