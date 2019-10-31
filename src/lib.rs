@@ -50,7 +50,7 @@
 //! You can find platform agnostic drivers built on top of `embedded-hal` on crates.io by [searching
 //! for the *embedded-hal* keyword](https://crates.io/keywords/embedded-hal).
 //!
-//! If you writing a platform agnostic driver yourself you are highly encouraged to [add the
+//! If you are writing a platform agnostic driver yourself you are highly encouraged to [add the
 //! embedded-hal keyword](https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata)
 //! to your crate before publishing it!
 //!
