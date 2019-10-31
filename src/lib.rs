@@ -235,8 +235,10 @@
 //!
 //! ### `futures`
 //!
-//! An example of running two tasks concurrently. First task: blink an LED every
-//! second. Second task: loop back data over the serial interface.
+//! An example of running two tasks concurrently. First task: blink a LED every
+//! second. Second task: loop back data over the serial interface. The target
+//! must provide the `libstd` in order to be able to use `futures`, which is not
+//! the case for many embedded targets.
 //!
 //! ```
 //! extern crate embedded_hal as hal;
@@ -377,7 +379,9 @@
 //!
 //! ### `await`
 //!
-//! Same example as above but using `await!` instead of `futures`.
+//! Same example as above but using `await!` instead of `futures`
+//! (same remark concerning the availability of `libstd` on the
+//! target).
 //!
 //! ```
 //! #![feature(generator_trait)]
