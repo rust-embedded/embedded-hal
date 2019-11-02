@@ -119,19 +119,19 @@
 //! Shown below is an implementation of some of the HAL traits for the [`stm32f30x`] crate. This
 //! single implementation will work for *any* microcontroller in the STM32F30x family.
 //!
-//! [`stm32f30x`]: https://crates.io/crates/stm32f30x
+//! [`stm32f3`]: https://crates.io/crates/stm32f3
 //!
 //! ```
-//! // crate: stm32f30x-hal
-//! // An implementation of the `embedded-hal` traits for STM32F30x microcontrollers
+//! // crate: stm32f3xx-hal
+//! // An implementation of the `embedded-hal` traits for STM32F3xx microcontrollers
 //!
 //! extern crate embedded_hal as hal;
 //! extern crate nb;
 //!
 //! // device crate
-//! extern crate stm32f30x;
+//! extern crate stm32f3;
 //!
-//! use stm32f30x::USART1;
+//! use stm32f3::stm32f303::USART1;
 //!
 //! /// A serial interface
 //! // NOTE generic over the USART peripheral
