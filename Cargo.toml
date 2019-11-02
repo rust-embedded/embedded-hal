@@ -17,7 +17,7 @@ version = "0.2.3"
 version = "0.1.1"
 
 [dev-dependencies]
-stm32f30x = "0.6.0"
+stm32f30x = "0.8.0"
 futures = "0.1.17"
 
 [features]
