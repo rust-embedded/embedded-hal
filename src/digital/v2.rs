@@ -59,6 +59,7 @@ pub trait ToggleableOutputPin {
 /// ```
 /// use embedded_hal::digital::v2::{OutputPin, StatefulOutputPin, ToggleableOutputPin};
 /// use embedded_hal::digital::v2::toggleable;
+/// use std::convert::Infallible;
 ///
 /// /// A virtual output pin that exists purely in software
 /// struct MyPin {
@@ -66,7 +67,7 @@ pub trait ToggleableOutputPin {
 /// }
 ///
 /// impl OutputPin for MyPin {
-///    type Error = void::Void;
+///    type Error = Infallible;
 ///
 ///    fn set_low(&mut self) -> Result<(), Self::Error> {
 ///        self.state = false;
