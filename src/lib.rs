@@ -90,20 +90,20 @@
 //! [`WouldBlock`]: https://docs.rs/nb/0.1.0/nb/enum.Error.html
 //!
 //! Some traits, like the one shown below, may expose possibly blocking APIs that can't fail. In
-//! those cases `nb::Result<_, Void>` is used.
+//! those cases `nb::Result<_, Infallible>` is used.
 //!
 //! ```
 //! extern crate nb;
-//! extern crate void;
 //!
-//! use void::Void;
+//! # use std as core;
+//! use core::convert::Infallible;
 //!
 //! /// A count down timer
 //! pub trait CountDown {
 //!     // ..
 //!
 //!     /// "waits" until the count down is over
-//!     fn wait(&mut self) -> nb::Result<(), Void>;
+//!     fn wait(&mut self) -> nb::Result<(), Infallible>;
 //! }
 //!
 //! # fn main() {}
@@ -223,11 +223,10 @@
 //! # }
 //!
 //! # mod stm32f30x_hal {
-//! #     extern crate void;
-//! #     use self::void::Void;
+//! #     use std::convert::Infallible;
 //! #     pub struct Serial1;
 //! #     impl Serial1 {
-//! #         pub fn write(&mut self, _: u8) -> ::nb::Result<(), Void> {
+//! #         pub fn write(&mut self, _: u8) -> ::nb::Result<(), Infallible> {
 //! #             Ok(())
 //! #         }
 //! #     }
@@ -242,7 +241,6 @@
 //! ```
 //! extern crate embedded_hal as hal;
 //! extern crate futures;
-//! extern crate void;
 //!
 //! #[macro_use(try_nb)]
 //! extern crate nb;
@@ -255,12 +253,12 @@
 //! };
 //! use futures::future::Loop;
 //! use stm32f30x_hal::{Led, Serial1, Timer6};
-//! use void::Void;
+//! use std::convert::Infallible;
 //!
 //! /// `futures` version of `CountDown.wait`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn wait<T>(mut timer: T) -> impl Future<Item = T, Error = Void>
+//! fn wait<T>(mut timer: T) -> impl Future<Item = T, Error = Infallible>
 //! where
 //!     T: hal::timer::CountDown,
 //! {
@@ -342,32 +340,31 @@
 //!
 //!     // Event loop
 //!     loop {
-//!         blinky.poll().unwrap(); // NOTE(unwrap) E = Void
+//!         blinky.poll().unwrap(); // NOTE(unwrap) E = Infallible
 //!         loopback.poll().unwrap();
 //! #       break;
 //!     }
 //! }
 //!
 //! # mod stm32f30x_hal {
-//! #     extern crate void;
-//! #     use self::void::Void;
+//! #     use std::convert::Infallible;
 //! #     pub struct Timer6;
 //! #     impl ::hal::timer::CountDown for Timer6 {
 //! #         type Time = ();
 //! #
 //! #         fn start<T>(&mut self, _: T) where T: Into<()> {}
-//! #         fn wait(&mut self) -> ::nb::Result<(), Void> { Err(::nb::Error::WouldBlock) }
+//! #         fn wait(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #     }
 //! #
 //! #     pub struct Serial1;
 //! #     impl ::hal::serial::Read<u8> for Serial1 {
-//! #         type Error = Void;
-//! #         fn read(&mut self) -> ::nb::Result<u8, Void> { Err(::nb::Error::WouldBlock) }
+//! #         type Error = Infallible;
+//! #         fn read(&mut self) -> ::nb::Result<u8, Infallible> { Err(::nb::Error::WouldBlock) }
 //! #     }
 //! #     impl ::hal::serial::Write<u8> for Serial1 {
-//! #         type Error = Void;
-//! #         fn flush(&mut self) -> ::nb::Result<(), Void> { Err(::nb::Error::WouldBlock) }
-//! #         fn write(&mut self, _: u8) -> ::nb::Result<(), Void> { Err(::nb::Error::WouldBlock) }
+//! #         type Error = Infallible;
+//! #         fn flush(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #         fn write(&mut self, _: u8) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #     }
 //! #
 //! #     pub struct Led;
@@ -418,7 +415,7 @@
 //!         loop {
 //!             // `await!` means "suspend / yield here" instead of "block until
 //!             // completion"
-//!             await!(timer.wait()).unwrap(); // NOTE(unwrap) E = Void
+//!             await!(timer.wait()).unwrap(); // NOTE(unwrap) E = Infallible
 //!
 //!             state = !state;
 //!
@@ -446,16 +443,15 @@
 //! }
 //!
 //! # mod stm32f30x_hal {
-//! #   extern crate void;
-//! #   use self::void::Void;
+//! #   use std::convert::Infallible;
 //! #   pub struct Serial1;
 //! #   impl Serial1 {
-//! #       pub fn read(&mut self) -> ::nb::Result<u8, Void> { Err(::nb::Error::WouldBlock) }
-//! #       pub fn write(&mut self, _: u8) -> ::nb::Result<(), Void> { Err(::nb::Error::WouldBlock) }
+//! #       pub fn read(&mut self) -> ::nb::Result<u8, Infallible> { Err(::nb::Error::WouldBlock) }
+//! #       pub fn write(&mut self, _: u8) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #   }
 //! #   pub struct Timer6;
 //! #   impl Timer6 {
-//! #       pub fn wait(&mut self) -> ::nb::Result<(), Void> { Err(::nb::Error::WouldBlock) }
+//! #       pub fn wait(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #   }
 //! #   pub struct Led;
 //! #   impl Led {
@@ -594,16 +590,16 @@
 //! - Buffered serial interface with periodic flushing in interrupt handler
 //!
 //! ```
+//! # use std as core;
 //! extern crate embedded_hal as hal;
 //! extern crate nb;
-//! extern crate void;
 //!
 //! use hal::prelude::*;
-//! use void::Void;
+//! use core::convert::Infallible;
 //!
 //! fn flush<S>(serial: &mut S, cb: &mut CircularBuffer)
 //! where
-//!     S: hal::serial::Write<u8, Error = Void>,
+//!     S: hal::serial::Write<u8, Error = Infallible>,
 //! {
 //!     loop {
 //!         if let Some(byte) = cb.peek() {
@@ -668,9 +664,9 @@
 //! # }
 //! # struct Serial1;
 //! # impl ::hal::serial::Write<u8> for Serial1 {
-//! #   type Error = Void;
-//! #   fn write(&mut self, _: u8) -> nb::Result<(), Void> { Err(::nb::Error::WouldBlock) }
-//! #   fn flush(&mut self) -> nb::Result<(), Void> { Err(::nb::Error::WouldBlock) }
+//! #   type Error = Infallible;
+//! #   fn write(&mut self, _: u8) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #   fn flush(&mut self) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! # }
 //! # struct CircularBuffer;
 //! # impl CircularBuffer {
@@ -687,7 +683,6 @@
 
 #[macro_use]
 extern crate nb;
-extern crate void;
 
 pub mod adc;
 pub mod blocking;
@@ -731,8 +726,7 @@ pub mod watchdog;
 ///     println!("Period: {} ms", period);
 /// }
 ///
-/// # extern crate void;
-/// # use void::Void;
+/// # use std::convert::Infallible;
 /// # struct MilliSeconds(u32);
 /// # trait U32Ext { fn ms(self) -> MilliSeconds; }
 /// # impl U32Ext for u32 { fn ms(self) -> MilliSeconds { MilliSeconds(self) } }
@@ -741,9 +735,9 @@ pub mod watchdog;
 /// # impl hal::Capture for Capture1 {
 /// #     type Capture = u16;
 /// #     type Channel = Channel;
-/// #     type Error = Void;
+/// #     type Error = Infallible;
 /// #     type Time = MilliSeconds;
-/// #     fn capture(&mut self, _: Channel) -> ::nb::Result<u16, Void> { Ok(0) }
+/// #     fn capture(&mut self, _: Channel) -> ::nb::Result<u16, Infallible> { Ok(0) }
 /// #     fn disable(&mut self, _: Channel) { unimplemented!() }
 /// #     fn enable(&mut self, _: Channel) { unimplemented!() }
 /// #     fn get_resolution(&self) -> MilliSeconds { unimplemented!() }
@@ -948,8 +942,7 @@ pub trait PwmPin {
 ///     println!("Speed: {} pulses per second", speed);
 /// }
 ///
-/// # extern crate void;
-/// # use void::Void;
+/// # use std::convert::Infallible;
 /// # struct Seconds(u32);
 /// # trait U32Ext { fn s(self) -> Seconds; }
 /// # impl U32Ext for u32 { fn s(self) -> Seconds { Seconds(self) } }
@@ -963,7 +956,7 @@ pub trait PwmPin {
 /// # impl hal::timer::CountDown for Timer6 {
 /// #     type Time = Seconds;
 /// #     fn start<T>(&mut self, _: T) where T: Into<Seconds> {}
-/// #     fn wait(&mut self) -> ::nb::Result<(), Void> { Ok(()) }
+/// #     fn wait(&mut self) -> ::nb::Result<(), Infallible> { Ok(()) }
 /// # }
 /// ```
 #[cfg(feature = "unproven")]

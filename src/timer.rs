@@ -1,7 +1,7 @@
 //! Timers
 
 use nb;
-use void::Void;
+use core::convert::Infallible;
 
 /// A count down timer
 ///
@@ -40,8 +40,7 @@ use void::Void;
 ///     Led.off();
 /// }
 ///
-/// # extern crate void;
-/// # use void::Void;
+/// # use std::convert::Infallible;
 /// # struct Seconds(u32);
 /// # trait U32Ext { fn s(self) -> Seconds; }
 /// # impl U32Ext for u32 { fn s(self) -> Seconds { Seconds(self) } }
@@ -54,7 +53,7 @@ use void::Void;
 /// # impl hal::timer::CountDown for Timer6 {
 /// #     type Time = Seconds;
 /// #     fn start<T>(&mut self, _: T) where T: Into<Seconds> {}
-/// #     fn wait(&mut self) -> ::nb::Result<(), Void> { Ok(()) }
+/// #     fn wait(&mut self) -> ::nb::Result<(), Infallible> { Ok(()) }
 /// # }
 /// ```
 pub trait CountDown {
@@ -74,7 +73,7 @@ pub trait CountDown {
     /// finishes.
     /// - Otherwise the behavior of calling `wait` after the last call returned `Ok` is UNSPECIFIED.
     /// Implementers are suggested to panic on this scenario to signal a programmer error.
-    fn wait(&mut self) -> nb::Result<(), Void>;
+    fn wait(&mut self) -> nb::Result<(), Infallible>;
 }
 
 /// Marker trait that indicates that a timer is periodic
