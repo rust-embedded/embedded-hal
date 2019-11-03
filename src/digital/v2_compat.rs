@@ -32,6 +32,8 @@
 //! ```
 //! 
 
+use core::convert::Infallible;
+
 #[allow(deprecated)]
 use super::v1;
 use super::v2;
@@ -42,8 +44,7 @@ impl <T> v2::OutputPin for T
 where
     T: v1::OutputPin,
 {
-    // TODO: update to ! when never_type is stabilized
-    type Error = ();
+    type Error = Infallible;
 
     fn set_low(&mut self) -> Result<(), Self::Error> {
         Ok(self.set_low())
@@ -81,8 +82,7 @@ impl <T> v2::InputPin for T
 where
     T: v1::InputPin
 {
-    // TODO: update to ! when never_type is stabilized
-    type Error = ();
+    type Error = Infallible;
 
     fn is_low(&self) -> Result<bool, Self::Error> {
         Ok(self.is_low())
