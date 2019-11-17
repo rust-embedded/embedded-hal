@@ -108,6 +108,8 @@ where
 
 /// Wrapper to allow fallible `v2::InputPin` traits to be converted to `v1::InputPin` traits
 /// where errors will panic.
+///
+/// Available behind `"unproven"` feature because `v1::InputPin` is
 #[cfg(feature = "unproven")]
 pub struct OldInputPin<T> {
     pin: T,
@@ -139,6 +141,8 @@ where
 
 /// Implementation of `v1::InputPin` trait for `v2::InputPin` fallible pins
 /// where errors will panic.
+///
+/// Available behind `"unproven"` feature because `v1::InputPin` is
 #[cfg(feature = "unproven")]
 #[allow(deprecated)]
 impl <T, E> v1::InputPin for OldInputPin<T>

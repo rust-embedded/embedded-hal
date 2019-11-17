@@ -76,6 +76,8 @@ where
 impl<T> v2::toggleable::Default for T where T: v1::toggleable::Default {}
 
 /// Implementation of fallible `v2::InputPin` for `v1::InputPin` digital traits
+///
+/// Available behind `"unproven"` feature because `v1::InputPin` is
 #[cfg(feature = "unproven")]
 #[allow(deprecated)]
 impl <T> v2::InputPin for T
