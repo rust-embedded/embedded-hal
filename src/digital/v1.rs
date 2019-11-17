@@ -131,11 +131,8 @@ pub mod toggleable {
 
 /// Single digital input pin
 ///
-/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
-///
 /// *This version of the trait is now deprecated. Please use the new `InputPin` trait in
 /// `digital::v2::InputPin`*.
-#[cfg(feature = "unproven")]
 pub trait InputPin {
     /// Is the input pin high?
     fn is_high(&self) -> bool;

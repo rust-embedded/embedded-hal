@@ -76,9 +76,6 @@ where
 impl<T> v2::toggleable::Default for T where T: v1::toggleable::Default {}
 
 /// Implementation of fallible `v2::InputPin` for `v1::InputPin` digital traits
-///
-/// Available behind `"unproven"` feature because `v1::InputPin` is
-#[cfg(feature = "unproven")]
 #[allow(deprecated)]
 impl <T> v2::InputPin for T
 where
@@ -178,13 +175,11 @@ mod tests {
         assert_eq!(o.state, false);
     }
 
-    #[cfg(feature = "unproven")]
     #[allow(deprecated)]
     struct OldInputPinImpl { 
         state: bool
     }
 
-    #[cfg(feature = "unproven")]
     #[allow(deprecated)]
     impl v1::InputPin for OldInputPinImpl {
         fn is_low(&self) -> bool {
@@ -195,12 +190,10 @@ mod tests {
         }
     }
 
-    #[cfg(feature = "unproven")]
     struct NewInputPinConsumer<T: v2::InputPin> {
         _pin: T,
     }
 
-    #[cfg(feature = "unproven")]
     impl <T>NewInputPinConsumer<T> 
     where T: v2::InputPin {
         pub fn new(pin: T) -> NewInputPinConsumer<T> {
@@ -208,14 +201,12 @@ mod tests {
         }
     }
 
-    #[cfg(feature = "unproven")]
     #[test]
     fn v2_v1_input_implicit() {
         let i = OldInputPinImpl{state: false};
         let _c = NewInputPinConsumer::new(i);
     }
 
-    #[cfg(feature = "unproven")]
     #[test]
     fn v2_v1_input_state() {
         let mut i = OldInputPinImpl{state: false};
