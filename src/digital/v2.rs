@@ -124,9 +124,6 @@ pub mod toggleable {
 }
 
 /// Single digital input pin
-///
-/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
-#[cfg(feature = "unproven")]
 pub trait InputPin {
     /// Error type
     type Error;

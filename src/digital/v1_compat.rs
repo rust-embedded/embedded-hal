@@ -108,12 +108,10 @@ where
 
 /// Wrapper to allow fallible `v2::InputPin` traits to be converted to `v1::InputPin` traits
 /// where errors will panic.
-#[cfg(feature = "unproven")]
 pub struct OldInputPin<T> {
     pin: T,
 }
 
-#[cfg(feature = "unproven")]
 impl <T, E> OldInputPin<T>
 where
     T: v2::OutputPin<Error=E>,
@@ -126,7 +124,6 @@ where
 
 }
 
-#[cfg(feature = "unproven")]
 impl <T, E> From<T> for OldInputPin<T>
 where
     T: v2::InputPin<Error=E>,
@@ -139,7 +136,6 @@ where
 
 /// Implementation of `v1::InputPin` trait for `v2::InputPin` fallible pins
 /// where errors will panic.
-#[cfg(feature = "unproven")]
 #[allow(deprecated)]
 impl <T, E> v1::InputPin for OldInputPin<T>
 where
@@ -224,15 +220,12 @@ mod tests {
         o.set_high();
     }
 
-    #[cfg(feature = "unproven")]
     use crate::digital::v1::InputPin;
 
-    #[cfg(feature = "unproven")]
     struct NewInputPinImpl {
         state: Result<bool, ()>,
     }
 
-    #[cfg(feature = "unproven")]
     impl v2::InputPin for NewInputPinImpl {
         type Error = ();
 
@@ -244,13 +237,11 @@ mod tests {
         }
     }
 
-    #[cfg(feature = "unproven")]
     #[allow(deprecated)]
     struct OldInputPinConsumer<T: v1::InputPin> {
         _pin: T,
     }
 
-    #[cfg(feature = "unproven")]
     #[allow(deprecated)]
     impl <T>OldInputPinConsumer<T> 
     where T: v1::InputPin 
@@ -260,14 +251,12 @@ mod tests {
         }
     }
 
-    #[cfg(feature = "unproven")]
     #[test]
     fn v1_v2_input_explicit() {
         let i = NewInputPinImpl{state: Ok(false)};
         let _c: OldInputPinConsumer<OldInputPin<_>> = OldInputPinConsumer::new(i.into());
     }
 
-    #[cfg(feature = "unproven")]
     #[test]
     fn v1_v2_input_state() {
         let i:  OldInputPin<_> = NewInputPinImpl{state: Ok(false)}.into();
@@ -276,7 +265,6 @@ mod tests {
         assert_eq!(i.is_high(), false);
     }
 
-    #[cfg(feature = "unproven")]
     #[test]
     #[should_panic]
     fn v1_v2_input_panic() {
