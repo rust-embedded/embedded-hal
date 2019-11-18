@@ -34,9 +34,9 @@ pub trait WriteIter<W> {
 pub mod transfer {
     /// Default implementation of `blocking::spi::Transfer<W>` for implementers of
     /// `spi::FullDuplex<W>`
-    pub trait Default<W>: ::spi::FullDuplex<W> {}
+    pub trait Default<W>: crate::spi::FullDuplex<W> {}
 
-    impl<W, S> ::blocking::spi::Transfer<W> for S
+    impl<W, S> crate::blocking::spi::Transfer<W> for S
     where
         S: Default<W>,
         W: Clone,
@@ -57,9 +57,9 @@ pub mod transfer {
 /// Blocking write
 pub mod write {
     /// Default implementation of `blocking::spi::Write<W>` for implementers of `spi::FullDuplex<W>`
-    pub trait Default<W>: ::spi::FullDuplex<W> {}
+    pub trait Default<W>: crate::spi::FullDuplex<W> {}
 
-    impl<W, S> ::blocking::spi::Write<W> for S
+    impl<W, S> crate::blocking::spi::Write<W> for S
     where
         S: Default<W>,
         W: Clone,
@@ -82,9 +82,9 @@ pub mod write {
 pub mod write_iter {
     /// Default implementation of `blocking::spi::WriteIter<W>` for implementers of
     /// `spi::FullDuplex<W>`
-    pub trait Default<W>: ::spi::FullDuplex<W> {}
+    pub trait Default<W>: crate::spi::FullDuplex<W> {}
 
-    impl<W, S> ::blocking::spi::WriteIter<W> for S
+    impl<W, S> crate::blocking::spi::WriteIter<W> for S
     where
         S: Default<W>,
         W: Clone,
