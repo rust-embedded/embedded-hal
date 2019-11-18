@@ -25,6 +25,8 @@ pub use digital::OutputPin as _embedded_hal_digital_OutputPin;
 #[cfg(feature = "unproven")]
 #[allow(deprecated)]
 pub use digital::ToggleableOutputPin as _embedded_hal_digital_ToggleableOutputPin;
+#[cfg(feature = "unproven")]
+pub use rng::Read as _embedded_hal_rng_Read;
 pub use serial::Read as _embedded_hal_serial_Read;
 pub use serial::Write as _embedded_hal_serial_Write;
 pub use spi::FullDuplex as _embedded_hal_spi_FullDuplex;

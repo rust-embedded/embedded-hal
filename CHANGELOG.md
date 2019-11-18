@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Added
-
+- A nonblocking trait for interfacing with random number generation hardware.
 
 ### Changed
 - The current versions of `InputPin` have been proven. These are `digital::v1::InputPin` 
