@@ -1,7 +1,7 @@
 //! Timers
 
-use nb;
 use core::convert::Infallible;
+use nb;
 
 /// A count down timer
 ///
@@ -80,7 +80,7 @@ pub trait CountDown {
 pub trait Periodic {}
 
 /// Trait for cancelable countdowns.
-pub trait Cancel : CountDown {
+pub trait Cancel: CountDown {
     /// Error returned when a countdown can't be canceled.
     type Error;
 

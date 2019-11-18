@@ -124,6 +124,6 @@ pub trait WriteIterRead {
         bytes: B,
         buffer: &mut [u8],
     ) -> Result<(), Self::Error>
-        where
+    where
         B: IntoIterator<Item = u8>;
 }
