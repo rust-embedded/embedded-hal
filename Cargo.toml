@@ -1,6 +1,10 @@
 [workspace]
 members = [
 	"embedded-hal",
+	"embedded-hal-delay",
 	"embedded-hal-digital",
+	"embedded-hal-i2c",
+	"embedded-hal-serial",
 	"embedded-hal-spi",
+	"embedded-hal-timer",
 ]

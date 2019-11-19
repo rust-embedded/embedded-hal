@@ -1,0 +1,15 @@
+[package]
+name = "embedded-hal-i2c"
+version = "1.0.0-rc1"
+authors = ["Rust Embedded Working Group <hal@teams.rust-embedded.org>"]
+edition = "2018"
+categories = ["gpio", "embedded", "hardware-support", "no-std"]
+description = " A Inter-IC (I2C) Interface Hardware Abstration Layer (HAL) for embedded systems "
+documentation = "https://docs.rs/embedded-hal-i2c"
+keywords = ["hal", "i2c"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/rust-embedded/embedded-hal"
+
+[dependencies]
+nb = "0.1"
