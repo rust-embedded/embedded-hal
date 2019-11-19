@@ -1,0 +1,14 @@
+[package]
+name = "embedded-hal-digital"
+version = "1.0.0-rc1"
+authors = ["Rust Embedded Working Group <hal@teams.rust-embedded.org>"]
+edition = "2018"
+categories = ["gpio", "embedded", "hardware-support", "no-std"]
+description = " A digital GPIO pin Hardware Abstraction Layer (HAL) for embedded systems "
+documentation = "https://docs.rs/embedded-hal-digital"
+keywords = ["hal", "IO", "gpio"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/rust-embedded/embedded-hal"
+
+[dependencies]

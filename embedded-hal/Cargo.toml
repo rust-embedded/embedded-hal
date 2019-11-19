@@ -1,0 +1,20 @@
+[package]
+name = "embedded-hal"
+version = "1.0.0-rc1"
+authors = ["Rust Embedded Working Group <hal@teams.rust-embedded.org>"]
+edition = "2018"
+categories = ["asynchronous", "embedded", "hardware-support", "no-std"]
+description = " A Hardware Abstraction Layer (HAL) for embedded systems "
+documentation = "https://docs.rs/embedded-hal"
+keywords = ["hal", "IO"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/rust-embedded/embedded-hal"
+
+[dependencies.embedded-hal-digital]
+path = "../embedded-hal-digital"
+# version = "1.0"
+
+[dependencies.embedded-hal-spi]
+path = "../embedded-hal-spi"
+# version = "1.0"
