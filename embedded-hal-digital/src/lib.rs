@@ -4,6 +4,9 @@
 //! [`embedded-hal`](https://crates.io/crates/embedded-hal) crate if you want
 //! a stable version.
 
+#![deny(missing_docs)]
+#![no_std]
+
 /// Single digital push-pull output pin
 pub trait OutputPin {
     /// Error type

@@ -1,5 +1,8 @@
 //! Timers
 
+#![deny(missing_docs)]
+#![no_std]
+
 use core::convert::Infallible;
 use nb;
 

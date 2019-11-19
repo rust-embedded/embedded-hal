@@ -2,6 +2,9 @@
 //!
 //! See README.md.
 
+#![deny(missing_docs)]
+#![no_std]
+
 /// A collection of items we expect most people to want to have in scope.
 ///
 /// We re-name items imported here to avoid collisions with any local items
@@ -28,18 +31,22 @@ pub mod prelude {
 /// A sub-set of traits which can block until the specific work is done. Blocking is usually
 /// performed by busy-waiting, so this may not be ideal in a performance-sensitive system.
 pub mod blocking {
+    /// Busy-waiting for fixed time periods
     pub mod delay {
         pub use embedded_hal_delay::blocking::{DelayMs, DelayUs};
     }
 
+    /// Busy-waiting I2C transactions
     pub mod i2c {
         pub use embedded_hal_i2c::blocking::{Read, Write, WriteRead};
     }
 
+    /// Busy-waiting serial transactions
     pub mod serial {
         pub use embedded_hal_serial::blocking::Write;
     }
 
+    /// Busy-waiting SPI transactions
     pub mod spi {
         pub use embedded_hal_spi::blocking::{Transfer, Write};
     }

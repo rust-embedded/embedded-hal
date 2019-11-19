@@ -2,6 +2,9 @@
 //!
 //! Traits for I2C (Inter-IC) Interface Masters
 
+#![deny(missing_docs)]
+#![no_std]
+
 /// Blocking I2C API
 ///
 /// Slave addresses used by this API are 7-bit I2C addresses ranging from 0 to 127.

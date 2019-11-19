@@ -1,5 +1,8 @@
 //! Serial interface
 
+#![deny(missing_docs)]
+#![no_std]
+
 /// Read half of a serial interface
 ///
 /// Some serial interfaces support different data sizes (8 bits, 9 bits, etc.);

@@ -1,5 +1,8 @@
 //! Serial Peripheral Interface
 
+#![deny(missing_docs)]
+#![no_std]
+
 use nb;
 
 /// Full duplex (master mode)

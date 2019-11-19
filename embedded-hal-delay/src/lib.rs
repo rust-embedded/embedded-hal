@@ -7,6 +7,10 @@
 //! provide *blocking* functionality. Note that you can also use the `timer::CountDown` trait to
 //! implement blocking delays.
 
+#![deny(missing_docs)]
+#![no_std]
+
+/// Blocking traits
 pub mod blocking {
 
     /// Millisecond delay
