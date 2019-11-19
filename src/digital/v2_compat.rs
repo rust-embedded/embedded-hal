@@ -114,6 +114,7 @@ mod tests {
         }
     }
 
+    #[cfg(feature = "unproven")]
     #[allow(deprecated)]
     impl v1::StatefulOutputPin for OldOutputPinImpl {
         fn is_set_low(&self) -> bool {
@@ -125,6 +126,7 @@ mod tests {
         }
     }
 
+    #[cfg(feature = "unproven")]
     #[allow(deprecated)]
     impl v1::toggleable::Default for OldOutputPinImpl {}
 
@@ -139,10 +141,12 @@ mod tests {
         }
     }
 
+    #[cfg(feature = "unproven")]
     struct NewToggleablePinConsumer<T: v2::ToggleableOutputPin> {
         _pin: T,
     }
 
+    #[cfg(feature = "unproven")]
     impl<T> NewToggleablePinConsumer<T>
     where
         T: v2::ToggleableOutputPin,
@@ -152,6 +156,7 @@ mod tests {
         }
     }
 
+    #[cfg(feature = "unproven")]
     #[test]
     fn v2_v1_toggleable_implicit() {
         let i = OldOutputPinImpl { state: false };
