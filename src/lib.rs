@@ -96,7 +96,7 @@
 //! extern crate nb;
 //!
 //! # use std as core;
-//! use core::convert::Infallible;
+//! use ::core::convert::Infallible;
 //!
 //! /// A count down timer
 //! pub trait CountDown {
@@ -385,7 +385,7 @@
 //!
 //! extern crate embedded_hal as hal;
 //!
-//! #[macro_use(await)]
+//! #[macro_use(r#await)]
 //! extern crate nb;
 //!
 //! use std::ops::Generator;
@@ -415,7 +415,7 @@
 //!         loop {
 //!             // `await!` means "suspend / yield here" instead of "block until
 //!             // completion"
-//!             await!(timer.wait()).unwrap(); // NOTE(unwrap) E = Infallible
+//!             nb::r#await!(timer.wait()).unwrap(); // NOTE(unwrap) E = Infallible
 //!
 //!             state = !state;
 //!
@@ -429,8 +429,8 @@
 //!
 //!     let mut loopback = (move || {
 //!         loop {
-//!             let byte = await!(serial.read()).unwrap();
-//!             await!(serial.write(byte)).unwrap();
+//!             let byte = nb::r#await!(serial.read()).unwrap();
+//!             nb::r#await!(serial.write(byte)).unwrap();
 //!         }
 //!     });
 //!
@@ -557,7 +557,7 @@
 //! #![feature(generator_trait)]
 //!
 //! extern crate embedded_hal as hal;
-//! #[macro_use(await)]
+//! #[macro_use(r#await)]
 //! extern crate nb;
 //!
 //! use std::ops::Generator;
@@ -576,8 +576,8 @@
 //!     move || {
 //!         let n = buffer.len();
 //!         for i in 0..n {
-//!             await!(spi.send(buffer[i]))?;
-//!             buffer[i] = await!(spi.read())?;
+//!             nb::r#await!(spi.send(buffer[i]))?;
+//!             buffer[i] = nb::r#await!(spi.read())?;
 //!         }
 //!
 //!         Ok((spi, buffer))
@@ -595,7 +595,7 @@
 //! extern crate nb;
 //!
 //! use hal::prelude::*;
-//! use core::convert::Infallible;
+//! use ::core::convert::Infallible;
 //!
 //! fn flush<S>(serial: &mut S, cb: &mut CircularBuffer)
 //! where

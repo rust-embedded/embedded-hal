@@ -29,9 +29,9 @@ pub mod write {
     ///
     /// [`serial::Write`]: ../../serial/trait.Write.html
     /// [`blocking::serial::Write`]: ../trait.Write.html
-    pub trait Default<Word>: ::serial::Write<Word> {}
+    pub trait Default<Word>: crate::serial::Write<Word> {}
 
-    impl<S, Word> ::blocking::serial::Write<Word> for S
+    impl<S, Word> crate::blocking::serial::Write<Word> for S
     where
         S: Default<Word>,
         Word: Clone,
