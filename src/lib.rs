@@ -238,7 +238,7 @@
 //! An example of running two tasks concurrently. First task: blink an LED every
 //! second. Second task: loop back data over the serial interface.
 //!
-//! ```
+//! ```not_run
 //! extern crate embedded_hal as hal;
 //! extern crate futures;
 //!
@@ -379,7 +379,7 @@
 //!
 //! Same example as above but using `await!` instead of `futures`.
 //!
-//! ```
+//! ```not_run
 //! #![feature(generator_trait)]
 //! #![feature(generators)]
 //!
@@ -551,7 +551,7 @@
 //!
 //! - Asynchronous SPI transfer
 //!
-//! ```
+//! ```not_run
 //! #![feature(conservative_impl_trait)]
 //! #![feature(generators)]
 //! #![feature(generator_trait)]
