@@ -50,7 +50,7 @@
 //! You can find platform agnostic drivers built on top of `embedded-hal` on crates.io by [searching
 //! for the *embedded-hal* keyword](https://crates.io/keywords/embedded-hal).
 //!
-//! If you writing a platform agnostic driver yourself you are highly encouraged to [add the
+//! If you are writing a platform agnostic driver yourself you are highly encouraged to [add the
 //! embedded-hal keyword](https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata)
 //! to your crate before publishing it!
 //!
@@ -235,8 +235,10 @@
 //!
 //! ### `futures`
 //!
-//! An example of running two tasks concurrently. First task: blink an LED every
-//! second. Second task: loop back data over the serial interface.
+//! An example of running two tasks concurrently. First task: blink a LED every
+//! second. Second task: loop back data over the serial interface. The target
+//! must provide the `libstd` in order to be able to use `futures`, which is not
+//! the case for many embedded targets.
 //!
 //! ```not_run
 //! extern crate embedded_hal as hal;
@@ -377,7 +379,9 @@
 //!
 //! ### `await`
 //!
-//! Same example as above but using `await!` instead of `futures`.
+//! Same example as above but using `await!` instead of `futures`
+//! (same remark concerning the availability of `libstd` on the
+//! target).
 //!
 //! ```not_run
 //! #![feature(generator_trait)]
