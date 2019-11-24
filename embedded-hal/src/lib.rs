@@ -682,7 +682,6 @@
 //! # fn main() {}
 //! ```
 
-
 #![deny(missing_docs)]
 #![no_std]
 

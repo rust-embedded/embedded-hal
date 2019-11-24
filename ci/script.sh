@@ -7,6 +7,8 @@ main() {
     if [ "$TARGET" = "x86_64-unknown-linux-gnu" ]; then
         cargo test --target $TARGET --features unproven
     fi
+
+    cargo fmt -- --check
 }
 
 main
