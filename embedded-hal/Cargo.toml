@@ -35,3 +35,7 @@ path = "../embedded-hal-spi"
 path = "../embedded-hal-timer"
 # version = "1.0"
 
+[dev-dependencies]
+nb = "0.1.1"
+stm32f3 = { version = "0.8", features = ["stm32f303", "rt"] }
+futures = "0.1.17"
