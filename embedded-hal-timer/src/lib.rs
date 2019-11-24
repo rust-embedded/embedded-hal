@@ -1,4 +1,10 @@
-//! Timers
+//! # embedded-hal-timer
+//!
+//! Traits for measuring elapsed periods of time. You should use the
+//! [`embedded-hal`](https://crates.io/crates/embedded-hal) crate if you want
+//! a stable version.
+//!
+//! This API is non-blocking.
 
 #![deny(missing_docs)]
 #![no_std]

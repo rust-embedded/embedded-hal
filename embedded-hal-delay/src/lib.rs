@@ -1,4 +1,8 @@
-//! Delays
+//! # embedded-hal-delay
+//!
+//! Traits for busy-waiting for specified periods of time. You should use the
+//! [`embedded-hal`](https://crates.io/crates/embedded-hal) crate if you want
+//! a stable version.
 //!
 //! # What's the difference between these traits and the `timer::CountDown` trait?
 //!

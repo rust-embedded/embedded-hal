@@ -1,6 +1,11 @@
 //! # embedded-hal-i2c
 //!
-//! Traits for I2C (Inter-IC) Interface Masters
+//! Traits for driving a Inter-IC (I2C) bus so as to access the other devices
+//! on that bus. You should use the
+//! [`embedded-hal`](https://crates.io/crates/embedded-hal) crate if you want
+//! a stable version.
+//!
+//! This is currently only available as a blocking API.
 
 #![deny(missing_docs)]
 #![no_std]

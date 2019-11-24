@@ -1,6 +1,6 @@
 //! # embedded-hal-digital
 //!
-//! Contains digital GPIO pin traits. You should use the
+//! Traits for writing and reading digital GPIO pins. You should use the
 //! [`embedded-hal`](https://crates.io/crates/embedded-hal) crate if you want
 //! a stable version.
 

@@ -1,4 +1,10 @@
-//! Serial interface
+//! # embedded-hal-serial
+//!
+//! Traits for driving a Serial interface (also known as a UART). You should use the
+//! [`embedded-hal`](https://crates.io/crates/embedded-hal) crate if you want
+//! a stable version.
+//!
+//! Available in both blocking and non-blocking variants.
 
 #![deny(missing_docs)]
 #![no_std]

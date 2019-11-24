@@ -1,4 +1,11 @@
-//! Serial Peripheral Interface
+//! # embedded-hal-spi
+//!
+//! Traits for driving a Serial Peripheral Interface (SPI) device for the
+//! purposes of accessing other devices on that bus. You should use the
+//! [`embedded-hal`](https://crates.io/crates/embedded-hal) crate if you want
+//! a stable version.
+//!
+//! Available in both blocking and non-blocking variants.
 
 #![deny(missing_docs)]
 #![no_std]
