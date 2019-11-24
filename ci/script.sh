@@ -2,8 +2,11 @@ set -euxo pipefail
 
 main() {
     cargo check --target $TARGET
-    cargo test --target $TARGET
-	cargo fmt -- --check
+    cargo check --target $TARGET --features unproven
+
+    if [ "$TARGET" = "x86_64-unknown-linux-gnu" ]; then
+        cargo test --target $TARGET --features unproven
+    fi
 }
 
 main
