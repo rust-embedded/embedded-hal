@@ -1,16 +1,17 @@
-# `embedded-hal`
+# `embedded-hal-spi`
 
->  A Hardware Abstraction Layer (HAL) for embedded systems
+>  A Hardware Abstraction Layer (HAL) for driving a Serial Peripheral
+>  Interface (SPI) bus on embedded systems
 
-This project is developed and maintained by the [HAL team][team].
+This project is developed and maintained by the [HAL team][team]. This crate may contain unstable functionality - the stable API is exposed in the [`embedded-hal`](https://crates.io/crates/embedded-hal) crate.
 
 ## [API reference]
 
-[API reference]: https://docs.rs/embedded-hal
+[API reference]: https://docs.rs/embedded-hal-spi
 
 ## How-to: add a new trait
 
-This is the suggested approach to adding a new trait to `embedded-hal`
+This is the suggested approach to adding a new trait to `embedded-hal-spi`
 
 ### Discussion
 
@@ -33,17 +34,17 @@ These issues / PRs will be labeled as `proposal`s in the issue tracker.
 
 ### Testing period
 
-If there are no objections to the proposal, the new trait(s) will land in one
-of the upstream `embedded-hal-XXX` crates and an issue about the new trait(s)
-will be created. If the proposal includes several alternatives and a single
-one couldn't be chosen as the best then each alternative will land behind a
-different Cargo feature, e.g. "alt1" or "alt2".
+If there are no objections to the proposal the new trait(s) will land in this
+crate and an issue about the new trait(s) will be created. If the proposal
+includes several alternatives and a single one couldn't be chosen as the best
+then each alternative will land behind a different Cargo feature, e.g. "alt1"
+or "alt2".
 
-The traits will undergo a testing period before they move into the set of
-proven traits. During this period users are encouraged to try to implement the
-unproven traits for their platforms and to build drivers on top of them.
-Problems implementing the trait(s) as well as successful implementations
-should be reported on the corresponding issue.
+The traits will undergo a testing period before they are exported from the
+top-level `embedded-hal` crate. During this period users are encouraged to try
+to implement the unproven traits for their platforms and to build drivers on
+top of them. Problems implementing the trait(s) as well as successful
+implementations should be reported on the corresponding issue.
 
 To leave the unproven state at least *two* implementations of the trait(s) for
 different platforms (ideally, the two platforms should be from different
@@ -56,24 +57,7 @@ trait(s) will be removed and we'll go back to the drawing board.
 Issues used to track unproven APIs will be labeled as `unproven-api`s in the
 issue tracker and they may also include the labels `needs-impl` and
 `needs-driver` to signal what's required for them to move to the set of proven
-traits exported by this crate.
-
-## Abstracted Interfaces
-
-The set of interfaces this crate currently supports is:
-
-* Delays/Busy-waiting -
-  [`embedded-hal-delay`](https://crates.io/crates/embedded-hal-delay)
-* Digital GPIO pin interfaces -
-  [`embedded-hal-digital`](https://crates.io/crates/embedded-hal-digital)
-* I2C bus interfaces -
-  [`embedded-hal-i2c`](https://crates.io/crates/embedded-hal-i2c)
-* Serial (UART) interfaces -
-  [`embedded-hal-uart`](https://crates.io/crates/embedded-hal-uart)
-* SPI bus interfaces -
-  [`embedded-hal-spi`](https://crates.io/crates/embedded-hal-spi)
-* Timer devices (measuring elapsed time) -
-  [`embedded-hal-timer`](https://crates.io/crates/embedded-hal-timer)
+traits.
 
 ## Implementations and drivers
 
@@ -94,10 +78,9 @@ at your option.
 
 ### Contribution
 
-Unless you explicitly state otherwise, any contribution intentionally
-submitted for inclusion in the work by you, as defined in the Apache-2.0
-license, shall be dual licensed as above, without any additional terms or
-conditions.
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in the work by you, as defined in the Apache-2.0 license, shall be
+dual licensed as above, without any additional terms or conditions.
 
 ## Code of Conduct
 
