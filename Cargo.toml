@@ -18,7 +18,6 @@ version = "0.2.3"
 version = "0.1.1"
 
 [dev-dependencies]
-stm32f3 = { version = "0.8", features = ["stm32f303", "rt"] }
 futures = "0.1.17"
 
 [features]
