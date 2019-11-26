@@ -1,7 +1,7 @@
 //! Analog-digital conversion traits
 
 #[cfg(feature = "unproven")]
-use nb;
+use core::task::Poll;
 
 /// A marker trait to identify MCU pins that can be used as inputs to an ADC channel.
 ///
@@ -61,6 +61,7 @@ pub trait Channel<ADC> {
 ///
 /// ```
 /// use embedded_hal::adc::{Channel, OneShot};
+/// use core::task::Poll::{self, Ready, Pending};
 ///
 /// struct MyAdc; // 10-bit ADC, with 5 channels
 /// # impl MyAdc {
@@ -76,12 +77,12 @@ pub trait Channel<ADC> {
 /// {
 ///    type Error = ();
 ///
-///    fn read(&mut self, _pin: &mut PIN) -> nb::Result<WORD, Self::Error> {
+///    fn read(&mut self, _pin: &mut PIN) -> Poll<Result<WORD, Self::Error>> {
 ///        let chan = 1 << PIN::channel();
 ///        self.power_up();
 ///        let result = self.do_conversion(chan);
 ///        self.power_down();
-///        Ok(result.into())
+///        Ready(Ok(result.into()))
 ///    }
 /// }
 /// ```
@@ -94,5 +95,5 @@ pub trait OneShot<ADC, Word, Pin: Channel<ADC>> {
     ///
     /// This method takes a `Pin` reference, as it is expected that the ADC will be able to sample
     /// whatever channel underlies the pin.
-    fn read(&mut self, pin: &mut Pin) -> nb::Result<Word, Self::Error>;
+    fn read(&mut self, pin: &mut Pin) -> Poll<Result<Word, Self::Error>>;
 }

@@ -1,6 +1,6 @@
 //! Serial Peripheral Interface
 
-use nb;
+use core::task::Poll;
 
 /// Full duplex (master mode)
 ///
@@ -20,10 +20,10 @@ pub trait FullDuplex<Word> {
     ///
     /// **NOTE** A word must be sent to the slave before attempting to call this
     /// method.
-    fn read(&mut self) -> nb::Result<Word, Self::Error>;
+    fn read(&mut self) -> Poll<Result<Word, Self::Error>>;
 
     /// Sends a word to the slave
-    fn send(&mut self, word: Word) -> nb::Result<(), Self::Error>;
+    fn send(&mut self, word: Word) -> Poll<Result<(), Self::Error>>;
 }
 
 /// Clock polarity

@@ -1,6 +1,6 @@
 //! Serial interface
 
-use nb;
+use core::task::Poll;
 
 /// Read half of a serial interface
 ///
@@ -11,7 +11,7 @@ pub trait Read<Word> {
     type Error;
 
     /// Reads a single word from the serial interface
-    fn read(&mut self) -> nb::Result<Word, Self::Error>;
+    fn read(&mut self) -> Poll<Result<Word, Self::Error>>;
 }
 
 /// Write half of a serial interface
@@ -20,8 +20,8 @@ pub trait Write<Word> {
     type Error;
 
     /// Writes a single word to the serial interface
-    fn write(&mut self, word: Word) -> nb::Result<(), Self::Error>;
+    fn write(&mut self, word: Word) -> Poll<Result<(), Self::Error>>;
 
     /// Ensures that none of the previously written words are still buffered
-    fn flush(&mut self) -> nb::Result<(), Self::Error>;
+    fn flush(&mut self) -> Poll<Result<(), Self::Error>>;
 }

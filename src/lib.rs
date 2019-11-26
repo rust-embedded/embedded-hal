@@ -67,7 +67,7 @@
 //! Here's how a HAL trait may look like:
 //!
 //! ```
-//! extern crate nb;
+//! use core::task::Poll::{self, Ready, Pending};
 //!
 //! /// A serial interface
 //! pub trait Serial {
@@ -75,10 +75,10 @@
 //!     type Error;
 //!
 //!     /// Reads a single byte
-//!     fn read(&mut self) -> nb::Result<u8, Self::Error>;
+//!     fn read(&mut self) -> Poll<Result<u8, Self::Error>>;
 //!
 //!     /// Writes a single byte
-//!     fn write(&mut self, byte: u8) -> nb::Result<(), Self::Error>;
+//!     fn write(&mut self, byte: u8) -> Poll<Result<(), Self::Error>>;
 //! }
 //! ```
 //!
@@ -93,7 +93,7 @@
 //! those cases `nb::Result<_, Infallible>` is used.
 //!
 //! ```
-//! extern crate nb;
+//! use ::core::task::Poll::{self, Ready, Pending};
 //!
 //! # use std as core;
 //! use ::core::convert::Infallible;
@@ -103,7 +103,7 @@
 //!     // ..
 //!
 //!     /// "waits" until the count down is over
-//!     fn wait(&mut self) -> nb::Result<(), Infallible>;
+//!     fn wait(&mut self) -> Poll<Result<(), Infallible>>;
 //! }
 //!
 //! # fn main() {}
@@ -125,8 +125,8 @@
 //! // crate: stm32f3xx-hal
 //! // An implementation of the `embedded-hal` traits for STM32F3xx microcontrollers
 //!
-//! extern crate embedded_hal as hal;
-//! extern crate nb;
+//! use embedded_hal as hal;
+//! use core::task::Poll::{self, Ready, Pending};
 //!
 //! // device crate
 //! extern crate stm32f3;
@@ -150,21 +150,21 @@
 //! impl hal::serial::Read<u8> for Serial<USART1> {
 //!     type Error = Error;
 //!
-//!     fn read(&mut self) -> nb::Result<u8, Error> {
+//!     fn read(&mut self) -> Poll<Result<u8, Error>> {
 //!         // read the status register
 //!         let isr = self.usart.isr.read();
 //!
 //!         if isr.ore().bit_is_set() {
 //!             // Error: Buffer overrun
-//!             Err(nb::Error::Other(Error::Overrun))
+//!             Ready(Err(Error::Overrun))
 //!         }
 //!         // omitted: checks for other errors
 //!         else if isr.rxne().bit_is_set() {
 //!             // Data available: read the data register
-//!             Ok(self.usart.rdr.read().bits() as u8)
+//!             Ready(Ok(self.usart.rdr.read().bits() as u8))
 //!         } else {
 //!             // No data available yet
-//!             Err(nb::Error::WouldBlock)
+//!             Pending
 //!         }
 //!     }
 //! }
@@ -172,14 +172,14 @@
 //! impl hal::serial::Write<u8> for Serial<USART1> {
 //!     type Error = Error;
 //!
-//!     fn write(&mut self, byte: u8) -> nb::Result<(), Error> {
+//!     fn write(&mut self, byte: u8) -> Poll<Result<(), Error>> {
 //!         // Similar to the `read` implementation
-//!         # Ok(())
+//!         # Ready(Ok(()))
 //!     }
 //!
-//!     fn flush(&mut self) -> nb::Result<(), Error> {
+//!     fn flush(&mut self) -> Poll<Result<(), Error>> {
 //!         // Similar to the `read` implementation
-//!         # Ok(())
+//!         # Ready(Ok(()))
 //!     }
 //! }
 //!
@@ -202,9 +202,9 @@
 //! fashion:
 //!
 //! ```
+//! #[macro_use]
 //! extern crate embedded_hal;
-//! #[macro_use(block)]
-//! extern crate nb;
+//! use futures::Poll;
 //!
 //! use stm32f30x_hal::Serial1;
 //! use embedded_hal::serial::Write;
@@ -224,10 +224,11 @@
 //!
 //! # mod stm32f30x_hal {
 //! #     use std::convert::Infallible;
+//! #     use core::task::Poll::{self, Ready, Pending};
 //! #     pub struct Serial1;
 //! #     impl Serial1 {
-//! #         pub fn write(&mut self, _: u8) -> ::nb::Result<(), Infallible> {
-//! #             Ok(())
+//! #         pub fn write(&mut self, _: u8) -> Poll<Result<(), Infallible>> {
+//! #             Ready(Ok(()))
 //! #         }
 //! #     }
 //! # }
@@ -243,9 +244,6 @@
 //! ```not_run
 //! extern crate embedded_hal as hal;
 //! extern crate futures;
-//!
-//! #[macro_use(try_nb)]
-//! extern crate nb;
 //!
 //! use hal::prelude::*;
 //! use futures::{
@@ -389,9 +387,6 @@
 //!
 //! extern crate embedded_hal as hal;
 //!
-//! #[macro_use(r#await)]
-//! extern crate nb;
-//!
 //! use std::ops::Generator;
 //! use std::pin::Pin;
 //!
@@ -481,11 +476,9 @@
 //! - Write a whole buffer to a serial device in blocking a fashion.
 //!
 //! ```
-//! extern crate embedded_hal as hal;
-//! #[macro_use(block)]
-//! extern crate nb;
+//! use embedded_hal as hal;
 //!
-//! use hal::prelude::*;
+//! use hal::{block, prelude::*};
 //!
 //! fn write_all<S>(serial: &mut S, buffer: &[u8]) -> Result<(), S::Error>
 //! where
@@ -504,8 +497,8 @@
 //! - Blocking serial read with timeout
 //!
 //! ```
-//! extern crate embedded_hal as hal;
-//! extern crate nb;
+//! use embedded_hal as hal;
+//! use core::task::Poll::{self, Ready, Pending};
 //!
 //! use hal::prelude::*;
 //!
@@ -529,23 +522,23 @@
 //!     loop {
 //!         match serial.read() {
 //!             // raise error
-//!             Err(nb::Error::Other(e)) => return Err(Error::Serial(e)),
-//!             Err(nb::Error::WouldBlock) => {
+//!             Ready(Err(e)) => return Err(Error::Serial(e)),
+//!             NotReady => {
 //!                 // no data available yet, check the timer below
 //!             },
-//!             Ok(byte) => return Ok(byte),
+//!             Ready(Ok(byte)) => return Ok(byte),
 //!         }
 //!
 //!         match timer.wait() {
-//!             Err(nb::Error::Other(e)) => {
+//!             Ready(Err(e)) => {
 //!                 // The error type specified by `timer.wait()` is `!`, which
 //!                 // means no error can actually occur. The Rust compiler
 //!                 // still forces us to provide this match arm, though.
 //!                 unreachable!()
 //!             },
 //!             // no timeout yet, try again
-//!             Err(nb::Error::WouldBlock) => continue,
-//!             Ok(()) => return Err(Error::TimedOut),
+//!             NotReady => continue,
+//!             Ready(Ok(())) => return Err(Error::TimedOut),
 //!         }
 //!     }
 //! }
@@ -595,8 +588,8 @@
 //!
 //! ```
 //! # use std as core;
-//! extern crate embedded_hal as hal;
-//! extern crate nb;
+//! use embedded_hal as hal;
+//! use ::core::task::Poll::{self, Ready, Pending};
 //!
 //! use hal::prelude::*;
 //! use ::core::convert::Infallible;
@@ -608,9 +601,9 @@
 //!     loop {
 //!         if let Some(byte) = cb.peek() {
 //!             match serial.write(*byte) {
-//!                 Err(nb::Error::Other(_)) => unreachable!(),
-//!                 Err(nb::Error::WouldBlock) => return,
-//!                 Ok(()) => {}, // keep flushing data
+//!                 Ready(Err(_)) => unreachable!(),
+//!                 NotReady => return,
+//!                 Ready(Ok(())) => {}, // keep flushing data
 //!             }
 //!         }
 //!
@@ -667,10 +660,10 @@
 //! #     fn deref_mut(&mut self) -> &mut T { self.0 }
 //! # }
 //! # struct Serial1;
-//! # impl ::hal::serial::Write<u8> for Serial1 {
+//! # impl hal::serial::Write<u8> for Serial1 {
 //! #   type Error = Infallible;
-//! #   fn write(&mut self, _: u8) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
-//! #   fn flush(&mut self) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #   fn write(&mut self, _: u8) -> Poll<Result<(), Infallible>> { Pending }
+//! #   fn flush(&mut self) -> Poll<Result<(), Infallible>> { Pending }
 //! # }
 //! # struct CircularBuffer;
 //! # impl CircularBuffer {
@@ -685,8 +678,33 @@
 #![deny(missing_docs)]
 #![no_std]
 
-#[macro_use]
-extern crate nb;
+#[cfg(feature = "unproven")]
+use core::task::Poll;
+
+/// Turns the non-blocking expression `$e` into a blocking operation.
+///
+/// # Input
+///
+/// An expression `$e` that evaluates to `Poll<Result<T, E>>`
+///
+/// # Output
+///
+/// - `Ok(t)` if `$e` evaluates to `Ok(t)`
+/// - `Err(e)` if `$e` evaluates to `Err(e)`
+#[macro_export]
+macro_rules! block {
+    ($e:expr) => {
+        loop {
+            use core::task::Poll;
+
+            match $e {
+                Poll::Ready(Err(e)) => break Err(e),
+                Poll::Ready(Ok(t)) => break Ok(t),
+                Poll::Pending => {}
+            }
+        }
+    };
+}
 
 pub mod adc;
 pub mod blocking;
@@ -709,11 +727,10 @@ pub mod watchdog;
 /// / events
 ///
 /// ```
-/// extern crate embedded_hal as hal;
-/// #[macro_use(block)]
-/// extern crate nb;
+/// use embedded_hal as hal;
+/// use core::task::Poll::{self, Ready, Pending};
 ///
-/// use hal::prelude::*;
+/// use hal::{block, prelude::*};
 ///
 /// fn main() {
 ///     let mut capture: Capture1 = {
@@ -742,7 +759,7 @@ pub mod watchdog;
 /// #     type Channel = Channel;
 /// #     type Error = Infallible;
 /// #     type Time = MilliSeconds;
-/// #     fn capture(&mut self, _: Channel) -> ::nb::Result<u16, Infallible> { Ok(0) }
+/// #     fn capture(&mut self, _: Channel) -> Poll<Result<u16, Infallible>> { Ready(Ok(0)) }
 /// #     fn disable(&mut self, _: Channel) { unimplemented!() }
 /// #     fn enable(&mut self, _: Channel) { unimplemented!() }
 /// #     fn get_resolution(&self) -> MilliSeconds { unimplemented!() }
@@ -778,7 +795,7 @@ pub trait Capture {
     ///
     /// NOTE that you must multiply the returned value by the *resolution* of
     /// this `Capture` interface to get a human time unit (e.g. seconds)
-    fn capture(&mut self, channel: Self::Channel) -> nb::Result<Self::Capture, Self::Error>;
+    fn capture(&mut self, channel: Self::Channel) -> Poll<Result<Self::Capture, Self::Error>>;
 
     /// Disables a capture `channel`
     fn disable(&mut self, channel: Self::Channel);
@@ -921,11 +938,10 @@ pub trait PwmPin {
 /// You can use this interface to measure the speed of a motor
 ///
 /// ```
-/// extern crate embedded_hal as hal;
-/// #[macro_use(block)]
-/// extern crate nb;
+/// use embedded_hal as hal;
+/// use core::task::Poll::{self, Ready, Pending};
 ///
-/// use hal::prelude::*;
+/// use hal::{block, prelude::*};
 ///
 /// fn main() {
 ///     let mut qei: Qei1 = {
@@ -955,13 +971,13 @@ pub trait PwmPin {
 /// # impl hal::Qei for Qei1 {
 /// #     type Count = u16;
 /// #     fn count(&self) -> u16 { 0 }
-/// #     fn direction(&self) -> ::hal::Direction { unimplemented!() }
+/// #     fn direction(&self) -> hal::Direction { unimplemented!() }
 /// # }
 /// # struct Timer6;
 /// # impl hal::timer::CountDown for Timer6 {
 /// #     type Time = Seconds;
 /// #     fn start<T>(&mut self, _: T) where T: Into<Seconds> {}
-/// #     fn wait(&mut self) -> ::nb::Result<(), Infallible> { Ok(()) }
+/// #     fn wait(&mut self) -> Poll<Result<(), Infallible>> { Ready(Ok(())) }
 /// # }
 /// ```
 #[cfg(feature = "unproven")]

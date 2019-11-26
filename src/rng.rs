@@ -1,7 +1,7 @@
 //! Random Number Generator Interface
 
 #[cfg(feature = "unproven")]
-use nb;
+use core::task::Poll;
 
 /// Nonblocking stream of random bytes.
 #[cfg(feature = "unproven")]
@@ -13,5 +13,5 @@ pub trait Read {
     type Error;
 
     /// Get a number of bytes from the RNG.
-    fn read(&mut self, buf: &mut [u8]) -> nb::Result<usize, Self::Error>;
+    fn read(&mut self, buf: &mut [u8]) -> Poll<Result<usize, Self::Error>>;
 }

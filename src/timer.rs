@@ -1,7 +1,7 @@
 //! Timers
 
 use core::convert::Infallible;
-use nb;
+use core::task::Poll;
 
 /// A count down timer
 ///
@@ -18,11 +18,10 @@ use nb;
 /// You can use this timer to create delays
 ///
 /// ```
-/// extern crate embedded_hal as hal;
-/// #[macro_use(block)]
-/// extern crate nb;
+/// use embedded_hal as hal;
+/// use core::task::Poll::{self, Ready, Pending};
 ///
-/// use hal::prelude::*;
+/// use hal::{block, prelude::*};
 ///
 /// fn main() {
 ///     let mut led: Led = {
@@ -53,7 +52,7 @@ use nb;
 /// # impl hal::timer::CountDown for Timer6 {
 /// #     type Time = Seconds;
 /// #     fn start<T>(&mut self, _: T) where T: Into<Seconds> {}
-/// #     fn wait(&mut self) -> ::nb::Result<(), Infallible> { Ok(()) }
+/// #     fn wait(&mut self) -> Poll<Result<(), Infallible>> { Ready(Ok(())) }
 /// # }
 /// ```
 pub trait CountDown {
@@ -73,7 +72,7 @@ pub trait CountDown {
     /// finishes.
     /// - Otherwise the behavior of calling `wait` after the last call returned `Ok` is UNSPECIFIED.
     /// Implementers are suggested to panic on this scenario to signal a programmer error.
-    fn wait(&mut self) -> nb::Result<(), Infallible>;
+    fn wait(&mut self) -> Poll<Result<(), Infallible>>;
 }
 
 /// Marker trait that indicates that a timer is periodic
