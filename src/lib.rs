@@ -795,6 +795,26 @@ pub trait Capture {
         R: Into<Self::Time>;
 }
 
+/// A single input capture channel / pin
+///
+/// See `Capture` for details
+#[cfg(feature = "unproven")]
+pub trait CapturePin {
+    /// Type  of value returned by capture
+    type Capture;
+    /// Enumeration of `Capture` errors
+    ///
+    /// Possible errors:
+    ///
+    /// - *overcapture*, the previous capture value was overwritten because it
+    ///   was not read in a timely manner
+    type Error;
+
+    /// "Waits" for a transition in the capture `channel` and returns the value
+    /// of counter at that instant
+    fn capture(&mut self) -> nb::Result<Self::Capture, Self::Error>;
+}
+
 /// Pulse Width Modulation
 ///
 /// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
