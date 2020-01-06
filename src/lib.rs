@@ -688,16 +688,21 @@
 #[macro_use]
 extern crate nb;
 
-pub mod adc;
-pub mod blocking;
+extern crate embedded_hal_v3;
+
+pub use embedded_hal_v3::{
+    adc,
+    blocking,
+    fmt,
+    prelude,
+    rng,
+    serial,
+    spi,
+    timer,
+    watchdog,
+};
+
 pub mod digital;
-pub mod fmt;
-pub mod prelude;
-pub mod rng;
-pub mod serial;
-pub mod spi;
-pub mod timer;
-pub mod watchdog;
 
 /// Input capture
 ///

@@ -12,10 +12,14 @@ license = "MIT OR Apache-2.0"
 name = "embedded-hal"
 readme = "README.md"
 repository = "https://github.com/rust-embedded/embedded-hal"
-version = "0.2.3"
+version = "0.2.4"
 
 [dependencies.nb]
-version = "0.1.1"
+version = "0.1.2"
+
+[dependencies.embedded-hal-v3]
+package = "embedded-hal"
+version = "0.3.0"
 
 [dev-dependencies]
 stm32f3 = { version = "0.8", features = ["stm32f303", "rt"] }
@@ -26,3 +30,7 @@ unproven = ["nb/unstable"]
 
 [package.metadata.docs.rs]
 features = ["unproven"]
+
+# TODO: remove before publishing
+[patch.crates-io]
+embedded-hal = { git = "https://github.com/ryankurte/embedded-hal", branch = "release-0.3.0" }
