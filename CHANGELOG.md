@@ -6,13 +6,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
-
 ### Added
-- A nonblocking trait for interfacing with random number generation hardware.
 
 ### Changed
-- The current versions of `InputPin` have been proven. These are `digital::v1::InputPin` 
-  and `digital::v2::InputPin`.
+
+## [v0.3.0] - 2020-01-06
+
+### Added
+- A nonblocking `rng` trait for interfacing with random number generation hardware.
+
+### Changed
+- `void::Void` type for infallible methods has been replaced with `core::convert::Infallible`
+- `digital::v1` has been removed
+- `digital::v2` has been promoted to the default
+- `digital::v2::InputPin` has been proven
 
 ## [v0.2.3] - 2019-05-09
 
