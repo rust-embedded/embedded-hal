@@ -1,6 +1,6 @@
 //! Digital I/O
 //!
-//! Version 2 / fallible traits. Infallible implementations should set Error to `!`.
+//! Version 2 / fallible traits. Infallible implementations should set Error to `core::convert::Infallible`.
 
 /// Single digital push-pull output pin
 pub trait OutputPin {

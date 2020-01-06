@@ -22,6 +22,5 @@ pub mod v1_compat;
 // These are implicit over v1 implementations
 pub mod v2_compat;
 
-// Re-export old traits so this isn't a breaking change
-#[allow(deprecated)]
-pub use self::v1::*;
+// Export V2 traits
+pub use self::v2::*;
