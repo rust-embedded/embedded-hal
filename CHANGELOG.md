@@ -17,9 +17,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - `void::Void` type for infallible methods has been replaced with `core::convert::Infallible`
-- `digital::v1` has been removed
 - `digital::v2` has been promoted to the default
-- `digital::v2::InputPin` has been proven
+- `digital::v2::InputPin` and `digital::v2::InputPin` have been proven
 
 ## [v0.2.3] - 2019-05-09
 
