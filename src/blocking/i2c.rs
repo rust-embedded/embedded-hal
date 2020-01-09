@@ -127,3 +127,28 @@ pub trait WriteIterRead {
     where
         B: IntoIterator<Item = u8>;
 }
+
+/// Actions for transactional I2C trait
+/// 
+/// This allows composition of I2C operations into a single bus transaction
+#[cfg(feature = "unproven")]
+#[derive(Debug, PartialEq)]
+pub enum Actions<'a> {
+    /// Read data into the provided buffer, write data undefined
+    Read(&'a mut [u8]),
+    /// Write data from the provided buffer, discarding read data
+    Write(&'a [u8]),
+}
+
+/// Transactional trait allows multiple actions to be executed
+/// as part of a single I2C transaction
+#[cfg(feature = "unproven")]
+pub trait Transactional {
+    /// Associated error type
+    type Error;
+    
+    /// Execute the provided actions
+    fn exec(&mut self, addr: u16, actions: &[Actions]) -> Result<(), Self::Error>;
+}
+
+
