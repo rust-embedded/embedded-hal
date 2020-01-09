@@ -134,9 +134,9 @@ pub trait WriteIterRead {
 #[cfg(feature = "unproven")]
 #[derive(Debug, PartialEq)]
 pub enum Actions<'a> {
-    /// Read data into the provided buffer, write data undefined
+    /// Read data into the provided buffer
     Read(&'a mut [u8]),
-    /// Write data from the provided buffer, discarding read data
+    /// Write data from the provided buffer
     Write(&'a [u8]),
 }
 
@@ -147,8 +147,8 @@ pub trait Transactional {
     /// Associated error type
     type Error;
     
-    /// Execute the provided actions
-    fn exec(&mut self, addr: u16, actions: &[Actions]) -> Result<(), Self::Error>;
+    /// Execute the provided actions against the provided I2C address
+    fn exec(&mut self, addr: u8, actions: &[Actions]) -> Result<(), Self::Error>;
 }
 
 
