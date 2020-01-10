@@ -111,11 +111,9 @@ pub mod write_iter {
 #[cfg(feature = "unproven")]
 #[derive(Debug, PartialEq)]
 pub enum Actions<'a> {
-    /// Read data into the provided buffer, write data undefined
-    Read(&'a mut [u8]),
     /// Write data from the provided buffer, discarding read data
     Write(&'a [u8]),
-    /// Transfer data from the provided buffer, overwriting the buffer with read data
+    /// Transfer data from the provided buffer, overwriting the output buffer with read data
     Transfer(&'a mut [u8]),
 }
 
