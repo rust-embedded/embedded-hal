@@ -15,7 +15,7 @@ repository = "https://github.com/rust-embedded/embedded-hal"
 version = "0.2.3"
 
 [dependencies.nb]
-version = "0.1.2"
+version = "0.1.1"
 
 [dev-dependencies]
 stm32f3 = { version = "0.8", features = ["stm32f303", "rt"] }
