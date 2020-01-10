@@ -105,9 +105,8 @@ pub mod write_iter {
     }
 }
 
-
 /// Actions for transactional SPI trait
-/// 
+///
 /// This allows composition of SPI operations into a single bus transaction
 #[cfg(feature = "unproven")]
 #[derive(Debug, PartialEq)]
@@ -126,9 +125,7 @@ pub enum Actions<'a> {
 pub trait Transactional {
     /// Associated error type
     type Error;
-    
+
     /// Execute the provided actions
     fn exec(&mut self, actions: &[Actions]) -> Result<(), Self::Error>;
 }
-
-

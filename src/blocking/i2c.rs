@@ -129,7 +129,7 @@ pub trait WriteIterRead {
 }
 
 /// Actions for transactional I2C trait
-/// 
+///
 /// This allows composition of I2C operations into a single bus transaction
 #[cfg(feature = "unproven")]
 #[derive(Debug, PartialEq)]
@@ -146,9 +146,7 @@ pub enum Actions<'a> {
 pub trait Transactional {
     /// Associated error type
     type Error;
-    
+
     /// Execute the provided actions against the provided I2C address
     fn exec(&mut self, addr: u8, actions: &[Actions]) -> Result<(), Self::Error>;
 }
-
-
