@@ -105,12 +105,12 @@ pub mod write_iter {
     }
 }
 
-/// Actions for transactional SPI trait
+/// Transactions for transactional SPI trait
 ///
 /// This allows composition of SPI operations into a single bus transaction
 #[cfg(feature = "unproven")]
 #[derive(Debug, PartialEq)]
-pub enum Actions<'a> {
+pub enum Transaction<'a> {
     /// Write data from the provided buffer, discarding read data
     Write(&'a [u8]),
     /// Write data from one buffer while reading into the second buffer
@@ -124,7 +124,7 @@ pub trait Transactional {
     /// Associated error type
     type Error;
 
-    /// Execute the provided actions
-    fn exec<'a, A>(&mut self, actions: A) -> Result<(), Self::Error>
-        where A: AsMut<[Actions<'a>]>;
+    /// Execute the provided transactions
+    fn exec<'a, T>(&mut self, transactions: T) -> Result<(), Self::Error>
+        where T: AsMut<[Transaction<'a>]>;
 }
