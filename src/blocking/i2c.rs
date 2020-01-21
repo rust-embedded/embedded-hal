@@ -149,5 +149,6 @@ pub trait Transactional {
 
     /// Execute the provided actions against the provided I2C address
     fn exec<'a, T>(&mut self, address: u8, transactions: T) -> Result<(), Self::Error>
-        where T: AsMut<[Transaction<'a>]>;
+    where
+        T: AsMut<[Transaction<'a>]>;
 }

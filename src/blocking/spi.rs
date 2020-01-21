@@ -126,5 +126,6 @@ pub trait Transactional {
 
     /// Execute the provided transactions
     fn exec<'a, T>(&mut self, transactions: T) -> Result<(), Self::Error>
-        where T: AsMut<[Transaction<'a>]>;
+    where
+        T: AsMut<[Transaction<'a>]>;
 }
