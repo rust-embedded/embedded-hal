@@ -113,8 +113,8 @@ pub mod write_iter {
 pub enum Actions<'a> {
     /// Write data from the provided buffer, discarding read data
     Write(&'a [u8]),
-    /// Transfer data from the provided buffer, overwriting the output buffer with read data
-    Transfer(&'a mut [u8]),
+    /// Write data from one buffer while reading into the second buffer
+    WriteRead(&'a [u8], &'a mut [u8]),
 }
 
 /// Transactional trait allows multiple actions to be executed
@@ -125,5 +125,6 @@ pub trait Transactional {
     type Error;
 
     /// Execute the provided actions
-    fn exec(&mut self, actions: &mut [Actions]) -> Result<(), Self::Error>;
+    fn exec<'a, A>(&mut self, actions: A) -> Result<(), Self::Error>
+        where A: AsMut<[Actions<'a>]>;
 }
