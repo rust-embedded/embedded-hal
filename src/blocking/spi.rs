@@ -125,5 +125,5 @@ pub trait Transactional {
     type Error;
 
     /// Execute the provided actions
-    fn exec(&mut self, actions: &[Actions]) -> Result<(), Self::Error>;
+    fn exec(&mut self, actions: &mut [Actions]) -> Result<(), Self::Error>;
 }
