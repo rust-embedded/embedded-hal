@@ -862,11 +862,17 @@ pub trait Pwm {
     /// (e.g. `0.0 .. 1.0`) or an integer representation (e.g. `0 .. 65535`)
     type Duty;
 
+    /// Disables a PWM timer (all channels)
+    fn disable(&mut self);
+
+    /// Enables a PWM timer (all channels)
+    fn enable(&mut self);
+
     /// Disables a PWM `channel`
-    fn disable(&mut self, channel: Self::Channel);
+    fn channel_disable(&mut self, channel: Self::Channel);
 
     /// Enables a PWM `channel`
-    fn enable(&mut self, channel: Self::Channel);
+    fn channel_enable(&mut self, channel: Self::Channel);
 
     /// Returns the current PWM period
     fn get_period(&self) -> Self::Time;
