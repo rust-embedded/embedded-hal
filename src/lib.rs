@@ -834,8 +834,8 @@ pub trait Capture {
 /// #     type Channel = Channel;
 /// #     type Time = KiloHertz;
 /// #     type Duty = u16;
-/// #.    fn disable(&mut self) { unimplemented!() }
-/// #.    fn enable(&mut self) { unimplemented!() }
+/// #     fn disable(&mut self) { unimplemented!() }
+/// #     fn enable(&mut self) { unimplemented!() }
 /// #     fn channel_disable(&mut self, _: Channel) { unimplemented!() }
 /// #     fn channel_enable(&mut self, _: Channel) { unimplemented!() }
 /// #     fn get_duty(&self, _: Channel) -> u16 { unimplemented!() }
