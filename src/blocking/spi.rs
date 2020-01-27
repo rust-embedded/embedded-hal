@@ -110,22 +110,22 @@ pub mod write_iter {
 /// This allows composition of SPI operations into a single bus transaction
 #[cfg(feature = "unproven")]
 #[derive(Debug, PartialEq)]
-pub enum Operation<'a> {
+pub enum Operation<'a, W> {
     /// Write data from the provided buffer, discarding read data
-    Write(&'a [u8]),
+    Write(&'a [W]),
     /// Write data from one buffer while reading into the second buffer
-    WriteRead(&'a [u8], &'a mut [u8]),
+    WriteRead(&'a [W], &'a mut [W]),
 }
 
 /// Transactional trait allows multiple actions to be executed
 /// as part of a single SPI transaction
 #[cfg(feature = "unproven")]
-pub trait Transactional {
+pub trait Transactional<W> {
     /// Associated error type
     type Error;
 
     /// Execute the provided transactions
     fn exec<'a, O>(&mut self, operations: O) -> Result<(), Self::Error>
     where
-        O: AsMut<[Operation<'a>]>;
+        O: AsMut<[Operation<'a, W>]>;
 }
