@@ -114,7 +114,7 @@ pub enum Operation<'a, W: 'static> {
     /// Write data from the provided buffer, discarding read data
     Write(&'a [W]),
     /// Write data from one buffer while reading into the second buffer
-    WriteRead(&'a [W], &'a mut [W]),
+    WriteRead(&'a mut [W]),
 }
 
 /// Transactional trait allows multiple actions to be executed
