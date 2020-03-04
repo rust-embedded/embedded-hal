@@ -125,7 +125,5 @@ pub trait Transactional<W: 'static> {
     type Error;
 
     /// Execute the provided transactions
-    fn exec<'a, O>(&mut self, operations: O) -> Result<(), Self::Error>
-    where
-        O: AsMut<[Operation<'a, W>]>;
+    fn exec<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error>;
 }
