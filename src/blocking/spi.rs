@@ -113,7 +113,7 @@ pub mod write_iter {
 pub enum Operation<'a, W: 'static> {
     /// Write data from the provided buffer, discarding read data
     Write(&'a [W]),
-    /// Write data from one buffer while reading into the second buffer
+    /// Write data out while reading data into the provided buffer
     WriteRead(&'a mut [W]),
 }
 
