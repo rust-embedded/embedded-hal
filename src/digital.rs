@@ -1,6 +1,4 @@
 //! Digital I/O
-//!
-//! Version 2 / fallible traits. Infallible implementations should set Error to `!`.
 
 /// Single digital push-pull output pin
 pub trait OutputPin {
@@ -57,8 +55,8 @@ pub trait ToggleableOutputPin {
 /// toggleable by software.
 ///
 /// ```
-/// use embedded_hal::digital::v2::{OutputPin, StatefulOutputPin, ToggleableOutputPin};
-/// use embedded_hal::digital::v2::toggleable;
+/// use embedded_hal::digital::{OutputPin, StatefulOutputPin, ToggleableOutputPin};
+/// use embedded_hal::digital::toggleable;
 /// use std::convert::Infallible;
 ///
 /// /// A virtual output pin that exists purely in software
