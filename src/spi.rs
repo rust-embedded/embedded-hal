@@ -20,10 +20,10 @@ pub trait FullDuplex<Word> {
     ///
     /// **NOTE** A word must be sent to the slave before attempting to call this
     /// method.
-    fn read(&mut self) -> nb::Result<Word, Self::Error>;
+    fn try_read(&mut self) -> nb::Result<Word, Self::Error>;
 
     /// Sends a word to the slave
-    fn send(&mut self, word: Word) -> nb::Result<(), Self::Error>;
+    fn try_send(&mut self, word: Word) -> nb::Result<(), Self::Error>;
 }
 
 /// Clock polarity

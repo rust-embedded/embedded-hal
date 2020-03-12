@@ -581,8 +581,8 @@
 //!     move || {
 //!         let n = buffer.len();
 //!         for i in 0..n {
-//!             nb::r#await!(spi.send(buffer[i]))?;
-//!             buffer[i] = nb::r#await!(spi.read())?;
+//!             nb::r#await!(spi.try_send(buffer[i]))?;
+//!             buffer[i] = nb::r#await!(spi.try_read())?;
 //!         }
 //!
 //!         Ok((spi, buffer))
