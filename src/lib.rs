@@ -103,7 +103,7 @@
 //!     // ..
 //!
 //!     /// "waits" until the count down is over
-//!     fn wait(&mut self) -> nb::Result<(), Infallible>;
+//!     fn try_wait(&mut self) -> nb::Result<(), Infallible>;
 //! }
 //!
 //! # fn main() {}
@@ -257,7 +257,7 @@
 //! use stm32f30x_hal::{Led, Serial1, Timer6};
 //! use std::convert::Infallible;
 //!
-//! /// `futures` version of `CountDown.wait`
+//! /// `futures` version of `CountDown.try_wait`
 //! ///
 //! /// This returns a future that must be polled to completion
 //! fn wait<T>(mut timer: T) -> impl Future<Item = T, Error = Infallible>
@@ -266,7 +266,7 @@
 //! {
 //!     let mut timer = Some(timer);
 //!     future::poll_fn(move || {
-//!         try_nb!(timer.as_mut().unwrap().wait());
+//!         try_nb!(timer.as_mut().unwrap().try_wait());
 //!
 //!         Ok(Async::Ready(timer.take().unwrap()))
 //!     })
@@ -349,13 +349,13 @@
 //! }
 //!
 //! # mod stm32f30x_hal {
-//! #     use std::convert::Infallible;
+//! #     use core::convert::Infallible;
 //! #     pub struct Timer6;
 //! #     impl ::hal::timer::CountDown for Timer6 {
 //! #         type Time = ();
 //! #
-//! #         fn start<T>(&mut self, _: T) where T: Into<()> {}
-//! #         fn wait(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #         fn try_start<T>(&mut self, _: T) -> Result<(), Infallible> where T: Into<()> {}
+//! #         fn try_wait(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #     }
 //! #
 //! #     pub struct Serial1;
@@ -509,22 +509,23 @@
 //!
 //! use hal::prelude::*;
 //!
-//! enum Error<E> {
+//! enum Error<SE, TE> {
 //!     /// Serial interface error
-//!     Serial(E),
-//!     TimedOut,
+//!     Serial(SE),
+//!     /// Timeout error
+//!     TimedOut(TE),
 //! }
 //!
 //! fn read_with_timeout<S, T>(
 //!     serial: &mut S,
 //!     timer: &mut T,
 //!     timeout: T::Time,
-//! ) -> Result<u8, Error<S::Error>>
+//! ) -> Result<u8, Error<S::Error, T::Error>>
 //! where
-//!     T: hal::timer::CountDown,
+//!     T: hal::timer::CountDown<Error = ()>,
 //!     S: hal::serial::Read<u8>,
 //! {
-//!     timer.start(timeout);
+//!     timer.try_start(timeout).map_err(Error::TimedOut)?;
 //!
 //!     loop {
 //!         match serial.read() {
@@ -536,16 +537,16 @@
 //!             Ok(byte) => return Ok(byte),
 //!         }
 //!
-//!         match timer.wait() {
+//!         match timer.try_wait() {
 //!             Err(nb::Error::Other(e)) => {
-//!                 // The error type specified by `timer.wait()` is `!`, which
+//!                 // The error type specified by `timer.try_wait()` is `!`, which
 //!                 // means no error can actually occur. The Rust compiler
 //!                 // still forces us to provide this match arm, though.
 //!                 unreachable!()
 //!             },
 //!             // no timeout yet, try again
 //!             Err(nb::Error::WouldBlock) => continue,
-//!             Ok(()) => return Err(Error::TimedOut),
+//!             Ok(()) => return Err(Error::TimedOut(())),
 //!         }
 //!     }
 //! }
@@ -949,8 +950,8 @@ pub trait PwmPin {
 ///
 ///
 ///     let before = qei.try_count().unwrap();
-///     timer.start(1.s());
-///     block!(timer.wait());
+///     timer.try_start(1.s()).unwrap();
+///     block!(timer.try_wait());
 ///     let after = qei.try_count().unwrap();
 ///
 ///     let speed = after.wrapping_sub(before);
@@ -965,14 +966,14 @@ pub trait PwmPin {
 /// # impl hal::Qei for Qei1 {
 /// #     type Error = Infallible;
 /// #     type Count = u16;
-/// #     fn try_count(&self) -> Result<u16, Self::Error> { 0 }
+/// #     fn try_count(&self) -> Result<u16, Self::Error> { Ok(0) }
 /// #     fn try_direction(&self) -> Result<::hal::Direction, Self::Error> { unimplemented!() }
 /// # }
 /// # struct Timer6;
 /// # impl hal::timer::CountDown for Timer6 {
 /// #     type Time = Seconds;
-/// #     fn start<T>(&mut self, _: T) where T: Into<Seconds> {}
-/// #     fn wait(&mut self) -> ::nb::Result<(), Infallible> { Ok(()) }
+/// #     fn try_start<T>(&mut self, _: T) -> Result<(), Infallible> where T: Into<Seconds> { Ok(()) }
+/// #     fn try_wait(&mut self) -> ::nb::Result<(), Infallible> { Ok(()) }
 /// # }
 /// ```
 #[cfg(feature = "unproven")]
