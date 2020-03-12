@@ -948,24 +948,25 @@ pub trait PwmPin {
 ///     };
 ///
 ///
-///     let before = qei.count();
+///     let before = qei.try_count().unwrap();
 ///     timer.start(1.s());
 ///     block!(timer.wait());
-///     let after = qei.count();
+///     let after = qei.try_count().unwrap();
 ///
 ///     let speed = after.wrapping_sub(before);
 ///     println!("Speed: {} pulses per second", speed);
 /// }
 ///
-/// # use std::convert::Infallible;
+/// # use core::convert::Infallible;
 /// # struct Seconds(u32);
 /// # trait U32Ext { fn s(self) -> Seconds; }
 /// # impl U32Ext for u32 { fn s(self) -> Seconds { Seconds(self) } }
 /// # struct Qei1;
 /// # impl hal::Qei for Qei1 {
+/// #     type Error = Infallible;
 /// #     type Count = u16;
-/// #     fn count(&self) -> u16 { 0 }
-/// #     fn direction(&self) -> ::hal::Direction { unimplemented!() }
+/// #     fn try_count(&self) -> Result<u16, Self::Error> { 0 }
+/// #     fn try_direction(&self) -> Result<::hal::Direction, Self::Error> { unimplemented!() }
 /// # }
 /// # struct Timer6;
 /// # impl hal::timer::CountDown for Timer6 {
@@ -978,14 +979,17 @@ pub trait PwmPin {
 // reason: needs to be re-evaluated in the new singletons world. At the very least this needs a
 // reference implementation
 pub trait Qei {
+    /// Enumeration of `Qei` errors
+    type Error;
+
     /// The type of the value returned by `count`
     type Count;
 
     /// Returns the current pulse count of the encoder
-    fn count(&self) -> Self::Count;
+    fn try_count(&self) -> Result<Self::Count, Self::Error>;
 
     /// Returns the count direction
-    fn direction(&self) -> Direction;
+    fn try_direction(&self) -> Result<Direction, Self::Error>;
 }
 
 /// Count direction
