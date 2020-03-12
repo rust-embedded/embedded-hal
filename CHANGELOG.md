@@ -11,8 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - A nonblocking trait for interfacing with random number generation hardware.
 
 ### Changed
-- The current versions of `InputPin` have been proven. These are `digital::v1::InputPin` 
-  and `digital::v2::InputPin`.
+- All traits have been marked as proven (`unproven` feature has been removed).
+- All trait methods have been made fallible.
+- All trait methods have been renamed `try_*` (i.e. `try_send`) for consistency.
 
 ## [v0.2.3] - 2019-05-09
 
