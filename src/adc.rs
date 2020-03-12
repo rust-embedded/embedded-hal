@@ -10,7 +10,7 @@ use nb;
 /// between the physical interface and the ADC sampling buffer.
 ///
 /// ```
-/// # use std::marker::PhantomData;
+/// # use core::marker::PhantomData;
 /// # use embedded_hal::adc::Channel;
 ///
 /// struct Adc1; // Example ADC with single bank of 8 channels

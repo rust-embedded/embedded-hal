@@ -223,7 +223,7 @@
 //! # }
 //!
 //! # mod stm32f30x_hal {
-//! #     use std::convert::Infallible;
+//! #     use core::convert::Infallible;
 //! #     pub struct Serial1;
 //! #     impl Serial1 {
 //! #         pub fn try_write(&mut self, _: u8) -> ::nb::Result<(), Infallible> {
@@ -255,7 +255,7 @@
 //! };
 //! use futures::future::Loop;
 //! use stm32f30x_hal::{Led, Serial1, Timer6};
-//! use std::convert::Infallible;
+//! use core::convert::Infallible;
 //!
 //! /// `futures` version of `CountDown.try_wait`
 //! ///
@@ -392,8 +392,8 @@
 //! #[macro_use(r#await)]
 //! extern crate nb;
 //!
-//! use std::ops::Generator;
-//! use std::pin::Pin;
+//! use core::ops::Generator;
+//! use core::pin::Pin;
 //!
 //! use hal::prelude::*;
 //! use stm32f30x_hal::{Led, Serial1, Timer6};
@@ -447,7 +447,7 @@
 //! }
 //!
 //! # mod stm32f30x_hal {
-//! #   use std::convert::Infallible;
+//! #   use core::convert::Infallible;
 //! #   pub struct Serial1;
 //! #   impl Serial1 {
 //! #       pub fn try_read(&mut self) -> ::nb::Result<u8, Infallible> { Err(::nb::Error::WouldBlock) }
@@ -565,7 +565,7 @@
 //! #[macro_use(r#await)]
 //! extern crate nb;
 //!
-//! use std::ops::Generator;
+//! use core::ops::Generator;
 //!
 //! /// Transfers a byte buffer of size N
 //! ///
@@ -660,11 +660,11 @@
 //! #     fn lock(&self) -> RefMut<T> { unimplemented!() }
 //! # }
 //! # struct RefMut<'a, T>(&'a mut T) where T: 'a;
-//! # impl<'a, T> ::std::ops::Deref for RefMut<'a, T> {
+//! # impl<'a, T> ::core::ops::Deref for RefMut<'a, T> {
 //! #     type Target = T;
 //! #     fn deref(&self) -> &T { self.0 }
 //! # }
-//! # impl<'a, T> ::std::ops::DerefMut for RefMut<'a, T> {
+//! # impl<'a, T> ::core::ops::DerefMut for RefMut<'a, T> {
 //! #     fn deref_mut(&mut self) -> &mut T { self.0 }
 //! # }
 //! # struct Serial1;
