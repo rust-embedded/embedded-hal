@@ -56,7 +56,6 @@ pub trait Write {
 }
 
 /// Blocking write (iterator version)
-#[cfg(feature = "unproven")]
 pub trait WriteIter {
     /// Error type
     type Error;
@@ -107,7 +106,6 @@ pub trait WriteRead {
 }
 
 /// Blocking write (iterator version) + read
-#[cfg(feature = "unproven")]
 pub trait WriteIterRead {
     /// Error type
     type Error;

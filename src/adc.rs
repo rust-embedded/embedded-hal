@@ -1,6 +1,5 @@
 //! Analog-digital conversion traits
 
-#[cfg(feature = "unproven")]
 use nb;
 
 /// A marker trait to identify MCU pins that can be used as inputs to an ADC channel.
@@ -35,7 +34,6 @@ use nb;
 ///     fn channel() -> (u8, u8) { (0, 3) } // bank 0 channel 3
 /// }
 /// ```
-#[cfg(feature = "unproven")]
 pub trait Channel<ADC> {
     /// Channel ID type
     ///
@@ -85,7 +83,6 @@ pub trait Channel<ADC> {
 ///    }
 /// }
 /// ```
-#[cfg(feature = "unproven")]
 pub trait OneShot<ADC, Word, Pin: Channel<ADC>> {
     /// Error type returned by ADC methods
     type Error;

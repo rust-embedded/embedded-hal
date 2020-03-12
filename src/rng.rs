@@ -1,11 +1,8 @@
 //! Random Number Generator Interface
 
-#[cfg(feature = "unproven")]
 use nb;
 
 /// Nonblocking stream of random bytes.
-#[cfg(feature = "unproven")]
-// reason: No implementation or users yet
 pub trait Read {
     /// An enumeration of RNG errors.
     ///

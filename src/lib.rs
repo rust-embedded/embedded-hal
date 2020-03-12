@@ -2,10 +2,7 @@
 //!
 //! **NOTE** This HAL is still is active development. Expect the traits presented here to be
 //! tweaked, split or be replaced wholesale before being stabilized, i.e. before hitting the 1.0.0
-//! release. That being said there's a part of the HAL that's currently considered unproven and is
-//! hidden behind an "unproven" Cargo feature. This API is even more volatile and it's exempt from
-//! semver rules: it can change in a non-backward compatible fashion or even disappear in between
-//! patch releases.
+//! release.
 //!
 //! # Design goals
 //!
@@ -702,8 +699,6 @@ pub mod watchdog;
 
 /// Input capture
 ///
-/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
-///
 /// # Examples
 ///
 /// You can use this interface to measure the period of (quasi) periodic signals
@@ -742,17 +737,15 @@ pub mod watchdog;
 /// #     type Error = Infallible;
 /// #     type Capture = u16;
 /// #     type Channel = Channel;
-/// #     type Error = Infallible;
 /// #     type Time = MilliSeconds;
 /// #     fn try_capture(&mut self, _: Channel) -> ::nb::Result<u16, Self::Error> { Ok(0) }
 /// #     fn try_disable(&mut self, _: Channel) -> Result<(), Self::Error> { unimplemented!() }
 /// #     fn try_enable(&mut self, _: Channel) -> Result<(), Self::Error> { unimplemented!() }
 /// #     fn try_get_resolution(&self) -> Result<MilliSeconds, Self::Error> { unimplemented!() }
-/// #     fn try_set_resolution<T>(&mut self, _: T) -> Result<(), Self::Error> where T: Into<MilliSeconds> {}
+/// #     fn try_set_resolution<T>(&mut self, _: T) -> Result<(), Self::Error> where T: Into<MilliSeconds> { Ok(()) }
 /// # }
 /// ```
-#[cfg(feature = "unproven")]
-// reason: pre-singletons API. With singletons a `CapturePin` (cf. `PwmPin`) trait seems more
+// unproven reason: pre-singletons API. With singletons a `CapturePin` (cf. `PwmPin`) trait seems more
 // appropriate
 pub trait Capture {
     /// Enumeration of `Capture` errors
@@ -799,8 +792,6 @@ pub trait Capture {
 
 /// Pulse Width Modulation
 ///
-/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
-///
 /// # Examples
 ///
 /// Use this interface to control the power output of some actuator
@@ -841,14 +832,13 @@ pub trait Capture {
 /// #     fn try_disable(&mut self, _: Channel) -> Result<(), Self::Error> { unimplemented!() }
 /// #     fn try_enable(&mut self, _: Channel) -> Result<(), Self::Error> { unimplemented!() }
 /// #     fn try_get_duty(&self, _: Channel) -> Result<u16, Self::Error> { unimplemented!() }
-/// #     fn try_get_max_duty(&self) -> Result<u16, Self::Error> { 0 }
-/// #     fn try_set_duty(&mut self, _: Channel, _: u16) -> Result<(), Self::Error> {}
+/// #     fn try_get_max_duty(&self) -> Result<u16, Self::Error> { Ok(0) }
+/// #     fn try_set_duty(&mut self, _: Channel, _: u16) -> Result<(), Self::Error> { Ok(()) }
 /// #     fn try_get_period(&self) -> Result<KiloHertz, Self::Error> { unimplemented!() }
-/// #     fn try_set_period<T>(&mut self, _: T) -> Result<(), Self::Error> where T: Into<KiloHertz> {}
+/// #     fn try_set_period<T>(&mut self, _: T) -> Result<(), Self::Error> where T: Into<KiloHertz> { Ok(()) }
 /// # }
 /// ```
-#[cfg(feature = "unproven")]
-// reason: pre-singletons API. The `PwmPin` trait seems more useful because it models independent
+// unproven reason: pre-singletons API. The `PwmPin` trait seems more useful because it models independent
 // PWM channels. Here a certain number of channels are multiplexed in a single implementer.
 pub trait Pwm {
     /// Enumeration of `Pwm` errors
@@ -925,8 +915,6 @@ pub trait PwmPin {
 
 /// Quadrature encoder interface
 ///
-/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
-///
 /// # Examples
 ///
 /// You can use this interface to measure the speed of a motor
@@ -971,13 +959,13 @@ pub trait PwmPin {
 /// # }
 /// # struct Timer6;
 /// # impl hal::timer::CountDown for Timer6 {
+/// #     type Error = Infallible;
 /// #     type Time = Seconds;
 /// #     fn try_start<T>(&mut self, _: T) -> Result<(), Infallible> where T: Into<Seconds> { Ok(()) }
 /// #     fn try_wait(&mut self) -> ::nb::Result<(), Infallible> { Ok(()) }
 /// # }
 /// ```
-#[cfg(feature = "unproven")]
-// reason: needs to be re-evaluated in the new singletons world. At the very least this needs a
+// unproven reason: needs to be re-evaluated in the new singletons world. At the very least this needs a
 // reference implementation
 pub trait Qei {
     /// Enumeration of `Qei` errors
@@ -994,11 +982,7 @@ pub trait Qei {
 }
 
 /// Count direction
-///
-/// *This enumeration is available if embedded-hal is built with the `"unproven"` feature.*
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-#[cfg(feature = "unproven")]
-// reason: part of the unproven `Qei` interface
 pub enum Direction {
     /// 3, 2, 1
     Downcounting,

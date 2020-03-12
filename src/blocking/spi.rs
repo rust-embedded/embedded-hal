@@ -19,7 +19,6 @@ pub trait Write<W> {
 }
 
 /// Blocking write (iterator version)
-#[cfg(feature = "unproven")]
 pub trait WriteIter<W> {
     /// Error type
     type Error;
@@ -78,7 +77,6 @@ pub mod write {
 }
 
 /// Blocking write (iterator version)
-#[cfg(feature = "unproven")]
 pub mod write_iter {
     /// Default implementation of `blocking::spi::WriteIter<W>` for implementers of
     /// `spi::FullDuplex<W>`
