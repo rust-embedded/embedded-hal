@@ -897,6 +897,9 @@ pub trait Pwm {
 ///
 /// See `Pwm` for details
 pub trait PwmPin {
+    /// Enumeration of `PwmPin` errors
+    type Error;
+
     /// Type for the `duty` methods
     ///
     /// The implementer is free to choose a float / percentage representation
@@ -904,19 +907,19 @@ pub trait PwmPin {
     type Duty;
 
     /// Disables a PWM `channel`
-    fn disable(&mut self);
+    fn try_disable(&mut self) -> Result<(), Self::Error>;
 
     /// Enables a PWM `channel`
-    fn enable(&mut self);
+    fn try_enable(&mut self) -> Result<(), Self::Error>;
 
     /// Returns the current duty cycle
-    fn get_duty(&self) -> Self::Duty;
+    fn try_get_duty(&self) -> Result<Self::Duty, Self::Error>;
 
     /// Returns the maximum duty cycle value
-    fn get_max_duty(&self) -> Self::Duty;
+    fn try_get_max_duty(&self) -> Result<Self::Duty, Self::Error>;
 
     /// Sets a new duty cycle
-    fn set_duty(&mut self, duty: Self::Duty);
+    fn try_set_duty(&mut self, duty: Self::Duty) -> Result<(), Self::Error>;
 }
 
 /// Quadrature encoder interface
