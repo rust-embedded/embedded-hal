@@ -216,9 +216,9 @@
 //! };
 //!
 //! for byte in b"Hello, world!" {
-//!     // NOTE `block!` blocks until `serial.write()` completes and returns
+//!     // NOTE `block!` blocks until `serial.try_write()` completes and returns
 //!     // `Result<(), Error>`
-//!     block!(serial.write(*byte)).unwrap();
+//!     block!(serial.try_write(*byte)).unwrap();
 //! }
 //! # }
 //!
@@ -226,7 +226,7 @@
 //! #     use std::convert::Infallible;
 //! #     pub struct Serial1;
 //! #     impl Serial1 {
-//! #         pub fn write(&mut self, _: u8) -> ::nb::Result<(), Infallible> {
+//! #         pub fn try_write(&mut self, _: u8) -> ::nb::Result<(), Infallible> {
 //! #             Ok(())
 //! #         }
 //! #     }
@@ -419,7 +419,7 @@
 //!         loop {
 //!             // `await!` means "suspend / yield here" instead of "block until
 //!             // completion"
-//!             nb::r#await!(timer.wait()).unwrap(); // NOTE(unwrap) E = Infallible
+//!             nb::r#await!(timer.try_wait()).unwrap(); // NOTE(unwrap) E = Infallible
 //!
 //!             state = !state;
 //!
@@ -433,8 +433,8 @@
 //!
 //!     let mut loopback = (move || {
 //!         loop {
-//!             let byte = nb::r#await!(serial.read()).unwrap();
-//!             nb::r#await!(serial.write(byte)).unwrap();
+//!             let byte = nb::r#await!(serial.try_read()).unwrap();
+//!             nb::r#await!(serial.try_write(byte)).unwrap();
 //!         }
 //!     });
 //!
@@ -450,12 +450,12 @@
 //! #   use std::convert::Infallible;
 //! #   pub struct Serial1;
 //! #   impl Serial1 {
-//! #       pub fn read(&mut self) -> ::nb::Result<u8, Infallible> { Err(::nb::Error::WouldBlock) }
-//! #       pub fn write(&mut self, _: u8) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #       pub fn try_read(&mut self) -> ::nb::Result<u8, Infallible> { Err(::nb::Error::WouldBlock) }
+//! #       pub fn try_write(&mut self, _: u8) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #   }
 //! #   pub struct Timer6;
 //! #   impl Timer6 {
-//! #       pub fn wait(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #       pub fn try_wait(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #   }
 //! #   pub struct Led;
 //! #   impl Led {
