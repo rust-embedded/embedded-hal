@@ -28,7 +28,7 @@ pub trait Read {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
-    fn read(&mut self, address: u8, buffer: &mut [u8]) -> Result<(), Self::Error>;
+    fn try_read(&mut self, address: u8, buffer: &mut [u8]) -> Result<(), Self::Error>;
 }
 
 /// Blocking write
@@ -52,7 +52,7 @@ pub trait Write {
     /// - `SAK` = slave acknowledge
     /// - `Bi` = ith byte of data
     /// - `SP` = stop condition
-    fn write(&mut self, addr: u8, bytes: &[u8]) -> Result<(), Self::Error>;
+    fn try_write(&mut self, addr: u8, bytes: &[u8]) -> Result<(), Self::Error>;
 }
 
 /// Blocking write (iterator version)
@@ -66,7 +66,7 @@ pub trait WriteIter {
     /// # I2C Events (contract)
     ///
     /// Same as `Write`
-    fn write<B>(&mut self, addr: u8, bytes: B) -> Result<(), Self::Error>
+    fn try_write<B>(&mut self, addr: u8, bytes: B) -> Result<(), Self::Error>
     where
         B: IntoIterator<Item = u8>;
 }
@@ -98,7 +98,7 @@ pub trait WriteRead {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
-    fn write_read(
+    fn try_write_read(
         &mut self,
         address: u8,
         bytes: &[u8],
@@ -118,7 +118,7 @@ pub trait WriteIterRead {
     /// # I2C Events (contract)
     ///
     /// Same as the `WriteRead` trait
-    fn write_iter_read<B>(
+    fn try_write_iter_read<B>(
         &mut self,
         address: u8,
         bytes: B,
