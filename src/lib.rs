@@ -75,10 +75,10 @@
 //!     type Error;
 //!
 //!     /// Reads a single byte
-//!     fn read(&mut self) -> nb::Result<u8, Self::Error>;
+//!     fn try_read(&mut self) -> nb::Result<u8, Self::Error>;
 //!
 //!     /// Writes a single byte
-//!     fn write(&mut self, byte: u8) -> nb::Result<(), Self::Error>;
+//!     fn try_write(&mut self, byte: u8) -> nb::Result<(), Self::Error>;
 //! }
 //! ```
 //!
@@ -150,7 +150,7 @@
 //! impl hal::serial::Read<u8> for Serial<USART1> {
 //!     type Error = Error;
 //!
-//!     fn read(&mut self) -> nb::Result<u8, Error> {
+//!     fn try_read(&mut self) -> nb::Result<u8, Error> {
 //!         // read the status register
 //!         let isr = self.usart.isr.read();
 //!
@@ -172,13 +172,13 @@
 //! impl hal::serial::Write<u8> for Serial<USART1> {
 //!     type Error = Error;
 //!
-//!     fn write(&mut self, byte: u8) -> nb::Result<(), Error> {
-//!         // Similar to the `read` implementation
+//!     fn try_write(&mut self, byte: u8) -> nb::Result<(), Error> {
+//!         // Similar to the `try_read` implementation
 //!         # Ok(())
 //!     }
 //!
-//!     fn flush(&mut self) -> nb::Result<(), Error> {
-//!         // Similar to the `read` implementation
+//!     fn try_flush(&mut self) -> nb::Result<(), Error> {
+//!         // Similar to the `try_read` implementation
 //!         # Ok(())
 //!     }
 //! }
@@ -281,7 +281,7 @@
 //! {
 //!     let mut serial = Some(serial);
 //!     future::poll_fn(move || {
-//!         let byte = try_nb!(serial.as_mut().unwrap().read());
+//!         let byte = try_nb!(serial.as_mut().unwrap().try_read());
 //!
 //!         Ok(Async::Ready((serial.take().unwrap(), byte)))
 //!     })
@@ -296,7 +296,7 @@
 //! {
 //!     let mut serial = Some(serial);
 //!     future::poll_fn(move || {
-//!         try_nb!(serial.as_mut().unwrap().write(byte));
+//!         try_nb!(serial.as_mut().unwrap().try_write(byte));
 //!
 //!         Ok(Async::Ready(serial.take().unwrap()))
 //!     })
@@ -361,12 +361,12 @@
 //! #     pub struct Serial1;
 //! #     impl ::hal::serial::Read<u8> for Serial1 {
 //! #         type Error = Infallible;
-//! #         fn read(&mut self) -> ::nb::Result<u8, Infallible> { Err(::nb::Error::WouldBlock) }
+//! #         fn try_read(&mut self) -> ::nb::Result<u8, Infallible> { Err(::nb::Error::WouldBlock) }
 //! #     }
 //! #     impl ::hal::serial::Write<u8> for Serial1 {
 //! #         type Error = Infallible;
-//! #         fn flush(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
-//! #         fn write(&mut self, _: u8) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #         fn try_flush(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #         fn try_write(&mut self, _: u8) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #     }
 //! #
 //! #     pub struct Led;
@@ -492,7 +492,7 @@
 //!     S: hal::serial::Write<u8>
 //! {
 //!     for &byte in buffer {
-//!         block!(serial.write(byte))?;
+//!         block!(serial.try_write(byte))?;
 //!     }
 //!
 //!     Ok(())
@@ -528,7 +528,7 @@
 //!     timer.try_start(timeout).map_err(Error::TimedOut)?;
 //!
 //!     loop {
-//!         match serial.read() {
+//!         match serial.try_read() {
 //!             // raise error
 //!             Err(nb::Error::Other(e)) => return Err(Error::Serial(e)),
 //!             Err(nb::Error::WouldBlock) => {
@@ -608,7 +608,7 @@
 //! {
 //!     loop {
 //!         if let Some(byte) = cb.peek() {
-//!             match serial.write(*byte) {
+//!             match serial.try_write(*byte) {
 //!                 Err(nb::Error::Other(_)) => unreachable!(),
 //!                 Err(nb::Error::WouldBlock) => return,
 //!                 Ok(()) => {}, // keep flushing data
@@ -670,8 +670,8 @@
 //! # struct Serial1;
 //! # impl ::hal::serial::Write<u8> for Serial1 {
 //! #   type Error = Infallible;
-//! #   fn write(&mut self, _: u8) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
-//! #   fn flush(&mut self) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #   fn try_write(&mut self, _: u8) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #   fn try_flush(&mut self) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! # }
 //! # struct CircularBuffer;
 //! # impl CircularBuffer {

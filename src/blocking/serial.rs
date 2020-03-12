@@ -40,14 +40,14 @@ pub mod write {
 
         fn try_bwrite_all(&mut self, buffer: &[Word]) -> Result<(), Self::Error> {
             for word in buffer {
-                block!(self.write(word.clone()))?;
+                block!(self.try_write(word.clone()))?;
             }
 
             Ok(())
         }
 
         fn try_bflush(&mut self) -> Result<(), Self::Error> {
-            block!(self.flush())?;
+            block!(self.try_flush())?;
             Ok(())
         }
     }
