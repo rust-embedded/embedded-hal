@@ -6,7 +6,7 @@ pub trait Transfer<W> {
     type Error;
 
     /// Sends `words` to the slave. Returns the `words` received from the slave
-    fn transfer<'w>(&mut self, words: &'w mut [W]) -> Result<&'w [W], Self::Error>;
+    fn try_transfer<'w>(&mut self, words: &'w mut [W]) -> Result<&'w [W], Self::Error>;
 }
 
 /// Blocking write
@@ -15,7 +15,7 @@ pub trait Write<W> {
     type Error;
 
     /// Sends `words` to the slave, ignoring all the incoming words
-    fn write(&mut self, words: &[W]) -> Result<(), Self::Error>;
+    fn try_write(&mut self, words: &[W]) -> Result<(), Self::Error>;
 }
 
 /// Blocking write (iterator version)
@@ -25,7 +25,7 @@ pub trait WriteIter<W> {
     type Error;
 
     /// Sends `words` to the slave, ignoring all the incoming words
-    fn write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
+    fn try_write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
     where
         WI: IntoIterator<Item = W>;
 }
@@ -43,7 +43,7 @@ pub mod transfer {
     {
         type Error = S::Error;
 
-        fn transfer<'w>(&mut self, words: &'w mut [W]) -> Result<&'w [W], S::Error> {
+        fn try_transfer<'w>(&mut self, words: &'w mut [W]) -> Result<&'w [W], S::Error> {
             for word in words.iter_mut() {
                 block!(self.send(word.clone()))?;
                 *word = block!(self.read())?;
@@ -66,7 +66,7 @@ pub mod write {
     {
         type Error = S::Error;
 
-        fn write(&mut self, words: &[W]) -> Result<(), S::Error> {
+        fn try_write(&mut self, words: &[W]) -> Result<(), S::Error> {
             for word in words {
                 block!(self.send(word.clone()))?;
                 block!(self.read())?;
@@ -91,7 +91,7 @@ pub mod write_iter {
     {
         type Error = S::Error;
 
-        fn write_iter<WI>(&mut self, words: WI) -> Result<(), S::Error>
+        fn try_write_iter<WI>(&mut self, words: WI) -> Result<(), S::Error>
         where
             WI: IntoIterator<Item = W>,
         {
