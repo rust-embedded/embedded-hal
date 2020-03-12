@@ -10,13 +10,13 @@ pub trait Write<Word> {
     /// An implementation can choose to buffer the write, returning `Ok(())`
     /// after the complete slice has been written to a buffer, but before all
     /// words have been sent via the serial interface. To make sure that
-    /// everything has been sent, call [`bflush`] after this function returns.
+    /// everything has been sent, call [`try_bflush`] after this function returns.
     ///
-    /// [`bflush`]: #tymethod.bflush
-    fn bwrite_all(&mut self, buffer: &[Word]) -> Result<(), Self::Error>;
+    /// [`try_bflush`]: #tymethod.bflush
+    fn try_bwrite_all(&mut self, buffer: &[Word]) -> Result<(), Self::Error>;
 
     /// Block until the serial interface has sent all buffered words
-    fn bflush(&mut self) -> Result<(), Self::Error>;
+    fn try_bflush(&mut self) -> Result<(), Self::Error>;
 }
 
 /// Blocking serial write
@@ -38,7 +38,7 @@ pub mod write {
     {
         type Error = S::Error;
 
-        fn bwrite_all(&mut self, buffer: &[Word]) -> Result<(), Self::Error> {
+        fn try_bwrite_all(&mut self, buffer: &[Word]) -> Result<(), Self::Error> {
             for word in buffer {
                 block!(self.write(word.clone()))?;
             }
@@ -46,7 +46,7 @@ pub mod write {
             Ok(())
         }
 
-        fn bflush(&mut self) -> Result<(), Self::Error> {
+        fn try_bflush(&mut self) -> Result<(), Self::Error> {
             block!(self.flush())?;
             Ok(())
         }
