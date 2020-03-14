@@ -20,7 +20,7 @@ use nb;
 /// impl Channel<Adc1> for Gpio1Pin1<Analog> {
 ///     type ID = u8; // ADC channels are identified numerically
 ///
-///     fn channel() -> u8 { 7_u8 } // GPIO pin 1 is connected to ADC channel 7
+///     const CHANNEL: u8 = 7_u8; // GPIO pin 1 is connected to ADC channel 7
 /// }
 ///
 /// struct Adc2; // ADC with two banks of 16 channels
@@ -31,7 +31,7 @@ use nb;
 /// impl Channel<Adc2> for Gpio2PinA<AltFun> {
 ///     type ID = (u8, u8); // ADC channels are identified by bank number and channel number
 ///
-///     fn channel() -> (u8, u8) { (0, 3) } // bank 0 channel 3
+///     const CHANNEL: (u8, u8) = (0, 3); // bank 0 channel 3
 /// }
 /// ```
 pub trait Channel<ADC> {
@@ -44,12 +44,7 @@ pub trait Channel<ADC> {
 
     /// Get the specific ID that identifies this channel, for example `0_u8` for the first ADC
     /// channel, if Self::ID is u8.
-    fn channel() -> Self::ID;
-
-    // `channel` is a function due to [this reported
-    // issue](https://github.com/rust-lang/rust/issues/54973). Something about blanket impls
-    // combined with `type ID; const CHANNEL: Self::ID;` causes problems.
-    //const CHANNEL: Self::ID;
+    const CHANNEL: Self::ID;
 }
 
 /// ADCs that sample on single channels per request, and do so at the time of the request.
@@ -75,7 +70,7 @@ pub trait Channel<ADC> {
 ///    type Error = ();
 ///
 ///    fn try_read(&mut self, _pin: &mut PIN) -> nb::Result<WORD, Self::Error> {
-///        let chan = 1 << PIN::channel();
+///        let chan = 1 << PIN::CHANNEL;
 ///        self.power_up();
 ///        let result = self.do_conversion(chan);
 ///        self.power_down();
