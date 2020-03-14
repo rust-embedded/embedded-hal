@@ -113,7 +113,7 @@ pub struct OldInputPin<T> {
 
 impl<T, E> OldInputPin<T>
 where
-    T: v2::OutputPin<Error = E>,
+    T: v2::InputPin<Error = E>,
     E: core::fmt::Debug,
 {
     /// Create an `OldInputPin` wrapper around a `v2::InputPin`.
