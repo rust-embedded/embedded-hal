@@ -12,8 +12,11 @@
 /// `UXX` denotes the range type of the delay time. `UXX` can be `u8`, `u16`, etc. A single type can
 /// implement this trait for different types of `UXX`.
 pub trait DelayMs<UXX> {
+    /// Enumeration of `DelayMs` errors
+    type Error;
+
     /// Pauses execution for `ms` milliseconds
-    fn delay_ms(&mut self, ms: UXX);
+    fn try_delay_ms(&mut self, ms: UXX) -> Result<(), Self::Error>;
 }
 
 /// Microsecond delay
@@ -21,6 +24,9 @@ pub trait DelayMs<UXX> {
 /// `UXX` denotes the range type of the delay time. `UXX` can be `u8`, `u16`, etc. A single type can
 /// implement this trait for different types of `UXX`.
 pub trait DelayUs<UXX> {
+    /// Enumeration of `DelayMs` errors
+    type Error;
+
     /// Pauses execution for `us` microseconds
-    fn delay_us(&mut self, us: UXX);
+    fn try_delay_us(&mut self, us: UXX) -> Result<(), Self::Error>;
 }

@@ -14,15 +14,10 @@ readme = "README.md"
 repository = "https://github.com/rust-embedded/embedded-hal"
 version = "0.2.3"
 
-[dependencies.nb]
-version = "0.1.1"
+[dependencies]
+nb = { version = "0.1.1", features = ["unstable"] }
 
 [dev-dependencies]
 stm32f3 = { version = "0.8", features = ["stm32f303", "rt"] }
 futures = "0.1.17"
 
-[features]
-unproven = ["nb/unstable"]
-
-[package.metadata.docs.rs]
-features = ["unproven"]
