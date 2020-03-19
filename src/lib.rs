@@ -688,20 +688,14 @@ extern crate nb;
 
 pub mod adc;
 pub mod blocking;
+pub mod capture;
 pub mod digital;
 pub mod fmt;
 pub mod prelude;
+pub mod pwm;
+pub mod qei;
 pub mod rng;
 pub mod serial;
 pub mod spi;
 pub mod timer;
 pub mod watchdog;
-
-mod capture;
-pub use capture::Capture;
-
-mod pwm;
-pub use pwm::{Pwm, PwmPin};
-
-mod qei;
-pub use qei::{Direction, Qei};

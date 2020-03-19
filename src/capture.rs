@@ -38,7 +38,7 @@ use nb;
 /// # impl U32Ext for u32 { fn ms(self) -> MilliSeconds { MilliSeconds(self) } }
 /// # struct Capture1;
 /// # enum Channel { _1 }
-/// # impl hal::Capture for Capture1 {
+/// # impl hal::capture::Capture for Capture1 {
 /// #     type Error = Infallible;
 /// #     type Capture = u16;
 /// #     type Channel = Channel;
