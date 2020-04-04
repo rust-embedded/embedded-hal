@@ -12,46 +12,29 @@ This project is developed and maintained by the [HAL team][team].
 
 This is the suggested approach to adding a new trait to `embedded-hal`
 
-### Discussion
+### Research / Discussion
 
-Ideally, before proposing a new trait, or set of traits, you should create an issue where the use
-cases and requirements of the trait(s) are discussed.
+Ideally, before proposing a new trait, or set of traits, you should check for an existing issue
+suggesting the need for the trait, as well as any related works / use cases / requirements that
+are useful to consider in the design of the trait.
 
-These issues will be labeled as `discussion`s in the issue tracker.
+These issues will be labeled as `discussion` in the issue tracker.
+
+### Implementation / Demonstration
+
+Proposed traits should then be implemented and demonstrated, either by forking `embedded-hal` or by creating a new crate with the intent of integrating this into `embedded-hal` once the traits have stabilized. You may find [cargo workspaces](https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html) and [patch](https://doc.rust-lang.org/edition-guide/rust-2018/cargo-and-crates-io/replacing-dependencies-with-patch.html) useful for the forking approach.
+
+Traits should be demonstrated with at least *two* Implementations on different platforms and *one* generic driver built on the trait. Where it is possible we suggest an implementation on a microcontroller, and implementation for [linux](https://github.com/rust-embedded/linux-embedded-hal), and a driver (or drivers where requirements are more complex) with bounds using the trait.
 
 ### Proposing a trait
 
-Once there's consensus on the requirements of the trait(s) a new issue, or a PR, with a proposal
-should be opened. The proposal should include the actual trait definitions as well as a link to the
-issue with previous discussion, if there was one.
+Once the trait has been demonstrated a PR should be opened to merge the new trait(s) into `embedded-hal`. This should include a link to the previous discussion issue.
 
-If the proposal includes more than one alternative then there should be further discussion to try to
-single out the best alternative.
+If there is determined to be more than one alternative then there should be further discussion to 
+try to single out the best option. Once there is consensus this will be merged into the `embedded-hal` repository.
 
 These issues / PRs will be labeled as `proposal`s in the issue tracker.
 
-### Testing period
-
-If there are no objections to the proposal the new trait(s) will land behind the "unproven" Cargo
-feature and an issue about the new trait(s) will be created. If the proposal includes several
-alternatives and a single one couldn't be chosen as the best then each alternative will land behind
-a different Cargo feature, e.g. "alt1" or "alt2".
-
-The traits will undergo a testing period before they move into the set of proven traits. During
-this period users are encouraged to try to implement the unproven traits for their platforms and to
-build drivers on top of them. Problems implementing the trait(s) as well as successful
-implementations should be reported on the corresponding issue.
-
-To leave the unproven state at least *two* implementations of the trait(s) for different platforms
-(ideally, the two platforms should be from different vendors) and *one* generic driver built on top
-of the trait(s), or alternatively one demo program that exercises the trait (via generic function /
-trait object), *should* be demonstrated. If, instead, reports indicate that the proposed trait(s)
-can't be implemented for a certain platform then the trait(s) will be removed and we'll go back to
-the drawing board.
-
-Issues used to track unproven APIs will be labeled as `unproven-api`s in the issue tracker and they
-may also include the labels `needs-impl` and `needs-driver` to signal what's required for them to
-move to the set of proven traits.
 
 ## Implementations and drivers
 
