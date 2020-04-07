@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- Fix the compatibility shim, where InputPin was implemented only for inner v1::OutputPin
+  values, a potentially serious problem.
 
 ## [v0.2.3] - 2019-05-09
 
