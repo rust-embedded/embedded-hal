@@ -12,8 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- Fix the input pin v2->v1 compatibility shim constructor, where `OldInputPin::new` was incorrectly implemented for v`1::OutputPin`
-  values.
+- Fix the input pin v2->v1 compatibility shim constructor, where `OldInputPin::new` 
+  was incorrectly implemented for v`1::OutputPin` values.
 
 ## [v0.2.3] - 2019-05-09
 
