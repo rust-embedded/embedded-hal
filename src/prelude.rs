@@ -28,6 +28,7 @@ pub use crate::digital::InputPin as _embedded_hal_digital_InputPin;
 pub use crate::digital::OutputPin as _embedded_hal_digital_OutputPin;
 pub use crate::digital::StatefulOutputPin as _embedded_hal_digital_StatefulOutputPin;
 pub use crate::digital::ToggleableOutputPin as _embedded_hal_digital_ToggleableOutputPin;
+pub use crate::i2s::FullDuplex as _embedded_hal_i2s_FullDuplex;
 pub use crate::pwm::Pwm as _embedded_hal_Pwm;
 pub use crate::pwm::PwmPin as _embedded_hal_PwmPin;
 pub use crate::qei::Qei as _embedded_hal_Qei;
