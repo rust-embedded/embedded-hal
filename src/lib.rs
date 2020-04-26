@@ -406,6 +406,7 @@
 
 pub mod adc;
 pub mod blocking;
+pub mod can;
 pub mod capture;
 pub mod digital;
 pub mod fmt;
