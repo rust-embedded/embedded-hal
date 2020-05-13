@@ -32,6 +32,6 @@ pub trait ConfigureBaud {
     type BaudRate;
     /// Set baud error
     type Error;
-    /// Change baudrate
-    fn set_baudrate(&mut self, baudrate: Self::BaudRate) -> Result<(), Self::Error>;
+    /// Change baud rate
+    fn set_baud_rate(&mut self, baud_rate: Self::BaudRate) -> Result<(), Self::Error>;
 }
