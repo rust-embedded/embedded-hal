@@ -32,7 +32,11 @@ pub trait WriteIter<W> {
     type Error;
 
     /// Sends `left_words` and `right_words` to the slave.
-    fn try_write<LW, RW>(&mut self, left_words: LW, right_words: RW) -> Result<(), Self::Error>
+    fn try_write_iter<LW, RW>(
+        &mut self,
+        left_words: LW,
+        right_words: RW,
+    ) -> Result<(), Self::Error>
     where
         LW: IntoIterator<Item = W>,
         RW: IntoIterator<Item = W>;
