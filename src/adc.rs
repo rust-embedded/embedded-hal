@@ -40,7 +40,7 @@ pub trait Channel<ADC> {
     /// A type used to identify this ADC channel. For example, if the ADC has eight channels, this
     /// might be a `u8`. If the ADC has multiple banks of channels, it could be a tuple, like
     /// `(u8: bank_id, u8: channel_id)`.
-    type ID;
+    type ID: Copy;
 
     /// Get the specific ID that identifies this channel, for example `0_u8` for the first ADC
     /// channel, if Self::ID is u8.
