@@ -1,4 +1,7 @@
-on: [push, pull_request]
+on:
+  push:
+    branches: [ staging, trying, master ]
+  pull_request:
 
 name: Code formatting check
 
