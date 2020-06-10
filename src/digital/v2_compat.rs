@@ -1,5 +1,36 @@
 //! v2 compatibility shims
-//! this module adds implicit forward support to v1 digital traits
+//! 
+//! This module adds implicit forward support to v1 digital traits,
+//! allowing v1 implementations to be directly used with v2 consumers.
+//! 
+//! ```
+//! extern crate embedded_hal;
+//! use embedded_hal::digital::{v1, v2};
+//! 
+//! struct OldOutputPinImpl { }
+//! 
+//! impl v1::OutputPin for OldOutputPinImpl {
+//!     fn set_low(&mut self) { }
+//!     fn set_high(&mut self) { }
+//! }
+//! 
+//! struct NewOutputPinConsumer<T: v2::OutputPin> {
+//!     _pin: T,
+//! }
+//! 
+//! impl <T>NewOutputPinConsumer<T> 
+//! where T: v2::OutputPin {
+//!     pub fn new(pin: T) -> NewOutputPinConsumer<T> {
+//!         NewOutputPinConsumer{ _pin: pin }
+//!     }
+//! }
+//! 
+//! fn main() {
+//!     let pin = OldOutputPinImpl{};
+//!     let _consumer = NewOutputPinConsumer::new(pin);
+//! }
+//! ```
+//! 
 
 #[allow(deprecated)]
 use super::v1;
@@ -39,6 +70,9 @@ where
      }
 }
 
+#[cfg(feature = "unproven")]
+#[allow(deprecated)]
+impl<T> v2::toggleable::Default for T where T: v1::toggleable::Default {}
 
 /// Implementation of fallible `v2::InputPin` for `v1::InputPin` digital traits
 #[cfg(feature = "unproven")]
@@ -81,6 +115,20 @@ mod tests {
         }
     }
 
+    #[allow(deprecated)]
+    impl v1::StatefulOutputPin for OldOutputPinImpl {
+        fn is_set_low(&self) -> bool {
+            self.state == false
+        }
+
+        fn is_set_high(&self) -> bool {
+            self.state == true
+        }
+    }
+
+    #[allow(deprecated)]
+    impl v1::toggleable::Default for OldOutputPinImpl {}
+
     struct NewOutputPinConsumer<T: v2::OutputPin> {
         _pin: T,
     }
@@ -90,6 +138,25 @@ mod tests {
         pub fn new(pin: T) -> NewOutputPinConsumer<T> {
             NewOutputPinConsumer{ _pin: pin }
         }
+    }
+
+    struct NewToggleablePinConsumer<T: v2::ToggleableOutputPin> {
+        _pin: T,
+    }
+
+    impl<T> NewToggleablePinConsumer<T>
+    where
+        T: v2::ToggleableOutputPin,
+    {
+        pub fn new(pin: T) -> NewToggleablePinConsumer<T> {
+            NewToggleablePinConsumer { _pin: pin }
+        }
+    }
+
+    #[test]
+    fn v2_v1_toggleable_implicit() {
+        let i = OldOutputPinImpl { state: false };
+        let _c = NewToggleablePinConsumer::new(i);
     }
 
     #[test]
