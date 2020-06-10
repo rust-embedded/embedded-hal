@@ -237,7 +237,7 @@
 //! must provide the `libstd` in order to be able to use `futures`, which is not
 //! the case for many embedded targets.
 //!
-//! ```not_run
+//! ```no_run
 //! extern crate embedded_hal as hal;
 //! extern crate futures;
 //!
@@ -257,7 +257,7 @@
 //! /// `futures` version of `CountDown.try_wait`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn wait<T>(mut timer: T) -> impl Future<Item = T, Error = Infallible>
+//! fn wait<T>(mut timer: T) -> impl Future<Item = T, Error = T::Error>
 //! where
 //!     T: hal::timer::CountDown,
 //! {
@@ -349,9 +349,10 @@
 //! #     use core::convert::Infallible;
 //! #     pub struct Timer6;
 //! #     impl ::hal::timer::CountDown for Timer6 {
+//! #         type Error = Infallible;
 //! #         type Time = ();
 //! #
-//! #         fn try_start<T>(&mut self, _: T) -> Result<(), Infallible> where T: Into<()> {}
+//! #         fn try_start<T>(&mut self, _: T) -> Result<(), Infallible> where T: Into<()> { Ok(()) }
 //! #         fn try_wait(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #     }
 //! #
@@ -380,7 +381,7 @@
 //! (same remark concerning the availability of `libstd` on the
 //! target).
 //!
-//! ```not_run
+//! ```no_run
 //! #![feature(generator_trait)]
 //! #![feature(generators)]
 //!
@@ -437,8 +438,8 @@
 //!
 //!     // Event loop
 //!     loop {
-//!         Pin::new(&mut blinky).resume();
-//!         Pin::new(&mut loopback).resume();
+//!         Pin::new(&mut blinky).resume(());
+//!         Pin::new(&mut loopback).resume(());
 //!         # break;
 //!     }
 //! }
@@ -553,7 +554,7 @@
 //!
 //! - Asynchronous SPI transfer
 //!
-//! ```not_run
+//! ```no_run
 //! #![feature(conservative_impl_trait)]
 //! #![feature(generators)]
 //! #![feature(generator_trait)]
