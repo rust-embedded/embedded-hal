@@ -5,7 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
 ## [Unreleased]
+
+### Added
+
+### Changed
+
+
+## [v1.0.0] - 2020-06-10
+
+*** This is a breaking change (sorry) ***
 
 ### Added
 - A nonblocking trait for interfacing with random number generation hardware.
@@ -16,6 +26,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - All trait methods have been renamed `try_*` (i.e. `try_send`) for consistency.
 - The `Capture`, `Pwm`, `PwmPin` and `Qei` traits have been moved into their own
   `capture`, `pwm` and `qei` modules for consistency.
+- Void has been replaced with `core::convert::Infallible` which should be used
+  in trait implementations where methods cannot fail.
+- A new [process](https://github.com/rust-embedded/embedded-hal#how-to-add-a-new-trait)
+  has been adopted for the addition of traits to the embedded-hal. 
 - The minimum supported Rust version is 1.35 due to [this issue](https://github.com/rust-lang/rust/issues/54973).
 
 ## [v0.2.3] - 2019-05-09
