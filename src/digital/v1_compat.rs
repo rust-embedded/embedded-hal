@@ -1,38 +1,38 @@
 //! v1 compatibility wrappers
-//! 
+//!
 //! This module provides wrappers to support use of v2 implementations with
-//! v1 consumers. v2 traits must be explicitly cast to the v1 version using 
+//! v1 consumers. v2 traits must be explicitly cast to the v1 version using
 //! `.into()`, and will panic on internal errors
-//! 
+//!
 //! ```
 //! extern crate embedded_hal;
 //! use embedded_hal::digital::{v1, v2, v1_compat::OldOutputPin};
-//! 
+//!
 //! struct NewOutputPinImpl {}
-//! 
+//!
 //! impl v2::OutputPin for NewOutputPinImpl {
 //!     type Error = ();
 //!     fn set_low(&mut self) -> Result<(), Self::Error> { Ok(()) }
 //!     fn set_high(&mut self) -> Result<(), Self::Error>{ Ok(()) }
 //! }
-//! 
+//!
 //! struct OldOutputPinConsumer<T: v1::OutputPin> {
 //!     _pin: T,
 //! }
-//! 
-//! impl <T>OldOutputPinConsumer<T> 
+//!
+//! impl <T>OldOutputPinConsumer<T>
 //! where T: v1::OutputPin {
 //!     pub fn new(pin: T) -> OldOutputPinConsumer<T> {
 //!         OldOutputPinConsumer{ _pin: pin }
 //!     }
 //! }
-//! 
+//!
 //! fn main() {
 //!     let pin = NewOutputPinImpl{};
 //!     let _consumer: OldOutputPinConsumer<OldOutputPin<_>> = OldOutputPinConsumer::new(pin.into());
 //! }
 //! ```
-//! 
+//!
 
 
 #[allow(deprecated)]
@@ -92,7 +92,7 @@ where
 /// where errors will panic.
 #[cfg(feature = "unproven")]
 #[allow(deprecated)]
-impl <T, E> v1::StatefulOutputPin for OldOutputPin<T> 
+impl <T, E> v1::StatefulOutputPin for OldOutputPin<T>
 where
     T: v2::StatefulOutputPin<Error=E>,
     E: core::fmt::Debug,
@@ -116,7 +116,7 @@ pub struct OldInputPin<T> {
 #[cfg(feature = "unproven")]
 impl <T, E> OldInputPin<T>
 where
-    T: v2::OutputPin<Error=E>,
+    T: v2::InputPin<Error=E>,
     E: core::fmt::Debug,
 {
     /// Create an `OldInputPin` wrapper around a `v2::InputPin`.
@@ -191,8 +191,8 @@ mod tests {
     }
 
     #[allow(deprecated)]
-    impl <T>OldOutputPinConsumer<T> 
-    where T: v1::OutputPin 
+    impl <T>OldOutputPinConsumer<T>
+    where T: v1::OutputPin
     {
         pub fn new(pin: T) -> OldOutputPinConsumer<T> {
             OldOutputPinConsumer{ _pin: pin }
@@ -213,7 +213,7 @@ mod tests {
         assert_eq!(o.inner().state, true);
 
         o.set_low();
-        assert_eq!(o.inner().state, false);   
+        assert_eq!(o.inner().state, false);
     }
 
     #[test]
@@ -252,8 +252,8 @@ mod tests {
 
     #[cfg(feature = "unproven")]
     #[allow(deprecated)]
-    impl <T>OldInputPinConsumer<T> 
-    where T: v1::InputPin 
+    impl <T>OldInputPinConsumer<T>
+    where T: v1::InputPin
     {
         pub fn new(pin: T) -> OldInputPinConsumer<T> {
             OldInputPinConsumer{ _pin: pin }
