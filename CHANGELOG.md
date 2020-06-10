@@ -12,6 +12,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+
+## [v0.2.4] - 2020-06-10
+
+### Added
+
+
+### Changed
+
+- Fix for `dyn` traits in fmt.rs
+- Remove `#![deny(warnings)]`, now imposed y CI
+- Updates stm32f30x from 0.6.0 to 0.8.0
 - Fix the input pin v2->v1 compatibility shim constructor, where `OldInputPin::new`
   was incorrectly implemented for `v1::OutputPin` values.
 
