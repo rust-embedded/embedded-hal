@@ -8,14 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-### Added
+## [v1.0.0-alpha.1] - 2020-06-16
 
-### Changed
-
-
-## [v1.0.0] - 2020-06-10
-
-*** This is a breaking change (sorry) ***
+*** This is an alpha release with breaking changes (sorry) ***
 
 ### Added
 - A nonblocking trait for interfacing with random number generation hardware.
@@ -117,8 +112,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/japaric/embedded-hal/compare/v0.2.1...HEAD
-[v0.2.1]: https://github.com/japaric/embedded-hal/compare/v0.2.0...v0.2.1
-[v0.2.0]: https://github.com/japaric/embedded-hal/compare/v0.1.2...v0.2.0
-[v0.1.2]: https://github.com/japaric/embedded-hal/compare/v0.1.1...v0.1.2
-[v0.1.1]: https://github.com/japaric/embedded-hal/compare/v0.1.0...v0.1.1
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.1...HEAD
+[v1.0.0-alpha.1]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.3...v1.0.0-alpha.1
+[v0.2.3]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.2...v0.2.3
+[v0.2.2]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.1...v0.2.2
+[v0.2.1]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.0...v0.2.1
+[v0.2.0]: https://github.com/rust-embedded/embedded-hal/compare/v0.1.2...v0.2.0
+[v0.1.2]: https://github.com/rust-embedded/embedded-hal/compare/v0.1.1...v0.1.2
+[v0.1.1]: https://github.com/rust-embedded/embedded-hal/compare/v0.1.0...v0.1.1
