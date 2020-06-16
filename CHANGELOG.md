@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- The watchdog API now uses move semantics. See [PR](https://github.com/rust-embedded/embedded-hal/pull/222).
+
 ## [v1.0.0-alpha.1] - 2020-06-16
 
 *** This is an alpha release with breaking changes (sorry) ***

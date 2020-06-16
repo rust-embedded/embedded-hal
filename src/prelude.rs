@@ -27,6 +27,6 @@ pub use crate::serial::Read as _embedded_hal_serial_Read;
 pub use crate::serial::Write as _embedded_hal_serial_Write;
 pub use crate::spi::FullDuplex as _embedded_hal_spi_FullDuplex;
 pub use crate::timer::CountDown as _embedded_hal_timer_CountDown;
-pub use crate::watchdog::Watchdog as _embedded_hal_watchdog_Watchdog;
 pub use crate::watchdog::Disable as _embedded_hal_watchdog_Disable;
 pub use crate::watchdog::Enable as _embedded_hal_watchdog_Enable;
+pub use crate::watchdog::Watchdog as _embedded_hal_watchdog_Watchdog;
