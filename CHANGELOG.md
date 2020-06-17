@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 
-## [v0.2.4] - 2020-06-10
+## [v0.2.4] - 2020-06-17
 
 ### Changed
 
@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   was incorrectly implemented for `v1::OutputPin` values.
 
 
-## [v0.2.3] - 2019-05-17
+## [v0.2.3] - 2019-05-09
 
 ### Added
 - A new version of the digital `OutputPin`, `StatefulOutputPin`, `ToggleableOutputPin`
