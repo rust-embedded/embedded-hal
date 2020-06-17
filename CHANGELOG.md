@@ -12,6 +12,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+
+## [v0.2.4] - 2020-06-17
+
+### Changed
+
+- Fix for `dyn` traits in fmt.rs
+- Remove `#![deny(warnings)]`, now imposed y CI
+- Updates stm32f30x from 0.6.0 to 0.8.0
 - Fix the input pin v2->v1 compatibility shim constructor, where `OldInputPin::new`
   was incorrectly implemented for `v1::OutputPin` values.
 
@@ -101,8 +109,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/japaric/embedded-hal/compare/v0.2.1...HEAD
-[v0.2.1]: https://github.com/japaric/embedded-hal/compare/v0.2.0...v0.2.1
-[v0.2.0]: https://github.com/japaric/embedded-hal/compare/v0.1.2...v0.2.0
-[v0.1.2]: https://github.com/japaric/embedded-hal/compare/v0.1.1...v0.1.2
-[v0.1.1]: https://github.com/japaric/embedded-hal/compare/v0.1.0...v0.1.1
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.4...HEAD
+[v0.2.4]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.3...v0.2.4
+[v0.2.3]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.2...v0.2.3
+[v0.2.2]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.1...v0.2.2
+[v0.2.1]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.0...v0.2.1
+[v0.2.0]: https://github.com/rust-embedded/embedded-hal/compare/v0.1.2...v0.2.0
+[v0.1.2]: https://github.com/rust-embedded/embedded-hal/compare/v0.1.1...v0.1.2
+[v0.1.1]: https://github.com/rust-embedded/embedded-hal/compare/v0.1.0...v0.1.1
