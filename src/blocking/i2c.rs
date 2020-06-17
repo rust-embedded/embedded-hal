@@ -232,3 +232,39 @@ pub trait WriteIterRead<A: AddressMode = SevenBitAddress> {
     where
         B: IntoIterator<Item = u8>;
 }
+
+/// Transactional I2C operation.
+///
+/// Several operations can be combined as part of a transaction.
+#[derive(Debug, PartialEq)]
+pub enum Operation<'a> {
+    /// Read data into the provided buffer
+    Read(&'a mut [u8]),
+    /// Write data from the provided buffer
+    Write(&'a [u8]),
+}
+
+/// Transactional I2C interface.
+///
+/// This allows combining operation within an I2C transaction.
+pub trait Transactional {
+    /// Error type
+    type Error;
+
+    /// Execute the provided operations on the I2C bus.
+    ///
+    /// Transaction contract:
+    /// - Before executing the first operation an ST is sent automatically. This is followed by SAD+R/W as appropriate.
+    /// - Data from adjacent operations of the same type are sent after each other without an SP or SR.
+    /// - Between adjacent operations of a different type an SR and SAD+R/W is sent.
+    /// - After executing the last operation an SP is sent automatically.
+    /// - If the last operation is a `Read` the master does not send an acknowledge for the last byte.
+    ///
+    /// - `ST` = start condition
+    /// - `SAD+R/W` = slave address followed by bit 1 to indicate reading or 0 to indicate writing
+    /// - `SR` = repeated start condition
+    /// - `SP` = stop condition
+    fn try_exec<'a, O>(&mut self, address: u8, operations: O) -> Result<(), Self::Error>
+    where
+        O: AsMut<[Operation<'a>]>;
+}
