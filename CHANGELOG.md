@@ -15,9 +15,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [v0.2.4] - 2020-06-10
 
-### Added
-
-
 ### Changed
 
 - Fix for `dyn` traits in fmt.rs
@@ -27,7 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   was incorrectly implemented for `v1::OutputPin` values.
 
 
-## [v0.2.3] - 2019-05-09
+## [v0.2.3] - 2019-05-17
 
 ### Added
 - A new version of the digital `OutputPin`, `StatefulOutputPin`, `ToggleableOutputPin`
@@ -112,8 +109,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/japaric/embedded-hal/compare/v0.2.1...HEAD
-[v0.2.1]: https://github.com/japaric/embedded-hal/compare/v0.2.0...v0.2.1
-[v0.2.0]: https://github.com/japaric/embedded-hal/compare/v0.1.2...v0.2.0
-[v0.1.2]: https://github.com/japaric/embedded-hal/compare/v0.1.1...v0.1.2
-[v0.1.1]: https://github.com/japaric/embedded-hal/compare/v0.1.0...v0.1.1
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.4...HEAD
+[v0.2.4]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.3...v0.2.4
+[v0.2.3]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.2...v0.2.3
+[v0.2.2]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.1...v0.2.2
+[v0.2.1]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.0...v0.2.1
+[v0.2.0]: https://github.com/rust-embedded/embedded-hal/compare/v0.1.2...v0.2.0
+[v0.1.2]: https://github.com/rust-embedded/embedded-hal/compare/v0.1.1...v0.1.2
+[v0.1.1]: https://github.com/rust-embedded/embedded-hal/compare/v0.1.0...v0.1.1
