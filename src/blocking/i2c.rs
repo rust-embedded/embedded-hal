@@ -270,3 +270,54 @@ pub trait Transactional {
         operations: &mut [Operation<'a>],
     ) -> Result<(), Self::Error>;
 }
+
+/// Default implementation of `blocking::i2c::Write`, `blocking::i2c::Read` and
+/// `blocking::i2c::WriteRead` traits for `blocking::i2c::Transactional` implementers.
+pub mod transactional {
+    use super::{Operation, Read, Transactional, Write, WriteRead};
+
+    /// Default implementation of `blocking::i2c::Write`, `blocking::i2c::Read` and
+    /// `blocking::i2c::WriteRead` traits for `blocking::i2c::Transactional` implementers.
+    pub trait Default<E> {}
+
+    impl<E, S> Write for S
+    where
+        S: self::Default<E> + Transactional<Error = E>,
+    {
+        type Error = E;
+
+        fn try_write(&mut self, address: u8, bytes: &[u8]) -> Result<(), Self::Error> {
+            self.try_exec(address, &mut [Operation::Write(bytes)])
+        }
+    }
+
+    impl<E, S> Read for S
+    where
+        S: self::Default<E> + Transactional<Error = E>,
+    {
+        type Error = E;
+
+        fn try_read(&mut self, address: u8, buffer: &mut [u8]) -> Result<(), Self::Error> {
+            self.try_exec(address, &mut [Operation::Read(buffer)])
+        }
+    }
+
+    impl<E, S> WriteRead for S
+    where
+        S: self::Default<E> + Transactional<Error = E>,
+    {
+        type Error = E;
+
+        fn try_write_read(
+            &mut self,
+            address: u8,
+            bytes: &[u8],
+            buffer: &mut [u8],
+        ) -> Result<(), Self::Error> {
+            self.try_exec(
+                address,
+                &mut [Operation::Write(bytes), Operation::Read(buffer)],
+            )
+        }
+    }
+}
