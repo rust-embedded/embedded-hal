@@ -264,7 +264,9 @@ pub trait Transactional {
     /// - `SAD+R/W` = slave address followed by bit 1 to indicate reading or 0 to indicate writing
     /// - `SR` = repeated start condition
     /// - `SP` = stop condition
-    fn try_exec<'a, O>(&mut self, address: u8, operations: O) -> Result<(), Self::Error>
-    where
-        O: AsMut<[Operation<'a>]>;
+    fn try_exec<'a>(
+        &mut self,
+        address: u8,
+        operations: &mut [Operation<'a>],
+    ) -> Result<(), Self::Error>;
 }
