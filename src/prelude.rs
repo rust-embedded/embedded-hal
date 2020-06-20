@@ -8,8 +8,9 @@ pub use crate::adc::OneShot as _embedded_hal_adc_OneShot;
 pub use crate::blocking::delay::DelayMs as _embedded_hal_blocking_delay_DelayMs;
 pub use crate::blocking::delay::DelayUs as _embedded_hal_blocking_delay_DelayUs;
 pub use crate::blocking::i2c::{
-    Read as _embedded_hal_blocking_i2c_Read, Write as _embedded_hal_blocking_i2c_Write,
-    WriteIter as _embedded_hal_blocking_i2c_WriteIter,
+    Read as _embedded_hal_blocking_i2c_Read,
+    Transactional as _embedded_hal_blocking_i2c_Transactional,
+    Write as _embedded_hal_blocking_i2c_Write, WriteIter as _embedded_hal_blocking_i2c_WriteIter,
     WriteIterRead as _embedded_hal_blocking_i2c_WriteIterRead,
     WriteRead as _embedded_hal_blocking_i2c_WriteRead,
 };
