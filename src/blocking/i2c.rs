@@ -246,7 +246,7 @@ pub enum Operation<'a> {
 
 /// Transactional I2C interface.
 ///
-/// This allows combining operation within an I2C transaction.
+/// This allows combining operations within an I2C transaction.
 pub trait Transactional {
     /// Error type
     type Error;
