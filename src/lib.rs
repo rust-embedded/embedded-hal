@@ -2,10 +2,7 @@
 //!
 //! **NOTE** This HAL is still is active development. Expect the traits presented here to be
 //! tweaked, split or be replaced wholesale before being stabilized, i.e. before hitting the 1.0.0
-//! release. That being said there's a part of the HAL that's currently considered unproven and is
-//! hidden behind an "unproven" Cargo feature. This API is even more volatile and it's exempt from
-//! semver rules: it can change in a non-backward compatible fashion or even disappear in between
-//! patch releases.
+//! release.
 //!
 //! # Design goals
 //!
@@ -75,10 +72,10 @@
 //!     type Error;
 //!
 //!     /// Reads a single byte
-//!     fn read(&mut self) -> nb::Result<u8, Self::Error>;
+//!     fn try_read(&mut self) -> nb::Result<u8, Self::Error>;
 //!
 //!     /// Writes a single byte
-//!     fn write(&mut self, byte: u8) -> nb::Result<(), Self::Error>;
+//!     fn try_write(&mut self, byte: u8) -> nb::Result<(), Self::Error>;
 //! }
 //! ```
 //!
@@ -103,7 +100,7 @@
 //!     // ..
 //!
 //!     /// "waits" until the count down is over
-//!     fn wait(&mut self) -> nb::Result<(), Infallible>;
+//!     fn try_wait(&mut self) -> nb::Result<(), Infallible>;
 //! }
 //!
 //! # fn main() {}
@@ -150,7 +147,7 @@
 //! impl hal::serial::Read<u8> for Serial<USART1> {
 //!     type Error = Error;
 //!
-//!     fn read(&mut self) -> nb::Result<u8, Error> {
+//!     fn try_read(&mut self) -> nb::Result<u8, Error> {
 //!         // read the status register
 //!         let isr = self.usart.isr.read();
 //!
@@ -172,13 +169,13 @@
 //! impl hal::serial::Write<u8> for Serial<USART1> {
 //!     type Error = Error;
 //!
-//!     fn write(&mut self, byte: u8) -> nb::Result<(), Error> {
-//!         // Similar to the `read` implementation
+//!     fn try_write(&mut self, byte: u8) -> nb::Result<(), Error> {
+//!         // Similar to the `try_read` implementation
 //!         # Ok(())
 //!     }
 //!
-//!     fn flush(&mut self) -> nb::Result<(), Error> {
-//!         // Similar to the `read` implementation
+//!     fn try_flush(&mut self) -> nb::Result<(), Error> {
+//!         // Similar to the `try_read` implementation
 //!         # Ok(())
 //!     }
 //! }
@@ -216,17 +213,17 @@
 //! };
 //!
 //! for byte in b"Hello, world!" {
-//!     // NOTE `block!` blocks until `serial.write()` completes and returns
+//!     // NOTE `block!` blocks until `serial.try_write()` completes and returns
 //!     // `Result<(), Error>`
-//!     block!(serial.write(*byte)).unwrap();
+//!     block!(serial.try_write(*byte)).unwrap();
 //! }
 //! # }
 //!
 //! # mod stm32f30x_hal {
-//! #     use std::convert::Infallible;
+//! #     use core::convert::Infallible;
 //! #     pub struct Serial1;
 //! #     impl Serial1 {
-//! #         pub fn write(&mut self, _: u8) -> ::nb::Result<(), Infallible> {
+//! #         pub fn try_write(&mut self, _: u8) -> ::nb::Result<(), Infallible> {
 //! #             Ok(())
 //! #         }
 //! #     }
@@ -240,7 +237,7 @@
 //! must provide the `libstd` in order to be able to use `futures`, which is not
 //! the case for many embedded targets.
 //!
-//! ```not_run
+//! ```no_run
 //! extern crate embedded_hal as hal;
 //! extern crate futures;
 //!
@@ -255,18 +252,18 @@
 //! };
 //! use futures::future::Loop;
 //! use stm32f30x_hal::{Led, Serial1, Timer6};
-//! use std::convert::Infallible;
+//! use core::convert::Infallible;
 //!
-//! /// `futures` version of `CountDown.wait`
+//! /// `futures` version of `CountDown.try_wait`
 //! ///
 //! /// This returns a future that must be polled to completion
-//! fn wait<T>(mut timer: T) -> impl Future<Item = T, Error = Infallible>
+//! fn wait<T>(mut timer: T) -> impl Future<Item = T, Error = T::Error>
 //! where
 //!     T: hal::timer::CountDown,
 //! {
 //!     let mut timer = Some(timer);
 //!     future::poll_fn(move || {
-//!         try_nb!(timer.as_mut().unwrap().wait());
+//!         try_nb!(timer.as_mut().unwrap().try_wait());
 //!
 //!         Ok(Async::Ready(timer.take().unwrap()))
 //!     })
@@ -281,7 +278,7 @@
 //! {
 //!     let mut serial = Some(serial);
 //!     future::poll_fn(move || {
-//!         let byte = try_nb!(serial.as_mut().unwrap().read());
+//!         let byte = try_nb!(serial.as_mut().unwrap().try_read());
 //!
 //!         Ok(Async::Ready((serial.take().unwrap(), byte)))
 //!     })
@@ -296,7 +293,7 @@
 //! {
 //!     let mut serial = Some(serial);
 //!     future::poll_fn(move || {
-//!         try_nb!(serial.as_mut().unwrap().write(byte));
+//!         try_nb!(serial.as_mut().unwrap().try_write(byte));
 //!
 //!         Ok(Async::Ready(serial.take().unwrap()))
 //!     })
@@ -349,24 +346,25 @@
 //! }
 //!
 //! # mod stm32f30x_hal {
-//! #     use std::convert::Infallible;
+//! #     use core::convert::Infallible;
 //! #     pub struct Timer6;
 //! #     impl ::hal::timer::CountDown for Timer6 {
+//! #         type Error = Infallible;
 //! #         type Time = ();
 //! #
-//! #         fn start<T>(&mut self, _: T) where T: Into<()> {}
-//! #         fn wait(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #         fn try_start<T>(&mut self, _: T) -> Result<(), Infallible> where T: Into<()> { Ok(()) }
+//! #         fn try_wait(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #     }
 //! #
 //! #     pub struct Serial1;
 //! #     impl ::hal::serial::Read<u8> for Serial1 {
 //! #         type Error = Infallible;
-//! #         fn read(&mut self) -> ::nb::Result<u8, Infallible> { Err(::nb::Error::WouldBlock) }
+//! #         fn try_read(&mut self) -> ::nb::Result<u8, Infallible> { Err(::nb::Error::WouldBlock) }
 //! #     }
 //! #     impl ::hal::serial::Write<u8> for Serial1 {
 //! #         type Error = Infallible;
-//! #         fn flush(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
-//! #         fn write(&mut self, _: u8) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #         fn try_flush(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #         fn try_write(&mut self, _: u8) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #     }
 //! #
 //! #     pub struct Led;
@@ -383,7 +381,7 @@
 //! (same remark concerning the availability of `libstd` on the
 //! target).
 //!
-//! ```not_run
+//! ```no_run
 //! #![feature(generator_trait)]
 //! #![feature(generators)]
 //!
@@ -392,8 +390,8 @@
 //! #[macro_use(r#await)]
 //! extern crate nb;
 //!
-//! use std::ops::Generator;
-//! use std::pin::Pin;
+//! use core::ops::Generator;
+//! use core::pin::Pin;
 //!
 //! use hal::prelude::*;
 //! use stm32f30x_hal::{Led, Serial1, Timer6};
@@ -419,7 +417,7 @@
 //!         loop {
 //!             // `await!` means "suspend / yield here" instead of "block until
 //!             // completion"
-//!             nb::r#await!(timer.wait()).unwrap(); // NOTE(unwrap) E = Infallible
+//!             nb::r#await!(timer.try_wait()).unwrap(); // NOTE(unwrap) E = Infallible
 //!
 //!             state = !state;
 //!
@@ -433,29 +431,29 @@
 //!
 //!     let mut loopback = (move || {
 //!         loop {
-//!             let byte = nb::r#await!(serial.read()).unwrap();
-//!             nb::r#await!(serial.write(byte)).unwrap();
+//!             let byte = nb::r#await!(serial.try_read()).unwrap();
+//!             nb::r#await!(serial.try_write(byte)).unwrap();
 //!         }
 //!     });
 //!
 //!     // Event loop
 //!     loop {
-//!         Pin::new(&mut blinky).resume();
-//!         Pin::new(&mut loopback).resume();
+//!         Pin::new(&mut blinky).resume(());
+//!         Pin::new(&mut loopback).resume(());
 //!         # break;
 //!     }
 //! }
 //!
 //! # mod stm32f30x_hal {
-//! #   use std::convert::Infallible;
+//! #   use core::convert::Infallible;
 //! #   pub struct Serial1;
 //! #   impl Serial1 {
-//! #       pub fn read(&mut self) -> ::nb::Result<u8, Infallible> { Err(::nb::Error::WouldBlock) }
-//! #       pub fn write(&mut self, _: u8) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #       pub fn try_read(&mut self) -> ::nb::Result<u8, Infallible> { Err(::nb::Error::WouldBlock) }
+//! #       pub fn try_write(&mut self, _: u8) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #   }
 //! #   pub struct Timer6;
 //! #   impl Timer6 {
-//! #       pub fn wait(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #       pub fn try_wait(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #   }
 //! #   pub struct Led;
 //! #   impl Led {
@@ -492,7 +490,7 @@
 //!     S: hal::serial::Write<u8>
 //! {
 //!     for &byte in buffer {
-//!         block!(serial.write(byte))?;
+//!         block!(serial.try_write(byte))?;
 //!     }
 //!
 //!     Ok(())
@@ -509,25 +507,26 @@
 //!
 //! use hal::prelude::*;
 //!
-//! enum Error<E> {
+//! enum Error<SE, TE> {
 //!     /// Serial interface error
-//!     Serial(E),
-//!     TimedOut,
+//!     Serial(SE),
+//!     /// Timeout error
+//!     TimedOut(TE),
 //! }
 //!
 //! fn read_with_timeout<S, T>(
 //!     serial: &mut S,
 //!     timer: &mut T,
 //!     timeout: T::Time,
-//! ) -> Result<u8, Error<S::Error>>
+//! ) -> Result<u8, Error<S::Error, T::Error>>
 //! where
-//!     T: hal::timer::CountDown,
+//!     T: hal::timer::CountDown<Error = ()>,
 //!     S: hal::serial::Read<u8>,
 //! {
-//!     timer.start(timeout);
+//!     timer.try_start(timeout).map_err(Error::TimedOut)?;
 //!
 //!     loop {
-//!         match serial.read() {
+//!         match serial.try_read() {
 //!             // raise error
 //!             Err(nb::Error::Other(e)) => return Err(Error::Serial(e)),
 //!             Err(nb::Error::WouldBlock) => {
@@ -536,16 +535,16 @@
 //!             Ok(byte) => return Ok(byte),
 //!         }
 //!
-//!         match timer.wait() {
+//!         match timer.try_wait() {
 //!             Err(nb::Error::Other(e)) => {
-//!                 // The error type specified by `timer.wait()` is `!`, which
+//!                 // The error type specified by `timer.try_wait()` is `!`, which
 //!                 // means no error can actually occur. The Rust compiler
 //!                 // still forces us to provide this match arm, though.
 //!                 unreachable!()
 //!             },
 //!             // no timeout yet, try again
 //!             Err(nb::Error::WouldBlock) => continue,
-//!             Ok(()) => return Err(Error::TimedOut),
+//!             Ok(()) => return Err(Error::TimedOut(())),
 //!         }
 //!     }
 //! }
@@ -555,7 +554,7 @@
 //!
 //! - Asynchronous SPI transfer
 //!
-//! ```not_run
+//! ```no_run
 //! #![feature(conservative_impl_trait)]
 //! #![feature(generators)]
 //! #![feature(generator_trait)]
@@ -564,7 +563,7 @@
 //! #[macro_use(r#await)]
 //! extern crate nb;
 //!
-//! use std::ops::Generator;
+//! use core::ops::Generator;
 //!
 //! /// Transfers a byte buffer of size N
 //! ///
@@ -580,8 +579,8 @@
 //!     move || {
 //!         let n = buffer.len();
 //!         for i in 0..n {
-//!             nb::r#await!(spi.send(buffer[i]))?;
-//!             buffer[i] = nb::r#await!(spi.read())?;
+//!             nb::r#await!(spi.try_send(buffer[i]))?;
+//!             buffer[i] = nb::r#await!(spi.try_read())?;
 //!         }
 //!
 //!         Ok((spi, buffer))
@@ -607,7 +606,7 @@
 //! {
 //!     loop {
 //!         if let Some(byte) = cb.peek() {
-//!             match serial.write(*byte) {
+//!             match serial.try_write(*byte) {
 //!                 Err(nb::Error::Other(_)) => unreachable!(),
 //!                 Err(nb::Error::WouldBlock) => return,
 //!                 Ok(()) => {}, // keep flushing data
@@ -659,18 +658,18 @@
 //! #     fn lock(&self) -> RefMut<T> { unimplemented!() }
 //! # }
 //! # struct RefMut<'a, T>(&'a mut T) where T: 'a;
-//! # impl<'a, T> ::std::ops::Deref for RefMut<'a, T> {
+//! # impl<'a, T> ::core::ops::Deref for RefMut<'a, T> {
 //! #     type Target = T;
 //! #     fn deref(&self) -> &T { self.0 }
 //! # }
-//! # impl<'a, T> ::std::ops::DerefMut for RefMut<'a, T> {
+//! # impl<'a, T> ::core::ops::DerefMut for RefMut<'a, T> {
 //! #     fn deref_mut(&mut self) -> &mut T { self.0 }
 //! # }
 //! # struct Serial1;
 //! # impl ::hal::serial::Write<u8> for Serial1 {
 //! #   type Error = Infallible;
-//! #   fn write(&mut self, _: u8) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
-//! #   fn flush(&mut self) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #   fn try_write(&mut self, _: u8) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #   fn try_flush(&mut self) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! # }
 //! # struct CircularBuffer;
 //! # impl CircularBuffer {
@@ -690,311 +689,14 @@ extern crate nb;
 
 pub mod adc;
 pub mod blocking;
+pub mod capture;
 pub mod digital;
 pub mod fmt;
 pub mod prelude;
+pub mod pwm;
+pub mod qei;
 pub mod rng;
 pub mod serial;
 pub mod spi;
 pub mod timer;
 pub mod watchdog;
-
-/// Input capture
-///
-/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
-///
-/// # Examples
-///
-/// You can use this interface to measure the period of (quasi) periodic signals
-/// / events
-///
-/// ```
-/// extern crate embedded_hal as hal;
-/// #[macro_use(block)]
-/// extern crate nb;
-///
-/// use hal::prelude::*;
-///
-/// fn main() {
-///     let mut capture: Capture1 = {
-///         // ..
-/// #       Capture1
-///     };
-///
-///     capture.set_resolution(1.ms());
-///
-///     let before = block!(capture.capture(Channel::_1)).unwrap();
-///     let after = block!(capture.capture(Channel::_1)).unwrap();
-///
-///     let period = after.wrapping_sub(before);
-///
-///     println!("Period: {} ms", period);
-/// }
-///
-/// # use std::convert::Infallible;
-/// # struct MilliSeconds(u32);
-/// # trait U32Ext { fn ms(self) -> MilliSeconds; }
-/// # impl U32Ext for u32 { fn ms(self) -> MilliSeconds { MilliSeconds(self) } }
-/// # struct Capture1;
-/// # enum Channel { _1 }
-/// # impl hal::Capture for Capture1 {
-/// #     type Capture = u16;
-/// #     type Channel = Channel;
-/// #     type Error = Infallible;
-/// #     type Time = MilliSeconds;
-/// #     fn capture(&mut self, _: Channel) -> ::nb::Result<u16, Infallible> { Ok(0) }
-/// #     fn disable(&mut self, _: Channel) { unimplemented!() }
-/// #     fn enable(&mut self, _: Channel) { unimplemented!() }
-/// #     fn get_resolution(&self) -> MilliSeconds { unimplemented!() }
-/// #     fn set_resolution<T>(&mut self, _: T) where T: Into<MilliSeconds> {}
-/// # }
-/// ```
-#[cfg(feature = "unproven")]
-// reason: pre-singletons API. With singletons a `CapturePin` (cf. `PwmPin`) trait seems more
-// appropriate
-pub trait Capture {
-    /// Enumeration of `Capture` errors
-    ///
-    /// Possible errors:
-    ///
-    /// - *overcapture*, the previous capture value was overwritten because it
-    ///   was not read in a timely manner
-    type Error;
-
-    /// Enumeration of channels that can be used with this `Capture` interface
-    ///
-    /// If your `Capture` interface has no channels you can use the type `()`
-    /// here
-    type Channel;
-
-    /// A time unit that can be converted into a human time unit (e.g. seconds)
-    type Time;
-
-    /// The type of the value returned by `capture`
-    type Capture;
-
-    /// "Waits" for a transition in the capture `channel` and returns the value
-    /// of counter at that instant
-    ///
-    /// NOTE that you must multiply the returned value by the *resolution* of
-    /// this `Capture` interface to get a human time unit (e.g. seconds)
-    fn capture(&mut self, channel: Self::Channel) -> nb::Result<Self::Capture, Self::Error>;
-
-    /// Disables a capture `channel`
-    fn disable(&mut self, channel: Self::Channel);
-
-    /// Enables a capture `channel`
-    fn enable(&mut self, channel: Self::Channel);
-
-    /// Returns the current resolution
-    fn get_resolution(&self) -> Self::Time;
-
-    /// Sets the resolution of the capture timer
-    fn set_resolution<R>(&mut self, resolution: R)
-    where
-        R: Into<Self::Time>;
-}
-
-/// Pulse Width Modulation
-///
-/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
-///
-/// # Examples
-///
-/// Use this interface to control the power output of some actuator
-///
-/// ```
-/// extern crate embedded_hal as hal;
-///
-/// use hal::prelude::*;
-///
-/// fn main() {
-///     let mut pwm: Pwm1 = {
-///         // ..
-/// #       Pwm1
-///     };
-///
-///     pwm.set_period(1.khz());
-///
-///     let max_duty = pwm.get_max_duty();
-///
-///     // brightest LED
-///     pwm.set_duty(Channel::_1, max_duty);
-///
-///     // dimmer LED
-///     pwm.set_duty(Channel::_2, max_duty / 4);
-/// }
-///
-/// # struct KiloHertz(u32);
-/// # trait U32Ext { fn khz(self) -> KiloHertz; }
-/// # impl U32Ext for u32 { fn khz(self) -> KiloHertz { KiloHertz(self) } }
-/// # enum Channel { _1, _2 }
-/// # struct Pwm1;
-/// # impl hal::Pwm for Pwm1 {
-/// #     type Channel = Channel;
-/// #     type Time = KiloHertz;
-/// #     type Duty = u16;
-/// #     fn disable(&mut self) { unimplemented!() }
-/// #     fn enable(&mut self) { unimplemented!() }
-/// #     fn channel_disable(&mut self, _: Channel) { unimplemented!() }
-/// #     fn channel_enable(&mut self, _: Channel) { unimplemented!() }
-/// #     fn get_duty(&self, _: Channel) -> u16 { unimplemented!() }
-/// #     fn get_max_duty(&self) -> u16 { 0 }
-/// #     fn set_duty(&mut self, _: Channel, _: u16) {}
-/// #     fn get_period(&self) -> KiloHertz { unimplemented!() }
-/// #     fn set_period<T>(&mut self, _: T) where T: Into<KiloHertz> {}
-/// # }
-/// ```
-#[cfg(feature = "unproven")]
-// reason: pre-singletons API. The `PwmPin` trait seems more useful because it models independent
-// PWM channels. Here a certain number of channels are multiplexed in a single implementer.
-pub trait Pwm {
-    /// Enumeration of channels that can be used with this `Pwm` interface
-    ///
-    /// If your `Pwm` interface has no channels you can use the type `()`
-    /// here
-    type Channel;
-
-    /// A time unit that can be converted into a human time unit (e.g. seconds)
-    type Time;
-
-    /// Type for the `duty` methods
-    ///
-    /// The implementer is free to choose a float / percentage representation
-    /// (e.g. `0.0 .. 1.0`) or an integer representation (e.g. `0 .. 65535`)
-    type Duty;
-
-    /// Disables a PWM timer (all channels)
-    fn disable(&mut self);
-
-    /// Enables a PWM timer (all channels)
-    fn enable(&mut self);
-
-    /// Disables a PWM `channel`
-    fn channel_disable(&mut self, channel: Self::Channel);
-
-    /// Enables a PWM `channel`
-    fn channel_enable(&mut self, channel: Self::Channel);
-
-    /// Returns the current PWM period
-    fn get_period(&self) -> Self::Time;
-
-    /// Returns the current duty cycle
-    fn get_duty(&self, channel: Self::Channel) -> Self::Duty;
-
-    /// Returns the maximum duty cycle value
-    fn get_max_duty(&self) -> Self::Duty;
-
-    /// Sets a new duty cycle
-    fn set_duty(&mut self, channel: Self::Channel, duty: Self::Duty);
-
-    /// Sets a new PWM period
-    fn set_period<P>(&mut self, period: P)
-    where
-        P: Into<Self::Time>;
-}
-
-/// A single PWM channel / pin
-///
-/// See `Pwm` for details
-pub trait PwmPin {
-    /// Type for the `duty` methods
-    ///
-    /// The implementer is free to choose a float / percentage representation
-    /// (e.g. `0.0 .. 1.0`) or an integer representation (e.g. `0 .. 65535`)
-    type Duty;
-
-    /// Disables a PWM `channel`
-    fn disable(&mut self);
-
-    /// Enables a PWM `channel`
-    fn enable(&mut self);
-
-    /// Returns the current duty cycle
-    fn get_duty(&self) -> Self::Duty;
-
-    /// Returns the maximum duty cycle value
-    fn get_max_duty(&self) -> Self::Duty;
-
-    /// Sets a new duty cycle
-    fn set_duty(&mut self, duty: Self::Duty);
-}
-
-/// Quadrature encoder interface
-///
-/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
-///
-/// # Examples
-///
-/// You can use this interface to measure the speed of a motor
-///
-/// ```
-/// extern crate embedded_hal as hal;
-/// #[macro_use(block)]
-/// extern crate nb;
-///
-/// use hal::prelude::*;
-///
-/// fn main() {
-///     let mut qei: Qei1 = {
-///         // ..
-/// #       Qei1
-///     };
-///     let mut timer: Timer6 = {
-///         // ..
-/// #       Timer6
-///     };
-///
-///
-///     let before = qei.count();
-///     timer.start(1.s());
-///     block!(timer.wait());
-///     let after = qei.count();
-///
-///     let speed = after.wrapping_sub(before);
-///     println!("Speed: {} pulses per second", speed);
-/// }
-///
-/// # use std::convert::Infallible;
-/// # struct Seconds(u32);
-/// # trait U32Ext { fn s(self) -> Seconds; }
-/// # impl U32Ext for u32 { fn s(self) -> Seconds { Seconds(self) } }
-/// # struct Qei1;
-/// # impl hal::Qei for Qei1 {
-/// #     type Count = u16;
-/// #     fn count(&self) -> u16 { 0 }
-/// #     fn direction(&self) -> ::hal::Direction { unimplemented!() }
-/// # }
-/// # struct Timer6;
-/// # impl hal::timer::CountDown for Timer6 {
-/// #     type Time = Seconds;
-/// #     fn start<T>(&mut self, _: T) where T: Into<Seconds> {}
-/// #     fn wait(&mut self) -> ::nb::Result<(), Infallible> { Ok(()) }
-/// # }
-/// ```
-#[cfg(feature = "unproven")]
-// reason: needs to be re-evaluated in the new singletons world. At the very least this needs a
-// reference implementation
-pub trait Qei {
-    /// The type of the value returned by `count`
-    type Count;
-
-    /// Returns the current pulse count of the encoder
-    fn count(&self) -> Self::Count;
-
-    /// Returns the count direction
-    fn direction(&self) -> Direction;
-}
-
-/// Count direction
-///
-/// *This enumeration is available if embedded-hal is built with the `"unproven"` feature.*
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-#[cfg(feature = "unproven")]
-// reason: part of the unproven `Qei` interface
-pub enum Direction {
-    /// 3, 2, 1
-    Downcounting,
-    /// 1, 2, 3
-    Upcounting,
-}

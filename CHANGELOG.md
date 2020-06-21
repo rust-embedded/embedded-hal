@@ -5,14 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
 ## [Unreleased]
+
+## [v1.0.0-alpha.1] - 2020-06-16
+
+*** This is an alpha release with breaking changes (sorry) ***
 
 ### Added
 - A nonblocking trait for interfacing with random number generation hardware.
 
 ### Changed
-- The current versions of `InputPin` have been proven. These are `digital::v1::InputPin` 
-  and `digital::v2::InputPin`.
+- All traits have been marked as proven (`unproven` feature has been removed).
+- All trait methods have been made fallible.
+- All trait methods have been renamed `try_*` (i.e. `try_send`) for consistency.
+- The `Capture`, `Pwm`, `PwmPin` and `Qei` traits have been moved into their own
+  `capture`, `pwm` and `qei` modules for consistency.
+- Void has been replaced with `core::convert::Infallible` which should be used
+  in trait implementations where methods cannot fail.
+- A new [process](https://github.com/rust-embedded/embedded-hal#how-to-add-a-new-trait)
+  has been adopted for the addition of traits to the embedded-hal. 
+- The minimum supported Rust version is 1.35 due to [this issue](https://github.com/rust-lang/rust/issues/54973).
 
 ## [v0.2.3] - 2019-05-09
 
@@ -99,8 +112,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/japaric/embedded-hal/compare/v0.2.1...HEAD
-[v0.2.1]: https://github.com/japaric/embedded-hal/compare/v0.2.0...v0.2.1
-[v0.2.0]: https://github.com/japaric/embedded-hal/compare/v0.1.2...v0.2.0
-[v0.1.2]: https://github.com/japaric/embedded-hal/compare/v0.1.1...v0.1.2
-[v0.1.1]: https://github.com/japaric/embedded-hal/compare/v0.1.0...v0.1.1
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.1...HEAD
+[v1.0.0-alpha.1]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.3...v1.0.0-alpha.1
+[v0.2.3]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.2...v0.2.3
+[v0.2.2]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.1...v0.2.2
+[v0.2.1]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.0...v0.2.1
+[v0.2.0]: https://github.com/rust-embedded/embedded-hal/compare/v0.1.2...v0.2.0
+[v0.1.2]: https://github.com/rust-embedded/embedded-hal/compare/v0.1.1...v0.1.2
+[v0.1.1]: https://github.com/rust-embedded/embedded-hal/compare/v0.1.0...v0.1.1

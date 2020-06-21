@@ -1,6 +1,5 @@
 //! Analog-digital conversion traits
 
-#[cfg(feature = "unproven")]
 use nb;
 
 /// A marker trait to identify MCU pins that can be used as inputs to an ADC channel.
@@ -10,7 +9,7 @@ use nb;
 /// between the physical interface and the ADC sampling buffer.
 ///
 /// ```
-/// # use std::marker::PhantomData;
+/// # use core::marker::PhantomData;
 /// # use embedded_hal::adc::Channel;
 ///
 /// struct Adc1; // Example ADC with single bank of 8 channels
@@ -21,7 +20,7 @@ use nb;
 /// impl Channel<Adc1> for Gpio1Pin1<Analog> {
 ///     type ID = u8; // ADC channels are identified numerically
 ///
-///     fn channel() -> u8 { 7_u8 } // GPIO pin 1 is connected to ADC channel 7
+///     const CHANNEL: u8 = 7_u8; // GPIO pin 1 is connected to ADC channel 7
 /// }
 ///
 /// struct Adc2; // ADC with two banks of 16 channels
@@ -32,26 +31,20 @@ use nb;
 /// impl Channel<Adc2> for Gpio2PinA<AltFun> {
 ///     type ID = (u8, u8); // ADC channels are identified by bank number and channel number
 ///
-///     fn channel() -> (u8, u8) { (0, 3) } // bank 0 channel 3
+///     const CHANNEL: (u8, u8) = (0, 3); // bank 0 channel 3
 /// }
 /// ```
-#[cfg(feature = "unproven")]
 pub trait Channel<ADC> {
     /// Channel ID type
     ///
     /// A type used to identify this ADC channel. For example, if the ADC has eight channels, this
     /// might be a `u8`. If the ADC has multiple banks of channels, it could be a tuple, like
     /// `(u8: bank_id, u8: channel_id)`.
-    type ID;
+    type ID: Copy;
 
     /// Get the specific ID that identifies this channel, for example `0_u8` for the first ADC
     /// channel, if Self::ID is u8.
-    fn channel() -> Self::ID;
-
-    // `channel` is a function due to [this reported
-    // issue](https://github.com/rust-lang/rust/issues/54973). Something about blanket impls
-    // combined with `type ID; const CHANNEL: Self::ID;` causes problems.
-    //const CHANNEL: Self::ID;
+    const CHANNEL: Self::ID;
 }
 
 /// ADCs that sample on single channels per request, and do so at the time of the request.
@@ -76,8 +69,8 @@ pub trait Channel<ADC> {
 /// {
 ///    type Error = ();
 ///
-///    fn read(&mut self, _pin: &mut PIN) -> nb::Result<WORD, Self::Error> {
-///        let chan = 1 << PIN::channel();
+///    fn try_read(&mut self, _pin: &mut PIN) -> nb::Result<WORD, Self::Error> {
+///        let chan = 1 << PIN::CHANNEL;
 ///        self.power_up();
 ///        let result = self.do_conversion(chan);
 ///        self.power_down();
@@ -85,7 +78,6 @@ pub trait Channel<ADC> {
 ///    }
 /// }
 /// ```
-#[cfg(feature = "unproven")]
 pub trait OneShot<ADC, Word, Pin: Channel<ADC>> {
     /// Error type returned by ADC methods
     type Error;
@@ -94,5 +86,5 @@ pub trait OneShot<ADC, Word, Pin: Channel<ADC>> {
     ///
     /// This method takes a `Pin` reference, as it is expected that the ADC will be able to sample
     /// whatever channel underlies the pin.
-    fn read(&mut self, pin: &mut Pin) -> nb::Result<Word, Self::Error>;
+    fn try_read(&mut self, pin: &mut Pin) -> nb::Result<Word, Self::Error>;
 }
