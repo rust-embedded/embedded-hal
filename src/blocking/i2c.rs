@@ -36,7 +36,7 @@ pub trait Write {
     /// Error type
     type Error;
 
-    /// Sends bytes to slave with address `addr`
+    /// Sends bytes to slave with address `address`
     ///
     /// # I2C Events (contract)
     ///
@@ -52,7 +52,7 @@ pub trait Write {
     /// - `SAK` = slave acknowledge
     /// - `Bi` = ith byte of data
     /// - `SP` = stop condition
-    fn try_write(&mut self, addr: u8, bytes: &[u8]) -> Result<(), Self::Error>;
+    fn try_write(&mut self, address: u8, bytes: &[u8]) -> Result<(), Self::Error>;
 }
 
 /// Blocking write (iterator version)
@@ -60,12 +60,12 @@ pub trait WriteIter {
     /// Error type
     type Error;
 
-    /// Sends bytes to slave with address `addr`
+    /// Sends bytes to slave with address `address`
     ///
     /// # I2C Events (contract)
     ///
     /// Same as `Write`
-    fn try_write<B>(&mut self, addr: u8, bytes: B) -> Result<(), Self::Error>
+    fn try_write<B>(&mut self, address: u8, bytes: B) -> Result<(), Self::Error>
     where
         B: IntoIterator<Item = u8>;
 }
@@ -75,7 +75,7 @@ pub trait WriteRead {
     /// Error type
     type Error;
 
-    /// Sends bytes to slave with address `addr` and then reads enough bytes to fill `buffer` *in a
+    /// Sends bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
     /// single transaction*
     ///
     /// # I2C Events (contract)
@@ -110,7 +110,7 @@ pub trait WriteIterRead {
     /// Error type
     type Error;
 
-    /// Sends bytes to slave with address `addr` and then reads enough bytes to fill `buffer` *in a
+    /// Sends bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
     /// single transaction*
     ///
     /// # I2C Events (contract)
