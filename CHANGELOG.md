@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - A nonblocking trait for interfacing with random number generation hardware.
+- Methods to enable or disable all channels for a PWM object
 
 ### Changed
 - All traits have been marked as proven (`unproven` feature has been removed).
@@ -26,6 +27,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - A new [process](https://github.com/rust-embedded/embedded-hal#how-to-add-a-new-trait)
   has been adopted for the addition of traits to the embedded-hal. 
 - The minimum supported Rust version is 1.35 due to [this issue](https://github.com/rust-lang/rust/issues/54973).
+- Renamed the existing PWM try_enable/try_disable methods to try_enable_channel/try_disable_channel to make room for new try_enable/try_disable methods
 
 ## [v0.2.3] - 2019-05-09
 
