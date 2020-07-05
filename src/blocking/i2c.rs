@@ -65,7 +65,7 @@ pub trait WriteIter {
     /// # I2C Events (contract)
     ///
     /// Same as `Write`
-    fn try_write<B>(&mut self, address: u8, bytes: B) -> Result<(), Self::Error>
+    fn try_write_iter<B>(&mut self, address: u8, bytes: B) -> Result<(), Self::Error>
     where
         B: IntoIterator<Item = u8>;
 }

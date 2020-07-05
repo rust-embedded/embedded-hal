@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+- The method `try_write` from the trait `blocking::i2c::WriteIter` trait
+  has been renamed `try_write_iter` for consistency.
+
 ## [v1.0.0-alpha.1] - 2020-06-16
 
 *** This is an alpha release with breaking changes (sorry) ***
