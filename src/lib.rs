@@ -700,3 +700,11 @@ pub mod serial;
 pub mod spi;
 pub mod timer;
 pub mod watchdog;
+
+mod private {
+    use crate::blocking::i2c::{SevenBitAddress, TenBitAddress};
+    pub trait Sealed {}
+
+    impl Sealed for SevenBitAddress {}
+    impl Sealed for TenBitAddress {}
+}
