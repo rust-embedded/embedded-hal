@@ -9,9 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Changed
+
 - The method `try_write` from the trait `blocking::i2c::WriteIter` trait
   has been renamed `try_write_iter` for consistency.
 - Updated `nb` dependency to version `1`.
+- The watchdog API now uses move semantics. See [PR](https://github.com/rust-embedded/embedded-hal/pull/222).
 
 ## [v1.0.0-alpha.1] - 2020-06-16
 
