@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+- The method `try_write` from the trait `blocking::i2c::WriteIter` trait
+  has been renamed `try_write_iter` for consistency.
+- Updated `nb` dependency to version `1`.
 - The watchdog API now uses move semantics. See [PR](https://github.com/rust-embedded/embedded-hal/pull/222).
 
 ## [v1.0.0-alpha.1] - 2020-06-16
@@ -28,7 +31,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Void has been replaced with `core::convert::Infallible` which should be used
   in trait implementations where methods cannot fail.
 - A new [process](https://github.com/rust-embedded/embedded-hal#how-to-add-a-new-trait)
-  has been adopted for the addition of traits to the embedded-hal. 
+  has been adopted for the addition of traits to the embedded-hal.
 - The minimum supported Rust version is 1.35 due to [this issue](https://github.com/rust-lang/rust/issues/54973).
 
 ## [v0.2.3] - 2019-05-09
