@@ -1,12 +1,119 @@
 //! Blocking I2C API
 //!
-//! Slave addresses used by this API are 7-bit I2C addresses ranging from 0 to 127.
+//! This API supports 7-bit and 10-bit addresses. Traits feature an `AddressMode`
+//! marker type parameter. Two implementation of the `AddressMode` exist:
+//! `SevenBitAddress` and `TenBitAddress`.
 //!
-//! Operations on 10-bit slave addresses are not supported by the API yet (but applications might
-//! be able to emulate some operations).
+//! Through this marker types it is possible to implement each address mode for
+//! the traits independently in `embedded-hal` implementations and device drivers
+//! can depend only on the mode that they support.
+//!
+//! Additionally, the I2C 10-bit address mode has been developed to be fully
+//! backwards compatible with the 7-bit address mode. This allows for a
+//! software-emulated 10-bit addressing implementation if the address mode
+//! is not supported by the hardware.
+//!
+//! Since 7-bit addressing is the mode of the majority of I2C devices,
+//! `SevenBitAddress` has been set as default mode and thus can be omitted if desired.
+//!
+//! ## Examples
+//!
+//! ### `embedded-hal` implementation for an MCU
+//! Here is an example of an embedded-hal implementation of the `Write` trait
+//! for both modes:
+//! ```
+//! # use embedded_hal::blocking::i2c::{SevenBitAddress, TenBitAddress, Write};
+//! /// I2C0 hardware peripheral which supports both 7-bit and 10-bit addressing.
+//! pub struct I2c0;
+//!
+//! impl Write<SevenBitAddress> for I2c0
+//! {
+//! #   type Error = ();
+//! #
+//!     fn try_write(&mut self, addr: u8, output: &[u8]) -> Result<(), Self::Error> {
+//!         // ...
+//! #       Ok(())
+//!     }
+//! }
+//!
+//! impl Write<TenBitAddress> for I2c0
+//! {
+//! #   type Error = ();
+//! #
+//!     fn try_write(&mut self, addr: u16, output: &[u8]) -> Result<(), Self::Error> {
+//!         // ...
+//! #       Ok(())
+//!     }
+//! }
+//! ```
+//!
+//! ### Device driver compatible only with 7-bit addresses
+//!
+//! For demonstration purposes the address mode parameter has been omitted in this example.
+//!
+//! ```
+//! # use embedded_hal::blocking::i2c::WriteRead;
+//! const ADDR: u8  = 0x15;
+//! # const TEMP_REGISTER: u8 = 0x1;
+//! pub struct TemperatureSensorDriver<I2C> {
+//!     i2c: I2C,
+//! }
+//!
+//! impl<I2C, E> TemperatureSensorDriver<I2C>
+//! where
+//!     I2C: WriteRead<Error = E>,
+//! {
+//!     pub fn read_temperature(&mut self) -> Result<u8, E> {
+//!         let mut temp = [0];
+//!         self.i2c
+//!             .try_write_read(ADDR, &[TEMP_REGISTER], &mut temp)
+//!             .and(Ok(temp[0]))
+//!     }
+//! }
+//! ```
+//!
+//! ### Device driver compatible only with 10-bit addresses
+//!
+//! ```
+//! # use embedded_hal::blocking::i2c::{TenBitAddress, WriteRead};
+//! const ADDR: u16  = 0x158;
+//! # const TEMP_REGISTER: u8 = 0x1;
+//! pub struct TemperatureSensorDriver<I2C> {
+//!     i2c: I2C,
+//! }
+//!
+//! impl<I2C, E> TemperatureSensorDriver<I2C>
+//! where
+//!     I2C: WriteRead<TenBitAddress, Error = E>,
+//! {
+//!     pub fn read_temperature(&mut self) -> Result<u8, E> {
+//!         let mut temp = [0];
+//!         self.i2c
+//!             .try_write_read(ADDR, &[TEMP_REGISTER], &mut temp)
+//!             .and(Ok(temp[0]))
+//!     }
+//! }
+//! ```
+
+use crate::private;
+
+/// Address mode (7-bit / 10-bit)
+///
+/// Note: This trait is sealed and should not be implemented outside of this crate.
+pub trait AddressMode: private::Sealed {}
+
+/// 7-bit address mode type
+pub type SevenBitAddress = u8;
+
+/// 10-bit address mode type
+pub type TenBitAddress = u16;
+
+impl AddressMode for SevenBitAddress {}
+
+impl AddressMode for TenBitAddress {}
 
 /// Blocking read
-pub trait Read {
+pub trait Read<A: AddressMode = SevenBitAddress> {
     /// Error type
     type Error;
 
@@ -28,11 +135,11 @@ pub trait Read {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
-    fn try_read(&mut self, address: u8, buffer: &mut [u8]) -> Result<(), Self::Error>;
+    fn try_read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error>;
 }
 
 /// Blocking write
-pub trait Write {
+pub trait Write<A: AddressMode = SevenBitAddress> {
     /// Error type
     type Error;
 
@@ -52,11 +159,11 @@ pub trait Write {
     /// - `SAK` = slave acknowledge
     /// - `Bi` = ith byte of data
     /// - `SP` = stop condition
-    fn try_write(&mut self, address: u8, bytes: &[u8]) -> Result<(), Self::Error>;
+    fn try_write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error>;
 }
 
 /// Blocking write (iterator version)
-pub trait WriteIter {
+pub trait WriteIter<A: AddressMode = SevenBitAddress> {
     /// Error type
     type Error;
 
@@ -65,13 +172,13 @@ pub trait WriteIter {
     /// # I2C Events (contract)
     ///
     /// Same as `Write`
-    fn try_write_iter<B>(&mut self, address: u8, bytes: B) -> Result<(), Self::Error>
+    fn try_write_iter<B>(&mut self, address: A, bytes: B) -> Result<(), Self::Error>
     where
         B: IntoIterator<Item = u8>;
 }
 
 /// Blocking write + read
-pub trait WriteRead {
+pub trait WriteRead<A: AddressMode = SevenBitAddress> {
     /// Error type
     type Error;
 
@@ -99,14 +206,14 @@ pub trait WriteRead {
     /// - `SP` = stop condition
     fn try_write_read(
         &mut self,
-        address: u8,
+        address: A,
         bytes: &[u8],
         buffer: &mut [u8],
     ) -> Result<(), Self::Error>;
 }
 
 /// Blocking write (iterator version) + read
-pub trait WriteIterRead {
+pub trait WriteIterRead<A: AddressMode = SevenBitAddress> {
     /// Error type
     type Error;
 
@@ -118,7 +225,7 @@ pub trait WriteIterRead {
     /// Same as the `WriteRead` trait
     fn try_write_iter_read<B>(
         &mut self,
-        address: u8,
+        address: A,
         bytes: B,
         buffer: &mut [u8],
     ) -> Result<(), Self::Error>

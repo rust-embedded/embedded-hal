@@ -8,8 +8,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- 10-bit addressing mode for I2C traits.
+
 ### Changed
 
+- I2C addressing modes are now selected via an `AddressMode` type parameter.
+  The trait features implementations for marker types `SevenBitAddress` and
+  `TenBitAddress`. `SevenBitAddress` is the default mode so this is not a
+  breaking change.
 - The method `try_write` from the trait `blocking::i2c::WriteIter` trait
   has been renamed `try_write_iter` for consistency.
 - Updated `nb` dependency to version `1`.
