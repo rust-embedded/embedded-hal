@@ -123,3 +123,82 @@ pub trait InputPin {
     /// Is the input pin low?
     fn try_is_low(&self) -> Result<bool, Self::Error>;
 }
+
+/// Dummy GPIO pin
+///
+/// These structures are useful when using optional pins, for example
+/// when using some SPI devices.
+pub mod dummy {
+    use super::{InputPin, OutputPin};
+    use core::{convert::Infallible, marker::PhantomData};
+
+    /// Pin level marker types for usage of `DummyPin` as an `InputPin`.
+    pub mod level {
+        /// `DummyPin` will always behave as being high when checked.
+        pub struct High;
+        /// `DummyPin` will always behave as being low when checked.
+        pub struct Low;
+    }
+
+    /// Dummy (No-op, zero-cost) pin
+    ///
+    /// This will discard any value set to it and when checked always behave
+    /// according to the value provided at construction time (high/low).
+    pub struct DummyPin<L = level::Low> {
+        _l: PhantomData<L>,
+    }
+
+    impl DummyPin<level::Low> {
+        /// Create new instance
+        ///
+        /// When checked it will always behave as being low.
+        pub fn new_low() -> Self {
+            DummyPin { _l: PhantomData }
+        }
+    }
+
+    impl DummyPin<level::High> {
+        /// Create new instance
+        ///
+        /// When checked it will always behave as being high.
+        pub fn new_high() -> Self {
+            DummyPin { _l: PhantomData }
+        }
+    }
+
+    impl<L> OutputPin for DummyPin<L> {
+        type Error = Infallible;
+
+        fn try_set_high(&mut self) -> Result<(), Self::Error> {
+            Ok(())
+        }
+
+        fn try_set_low(&mut self) -> Result<(), Self::Error> {
+            Ok(())
+        }
+    }
+
+    impl InputPin for DummyPin<level::Low> {
+        type Error = Infallible;
+
+        fn try_is_high(&self) -> Result<bool, Self::Error> {
+            Ok(false)
+        }
+
+        fn try_is_low(&self) -> Result<bool, Self::Error> {
+            Ok(true)
+        }
+    }
+
+    impl InputPin for DummyPin<level::High> {
+        type Error = Infallible;
+
+        fn try_is_high(&self) -> Result<bool, Self::Error> {
+            Ok(true)
+        }
+
+        fn try_is_low(&self) -> Result<bool, Self::Error> {
+            Ok(false)
+        }
+    }
+}
