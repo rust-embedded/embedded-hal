@@ -1,5 +1,45 @@
 //! Digital I/O
 
+use core::{convert::From, ops::Not};
+
+/// Digital output pin state
+///
+/// Conversion from `bool` and logical negation are also implemented
+/// for this type.
+/// ```rust
+/// # use embedded_hal::digital::PinState;
+/// let state = PinState::from(false);
+/// assert_eq!(state, PinState::Low);
+/// assert_eq!(!state, PinState::High);
+/// ```
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum PinState {
+    /// Low pin state
+    Low,
+    /// High pin state
+    High,
+}
+
+impl From<bool> for PinState {
+    fn from(value: bool) -> Self {
+        match value {
+            false => PinState::Low,
+            true => PinState::High,
+        }
+    }
+}
+
+impl Not for PinState {
+    type Output = PinState;
+
+    fn not(self) -> Self::Output {
+        match self {
+            PinState::High => PinState::Low,
+            PinState::Low => PinState::High,
+        }
+    }
+}
+
 /// Single digital push-pull output pin
 pub trait OutputPin {
     /// Error type
@@ -16,6 +56,17 @@ pub trait OutputPin {
     /// *NOTE* the actual electrical state of the pin may not actually be high, e.g. due to external
     /// electrical sources
     fn try_set_high(&mut self) -> Result<(), Self::Error>;
+
+    /// Drives the pin high or low depending on the provided value
+    ///
+    /// *NOTE* the actual electrical state of the pin may not actually be high or low, e.g. due to external
+    /// electrical sources
+    fn try_set_state(&mut self, state: PinState) -> Result<(), Self::Error> {
+        match state {
+            PinState::Low => self.try_set_low(),
+            PinState::High => self.try_set_high(),
+        }
+    }
 }
 
 /// Push-pull output pin that can read its output state
