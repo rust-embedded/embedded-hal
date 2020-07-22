@@ -79,6 +79,9 @@ pub trait Pwm {
     fn try_get_period(&self) -> Result<Self::Time, Self::Error>;
 
     /// Returns the current duty cycle
+    ///
+    /// While the pin is transitioning to the new duty cycle after a `try_set_duty` call, this may
+    /// return the old or the new duty cycle depending on the implementation.
     fn try_get_duty(&self, channel: Self::Channel) -> Result<Self::Duty, Self::Error>;
 
     /// Returns the maximum duty cycle value
