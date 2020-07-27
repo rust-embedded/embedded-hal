@@ -86,7 +86,7 @@ pub trait MultiWrite<Word,U> {
 
 /// For Flash storage, the write functions can't set a bit to 1. To enable a complete rewrite flash, it needs to be erased beforehand
 /// For non flash devices, this trait is not required, but it can be used to erase data as recommended by the device (EG set all fields to 0)
-pub trait ErasePage<Word,U> {
+pub trait ErasePage<U> {
     /// An enumeration of Storage errors
     type Error;
 
