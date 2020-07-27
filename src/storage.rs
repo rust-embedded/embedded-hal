@@ -7,7 +7,7 @@ use nb;
 /// Address should be an Unsigned int that is used to represent the address space. This allows for devices that have bigger or smaller address spaces than the host
 pub struct Address<U>(U);
 /// Address Offset should be an Unsigned int that is used to represent an optional offset from the base address
-pub struct AddressOffset<U>();
+pub struct AddressOffset<U>(U);
 
 use core::ops::Add;
 
@@ -20,6 +20,9 @@ impl Add for Address<U> {
     }
 
 }
+
+/// Page should be an Unsigned int that is used to represent a Page ID in the Device Memory Space
+pub struct Page<U>(U);
 
 /// Read a single word from the device
 /// `Word` type allows any word size to be used
@@ -90,10 +93,10 @@ pub trait ErasePage<U> {
     /// An enumeration of Storage errors
     type Error;
 
-    /// Erase the page of memory at the address
+    /// Erase the page of memory
     /// For flash devices, this sets the whole page to 0xFF
     /// Implementations should mask the address as required to get the page to erase
-    fn try_erase(&mut self, address: Address<U>) -> nb::Result<(), Self::Error>;
+    fn try_erase(&mut self, page: Page<U>) -> nb::Result<(), Self::Error>;
 }
 
  pub trait StorageSize<Word,U> {
