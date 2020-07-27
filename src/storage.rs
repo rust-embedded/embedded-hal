@@ -1,6 +1,6 @@
 //! Storage
-//! The Read and Write traits are seperate to allow for Read Only Memory as well as Read and Write
-//! Example implementations include:
+/// The Read and Write traits are seperate to allow for Read Only Memory as well as Read and Write
+/// Example implementations include:
 
 use nb;
 
@@ -12,7 +12,7 @@ pub struct AddressOffset<U>(U);
 use core::ops::Add;
 
 /// Implement add for the Address and AddressOffset Types
-impl Add for Address<U> {
+impl<U> Add<AddressOffset<U>> for Address<U> {
     type Output = Self;
 
     fn add(self, other: AddressOffset<U>) -> Self {
@@ -96,9 +96,15 @@ pub trait ErasePage<U> {
     /// Erase the page of memory
     /// For flash devices, this sets the whole page to 0xFF
     /// Implementations should mask the address as required to get the page to erase
-    fn try_erase(&mut self, page: Page<U>) -> nb::Result<(), Self::Error>;
+    fn try_erase_page(&mut self, page: Page<U>) -> nb::Result<(), Self::Error>;
+
+    /// Erase the page of memory at the address. Note: The only valid address is the start of the page
+    /// For flash devices, this sets the whole page to 0xFF
+    /// Implementations should mask the address as required to get the page to erase
+    fn try_erase_address(&mut self, address: Address<U>) -> nb::Result<(), Self::Error>;
 }
 
+/// This trait allows for checking that data can fit before writing to the device. As some devices have limits on writing accross pages, the page size is also included
  pub trait StorageSize<Word,U> {
     /// An enumeration of Storage errors
     type Error;
