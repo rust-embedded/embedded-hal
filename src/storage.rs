@@ -1,7 +1,7 @@
 //! Storage
-/// The Read and Write traits are seperate to allow for Read Only Memory as well as Read and Write
-///
-/// Example implementations include:
+/// Traits to allow on and off board storage deivces to read and write data
+/// Allows for Read Only Memory as well as Read and Write Memory
+
 
 use nb;
 

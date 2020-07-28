@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - 10-bit addressing mode for I2C traits.
+- Storage traits for on and off board devices
 
 ### Changed
 
