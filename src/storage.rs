@@ -6,9 +6,9 @@
 use nb;
 
 /// Address represents an unsigned int. This allows for devices that have bigger or smaller address spaces than the host.
-pub struct Address<U>(U);
+pub struct Address<U>(pub U);
 /// Address Offset represents an unsigned int that is used as an optional offset from the base address.
-pub struct AddressOffset<U>(U);
+pub struct AddressOffset<U>(pub U);
 
 use core::ops::Add;
 
