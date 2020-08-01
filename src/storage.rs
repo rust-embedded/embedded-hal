@@ -1,8 +1,6 @@
 //! Storage
 /// Traits to allow on and off board storage deivces to read and write data
 /// Allows for Read Only Memory as well as Read and Write Memory
-
-
 use nb;
 
 /// Address represents an unsigned int. This allows for devices that have bigger or smaller address spaces than the host.
@@ -13,13 +11,15 @@ pub struct AddressOffset<U>(pub U);
 use core::ops::Add;
 
 /// Implement add for the Address and AddressOffset Types.
-impl<'a, 'b, U> Add<&'b AddressOffset<U>> for &'a Address<U> where U: Add<U, Output=U> + Copy {
+impl<'a, 'b, U> Add<&'b AddressOffset<U>> for &'a Address<U>
+where
+    U: Add<U, Output = U> + Copy,
+{
     type Output = Address<U>;
 
     fn add(self, other: &'b AddressOffset<U>) -> Address<U> {
         Address(self.0 + other.0)
     }
-
 }
 
 /// Page represents an unsigned int that is a Page ID in the device memory space.
@@ -28,7 +28,7 @@ pub struct Page<U>(U);
 /// Read a single word from the device.
 ///
 /// `Word` type allows any word size to be used.
-pub trait SingleRead<Word,U> {
+pub trait SingleRead<Word, U> {
     /// An enumeration of Storage errors
     type Error;
 
@@ -37,59 +37,66 @@ pub trait SingleRead<Word,U> {
     /// pub fn try_read(&mut self, address: Address) -> nb::Result<u8, Self::Error>
     ///     let address = address.0 as *const _;
     ///     unsafe {
-    ///         Ok(core::slice::from_raw_parts::<'static, u8>(address,length)) 
+    ///         Ok(core::slice::from_raw_parts::<'static, u8>(address,length))
     ///     }
     /// ```
     fn try_read(&mut self, address: Address<U>) -> nb::Result<Word, Self::Error>;
-
 }
 
 /// Write a single word to the device.
 ///
 /// `Word` type allows any word size to be used.
-pub trait SingleWrite<Word,U> {
+pub trait SingleWrite<Word, U> {
     /// An enumeration of Storage errors
     type Error;
 
     /// Writes the word to the address
     fn try_write(&mut self, address: Address<U>, word: Word) -> nb::Result<(), Self::Error>;
-
 }
 
 /// Read multiple bytes from the device.
 ///
 /// Intended to be used for when there is a optimized method of reading multiple bytes.
-/// 
+///
 /// Iterating over the slice is a valid method to ```impl``` this trait.
-pub trait MultiRead<Word,U> {
+pub trait MultiRead<Word, U> {
     /// An enumeration of Storage errors
     type Error;
 
     /// Reads the words stored at the address to fill the buffer
     /// ```
-    /// pub fn try_read_slice(&mut self, address: Address,  buf: &mut [Word]) -> nb::Result<Word, Self::Error>
+    /// pub fn try_read_slice(
+    ///     &mut self,
+    ///     address: Address,  
+    ///     buf: &mut [Word]
+    /// ) -> nb::Result<Word, Self::Error>
     ///     let address = address.0 as *const _;
     ///     unsafe {
     ///         buf = core::slice::from_raw_parts::<'static, Word>(address,buf.len())
     ///     }
     ///     
-    ///     Ok() 
+    ///     Ok()
     /// }
     /// ```
-    fn try_read_slice(&mut self, address: Address<U>, buf: &mut [Word]) -> nb::Result<(), Self::Error>;
+    fn try_read_slice(
+        &mut self,
+        address: Address<U>,
+        buf: &mut [Word],
+    ) -> nb::Result<(), Self::Error>;
 }
 
 /// Write multiple bytes to the device.
 ///
 /// Intended to be used for when there is a optimized method of reading multiple bytes.
-/// 
+///
 /// Iterating over the slice is a valid method to ```impl``` this trait.
-pub trait MultiWrite<Word,U> {
+pub trait MultiWrite<Word, U> {
     /// An enumeration of Storage errors
     type Error;
 
     /// Writes the buffer to the address
-    fn try_write_slice(&mut self, address: Address<U>, buf: &[Word]) -> nb::Result<(), Self::Error>;
+    fn try_write_slice(&mut self, address: Address<U>, buf: &[Word])
+        -> nb::Result<(), Self::Error>;
 }
 
 /// A common interface to erase pages or memory locations.
@@ -115,12 +122,12 @@ pub trait ErasePage<U> {
 /// Allow for checking that data can fit before writing to the device.
 ///
 /// As some devices have limits on writing accross pages, the page size is also included.
- pub trait StorageSize<Word,U> {
+pub trait StorageSize<Word, U> {
     /// An enumeration of Storage errors
     type Error;
 
     /// Returns the start address and the maximum size that can be stored by the device
-    fn try_total_size(&mut self) -> nb::Result<(Address<U>,AddressOffset<U>), Self::Error>;
+    fn try_total_size(&mut self) -> nb::Result<(Address<U>, AddressOffset<U>), Self::Error>;
     /// For devices that are paged, this should return the size of the page
     ///
     /// For non paged devices, this should return the AddressOffset in ```try_total_size```
