@@ -35,7 +35,7 @@ pub trait SingleRead<Word,U> {
     /// Reads the word stored at the address
     /// ```
     /// pub fn try_read(&mut self, address: Address) -> nb::Result<u8, Self::Error>
-    ///     let address = address as *const _;
+    ///     let address = address.0 as *const _;
     ///     unsafe {
     ///         Ok(core::slice::from_raw_parts::<'static, u8>(address,length)) 
     ///     }
@@ -68,7 +68,7 @@ pub trait MultiRead<Word,U> {
     /// Reads the words stored at the address to fill the buffer
     /// ```
     /// pub fn try_read_slice(&mut self, address: Address,  buf: &mut [Word]) -> nb::Result<Word, Self::Error>
-    ///     let address = address as *const _;
+    ///     let address = address.0 as *const _;
     ///     unsafe {
     ///         buf = core::slice::from_raw_parts::<'static, Word>(address,buf.len())
     ///     }
