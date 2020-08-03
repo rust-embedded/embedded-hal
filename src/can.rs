@@ -1,12 +1,14 @@
 //! Controller Area Network
 
 /// A CAN2.0 Frame
-pub trait Frame {
-    /// Creates a new frame with a standard identifier.
-    fn new_standard(id: u32, data: &[u8]) -> Self;
+pub trait Frame: Sized {
+    /// Creates a new frame with a standard identifier (0..=0x7FF).
+    /// Returns an error when the the identifier is not valid.
+    fn new_standard(id: u32, data: &[u8]) -> Result<Self, ()>;
 
-    /// Creates a new frame with an extended identifier.
-    fn new_extended(id: u32, data: &[u8]) -> Self;
+    /// Creates a new frame with an extended identifier (0..=0x1FFF_FFFF).
+    /// Returns an error when the the identifier is not valid.
+    fn new_extended(id: u32, data: &[u8]) -> Result<Self, ()>;
 
     /// Marks this frame as a remote frame (by setting the RTR bit).
     fn with_rtr(&mut self, dlc: usize) -> &mut Self;
