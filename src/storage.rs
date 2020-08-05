@@ -3,12 +3,12 @@
 /// Allows for Read Only Memory as well as Read and Write Memory
 use nb;
 
-/// Address represents an unsigned int. This allows for devices that have bigger or smaller address spaces than the host.
+/// Address represents an unsigned integer. This allows for devices that have bigger or smaller address spaces than the host.
 pub struct Address<U>(pub U);
-/// Address Offset represents an unsigned int that is used as an optional offset from the base address.
+/// Address Offset represents an unsigned integer that is used as an optional offset from the base address.
 pub struct AddressOffset<U>(pub U);
 
-use core::ops::Add;
+use core::ops::{Add,Sub};
 
 /// Implement add for the Address and AddressOffset Types.
 impl<'a, 'b, U> Add<&'b AddressOffset<U>> for &'a Address<U>
@@ -22,7 +22,19 @@ where
     }
 }
 
-/// Page represents an unsigned int that is a Page ID in the device memory space.
+/// Implement subtraction for the Address and AddressOffset Types.
+impl<'a, 'b, U> Sub<&'b AddressOffset<U>> for &'a Address<U>
+where
+    U: Sub<U, Output = U> + Copy,
+{
+    type Output = Address<U>;
+
+    fn sub(self, other: &'b AddressOffset<U>) -> Address<U> {
+        Address(self.0 - other.0)
+    }
+}
+
+/// Page represents an unsigned integer that is a Page ID in the device memory space.
 pub struct Page<U>(U);
 
 /// Read a single word from the device.
@@ -56,7 +68,7 @@ pub trait SingleWrite<Word, U> {
 
 /// Read multiple bytes from the device.
 ///
-/// Intended to be used for when there is a optimized method of reading multiple bytes.
+/// intended to be used for when there is a optimized method of reading multiple bytes.
 ///
 /// Iterating over the slice is a valid method to ```impl``` this trait.
 pub trait MultiRead<Word, U> {
@@ -87,7 +99,7 @@ pub trait MultiRead<Word, U> {
 
 /// Write multiple bytes to the device.
 ///
-/// Intended to be used for when there is a optimized method of reading multiple bytes.
+/// intended to be used for when there is a optimized method of reading multiple bytes.
 ///
 /// Iterating over the slice is a valid method to ```impl``` this trait.
 pub trait MultiWrite<Word, U> {
@@ -109,13 +121,9 @@ pub trait ErasePage<U> {
     type Error;
 
     /// Erase the page of memory
-    /// For flash devices, this sets the whole page to 0xFF
-    /// Implementations should mask the address as required to get the page to erase
     fn try_erase_page(&mut self, page: Page<U>) -> nb::Result<(), Self::Error>;
 
-    /// Erase the page of memory at the address. Note: The only valid address is the start of the page
-    /// For flash devices, this sets the whole page to 0xFF
-    /// Implementations should mask the address as required to get the page to erase
+    /// Erase the page of memory at the address. Note: The only valid address is the start of the page (If the storage is page based)
     fn try_erase_address(&mut self, address: Address<U>) -> nb::Result<(), Self::Error>;
 }
 
@@ -126,10 +134,15 @@ pub trait StorageSize<Word, U> {
     /// An enumeration of Storage errors
     type Error;
 
-    /// Returns the start address and the maximum size that can be stored by the device
-    fn try_total_size(&mut self) -> nb::Result<(Address<U>, AddressOffset<U>), Self::Error>;
+    /// Returns the start address of the device
+    fn try_start_address(&mut self) -> nb::Result<Address<U>, Self::Error>;
+
+    /// Returns the maximum size that can be stored by the device
+    fn try_total_size(&mut self) -> nb::Result<AddressOffset<U>, Self::Error>;
+
     /// For devices that are paged, this should return the size of the page
     ///
     /// For non paged devices, this should return the AddressOffset in ```try_total_size```
     fn try_page_size(&mut self) -> nb::Result<AddressOffset<U>, Self::Error>;
+
 }
