@@ -8,7 +8,7 @@ pub struct Address<U>(pub U);
 /// Address Offset represents an unsigned integer that is used as an optional offset from the base address.
 pub struct AddressOffset<U>(pub U);
 
-use core::ops::{Add,Sub};
+use core::ops::{Add, Sub};
 
 /// Implement add for the Address and AddressOffset Types.
 impl<'a, 'b, U> Add<&'b AddressOffset<U>> for &'a Address<U>
@@ -106,8 +106,9 @@ pub trait MultiWrite<Word, U> {
     /// An enumeration of Storage errors
     type Error;
 
-    /// Writes the buffer to the address
-    fn try_write_slice(&mut self, address: Address<U>, buf: &[Word])
+    /// Writes the buffer to the address.
+    // Impls using spi will need a mutable buffer
+    fn try_write_slice(&mut self, address: Address<U>, buf: &mut [Word])
         -> nb::Result<(), Self::Error>;
 }
 
@@ -137,12 +138,11 @@ pub trait StorageSize<Word, U> {
     /// Returns the start address of the device
     fn try_start_address(&mut self) -> nb::Result<Address<U>, Self::Error>;
 
-    /// Returns the maximum size that can be stored by the device
+    /// Returns the maximum number of words that can be stored by the device
     fn try_total_size(&mut self) -> nb::Result<AddressOffset<U>, Self::Error>;
 
-    /// For devices that are paged, this should return the size of the page
+    /// For devices that are paged, this should return the number of words of the page
     ///
     /// For non paged devices, this should return the AddressOffset in ```try_total_size```
     fn try_page_size(&mut self) -> nb::Result<AddressOffset<U>, Self::Error>;
-
 }
