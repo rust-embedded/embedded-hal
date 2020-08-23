@@ -108,8 +108,11 @@ pub trait MultiWrite<Word, U> {
 
     /// Writes the buffer to the address.
     // Impls using spi will need a mutable buffer
-    fn try_write_slice(&mut self, address: Address<U>, buf: &mut [Word])
-        -> nb::Result<(), Self::Error>;
+    fn try_write_slice(
+        &mut self,
+        address: Address<U>,
+        buf: &mut [Word],
+    ) -> nb::Result<(), Self::Error>;
 }
 
 /// A common interface to erase pages or memory locations.
