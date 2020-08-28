@@ -1,17 +1,35 @@
 //! Controller Area Network
 
+/// CAN Identifier
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum Id {
+    /// Standard 11bit Identifier (0..=0x7FF)
+    Standard(u32),
+
+    /// Extended 29bit Identifier (0..=0x1FFF_FFFF)
+    Extended(u32),
+}
+
+impl Id {
+    /// Returs true when the identifier is valid, false otherwise.
+    pub fn valid(self) -> bool {
+        match self {
+            Id::Standard(id) if id <= 0x7FF => true,
+            Id::Extended(id) if id <= 0x1FFF_FFFF => true,
+            _ => false,
+        }
+    }
+}
+
 /// A CAN2.0 Frame
 pub trait Frame: Sized {
-    /// Creates a new frame with a standard identifier (0..=0x7FF).
-    /// Returns an error when the the identifier is not valid.
-    fn new_standard(id: u32, data: &[u8]) -> Result<Self, ()>;
+    /// Creates a new frame.
+    /// Returns an error when the the identifier is not valid or the data slice is too long.
+    fn new(id: Id, data: &[u8]) -> Result<Self, ()>;
 
-    /// Creates a new frame with an extended identifier (0..=0x1FFF_FFFF).
-    /// Returns an error when the the identifier is not valid.
-    fn new_extended(id: u32, data: &[u8]) -> Result<Self, ()>;
-
-    /// Marks this frame as a remote frame (by setting the RTR bit).
-    fn with_rtr(&mut self, dlc: usize) -> &mut Self;
+    /// Creates a new remote frame (RTR bit set).
+    /// Returns an error when the the identifier is  or the data length code (DLC) not valid.
+    fn new_remote(id: Id, dlc: usize) -> Result<Self, ()>;
 
     /// Returns true if this frame is a extended frame.
     fn is_extended(&self) -> bool;
@@ -30,7 +48,7 @@ pub trait Frame: Sized {
     }
 
     /// Returns the frame identifier.
-    fn id(&self) -> u32;
+    fn id(&self) -> Id;
 
     /// Returns the data length code (DLC) which is in the range 0..8.
     ///
