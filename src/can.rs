@@ -42,8 +42,8 @@ pub trait Frame: Sized {
     fn data(&self) -> &[u8];
 }
 
-/// A CAN interface that is able to transmit frames.
-pub trait Transmitter {
+/// A CAN interface that is able to transmit and receive frames.
+pub trait Can {
     /// Associated frame type.
     type Frame: Frame;
 
@@ -54,16 +54,8 @@ pub trait Transmitter {
     ///
     /// If the buffer is full, this function will try to replace a lower priority frame
     /// and return it. This is to avoid the priority inversion problem.
+    /// Transmits frames of equal identifier in FIFO fashion.
     fn transmit(&mut self, frame: &Self::Frame) -> nb::Result<Option<Self::Frame>, Self::Error>;
-}
-
-/// A CAN interface that is able to receive frames.
-pub trait Receiver {
-    /// Associated frame type.
-    type Frame: Frame;
-
-    /// Associated error type.
-    type Error;
 
     /// Returns a received frame if available.
     fn receive(&mut self) -> nb::Result<Self::Frame, Self::Error>;
