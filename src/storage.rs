@@ -35,7 +35,7 @@ where
 }
 
 /// Page represents an unsigned integer that is a Page ID in the device memory space.
-pub struct Page<U>(U);
+pub struct Page<U>(pub U);
 
 /// Read a single word from the device.
 ///
@@ -144,8 +144,8 @@ pub trait StorageSize<Word, U> {
     /// Returns the maximum number of words that can be stored by the device
     fn try_total_size(&mut self) -> nb::Result<AddressOffset<U>, Self::Error>;
 
-    /// For devices that are paged, this should return the number of words of the page
+    /// For devices that are paged, this should return the number of words of the page referenced in the address
     ///
     /// For non paged devices, this should return the AddressOffset in ```try_total_size```
-    fn try_page_size(&mut self) -> nb::Result<AddressOffset<U>, Self::Error>;
+    fn try_page_size(&mut self, address: Address<U>) -> nb::Result<AddressOffset<U>, Self::Error>;
 }
