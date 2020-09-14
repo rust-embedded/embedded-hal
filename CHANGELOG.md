@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - 10-bit addressing mode for I2C traits.
+- `try_set_state` method for `OutputPin` using an input `PinState` value.
 
 ### Changed
 
