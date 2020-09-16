@@ -10,7 +10,7 @@ use nb;
 ///
 /// - Due to how full duplex SPI works each `try_read` call must be preceded by a `try_send` call.
 ///
-/// - `try_read` calls only return the data received with the last `send` call.
+/// - `try_read` calls only return the data received with the last `try_send` call.
 /// Previously received data is discarded
 ///
 /// - Data is only guaranteed to be clocked out when the `try_read` call succeeds.
