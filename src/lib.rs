@@ -118,7 +118,7 @@
 //!
 //! [`stm32f3`]: https://crates.io/crates/stm32f3
 //!
-//! ```
+//! ```not_run
 //! // crate: stm32f3xx-hal
 //! // An implementation of the `embedded-hal` traits for STM32F3xx microcontrollers
 //!
