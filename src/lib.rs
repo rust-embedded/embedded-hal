@@ -697,8 +697,8 @@ pub mod pwm;
 pub mod qei;
 pub mod rng;
 pub mod serial;
-pub mod storage;
 pub mod spi;
+pub mod storage;
 pub mod timer;
 pub mod watchdog;
 
