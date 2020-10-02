@@ -684,9 +684,6 @@
 #![deny(missing_docs)]
 #![no_std]
 
-#[macro_use]
-extern crate nb;
-
 pub mod adc;
 pub mod blocking;
 pub mod capture;
