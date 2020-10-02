@@ -38,9 +38,9 @@
 //!
 //! # Reference implementation
 //!
-//! The [`stm32f30x-hal`] crate contains a reference implementation of this HAL.
+//! The [`stm32f1xx-hal`] crate contains a reference implementation of this HAL.
 //!
-//! [`stm32f30x-hal`]: https://crates.io/crates/stm32f30x-hal/0.1.0
+//! [`stm32f1xx-hal`]: https://crates.io/crates/stm32f1xx-hal
 //!
 //! # Platform agnostic drivers
 //!
