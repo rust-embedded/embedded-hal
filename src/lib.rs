@@ -38,9 +38,9 @@
 //!
 //! # Reference implementation
 //!
-//! The [`stm32f30x-hal`] crate contains a reference implementation of this HAL.
+//! The [`stm32f1xx-hal`] crate contains a reference implementation of this HAL.
 //!
-//! [`stm32f30x-hal`]: https://crates.io/crates/stm32f30x-hal/0.1.0
+//! [`stm32f1xx-hal`]: https://crates.io/crates/stm32f1xx-hal
 //!
 //! # Platform agnostic drivers
 //!
@@ -64,7 +64,7 @@
 //! Here's how a HAL trait may look like:
 //!
 //! ```
-//! extern crate nb;
+//! use nb;
 //!
 //! /// A serial interface
 //! pub trait Serial {
@@ -90,7 +90,7 @@
 //! those cases `nb::Result<_, Infallible>` is used.
 //!
 //! ```
-//! extern crate nb;
+//! use nb;
 //!
 //! # use std as core;
 //! use ::core::convert::Infallible;
@@ -113,22 +113,20 @@
 //!
 //! [`svd2rust`]: https://crates.io/crates/svd2rust
 //!
-//! Shown below is an implementation of some of the HAL traits for the [`stm32f30x`] crate. This
-//! single implementation will work for *any* microcontroller in the STM32F30x family.
+//! Shown below is an implementation of some of the HAL traits for the [`stm32f1xx-hal`] crate. This
+//! single implementation will work for *any* microcontroller in the STM32F1xx family.
 //!
-//! [`stm32f3`]: https://crates.io/crates/stm32f3
+//! [`stm32f1`]: https://crates.io/crates/stm32f1
 //!
 //! ```not_run
-//! // crate: stm32f3xx-hal
-//! // An implementation of the `embedded-hal` traits for STM32F3xx microcontrollers
+//! // crate: stm32f1xx-hal
+//! // An implementation of the `embedded-hal` traits for STM32F1xx microcontrollers
 //!
-//! extern crate embedded_hal as hal;
-//! extern crate nb;
+//! use embedded_hal as hal;
+//! use nb;
 //!
 //! // device crate
-//! extern crate stm32f3;
-//!
-//! use stm32f3::stm32f303::USART1;
+//! use stm32f1::stm32f103::USART1;
 //!
 //! /// A serial interface
 //! // NOTE generic over the USART peripheral
@@ -185,13 +183,10 @@
 //!
 //! ## Intended usage
 //!
-//! Thanks to the [`nb`] crate the HAL API can be used in a blocking manner,
-//! with `futures` or with the `await` operator using the [`block!`],
-//! [`try_nb!`] and [`await!`] macros respectively.
+//! Thanks to the [`nb`] crate the HAL API can be used in a blocking manner
+//! with the [`block!`] macro or with `futures`.
 //!
-//! [`block!`]: https://docs.rs/nb/0.1.0/nb/macro.block.html
-//! [`try_nb!`]: https://docs.rs/nb/0.1.0/nb/index.html#how-to-use-this-crate
-//! [`await!`]: https://docs.rs/nb/0.1.0/nb/index.html#how-to-use-this-crate
+//! [`block!`]: https://docs.rs/nb/1.0.0/nb/macro.block.html
 //!
 //! ### Blocking mode
 //!
@@ -199,12 +194,9 @@
 //! fashion:
 //!
 //! ```
-//! extern crate embedded_hal;
-//! #[macro_use(block)]
-//! extern crate nb;
-//!
-//! use stm32f30x_hal::Serial1;
+//! use crate::stm32f1xx_hal::Serial1;
 //! use embedded_hal::serial::Write;
+//! use nb::block;
 //!
 //! # fn main() {
 //! let mut serial: Serial1 = {
@@ -219,11 +211,12 @@
 //! }
 //! # }
 //!
-//! # mod stm32f30x_hal {
+//! # mod stm32f1xx_hal {
+//! #     use nb;
 //! #     use core::convert::Infallible;
 //! #     pub struct Serial1;
 //! #     impl Serial1 {
-//! #         pub fn try_write(&mut self, _: u8) -> ::nb::Result<(), Infallible> {
+//! #         pub fn try_write(&mut self, _: u8) -> nb::Result<(), Infallible> {
 //! #             Ok(())
 //! #         }
 //! #     }
@@ -238,20 +231,15 @@
 //! the case for many embedded targets.
 //!
 //! ```no_run
-//! extern crate embedded_hal as hal;
-//! extern crate futures;
-//!
-//! #[macro_use(try_nb)]
-//! extern crate nb;
-//!
-//! use hal::prelude::*;
+//! use embedded_hal as hal;
+//! use crate::hal::prelude::*;
 //! use futures::{
-//!     future,
+//!     future::{self, Loop},
 //!     Async,
 //!     Future,
 //! };
-//! use futures::future::Loop;
-//! use stm32f30x_hal::{Led, Serial1, Timer6};
+//! use nb;
+//! use stm32f1xx_hal::{Led, Serial1, Timer6};
 //! use core::convert::Infallible;
 //!
 //! /// `futures` version of `CountDown.try_wait`
@@ -263,7 +251,11 @@
 //! {
 //!     let mut timer = Some(timer);
 //!     future::poll_fn(move || {
-//!         try_nb!(timer.as_mut().unwrap().try_wait());
+//!         match timer.as_mut().unwrap().try_wait() {
+//!             Err(nb::Error::Other(e)) => return Err(e),
+//!             Err(nb::Error::WouldBlock) => return Ok(Async::NotReady),
+//!             Ok(_) => (),
+//!         };
 //!
 //!         Ok(Async::Ready(timer.take().unwrap()))
 //!     })
@@ -278,7 +270,11 @@
 //! {
 //!     let mut serial = Some(serial);
 //!     future::poll_fn(move || {
-//!         let byte = try_nb!(serial.as_mut().unwrap().try_read());
+//!         let byte = match serial.as_mut().unwrap().try_read() {
+//!             Err(nb::Error::Other(e)) => return Err(e),
+//!             Err(nb::Error::WouldBlock) => return Ok(Async::NotReady),
+//!             Ok(x) => x,
+//!         };
 //!
 //!         Ok(Async::Ready((serial.take().unwrap(), byte)))
 //!     })
@@ -293,7 +289,11 @@
 //! {
 //!     let mut serial = Some(serial);
 //!     future::poll_fn(move || {
-//!         try_nb!(serial.as_mut().unwrap().try_write(byte));
+//!         match serial.as_mut().unwrap().try_write(byte) {
+//!             Err(nb::Error::Other(e)) => return Err(e),
+//!             Err(nb::Error::WouldBlock) => return Ok(Async::NotReady),
+//!             Ok(_) => (),
+//!         };
 //!
 //!         Ok(Async::Ready(serial.take().unwrap()))
 //!     })
@@ -345,10 +345,11 @@
 //!     }
 //! }
 //!
-//! # mod stm32f30x_hal {
+//! # mod stm32f1xx_hal {
+//! #     use crate::hal;
 //! #     use core::convert::Infallible;
 //! #     pub struct Timer6;
-//! #     impl ::hal::timer::CountDown for Timer6 {
+//! #     impl hal::timer::CountDown for Timer6 {
 //! #         type Error = Infallible;
 //! #         type Time = ();
 //! #
@@ -357,11 +358,11 @@
 //! #     }
 //! #
 //! #     pub struct Serial1;
-//! #     impl ::hal::serial::Read<u8> for Serial1 {
+//! #     impl hal::serial::Read<u8> for Serial1 {
 //! #         type Error = Infallible;
 //! #         fn try_read(&mut self) -> ::nb::Result<u8, Infallible> { Err(::nb::Error::WouldBlock) }
 //! #     }
-//! #     impl ::hal::serial::Write<u8> for Serial1 {
+//! #     impl hal::serial::Write<u8> for Serial1 {
 //! #         type Error = Infallible;
 //! #         fn try_flush(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #         fn try_write(&mut self, _: u8) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
@@ -372,94 +373,6 @@
 //! #         pub fn off(&mut self) {}
 //! #         pub fn on(&mut self) {}
 //! #     }
-//! # }
-//! ```
-//!
-//! ### `await`
-//!
-//! Same example as above but using `await!` instead of `futures`
-//! (same remark concerning the availability of `libstd` on the
-//! target).
-//!
-//! ```no_run
-//! #![feature(generator_trait)]
-//! #![feature(generators)]
-//!
-//! extern crate embedded_hal as hal;
-//!
-//! #[macro_use(r#await)]
-//! extern crate nb;
-//!
-//! use core::ops::Generator;
-//! use core::pin::Pin;
-//!
-//! use hal::prelude::*;
-//! use stm32f30x_hal::{Led, Serial1, Timer6};
-//!
-//! fn main() {
-//!     // HAL implementers
-//!     let mut timer: Timer6 = {
-//!         // ..
-//! #       Timer6
-//!     };
-//!     let mut serial: Serial1 = {
-//!         // ..
-//! #       Serial1
-//!     };
-//!     let mut led: Led = {
-//!         // ..
-//! #       Led
-//!     };
-//!
-//!     // Tasks
-//!     let mut blinky = (move || {
-//!         let mut state = false;
-//!         loop {
-//!             // `await!` means "suspend / yield here" instead of "block until
-//!             // completion"
-//!             nb::r#await!(timer.try_wait()).unwrap(); // NOTE(unwrap) E = Infallible
-//!
-//!             state = !state;
-//!
-//!             if state {
-//!                 led.on();
-//!             } else {
-//!                 led.off();
-//!             }
-//!         }
-//!     });
-//!
-//!     let mut loopback = (move || {
-//!         loop {
-//!             let byte = nb::r#await!(serial.try_read()).unwrap();
-//!             nb::r#await!(serial.try_write(byte)).unwrap();
-//!         }
-//!     });
-//!
-//!     // Event loop
-//!     loop {
-//!         Pin::new(&mut blinky).resume(());
-//!         Pin::new(&mut loopback).resume(());
-//!         # break;
-//!     }
-//! }
-//!
-//! # mod stm32f30x_hal {
-//! #   use core::convert::Infallible;
-//! #   pub struct Serial1;
-//! #   impl Serial1 {
-//! #       pub fn try_read(&mut self) -> ::nb::Result<u8, Infallible> { Err(::nb::Error::WouldBlock) }
-//! #       pub fn try_write(&mut self, _: u8) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
-//! #   }
-//! #   pub struct Timer6;
-//! #   impl Timer6 {
-//! #       pub fn try_wait(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
-//! #   }
-//! #   pub struct Led;
-//! #   impl Led {
-//! #       pub fn off(&mut self) {}
-//! #       pub fn on(&mut self) {}
-//! #   }
 //! # }
 //! ```
 //!
@@ -479,10 +392,8 @@
 //! - Write a whole buffer to a serial device in blocking a fashion.
 //!
 //! ```
-//! extern crate embedded_hal as hal;
-//! #[macro_use(block)]
-//! extern crate nb;
-//!
+//! use embedded_hal as hal;
+//! use nb::block;
 //! use hal::prelude::*;
 //!
 //! fn write_all<S>(serial: &mut S, buffer: &[u8]) -> Result<(), S::Error>
@@ -502,8 +413,8 @@
 //! - Blocking serial read with timeout
 //!
 //! ```
-//! extern crate embedded_hal as hal;
-//! extern crate nb;
+//! use embedded_hal as hal;
+//! use nb;
 //!
 //! use hal::prelude::*;
 //!
@@ -552,50 +463,12 @@
 //! # fn main() {}
 //! ```
 //!
-//! - Asynchronous SPI transfer
-//!
-//! ```no_run
-//! #![feature(conservative_impl_trait)]
-//! #![feature(generators)]
-//! #![feature(generator_trait)]
-//!
-//! extern crate embedded_hal as hal;
-//! #[macro_use(r#await)]
-//! extern crate nb;
-//!
-//! use core::ops::Generator;
-//!
-//! /// Transfers a byte buffer of size N
-//! ///
-//! /// Returns the same byte buffer but filled with the data received from the
-//! /// slave device
-//! fn transfer<S, B>(
-//!     mut spi: S,
-//!     mut buffer: [u8; 16], // NOTE this should be generic over the size of the array
-//! ) -> impl Generator<Return = Result<(S, [u8; 16]), S::Error>, Yield = ()>
-//! where
-//!     S: hal::spi::FullDuplex<u8>,
-//! {
-//!     move || {
-//!         let n = buffer.len();
-//!         for i in 0..n {
-//!             nb::r#await!(spi.try_send(buffer[i]))?;
-//!             buffer[i] = nb::r#await!(spi.try_read())?;
-//!         }
-//!
-//!         Ok((spi, buffer))
-//!     }
-//! }
-//!
-//! # fn main() {}
-//! ```
-//!
 //! - Buffered serial interface with periodic flushing in interrupt handler
 //!
 //! ```
 //! # use std as core;
-//! extern crate embedded_hal as hal;
-//! extern crate nb;
+//! use embedded_hal as hal;
+//! use nb;
 //!
 //! use hal::prelude::*;
 //! use ::core::convert::Infallible;
@@ -666,7 +539,7 @@
 //! #     fn deref_mut(&mut self) -> &mut T { self.0 }
 //! # }
 //! # struct Serial1;
-//! # impl ::hal::serial::Write<u8> for Serial1 {
+//! # impl hal::serial::Write<u8> for Serial1 {
 //! #   type Error = Infallible;
 //! #   fn try_write(&mut self, _: u8) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #   fn try_flush(&mut self) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
