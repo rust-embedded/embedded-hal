@@ -81,8 +81,8 @@
 //!
 //! The `nb::Result` enum is used to add a [`WouldBlock`] variant to the errors
 //! of the serial interface. As explained in the documentation of the `nb` crate this single API,
-//! when paired with the macros in the `nb` crate, can operate in a blocking manner, or in a
-//! non-blocking manner compatible with `futures` and with the `await!` operator.
+//! when paired with the macros in the `nb` crate, can operate in a blocking manner, or be adapted
+//! to other asynchronous execution schemes.
 //!
 //! [`WouldBlock`]: https://docs.rs/nb/0.1.0/nb/enum.Error.html
 //!
@@ -223,165 +223,12 @@
 //! # }
 //! ```
 //!
-//! ### `futures`
-//!
-//! An example of running two tasks concurrently. First task: blink a LED every
-//! second. Second task: loop back data over the serial interface. The target
-//! must provide the `libstd` in order to be able to use `futures`, which is not
-//! the case for many embedded targets.
-//!
-//! ```no_run
-//! use embedded_hal as hal;
-//! use crate::hal::prelude::*;
-//! use futures::{
-//!     future::{self, Loop},
-//!     Async,
-//!     Future,
-//! };
-//! use nb;
-//! use stm32f1xx_hal::{Led, Serial1, Timer6};
-//! use core::convert::Infallible;
-//!
-//! /// `futures` version of `CountDown.try_wait`
-//! ///
-//! /// This returns a future that must be polled to completion
-//! fn wait<T>(mut timer: T) -> impl Future<Item = T, Error = T::Error>
-//! where
-//!     T: hal::timer::CountDown,
-//! {
-//!     let mut timer = Some(timer);
-//!     future::poll_fn(move || {
-//!         match timer.as_mut().unwrap().try_wait() {
-//!             Err(nb::Error::Other(e)) => return Err(e),
-//!             Err(nb::Error::WouldBlock) => return Ok(Async::NotReady),
-//!             Ok(_) => (),
-//!         };
-//!
-//!         Ok(Async::Ready(timer.take().unwrap()))
-//!     })
-//! }
-//!
-//! /// `futures` version of `Serial.read`
-//! ///
-//! /// This returns a future that must be polled to completion
-//! fn read<S>(mut serial: S) -> impl Future<Item = (S, u8), Error = S::Error>
-//! where
-//!     S: hal::serial::Read<u8>,
-//! {
-//!     let mut serial = Some(serial);
-//!     future::poll_fn(move || {
-//!         let byte = match serial.as_mut().unwrap().try_read() {
-//!             Err(nb::Error::Other(e)) => return Err(e),
-//!             Err(nb::Error::WouldBlock) => return Ok(Async::NotReady),
-//!             Ok(x) => x,
-//!         };
-//!
-//!         Ok(Async::Ready((serial.take().unwrap(), byte)))
-//!     })
-//! }
-//!
-//! /// `futures` version of `Serial.write`
-//! ///
-//! /// This returns a future that must be polled to completion
-//! fn write<S>(mut serial: S, byte: u8) -> impl Future<Item = S, Error = S::Error>
-//! where
-//!     S: hal::serial::Write<u8>,
-//! {
-//!     let mut serial = Some(serial);
-//!     future::poll_fn(move || {
-//!         match serial.as_mut().unwrap().try_write(byte) {
-//!             Err(nb::Error::Other(e)) => return Err(e),
-//!             Err(nb::Error::WouldBlock) => return Ok(Async::NotReady),
-//!             Ok(_) => (),
-//!         };
-//!
-//!         Ok(Async::Ready(serial.take().unwrap()))
-//!     })
-//! }
-//!
-//! fn main() {
-//!     // HAL implementers
-//!     let timer: Timer6 = {
-//!         // ..
-//! #       Timer6
-//!     };
-//!     let serial: Serial1 = {
-//!         // ..
-//! #       Serial1
-//!     };
-//!     let led: Led = {
-//!         // ..
-//! #       Led
-//!     };
-//!
-//!     // Tasks
-//!     let mut blinky = future::loop_fn::<_, (), _, _>(
-//!         (led, timer, true),
-//!         |(mut led, mut timer, state)| {
-//!             wait(timer).map(move |timer| {
-//!                 if state {
-//!                     led.on();
-//!                 } else {
-//!                     led.off();
-//!                 }
-//!
-//!                 Loop::Continue((led, timer, !state))
-//!             })
-//!         });
-//!
-//!     let mut loopback = future::loop_fn::<_, (), _, _>(serial, |mut serial| {
-//!         read(serial).and_then(|(serial, byte)| {
-//!             write(serial, byte)
-//!         }).map(|serial| {
-//!             Loop::Continue(serial)
-//!         })
-//!     });
-//!
-//!     // Event loop
-//!     loop {
-//!         blinky.poll().unwrap(); // NOTE(unwrap) E = Infallible
-//!         loopback.poll().unwrap();
-//! #       break;
-//!     }
-//! }
-//!
-//! # mod stm32f1xx_hal {
-//! #     use crate::hal;
-//! #     use core::convert::Infallible;
-//! #     pub struct Timer6;
-//! #     impl hal::timer::CountDown for Timer6 {
-//! #         type Error = Infallible;
-//! #         type Time = ();
-//! #
-//! #         fn try_start<T>(&mut self, _: T) -> Result<(), Infallible> where T: Into<()> { Ok(()) }
-//! #         fn try_wait(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
-//! #     }
-//! #
-//! #     pub struct Serial1;
-//! #     impl hal::serial::Read<u8> for Serial1 {
-//! #         type Error = Infallible;
-//! #         fn try_read(&mut self) -> ::nb::Result<u8, Infallible> { Err(::nb::Error::WouldBlock) }
-//! #     }
-//! #     impl hal::serial::Write<u8> for Serial1 {
-//! #         type Error = Infallible;
-//! #         fn try_flush(&mut self) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
-//! #         fn try_write(&mut self, _: u8) -> ::nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
-//! #     }
-//! #
-//! #     pub struct Led;
-//! #     impl Led {
-//! #         pub fn off(&mut self) {}
-//! #         pub fn on(&mut self) {}
-//! #     }
-//! # }
-//! ```
-//!
 //! ## Generic programming and higher level abstractions
 //!
 //! The core of the HAL has been kept minimal on purpose to encourage building **generic** higher
 //! level abstractions on top of it. Some higher level abstractions that pick an asynchronous model
 //! or that have blocking behavior and that are deemed useful to build other abstractions can be
-//! found in the `blocking` module and, in the future, in the `futures` and `async` modules.
+//! found in the `blocking` module.
 //!
 //! Some examples:
 //!
