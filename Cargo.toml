@@ -20,3 +20,6 @@ nb = "1"
 [dev-dependencies]
 futures = "0.1.17"
 
+[dev-dependencies.stm32f1]
+version = "0.12"
+features = ["stm32f103", "rt"]

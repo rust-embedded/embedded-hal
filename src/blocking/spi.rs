@@ -44,8 +44,8 @@ pub mod transfer {
 
         fn try_transfer<'w>(&mut self, words: &'w mut [W]) -> Result<&'w [W], S::Error> {
             for word in words.iter_mut() {
-                block!(self.try_send(word.clone()))?;
-                *word = block!(self.try_read())?;
+                nb::block!(self.try_send(word.clone()))?;
+                *word = nb::block!(self.try_read())?;
             }
 
             Ok(words)
@@ -67,8 +67,8 @@ pub mod write {
 
         fn try_write(&mut self, words: &[W]) -> Result<(), S::Error> {
             for word in words {
-                block!(self.try_send(word.clone()))?;
-                block!(self.try_read())?;
+                nb::block!(self.try_send(word.clone()))?;
+                nb::block!(self.try_read())?;
             }
 
             Ok(())
@@ -94,8 +94,8 @@ pub mod write_iter {
             WI: IntoIterator<Item = W>,
         {
             for word in words.into_iter() {
-                block!(self.try_send(word.clone()))?;
-                block!(self.try_read())?;
+                nb::block!(self.try_send(word.clone()))?;
+                nb::block!(self.try_read())?;
             }
 
             Ok(())
