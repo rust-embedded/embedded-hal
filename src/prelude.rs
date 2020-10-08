@@ -5,6 +5,7 @@
 
 pub use crate::adc::Channel as _embedded_hal_adc_Channel;
 pub use crate::adc::OneShot as _embedded_hal_adc_OneShot;
+pub use crate::blocking::dac::SingleChannelDac as _embedded_hal_blocking_dac_SingleChannelDac;
 pub use crate::blocking::delay::DelayMs as _embedded_hal_blocking_delay_DelayMs;
 pub use crate::blocking::delay::DelayUs as _embedded_hal_blocking_delay_DelayUs;
 pub use crate::blocking::i2c::{
