@@ -129,7 +129,7 @@ pub trait ReadWrite {
 
     /// Read a slice of data from the storage peripheral, starting the read
     /// operation at the given address, and reading until end address
-    /// (`range().1`) or buffer length, whichever comes first.
+    /// (`self.range().1`) or buffer length, whichever comes first.
     fn try_read(&mut self, address: Address, bytes: &mut [u8]) -> nb::Result<(), Self::Error>;
 
     /// Write a slice of data to the storage peripheral, starting the write
@@ -141,6 +141,6 @@ pub trait ReadWrite {
     /// (start_addr, end_addr)
     fn range(&self) -> (Address, Address);
 
-    /// Erase the full storage range, clearing all data withing `range()`.
+    /// Erase the full storage range, clearing all data within `self.range()`.
     fn try_erase(&mut self) -> nb::Result<(), Self::Error>;
 }
