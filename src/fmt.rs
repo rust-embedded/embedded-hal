@@ -11,7 +11,7 @@ where
         let _ = s
             .as_bytes()
             .into_iter()
-            .map(|c| block!(self.try_write(Word::from(*c))))
+            .map(|c| nb::block!(self.try_write(Word::from(*c))))
             .last();
         Ok(())
     }

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - 10-bit addressing mode for I2C traits.
 - Added `blocking::dac::SingleChannelDac` trait for digitial-to-analog-converters.
+- `try_set_state` method for `OutputPin` using an input `PinState` value.
 
 ### Changed
 
@@ -22,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   has been renamed `try_write_iter` for consistency.
 - Updated `nb` dependency to version `1`.
 - The watchdog API now uses move semantics. See [PR](https://github.com/rust-embedded/embedded-hal/pull/222).
+- The ADC `Channel` trait now uses a stateful method to get the IDs.
 
 ## [v1.0.0-alpha.1] - 2020-06-16
 
@@ -40,6 +42,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   in trait implementations where methods cannot fail.
 - A new [process](https://github.com/rust-embedded/embedded-hal#how-to-add-a-new-trait)
   has been adopted for the addition of traits to the embedded-hal.
+- The ADC `Channel` trait now uses a constant to represent the IDs.
 - The minimum supported Rust version is 1.35 due to [this issue](https://github.com/rust-lang/rust/issues/54973).
 
 ## [v0.2.3] - 2019-05-09
