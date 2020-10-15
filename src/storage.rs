@@ -141,6 +141,9 @@ pub trait ReadWrite {
     /// (start_addr, end_addr)
     fn range(&self) -> (Address, Address);
 
-    /// Erase the full storage range, clearing all data within `self.range()`.
-    fn try_erase(&mut self) -> nb::Result<(), Self::Error>;
+    /// Erase the given storage range, clearing all data within `[from..to]`.
+    ///
+    /// This should return an error if the range is not aligned to a proper
+    /// erase resolution
+    fn try_erase(&mut self, from: Address, to: Address) -> nb::Result<(), Self::Error>;
 }
