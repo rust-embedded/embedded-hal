@@ -83,8 +83,7 @@ pub trait Pwm {
     fn try_get_max_duty(&self) -> Result<Self::Duty, Self::Error>;
 
     /// Sets a new duty cycle
-    fn try_set_duty(&mut self, channel: usize, duty: Self::Duty)
-        -> Result<(), Self::Error>;
+    fn try_set_duty(&mut self, channel: usize, duty: Self::Duty) -> Result<(), Self::Error>;
 
     /// Sets a new PWM period
     fn try_set_period<P>(&mut self, period: P) -> Result<(), Self::Error>
