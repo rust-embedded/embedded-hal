@@ -65,12 +65,12 @@ use core::time::Duration;
 /// #     fn try_disable(&mut self, _: usize) -> Result<(), Self::Error> { unimplemented!() }
 /// #     fn try_enable(&mut self, _: usize) -> Result<(), Self::Error> { unimplemented!() }
 /// #     fn try_get_period(&self) -> Result<Duration, Self::Error> { unimplemented!() }
-/// #     fn try_set_period<T>(&mut self, _: T) -> Result<(), Self::Error> where T: Into<Duration> { Ok(()) }
+/// #     fn try_set_period(&mut self, _: Duration) -> Result<(), Self::Error> { Ok(()) }
 /// # }
 /// #
 /// # impl hal::pwm::PwmDuty<u16> for Pwm1<HasPins> {
 /// #     fn try_get_duty(&self, _: usize) -> Result<u16, Self::Error> { unimplemented!() }
-/// #     fn try_set_duty<D>(&mut self, _: usize, _: D) -> Result<(), Self::Error> where D: Into<u16> { Ok(()) }
+/// #     fn try_set_duty(&mut self, _: usize, _: u16) -> Result<(), Self::Error> { Ok(()) }
 /// # }
 /// # impl hal::pwm::PwmPin<u16> for Pwm1Pin {
 /// #     const MAX_DUTY: u16 = 1024;
@@ -78,7 +78,7 @@ use core::time::Duration;
 /// #     fn try_disable(&mut self) -> Result<(), Self::Error> { unimplemented!() }
 /// #     fn try_enable(&mut self) -> Result<(), Self::Error> { unimplemented!() }
 /// #     fn try_get_duty(&self) -> Result<u16, Self::Error> { unimplemented!() }
-/// #     fn try_set_duty<D>(&mut self, _: D) -> Result<(), Self::Error> where D: Into<u16> { Ok(()) }
+/// #     fn try_set_duty(&mut self, _: u16) -> Result<(), Self::Error> { Ok(()) }
 /// # }
 /// ```
 // unproven reason: pre-singletons API. The `PwmPin` trait seems more useful because it models independent
@@ -106,9 +106,7 @@ pub trait Pwm<Duty> {
     fn try_get_period(&self) -> Result<Duration, Self::Error>;
 
     /// Sets a new PWM period
-    fn try_set_period<P>(&mut self, period: P) -> Result<(), Self::Error>
-    where
-        P: Into<Duration>;
+    fn try_set_period(&mut self, period: Duration) -> Result<(), Self::Error>;
 
     // Note: technically there could be a `channel` or `split` method here but this is
     // rather extremely difficult prior to const-generics landing (and CHANNELS would need to be a const generic)
@@ -126,9 +124,7 @@ pub trait PwmDuty<Duty>: Pwm<Duty> {
     fn try_get_duty(&self, channel: usize) -> Result<Duty, Self::Error>;
 
     /// Sets a new duty cycle
-    fn try_set_duty<D>(&mut self, channel: usize, duty: D) -> Result<(), Self::Error>
-    where
-        D: Into<Duty>;
+    fn try_set_duty(&mut self, channel: usize, duty: Duty) -> Result<(), Self::Error>;
 }
 
 /// A single PWM channel / pin
@@ -155,8 +151,6 @@ pub trait PwmPin<Duty> {
     fn try_get_duty(&self) -> Result<Duty, Self::Error>;
 
     /// Sets a new duty cycle
-    fn try_set_duty<D>(&mut self, duty: D) -> Result<(), Self::Error>
-    where
-        D: Into<Duty>;
+    fn try_set_duty(&mut self, duty: Duty) -> Result<(), Self::Error>;
 }
 
