@@ -134,7 +134,7 @@ pub mod transactional {
 
     impl<W: 'static, E, S> super::Transactional<W> for S
     where
-        S: self::Default<W> + Write<W, Error=E> + Transfer<W, Error=E> ,
+        S: self::Default<W> + Write<W, Error = E> + Transfer<W, Error = E>,
         W: Copy + Clone,
     {
         type Error = E;
