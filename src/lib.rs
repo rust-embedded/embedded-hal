@@ -4,6 +4,9 @@
 //! tweaked, split or be replaced wholesale before being stabilized, i.e. before hitting the 1.0.0
 //! release.
 //!
+//! **NOTE** If you want to use an alpha release of the 1.0.0 version, use an exact version
+//! specifier in your `Cargo.toml` like: `embedded-hal = "=1.0.0-alpha.2"`.
+//!
 //! # Design goals
 //!
 //! The HAL

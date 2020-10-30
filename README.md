@@ -8,6 +8,17 @@ This project is developed and maintained by the [HAL team][team].
 
 [API reference]: https://docs.rs/embedded-hal
 
+## Releases
+
+At the moment we are working towards a `1.0.0` release (see [#177]). During this process we will
+release alpha versions like `1.0.0-alpha.1` and `1.0.0-alpha.2`.
+Alpha releases are **not guaranteed** to be compatible with each other.
+They are provided as early previews for community testing and preparation for the final release.
+If you use an alpha release, we recommend you choose an exact version specification in your
+`Cargo.toml` like: `embedded-hal = "=1.0.0-alpha.2"`
+
+[#177]: https://github.com/rust-embedded/embedded-hal/issues/177
+
 ## How-to: add a new trait
 
 This is the suggested approach to adding a new trait to `embedded-hal`
@@ -30,7 +41,7 @@ Traits should be demonstrated with at least *two* implementations on different p
 
 Once the trait has been demonstrated a PR should be opened to merge the new trait(s) into `embedded-hal`. This should include a link to the previous discussion issue.
 
-If there is determined to be more than one alternative then there should be further discussion to 
+If there is determined to be more than one alternative then there should be further discussion to
 try to single out the best option. Once there is consensus this will be merged into the `embedded-hal` repository.
 
 These issues / PRs will be labeled as `proposal`s in the issue tracker.
@@ -43,7 +54,7 @@ list.
 
 [awesome-embedded-rust]: https://github.com/rust-embedded/awesome-embedded-rust#driver-crates
 
-# Minimum Supported Rust Version (MSRV)
+## Minimum Supported Rust Version (MSRV)
 
 This crate is guaranteed to compile on stable Rust 1.35 and up. It *might*
 compile with older versions but that may change in any new patch release.
