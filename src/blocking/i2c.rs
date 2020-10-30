@@ -232,3 +232,117 @@ pub trait WriteIterRead<A: AddressMode = SevenBitAddress> {
     where
         B: IntoIterator<Item = u8>;
 }
+
+/// Transactional I2C operation.
+///
+/// Several operations can be combined as part of a transaction.
+#[derive(Debug, PartialEq)]
+pub enum Operation<'a> {
+    /// Read data into the provided buffer
+    Read(&'a mut [u8]),
+    /// Write data from the provided buffer
+    Write(&'a [u8]),
+}
+
+/// Transactional I2C interface.
+///
+/// This allows combining operations within an I2C transaction.
+pub trait Transactional {
+    /// Error type
+    type Error;
+
+    /// Execute the provided operations on the I2C bus.
+    ///
+    /// Transaction contract:
+    /// - Before executing the first operation an ST is sent automatically. This is followed by SAD+R/W as appropriate.
+    /// - Data from adjacent operations of the same type are sent after each other without an SP or SR.
+    /// - Between adjacent operations of a different type an SR and SAD+R/W is sent.
+    /// - After executing the last operation an SP is sent automatically.
+    /// - If the last operation is a `Read` the master does not send an acknowledge for the last byte.
+    ///
+    /// - `ST` = start condition
+    /// - `SAD+R/W` = slave address followed by bit 1 to indicate reading or 0 to indicate writing
+    /// - `SR` = repeated start condition
+    /// - `SP` = stop condition
+    fn try_exec<'a>(
+        &mut self,
+        address: u8,
+        operations: &mut [Operation<'a>],
+    ) -> Result<(), Self::Error>;
+}
+
+/// Transactional I2C interface (iterator version).
+///
+/// This allows combining operation within an I2C transaction.
+pub trait TransactionalIter {
+    /// Error type
+    type Error;
+
+    /// Execute the provided operations on the I2C bus (iterator version).
+    ///
+    /// Transaction contract:
+    /// - Before executing the first operation an ST is sent automatically. This is followed by SAD+R/W as appropriate.
+    /// - Data from adjacent operations of the same type are sent after each other without an SP or SR.
+    /// - Between adjacent operations of a different type an SR and SAD+R/W is sent.
+    /// - After executing the last operation an SP is sent automatically.
+    /// - If the last operation is a `Read` the master does not send an acknowledge for the last byte.
+    ///
+    /// - `ST` = start condition
+    /// - `SAD+R/W` = slave address followed by bit 1 to indicate reading or 0 to indicate writing
+    /// - `SR` = repeated start condition
+    /// - `SP` = stop condition
+    fn try_exec_iter<'a, O>(&mut self, address: u8, operations: O) -> Result<(), Self::Error>
+    where
+        O: IntoIterator<Item = Operation<'a>>;
+}
+
+/// Default implementation of `blocking::i2c::Write`, `blocking::i2c::Read` and
+/// `blocking::i2c::WriteRead` traits for `blocking::i2c::Transactional` implementers.
+pub mod transactional {
+    use super::{Operation, Read, Transactional, Write, WriteRead};
+
+    /// Default implementation of `blocking::i2c::Write`, `blocking::i2c::Read` and
+    /// `blocking::i2c::WriteRead` traits for `blocking::i2c::Transactional` implementers.
+    pub trait Default<E> {}
+
+    impl<E, S> Write for S
+    where
+        S: self::Default<E> + Transactional<Error = E>,
+    {
+        type Error = E;
+
+        fn try_write(&mut self, address: u8, bytes: &[u8]) -> Result<(), Self::Error> {
+            self.try_exec(address, &mut [Operation::Write(bytes)])
+        }
+    }
+
+    impl<E, S> Read for S
+    where
+        S: self::Default<E> + Transactional<Error = E>,
+    {
+        type Error = E;
+
+        fn try_read(&mut self, address: u8, buffer: &mut [u8]) -> Result<(), Self::Error> {
+            self.try_exec(address, &mut [Operation::Read(buffer)])
+        }
+    }
+
+    impl<E, S> WriteRead for S
+    where
+        S: self::Default<E> + Transactional<Error = E>,
+    {
+        type Error = E;
+
+        fn try_write_read(
+            &mut self,
+            address: u8,
+            bytes: &[u8],
+            buffer: &mut [u8],
+        ) -> Result<(), Self::Error> {
+            self.try_exec(
+                address,
+                &mut [Operation::Write(bytes), Operation::Read(buffer)],
+            )
+        }
+    }
+}
