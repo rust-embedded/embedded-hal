@@ -1,5 +1,6 @@
 [package]
 authors = [
+  "The Embedded HAL Team <embedded-hal@teams.rust-embedded.org>",
   "Jorge Aparicio <jorge@japaric.io>",
   "Jonathan 'theJPster' Pallant <github@thejpster.org.uk>"
 ]
@@ -12,7 +13,7 @@ license = "MIT OR Apache-2.0"
 name = "embedded-hal"
 readme = "README.md"
 repository = "https://github.com/rust-embedded/embedded-hal"
-version = "1.0.0-alpha.2"
+version = "1.0.0-alpha.3"
 
 [dependencies]
 nb = "1"
