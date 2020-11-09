@@ -298,6 +298,37 @@ pub trait TransactionalIter<A: AddressMode = SevenBitAddress> {
 
 /// Default implementation of `blocking::i2c::Write`, `blocking::i2c::Read` and
 /// `blocking::i2c::WriteRead` traits for `blocking::i2c::Transactional` implementers.
+///
+/// If you implement `blocking::i2c::Transactional` for your I2C peripheral,
+/// you can use this default implementation so that you do not need to implement
+/// the `blocking::i2c::Write`, `blocking::i2c::Read` and `blocking::i2c::WriteRead`
+/// traits as well.
+/// ```
+/// use embedded_hal::blocking::i2c;
+///
+/// struct I2c1;
+///
+/// impl i2c::Transactional<i2c::SevenBitAddress> for I2c1 {
+/// #    type Error = ();
+///     fn try_exec<'a>(
+///         &mut self,
+///         address: i2c::SevenBitAddress,
+///         operations: &mut [i2c::Operation<'a>],
+///     ) -> Result<(), Self::Error> {
+///         // ...
+///         # Ok(())
+///     }
+/// }
+///
+/// // This is all you need to do:
+/// impl i2c::transactional::Default<i2c::SevenBitAddress> for I2c1 {};
+///
+/// // Then you can use `Write` and so on:
+/// use i2c::Write;
+///
+/// let mut i2c1 = I2c1{};
+/// i2c1.try_write(0x01, &[0xAB, 0xCD]).unwrap();
+/// ```
 pub mod transactional {
     use super::{AddressMode, Operation, Read, Transactional, Write, WriteRead};
 
