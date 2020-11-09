@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+### Fixed
+- Support for I2C addressing modes in `Transactional` I2C traits.
 
 ## [v1.0.0-alpha.3] - 2020-11-04
 
