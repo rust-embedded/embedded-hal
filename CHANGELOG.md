@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## [v1.0.0-alpha.4] - 2020-11-11
+
 ### Fixed
 - Support for I2C addressing modes in `Transactional` I2C traits.
 
@@ -148,7 +150,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.3...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.4...HEAD
+[v1.0.0-alpha.4]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.3...v1.0.0-alpha.4
 [v1.0.0-alpha.3]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.2...v1.0.0-alpha.3
 [v1.0.0-alpha.2]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.1...v1.0.0-alpha.2
 [v1.0.0-alpha.1]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.3...v1.0.0-alpha.1
