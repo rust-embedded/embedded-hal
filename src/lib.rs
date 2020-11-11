@@ -404,6 +404,7 @@
 //! # fn main() {}
 //! ```
 
+#![doc(html_root_url = "https://docs.rs/embedded-hal/1.0.0-alpha.3")]
 #![deny(missing_docs)]
 #![no_std]
 
