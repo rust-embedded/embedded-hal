@@ -10,10 +10,10 @@ pub trait Can {
 
     /// Puts a frame in the transmit buffer. Blocks until space is available in
     /// the transmit buffer.
-    fn try_transmit(&mut self, frame: &Self::Frame) -> Result<(), Self::Error>;
+    fn try_write(&mut self, frame: &Self::Frame) -> Result<(), Self::Error>;
 
     /// Blocks until a frame was received or an error occured.
-    fn try_receive(&mut self) -> Result<Self::Frame, Self::Error>;
+    fn try_read(&mut self) -> Result<Self::Frame, Self::Error>;
 }
 
 /// Default implementation of `blocking::can::Can` for implementers of `can::Can`
@@ -26,7 +26,7 @@ where
     type Frame = S::Frame;
     type Error = S::Error;
 
-    fn try_transmit(&mut self, frame: &Self::Frame) -> Result<(), Self::Error> {
+    fn try_write(&mut self, frame: &Self::Frame) -> Result<(), Self::Error> {
         let mut replaced_frame;
         let mut frame_to_transmit = frame;
         while let Some(f) = nb::block!(self.try_transmit(&frame_to_transmit))? {
@@ -36,7 +36,7 @@ where
         Ok(())
     }
 
-    fn try_receive(&mut self) -> Result<Self::Frame, Self::Error> {
+    fn try_read(&mut self) -> Result<Self::Frame, Self::Error> {
         nb::block!(self.try_receive())
     }
 }
