@@ -3,7 +3,7 @@
 //! TODO write example of usage
 use core::fmt::{Result, Write};
 
-impl<Word, Error> Write for dyn (crate::serial::Write<Word, Error = Error>)
+impl<Word, Error> Write for dyn crate::serial::Write<Word, Error = Error> + '_
 where
     Word: From<u8>,
 {
