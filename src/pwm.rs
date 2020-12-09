@@ -39,8 +39,10 @@
 /// #     type Channel = Channel;
 /// #     type Time = KiloHertz;
 /// #     type Duty = u16;
-/// #     fn try_disable(&mut self, _: Channel) -> Result<(), Self::Error> { unimplemented!() }
-/// #     fn try_enable(&mut self, _: Channel) -> Result<(), Self::Error> { unimplemented!() }
+/// #     fn try_disable(&mut self) -> Result<(), Self::Error> { unimplemented!() }
+/// #     fn try_enable(&mut self) -> Result<(), Self::Error> { unimplemented!() }
+/// #     fn try_disable_channel(&mut self, _: Channel) -> Result<(), Self::Error> { unimplemented!() }
+/// #     fn try_enable_channel(&mut self, _: Channel) -> Result<(), Self::Error> { unimplemented!() }
 /// #     fn try_get_duty(&self, _: Channel) -> Result<u16, Self::Error> { unimplemented!() }
 /// #     fn try_get_max_duty(&self) -> Result<u16, Self::Error> { Ok(0) }
 /// #     fn try_set_duty(&mut self, _: Channel, _: u16) -> Result<(), Self::Error> { Ok(()) }
@@ -69,11 +71,17 @@ pub trait Pwm {
     /// (e.g. `0.0 .. 1.0`) or an integer representation (e.g. `0 .. 65535`)
     type Duty;
 
+    /// Disables all channels on the timer
+    fn try_disable(&mut self) -> Result<(), Self::Error>;
+
+    /// Enables all channels on the timer
+    fn try_enable(&mut self) -> Result<(), Self::Error>;
+
     /// Disables a PWM `channel`
-    fn try_disable(&mut self, channel: Self::Channel) -> Result<(), Self::Error>;
+    fn try_disable_channel(&mut self, channel: Self::Channel) -> Result<(), Self::Error>;
 
     /// Enables a PWM `channel`
-    fn try_enable(&mut self, channel: Self::Channel) -> Result<(), Self::Error>;
+    fn try_enable_channel(&mut self, channel: Self::Channel) -> Result<(), Self::Error>;
 
     /// Returns the current PWM period
     fn try_get_period(&self) -> Result<Self::Time, Self::Error>;
