@@ -142,8 +142,9 @@ pub mod dummy {
 
     /// Dummy (no-op, zero-cost) pin
     ///
-    /// This will discard any value set to it and when checked always behave
-    /// according to the value provided at construction time (high/low).
+    /// The implementation will discard any value written to it. When read,
+    /// it will always behave according to the value provided at construction
+    /// time (high or low).
     pub struct DummyPin<L = level::Low> {
         _l: PhantomData<L>,
     }
