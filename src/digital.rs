@@ -161,7 +161,7 @@ pub mod dummy {
     impl DummyPin<level::High> {
         /// Create new instance
         ///
-        /// When checked it will always behave as being high.
+        /// When read it will always behave as being high.
         pub fn new_high() -> Self {
             DummyPin { _l: PhantomData }
         }
