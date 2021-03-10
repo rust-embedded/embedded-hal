@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - 10-bit addressing mode for I2C traits.
-- Dummy GPIO pin (No-op, zero cost) struct `DummyPin`, useful when dealing
+- Dummy GPIO pin (no-op, zero cost) struct `DummyPin`, useful when dealing
   with optional pins.
 
 ### Changed
