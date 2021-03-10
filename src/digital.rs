@@ -140,7 +140,7 @@ pub mod dummy {
         pub struct Low;
     }
 
-    /// Dummy (No-op, zero-cost) pin
+    /// Dummy (no-op, zero-cost) pin
     ///
     /// This will discard any value set to it and when checked always behave
     /// according to the value provided at construction time (high/low).
