@@ -247,7 +247,7 @@ pub enum Operation<'a> {
 /// Transactional I2C interface.
 ///
 /// This allows combining operations within an I2C transaction.
-pub trait Transactional {
+pub trait Transactional<A: AddressMode = SevenBitAddress> {
     /// Error type
     type Error;
 
@@ -266,7 +266,7 @@ pub trait Transactional {
     /// - `SP` = stop condition
     fn try_exec<'a>(
         &mut self,
-        address: u8,
+        address: A,
         operations: &mut [Operation<'a>],
     ) -> Result<(), Self::Error>;
 }
@@ -274,7 +274,7 @@ pub trait Transactional {
 /// Transactional I2C interface (iterator version).
 ///
 /// This allows combining operation within an I2C transaction.
-pub trait TransactionalIter {
+pub trait TransactionalIter<A: AddressMode = SevenBitAddress> {
     /// Error type
     type Error;
 
@@ -291,51 +291,85 @@ pub trait TransactionalIter {
     /// - `SAD+R/W` = slave address followed by bit 1 to indicate reading or 0 to indicate writing
     /// - `SR` = repeated start condition
     /// - `SP` = stop condition
-    fn try_exec_iter<'a, O>(&mut self, address: u8, operations: O) -> Result<(), Self::Error>
+    fn try_exec_iter<'a, O>(&mut self, address: A, operations: O) -> Result<(), Self::Error>
     where
         O: IntoIterator<Item = Operation<'a>>;
 }
 
 /// Default implementation of `blocking::i2c::Write`, `blocking::i2c::Read` and
 /// `blocking::i2c::WriteRead` traits for `blocking::i2c::Transactional` implementers.
+///
+/// If you implement `blocking::i2c::Transactional` for your I2C peripheral,
+/// you can use this default implementation so that you do not need to implement
+/// the `blocking::i2c::Write`, `blocking::i2c::Read` and `blocking::i2c::WriteRead`
+/// traits as well.
+/// ```
+/// use embedded_hal::blocking::i2c;
+///
+/// struct I2c1;
+///
+/// impl i2c::Transactional<i2c::SevenBitAddress> for I2c1 {
+/// #    type Error = ();
+///     fn try_exec<'a>(
+///         &mut self,
+///         address: i2c::SevenBitAddress,
+///         operations: &mut [i2c::Operation<'a>],
+///     ) -> Result<(), Self::Error> {
+///         // ...
+///         # Ok(())
+///     }
+/// }
+///
+/// // This is all you need to do:
+/// impl i2c::transactional::Default<i2c::SevenBitAddress> for I2c1 {};
+///
+/// // Then you can use `Write` and so on:
+/// use i2c::Write;
+///
+/// let mut i2c1 = I2c1{};
+/// i2c1.try_write(0x01, &[0xAB, 0xCD]).unwrap();
+/// ```
 pub mod transactional {
-    use super::{Operation, Read, Transactional, Write, WriteRead};
+    use super::{AddressMode, Operation, Read, Transactional, Write, WriteRead};
 
     /// Default implementation of `blocking::i2c::Write`, `blocking::i2c::Read` and
     /// `blocking::i2c::WriteRead` traits for `blocking::i2c::Transactional` implementers.
-    pub trait Default<E> {}
+    pub trait Default<A: AddressMode>: Transactional<A> {}
 
-    impl<E, S> Write for S
+    impl<A, E, S> Write<A> for S
     where
-        S: self::Default<E> + Transactional<Error = E>,
+        A: AddressMode,
+        S: self::Default<A> + Transactional<A, Error = E>,
     {
         type Error = E;
 
-        fn try_write(&mut self, address: u8, bytes: &[u8]) -> Result<(), Self::Error> {
+        fn try_write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error> {
             self.try_exec(address, &mut [Operation::Write(bytes)])
         }
     }
 
-    impl<E, S> Read for S
+    impl<A, E, S> Read<A> for S
     where
-        S: self::Default<E> + Transactional<Error = E>,
+        A: AddressMode,
+        S: self::Default<A> + Transactional<A, Error = E>,
     {
         type Error = E;
 
-        fn try_read(&mut self, address: u8, buffer: &mut [u8]) -> Result<(), Self::Error> {
+        fn try_read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error> {
             self.try_exec(address, &mut [Operation::Read(buffer)])
         }
     }
 
-    impl<E, S> WriteRead for S
+    impl<A, E, S> WriteRead<A> for S
     where
-        S: self::Default<E> + Transactional<Error = E>,
+        A: AddressMode,
+        S: self::Default<A> + Transactional<A, Error = E>,
     {
         type Error = E;
 
         fn try_write_read(
             &mut self,
-            address: u8,
+            address: A,
             bytes: &[u8],
             buffer: &mut [u8],
         ) -> Result<(), Self::Error> {
