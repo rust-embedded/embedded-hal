@@ -22,10 +22,10 @@
 ///     let max_duty = pwm.try_get_max_duty().unwrap();
 ///
 ///     // brightest LED
-///     pwm.try_set_duty(Channel::_1, max_duty).unwrap();
+///     pwm.try_set_duty(&Channel::_1, max_duty).unwrap();
 ///
 ///     // dimmer LED
-///     pwm.try_set_duty(Channel::_2, max_duty / 4).unwrap();
+///     pwm.try_set_duty(&Channel::_2, max_duty / 4).unwrap();
 /// }
 ///
 /// # use core::convert::Infallible;
@@ -39,11 +39,11 @@
 /// #     type Channel = Channel;
 /// #     type Time = KiloHertz;
 /// #     type Duty = u16;
-/// #     fn try_disable(&mut self, _: Channel) -> Result<(), Self::Error> { unimplemented!() }
-/// #     fn try_enable(&mut self, _: Channel) -> Result<(), Self::Error> { unimplemented!() }
-/// #     fn try_get_duty(&self, _: Channel) -> Result<u16, Self::Error> { unimplemented!() }
+/// #     fn try_disable(&mut self, _: &Channel) -> Result<(), Self::Error> { unimplemented!() }
+/// #     fn try_enable(&mut self, _: &Channel) -> Result<(), Self::Error> { unimplemented!() }
+/// #     fn try_get_duty(&self, _: &Channel) -> Result<u16, Self::Error> { unimplemented!() }
 /// #     fn try_get_max_duty(&self) -> Result<u16, Self::Error> { Ok(0) }
-/// #     fn try_set_duty(&mut self, _: Channel, _: u16) -> Result<(), Self::Error> { Ok(()) }
+/// #     fn try_set_duty(&mut self, _: &Channel, _: u16) -> Result<(), Self::Error> { Ok(()) }
 /// #     fn try_get_period(&self) -> Result<KiloHertz, Self::Error> { unimplemented!() }
 /// #     fn try_set_period<T>(&mut self, _: T) -> Result<(), Self::Error> where T: Into<KiloHertz> { Ok(()) }
 /// # }
@@ -70,10 +70,10 @@ pub trait Pwm {
     type Duty;
 
     /// Disables a PWM `channel`
-    fn try_disable(&mut self, channel: Self::Channel) -> Result<(), Self::Error>;
+    fn try_disable(&mut self, channel: &Self::Channel) -> Result<(), Self::Error>;
 
     /// Enables a PWM `channel`
-    fn try_enable(&mut self, channel: Self::Channel) -> Result<(), Self::Error>;
+    fn try_enable(&mut self, channel: &Self::Channel) -> Result<(), Self::Error>;
 
     /// Returns the current PWM period
     fn try_get_period(&self) -> Result<Self::Time, Self::Error>;
@@ -82,13 +82,13 @@ pub trait Pwm {
     ///
     /// While the pin is transitioning to the new duty cycle after a `try_set_duty` call, this may
     /// return the old or the new duty cycle depending on the implementation.
-    fn try_get_duty(&self, channel: Self::Channel) -> Result<Self::Duty, Self::Error>;
+    fn try_get_duty(&self, channel: &Self::Channel) -> Result<Self::Duty, Self::Error>;
 
     /// Returns the maximum duty cycle value
     fn try_get_max_duty(&self) -> Result<Self::Duty, Self::Error>;
 
     /// Sets a new duty cycle
-    fn try_set_duty(&mut self, channel: Self::Channel, duty: Self::Duty)
+    fn try_set_duty(&mut self, channel: &Self::Channel, duty: Self::Duty)
         -> Result<(), Self::Error>;
 
     /// Sets a new PWM period

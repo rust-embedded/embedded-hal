@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 ### Changed
+- Swap PWM channel arguments to references
 
 ## [v1.0.0-alpha.4] - 2020-11-11
 
