@@ -174,3 +174,49 @@ pub trait InputPin {
     /// Is the input pin low?
     fn try_is_low(&self) -> Result<bool, Self::Error>;
 }
+
+/// Single pin that can switch from input to output mode, and vice-versa.
+///
+/// Example use (assumes the `Error` type is the same for the `IoPin`,
+/// `InputPin`, and `OutputPin`):
+///
+/// ```
+/// use core::time::Duration;
+/// use embedded_hal::digital::{IoPin, InputPin, OutputPin};
+///
+/// pub fn ping_and_read<TInputPin, TOutputPin, TError>(
+///     mut pin: TOutputPin, delay_fn: &dyn Fn(Duration) -> ()) -> Result<bool, TError>
+/// where
+///     TInputPin : InputPin<Error = TError> + IoPin<TInputPin, TOutputPin, Error = TError>,
+///     TOutputPin : OutputPin<Error = TError> + IoPin<TInputPin, TOutputPin, Error = TError>,
+/// {
+///     // Ping
+///     pin.try_set_low()?;
+///     delay_fn(Duration::from_millis(10));
+///     pin.try_set_high()?;
+///
+///     // Read
+///     let pin = pin.try_into_input_pin()?;
+///     delay_fn(Duration::from_millis(10));
+///     pin.try_is_high()
+/// }
+/// ```
+pub trait IoPin<TInput, TOutput>
+where
+    TInput: InputPin + IoPin<TInput, TOutput>,
+    TOutput: OutputPin + IoPin<TInput, TOutput>,
+{
+    /// Error type.
+    type Error;
+
+    /// Tries to convert this pin to input mode.
+    ///
+    /// If the pin is already in input mode, this method should succeed.
+    fn try_into_input_pin(self) -> Result<TInput, Self::Error>;
+
+    /// Tries to convert this pin to output mode with the given initial state.
+    ///
+    /// If the pin is already in the requested state, this method should
+    /// succeed.
+    fn try_into_output_pin(self, state: PinState) -> Result<TOutput, Self::Error>;
+}
