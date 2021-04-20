@@ -22,10 +22,10 @@ use nb;
 /// #       Capture1
 ///     };
 ///
-///     capture.try_set_resolution(1.ms()).unwrap();
+///     capture.set_resolution(1.ms()).unwrap();
 ///
-///     let before = block!(capture.try_capture(Channel::_1)).unwrap();
-///     let after = block!(capture.try_capture(Channel::_1)).unwrap();
+///     let before = block!(capture.capture(Channel::_1)).unwrap();
+///     let after = block!(capture.capture(Channel::_1)).unwrap();
 ///
 ///     let period = after.wrapping_sub(before);
 ///
@@ -43,11 +43,11 @@ use nb;
 /// #     type Capture = u16;
 /// #     type Channel = Channel;
 /// #     type Time = MilliSeconds;
-/// #     fn try_capture(&mut self, _: Channel) -> ::nb::Result<u16, Self::Error> { Ok(0) }
-/// #     fn try_disable(&mut self, _: Channel) -> Result<(), Self::Error> { unimplemented!() }
-/// #     fn try_enable(&mut self, _: Channel) -> Result<(), Self::Error> { unimplemented!() }
-/// #     fn try_get_resolution(&self) -> Result<MilliSeconds, Self::Error> { unimplemented!() }
-/// #     fn try_set_resolution<T>(&mut self, _: T) -> Result<(), Self::Error> where T: Into<MilliSeconds> { Ok(()) }
+/// #     fn capture(&mut self, _: Channel) -> ::nb::Result<u16, Self::Error> { Ok(0) }
+/// #     fn disable(&mut self, _: Channel) -> Result<(), Self::Error> { unimplemented!() }
+/// #     fn enable(&mut self, _: Channel) -> Result<(), Self::Error> { unimplemented!() }
+/// #     fn get_resolution(&self) -> Result<MilliSeconds, Self::Error> { unimplemented!() }
+/// #     fn set_resolution<T>(&mut self, _: T) -> Result<(), Self::Error> where T: Into<MilliSeconds> { Ok(()) }
 /// # }
 /// ```
 // unproven reason: pre-singletons API. With singletons a `CapturePin` (cf. `PwmPin`) trait seems more
@@ -78,19 +78,19 @@ pub trait Capture {
     ///
     /// NOTE that you must multiply the returned value by the *resolution* of
     /// this `Capture` interface to get a human time unit (e.g. seconds)
-    fn try_capture(&mut self, channel: Self::Channel) -> nb::Result<Self::Capture, Self::Error>;
+    fn capture(&mut self, channel: Self::Channel) -> nb::Result<Self::Capture, Self::Error>;
 
     /// Disables a capture `channel`
-    fn try_disable(&mut self, channel: Self::Channel) -> Result<(), Self::Error>;
+    fn disable(&mut self, channel: Self::Channel) -> Result<(), Self::Error>;
 
     /// Enables a capture `channel`
-    fn try_enable(&mut self, channel: Self::Channel) -> Result<(), Self::Error>;
+    fn enable(&mut self, channel: Self::Channel) -> Result<(), Self::Error>;
 
     /// Returns the current resolution
-    fn try_get_resolution(&self) -> Result<Self::Time, Self::Error>;
+    fn get_resolution(&self) -> Result<Self::Time, Self::Error>;
 
     /// Sets the resolution of the capture timer
-    fn try_set_resolution<R>(&mut self, resolution: R) -> Result<(), Self::Error>
+    fn set_resolution<R>(&mut self, resolution: R) -> Result<(), Self::Error>
     where
         R: Into<Self::Time>;
 }

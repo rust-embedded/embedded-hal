@@ -6,7 +6,7 @@ use nb;
 ///
 /// # Contract
 ///
-/// - `self.start(count); block!(self.try_wait());` MUST block for AT LEAST the time specified by
+/// - `self.start(count); block!(self.wait());` MUST block for AT LEAST the time specified by
 /// `count`.
 ///
 /// *Note* that the implementer doesn't necessarily have to be a *downcounting* timer; it could also
@@ -34,8 +34,8 @@ use nb;
 ///     };
 ///
 ///     Led.on();
-///     timer.try_start(1.s()).unwrap();
-///     block!(timer.try_wait()); // blocks for 1 second
+///     timer.start(1.s()).unwrap();
+///     block!(timer.wait()); // blocks for 1 second
 ///     Led.off();
 /// }
 ///
@@ -52,8 +52,8 @@ use nb;
 /// # impl hal::timer::CountDown for Timer6 {
 /// #     type Error = Infallible;
 /// #     type Time = Seconds;
-/// #     fn try_start<T>(&mut self, _: T) -> Result<(), Self::Error> where T: Into<Seconds> { Ok(()) }
-/// #     fn try_wait(&mut self) -> ::nb::Result<(), Infallible> { Ok(()) }
+/// #     fn start<T>(&mut self, _: T) -> Result<(), Self::Error> where T: Into<Seconds> { Ok(()) }
+/// #     fn wait(&mut self) -> ::nb::Result<(), Infallible> { Ok(()) }
 /// # }
 /// ```
 pub trait CountDown {
@@ -66,7 +66,7 @@ pub trait CountDown {
     type Time;
 
     /// Starts a new count down
-    fn try_start<T>(&mut self, count: T) -> Result<(), Self::Error>
+    fn start<T>(&mut self, count: T) -> Result<(), Self::Error>
     where
         T: Into<Self::Time>;
 
@@ -76,9 +76,9 @@ pub trait CountDown {
     ///
     /// - If `Self: Periodic`, the timer will start a new count down right after the last one
     /// finishes.
-    /// - Otherwise the behavior of calling `try_wait` after the last call returned `Ok` is UNSPECIFIED.
+    /// - Otherwise the behavior of calling `wait` after the last call returned `Ok` is UNSPECIFIED.
     /// Implementers are suggested to panic on this scenario to signal a programmer error.
-    fn try_wait(&mut self) -> nb::Result<(), Self::Error>;
+    fn wait(&mut self) -> nb::Result<(), Self::Error>;
 }
 
 /// Marker trait that indicates that a timer is periodic
@@ -92,5 +92,5 @@ pub trait Cancel: CountDown {
     ///
     /// An error will be returned if the countdown has already been canceled or was never started.
     /// An error is also returned if the countdown is not `Periodic` and has already expired.
-    fn try_cancel(&mut self) -> Result<(), Self::Error>;
+    fn cancel(&mut self) -> Result<(), Self::Error>;
 }
