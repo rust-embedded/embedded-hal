@@ -14,7 +14,6 @@ pub use crate::blocking::i2c::{
     WriteIterRead as _embedded_hal_blocking_i2c_WriteIterRead,
     WriteRead as _embedded_hal_blocking_i2c_WriteRead,
 };
-pub use crate::blocking::rng::Read as _embedded_hal_blocking_rng_Read;
 pub use crate::blocking::serial::Write as _embedded_hal_blocking_serial_Write;
 pub use crate::blocking::spi::{
     Transfer as _embedded_hal_blocking_spi_Transfer, Write as _embedded_hal_blocking_spi_Write,
@@ -28,7 +27,6 @@ pub use crate::digital::ToggleableOutputPin as _embedded_hal_digital_ToggleableO
 pub use crate::pwm::Pwm as _embedded_hal_Pwm;
 pub use crate::pwm::PwmPin as _embedded_hal_PwmPin;
 pub use crate::qei::Qei as _embedded_hal_Qei;
-pub use crate::rng::Read as _embedded_hal_rng_Read;
 pub use crate::serial::Read as _embedded_hal_serial_Read;
 pub use crate::serial::Write as _embedded_hal_serial_Write;
 pub use crate::spi::FullDuplex as _embedded_hal_spi_FullDuplex;
