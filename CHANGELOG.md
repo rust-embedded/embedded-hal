@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Swap PWM channel arguments to references
+- Dropped RNG traits in favor of [rand_core](https://crates.io/crates/rand_core)
 
 ## [v1.0.0-alpha.4] - 2020-11-11
 
