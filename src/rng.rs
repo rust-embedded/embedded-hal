@@ -2,6 +2,7 @@
 
 use nb;
 
+#[deprecated(note = "Implement rand_core instead.")]
 /// Nonblocking stream of random bytes.
 pub trait Read {
     /// An enumeration of RNG errors.

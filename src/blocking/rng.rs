@@ -1,5 +1,6 @@
 //! Blocking hardware random number generator
 
+#[deprecated(note = "Implement rand_core instead.")]
 /// Blocking read
 pub trait Read {
     /// Error type
