@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Swap PWM channel arguments to references
+- Marked RNG Traits as deprecated.
 
 ## [v1.0.0-alpha.4] - 2020-11-11
 
