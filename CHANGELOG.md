@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Added
+- Added `IoPin` trait for pins that can change between being inputs or outputs
+  dynamically.
 
 ### Changed
 - Swap PWM channel arguments to references
