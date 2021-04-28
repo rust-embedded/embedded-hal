@@ -5,6 +5,9 @@ on:
 
 name: Continuous integration
 
+env:
+  RUSTFLAGS: '--deny warnings'
+
 jobs:
   ci-linux:
     runs-on: ubuntu-latest
