@@ -1,7 +1,5 @@
 //! Analog-digital conversion traits
 
-use nb;
-
 /// A marker trait to identify MCU pins that can be used as inputs to an ADC channel.
 ///
 /// This marker trait denotes an object, i.e. a GPIO pin, that is ready for use as an input to the

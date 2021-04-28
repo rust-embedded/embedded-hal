@@ -1,7 +1,5 @@
 //! Serial interface
 
-use nb;
-
 /// Read half of a serial interface
 ///
 /// Some serial interfaces support different data sizes (8 bits, 9 bits, etc.);
