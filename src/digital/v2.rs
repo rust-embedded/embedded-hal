@@ -24,7 +24,7 @@ pub trait OutputPin {
 ///
 /// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
 #[cfg(feature = "unproven")]
-pub trait StatefulOutputPin : OutputPin {
+pub trait StatefulOutputPin: OutputPin {
     /// Is the pin in drive high mode?
     ///
     /// *NOTE* this does *not* read the electrical state of the pin

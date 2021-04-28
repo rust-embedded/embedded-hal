@@ -439,8 +439,8 @@
 //!
 //!     // Event loop
 //!     loop {
-//!         Pin::new(&mut blinky).resume();
-//!         Pin::new(&mut loopback).resume();
+//!         Pin::new(&mut blinky).resume(());
+//!         Pin::new(&mut loopback).resume(());
 //!         # break;
 //!     }
 //! }

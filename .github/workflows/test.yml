@@ -1,0 +1,29 @@
+on:
+  push:
+    branches: [ staging, trying, master ]
+  pull_request:
+
+name: Test Suite
+
+env:
+  RUSTFLAGS: '--deny warnings'
+
+jobs:
+  ci-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust: [nightly]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ matrix.rust }}
+          target: ${{ matrix.TARGET }}
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --features unproven
