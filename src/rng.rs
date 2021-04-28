@@ -10,5 +10,5 @@ pub trait Read {
     type Error;
 
     /// Get a number of bytes from the RNG.
-    fn try_read(&mut self, buf: &mut [u8]) -> nb::Result<usize, Self::Error>;
+    fn read(&mut self, buf: &mut [u8]) -> nb::Result<usize, Self::Error>;
 }

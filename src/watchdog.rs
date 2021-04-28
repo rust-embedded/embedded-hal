@@ -10,7 +10,7 @@ pub trait Watchdog {
 
     /// Triggers the watchdog. This must be done once the watchdog is started
     /// to prevent the processor being reset.
-    fn try_feed(&mut self) -> Result<(), Self::Error>;
+    fn feed(&mut self) -> Result<(), Self::Error>;
 }
 
 /// Enables A watchdog timer to reset the processor if software is frozen or
@@ -33,7 +33,7 @@ pub trait Enable {
     ///
     /// This consumes the value and returns the `Watchdog` trait that you must
     /// `feed()`.
-    fn try_start<T>(self, period: T) -> Result<Self::Target, Self::Error>
+    fn start<T>(self, period: T) -> Result<Self::Target, Self::Error>
     where
         T: Into<Self::Time>;
 }
@@ -56,5 +56,5 @@ pub trait Disable {
     ///
     /// This stops the watchdog and returns an instance implementing the
     /// `Enable` trait so that it can be started again.
-    fn try_disable(self) -> Result<Self::Target, Self::Error>;
+    fn disable(self) -> Result<Self::Target, Self::Error>;
 }

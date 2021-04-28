@@ -16,7 +16,7 @@ pub trait DelayMs<UXX> {
     type Error;
 
     /// Pauses execution for `ms` milliseconds
-    fn try_delay_ms(&mut self, ms: UXX) -> Result<(), Self::Error>;
+    fn delay_ms(&mut self, ms: UXX) -> Result<(), Self::Error>;
 }
 
 /// Microsecond delay
@@ -28,5 +28,5 @@ pub trait DelayUs<UXX> {
     type Error;
 
     /// Pauses execution for `us` microseconds
-    fn try_delay_us(&mut self, us: UXX) -> Result<(), Self::Error>;
+    fn delay_us(&mut self, us: UXX) -> Result<(), Self::Error>;
 }

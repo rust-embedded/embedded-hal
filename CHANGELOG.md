@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Swap PWM channel arguments to references
+- All trait methods have been renamed to remove the `try_` prefix (i.e. `try_send` -> `send`) for consistency.
 
 ## [v1.0.0-alpha.4] - 2020-11-11
 

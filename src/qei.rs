@@ -24,10 +24,10 @@
 ///     };
 ///
 ///
-///     let before = qei.try_count().unwrap();
-///     timer.try_start(1.s()).unwrap();
-///     block!(timer.try_wait());
-///     let after = qei.try_count().unwrap();
+///     let before = qei.count().unwrap();
+///     timer.start(1.s()).unwrap();
+///     block!(timer.wait());
+///     let after = qei.count().unwrap();
 ///
 ///     let speed = after.wrapping_sub(before);
 ///     println!("Speed: {} pulses per second", speed);
@@ -41,15 +41,15 @@
 /// # impl hal::qei::Qei for Qei1 {
 /// #     type Error = Infallible;
 /// #     type Count = u16;
-/// #     fn try_count(&self) -> Result<u16, Self::Error> { Ok(0) }
-/// #     fn try_direction(&self) -> Result<::hal::qei::Direction, Self::Error> { unimplemented!() }
+/// #     fn count(&self) -> Result<u16, Self::Error> { Ok(0) }
+/// #     fn direction(&self) -> Result<::hal::qei::Direction, Self::Error> { unimplemented!() }
 /// # }
 /// # struct Timer6;
 /// # impl hal::timer::CountDown for Timer6 {
 /// #     type Error = Infallible;
 /// #     type Time = Seconds;
-/// #     fn try_start<T>(&mut self, _: T) -> Result<(), Infallible> where T: Into<Seconds> { Ok(()) }
-/// #     fn try_wait(&mut self) -> ::nb::Result<(), Infallible> { Ok(()) }
+/// #     fn start<T>(&mut self, _: T) -> Result<(), Infallible> where T: Into<Seconds> { Ok(()) }
+/// #     fn wait(&mut self) -> ::nb::Result<(), Infallible> { Ok(()) }
 /// # }
 /// ```
 // unproven reason: needs to be re-evaluated in the new singletons world. At the very least this needs a
@@ -62,10 +62,10 @@ pub trait Qei {
     type Count;
 
     /// Returns the current pulse count of the encoder
-    fn try_count(&self) -> Result<Self::Count, Self::Error>;
+    fn count(&self) -> Result<Self::Count, Self::Error>;
 
     /// Returns the count direction
-    fn try_direction(&self) -> Result<Direction, Self::Error>;
+    fn direction(&self) -> Result<Direction, Self::Error>;
 }
 
 /// Count direction

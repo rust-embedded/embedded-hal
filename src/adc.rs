@@ -73,7 +73,7 @@ pub trait Channel<ADC> {
 /// {
 ///    type Error = ();
 ///
-///    fn try_read(&mut self, pin: &mut PIN) -> nb::Result<WORD, Self::Error> {
+///    fn read(&mut self, pin: &mut PIN) -> nb::Result<WORD, Self::Error> {
 ///        let chan = 1 << pin.channel();
 ///        self.power_up();
 ///        let result = self.do_conversion(chan);
@@ -90,5 +90,5 @@ pub trait OneShot<ADC, Word, Pin: Channel<ADC>> {
     ///
     /// This method takes a `Pin` reference, as it is expected that the ADC will be able to sample
     /// whatever channel underlies the pin.
-    fn try_read(&mut self, pin: &mut Pin) -> nb::Result<Word, Self::Error>;
+    fn read(&mut self, pin: &mut Pin) -> nb::Result<Word, Self::Error>;
 }

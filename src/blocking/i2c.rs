@@ -30,7 +30,7 @@
 //! {
 //! #   type Error = ();
 //! #
-//!     fn try_write(&mut self, addr: u8, output: &[u8]) -> Result<(), Self::Error> {
+//!     fn write(&mut self, addr: u8, output: &[u8]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
@@ -40,7 +40,7 @@
 //! {
 //! #   type Error = ();
 //! #
-//!     fn try_write(&mut self, addr: u16, output: &[u8]) -> Result<(), Self::Error> {
+//!     fn write(&mut self, addr: u16, output: &[u8]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
@@ -66,7 +66,7 @@
 //!     pub fn read_temperature(&mut self) -> Result<u8, E> {
 //!         let mut temp = [0];
 //!         self.i2c
-//!             .try_write_read(ADDR, &[TEMP_REGISTER], &mut temp)
+//!             .write_read(ADDR, &[TEMP_REGISTER], &mut temp)
 //!             .and(Ok(temp[0]))
 //!     }
 //! }
@@ -89,7 +89,7 @@
 //!     pub fn read_temperature(&mut self) -> Result<u8, E> {
 //!         let mut temp = [0];
 //!         self.i2c
-//!             .try_write_read(ADDR, &[TEMP_REGISTER], &mut temp)
+//!             .write_read(ADDR, &[TEMP_REGISTER], &mut temp)
 //!             .and(Ok(temp[0]))
 //!     }
 //! }
@@ -135,7 +135,7 @@ pub trait Read<A: AddressMode = SevenBitAddress> {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
-    fn try_read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error>;
+    fn read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error>;
 }
 
 /// Blocking write
@@ -159,7 +159,7 @@ pub trait Write<A: AddressMode = SevenBitAddress> {
     /// - `SAK` = slave acknowledge
     /// - `Bi` = ith byte of data
     /// - `SP` = stop condition
-    fn try_write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error>;
+    fn write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error>;
 }
 
 /// Blocking write (iterator version)
@@ -172,7 +172,7 @@ pub trait WriteIter<A: AddressMode = SevenBitAddress> {
     /// # I2C Events (contract)
     ///
     /// Same as `Write`
-    fn try_write_iter<B>(&mut self, address: A, bytes: B) -> Result<(), Self::Error>
+    fn write_iter<B>(&mut self, address: A, bytes: B) -> Result<(), Self::Error>
     where
         B: IntoIterator<Item = u8>;
 }
@@ -204,7 +204,7 @@ pub trait WriteRead<A: AddressMode = SevenBitAddress> {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
-    fn try_write_read(
+    fn write_read(
         &mut self,
         address: A,
         bytes: &[u8],
@@ -223,7 +223,7 @@ pub trait WriteIterRead<A: AddressMode = SevenBitAddress> {
     /// # I2C Events (contract)
     ///
     /// Same as the `WriteRead` trait
-    fn try_write_iter_read<B>(
+    fn write_iter_read<B>(
         &mut self,
         address: A,
         bytes: B,
@@ -264,11 +264,8 @@ pub trait Transactional<A: AddressMode = SevenBitAddress> {
     /// - `SAD+R/W` = slave address followed by bit 1 to indicate reading or 0 to indicate writing
     /// - `SR` = repeated start condition
     /// - `SP` = stop condition
-    fn try_exec<'a>(
-        &mut self,
-        address: A,
-        operations: &mut [Operation<'a>],
-    ) -> Result<(), Self::Error>;
+    fn exec<'a>(&mut self, address: A, operations: &mut [Operation<'a>])
+        -> Result<(), Self::Error>;
 }
 
 /// Transactional I2C interface (iterator version).
@@ -291,7 +288,7 @@ pub trait TransactionalIter<A: AddressMode = SevenBitAddress> {
     /// - `SAD+R/W` = slave address followed by bit 1 to indicate reading or 0 to indicate writing
     /// - `SR` = repeated start condition
     /// - `SP` = stop condition
-    fn try_exec_iter<'a, O>(&mut self, address: A, operations: O) -> Result<(), Self::Error>
+    fn exec_iter<'a, O>(&mut self, address: A, operations: O) -> Result<(), Self::Error>
     where
         O: IntoIterator<Item = Operation<'a>>;
 }
@@ -310,7 +307,7 @@ pub trait TransactionalIter<A: AddressMode = SevenBitAddress> {
 ///
 /// impl i2c::Transactional<i2c::SevenBitAddress> for I2c1 {
 /// #    type Error = ();
-///     fn try_exec<'a>(
+///     fn exec<'a>(
 ///         &mut self,
 ///         address: i2c::SevenBitAddress,
 ///         operations: &mut [i2c::Operation<'a>],
@@ -327,7 +324,7 @@ pub trait TransactionalIter<A: AddressMode = SevenBitAddress> {
 /// use i2c::Write;
 ///
 /// let mut i2c1 = I2c1{};
-/// i2c1.try_write(0x01, &[0xAB, 0xCD]).unwrap();
+/// i2c1.write(0x01, &[0xAB, 0xCD]).unwrap();
 /// ```
 pub mod transactional {
     use super::{AddressMode, Operation, Read, Transactional, Write, WriteRead};
@@ -343,8 +340,8 @@ pub mod transactional {
     {
         type Error = E;
 
-        fn try_write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error> {
-            self.try_exec(address, &mut [Operation::Write(bytes)])
+        fn write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error> {
+            self.exec(address, &mut [Operation::Write(bytes)])
         }
     }
 
@@ -355,8 +352,8 @@ pub mod transactional {
     {
         type Error = E;
 
-        fn try_read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error> {
-            self.try_exec(address, &mut [Operation::Read(buffer)])
+        fn read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error> {
+            self.exec(address, &mut [Operation::Read(buffer)])
         }
     }
 
@@ -367,13 +364,13 @@ pub mod transactional {
     {
         type Error = E;
 
-        fn try_write_read(
+        fn write_read(
             &mut self,
             address: A,
             bytes: &[u8],
             buffer: &mut [u8],
         ) -> Result<(), Self::Error> {
-            self.try_exec(
+            self.exec(
                 address,
                 &mut [Operation::Write(bytes), Operation::Read(buffer)],
             )
