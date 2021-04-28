@@ -1,7 +1,5 @@
 //! Timers
 
-use nb;
-
 /// A count down timer
 ///
 /// # Contract

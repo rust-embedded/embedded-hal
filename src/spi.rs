@@ -1,7 +1,5 @@
 //! Serial Peripheral Interface
 
-use nb;
-
 /// Full duplex (master mode)
 ///
 /// # Notes

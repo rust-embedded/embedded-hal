@@ -9,9 +9,8 @@ where
 {
     fn write_str(&mut self, s: &str) -> Result {
         let _ = s
-            .as_bytes()
-            .into_iter()
-            .map(|c| nb::block!(self.write(Word::from(*c))))
+            .bytes()
+            .map(|c| nb::block!(self.write(Word::from(c))))
             .last();
         Ok(())
     }

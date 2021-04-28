@@ -1,7 +1,5 @@
 //! Input capture
 
-use nb;
-
 /// Input capture
 ///
 /// # Examples
