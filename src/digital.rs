@@ -191,14 +191,14 @@ pub trait InputPin {
 ///     TOutputPin : OutputPin<Error = TError> + IoPin<TInputPin, TOutputPin, Error = TError>,
 /// {
 ///     // Ping
-///     pin.try_set_low()?;
+///     pin.set_low()?;
 ///     delay_fn(Duration::from_millis(10));
-///     pin.try_set_high()?;
+///     pin.set_high()?;
 ///
 ///     // Read
-///     let pin = pin.try_into_input_pin()?;
+///     let pin = pin.into_input_pin()?;
 ///     delay_fn(Duration::from_millis(10));
-///     pin.try_is_high()
+///     pin.is_high()
 /// }
 /// ```
 pub trait IoPin<TInput, TOutput>
@@ -212,11 +212,11 @@ where
     /// Tries to convert this pin to input mode.
     ///
     /// If the pin is already in input mode, this method should succeed.
-    fn try_into_input_pin(self) -> Result<TInput, Self::Error>;
+    fn into_input_pin(self) -> Result<TInput, Self::Error>;
 
     /// Tries to convert this pin to output mode with the given initial state.
     ///
     /// If the pin is already in the requested state, this method should
     /// succeed.
-    fn try_into_output_pin(self, state: PinState) -> Result<TOutput, Self::Error>;
+    fn into_output_pin(self, state: PinState) -> Result<TOutput, Self::Error>;
 }
