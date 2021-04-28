@@ -10,8 +10,8 @@ keywords = ["hal", "IO"]
 license = "MIT OR Apache-2.0"
 name = "embedded-hal"
 readme = "README.md"
-repository = "https://github.com/japaric/embedded-hal"
-version = "0.2.4"
+repository = "https://github.com/rust-embedded/embedded-hal"
+version = "0.2.5"
 
 [dependencies.void]
 default-features = false

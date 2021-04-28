@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
+## [v0.2.5] - 2021-04-28
+
+### Changed
+
+- Updated `nb` dependency to version `0.1.3` to ensure compatibility with `nb` version `1.0`.
+
 
 ## [v0.2.4] - 2020-06-17
 
@@ -109,7 +115,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.4...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.5...v0.2.x
+[v0.2.5]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.4...v0.2.5
 [v0.2.4]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.3...v0.2.4
 [v0.2.3]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.2...v0.2.3
 [v0.2.2]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.1...v0.2.2
