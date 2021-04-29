@@ -65,7 +65,7 @@ as well as the latest `1.0.0-alpha` version side by side. This has several big a
 - Allows for a faster upgrade to `1.0` once it comes out.
 - Provides more oportunities to test the new `embedded-hal` version.
 
-This approach has been exemplary implemented in [LPC8xx HAL]. Here are the steps:
+This approach has been implemented in [LPC8xx HAL](https://github.com/lpc-rs/lpc8xx-hal). Here are the steps:
 
 1. Add a dependency to the latest `embedded-hal` version to `Cargo.toml`.
    Use the `package` attribute to refer to it by another name, to prevent name collision
