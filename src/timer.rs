@@ -79,6 +79,12 @@ pub trait CountDown {
     fn wait(&mut self) -> nb::Result<(), Self::Error>;
 }
 
+/// A count down timer that allows reading out elapsed time since start.
+pub trait Elapsed: CountDown {
+    /// The units of time that elapsed since the timer was started.
+    fn elapsed(&self) -> Result<Self::Time, Self::Error>;
+}
+
 /// Marker trait that indicates that a timer is periodic
 pub trait Periodic {}
 
