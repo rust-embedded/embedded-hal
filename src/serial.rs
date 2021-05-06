@@ -23,3 +23,13 @@ pub trait Write<Word> {
     /// Ensures that none of the previously written words are still buffered
     fn flush(&mut self) -> nb::Result<(), Self::Error>;
 }
+
+/// Enable changing the baudrate after initiation of serial interface
+pub trait ConfigureBaud {
+    /// Baudrate type
+    type BaudRate;
+    /// Set baud error
+    type Error;
+    /// Change baud rate
+    fn set_baud_rate(&mut self, baud_rate: Self::BaudRate) -> Result<(), Self::Error>;
+}
