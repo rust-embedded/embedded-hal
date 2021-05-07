@@ -109,6 +109,10 @@
 //! # fn main() {}
 //! ```
 //!
+//! In some cases it's possible to implement the blocking traits on top of one of the non-blocking HAL
+//! traits. To save boilerplate when that's the case a `Default` marker trait may be provided.
+//! Implementing that marker trait will opt in your type into a blanket implementation.
+//!
 //! ## Suggested implementation
 //!
 //! The HAL traits should be implemented for device crates generated via [`svd2rust`] to maximize
@@ -408,13 +412,21 @@
 #![deny(missing_docs)]
 #![no_std]
 
-pub mod blocking;
+pub mod delay;
+pub mod digital;
 pub mod fmt;
+pub mod i2c;
 pub mod nonblocking;
 pub mod prelude;
+pub mod pwm;
+pub mod qei;
+pub mod rng;
+pub mod serial;
+pub mod spi;
+pub mod watchdog;
 
 mod private {
-    use crate::blocking::i2c::{SevenBitAddress, TenBitAddress};
+    use crate::i2c::{SevenBitAddress, TenBitAddress};
     pub trait Sealed {}
 
     impl Sealed for SevenBitAddress {}

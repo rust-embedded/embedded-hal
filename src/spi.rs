@@ -35,7 +35,7 @@ pub mod transfer {
     /// `nonblocking::spi::FullDuplex<W>`
     pub trait Default<W>: crate::nonblocking::spi::FullDuplex<W> {}
 
-    impl<W, S> crate::blocking::spi::Transfer<W> for S
+    impl<W, S> crate::spi::Transfer<W> for S
     where
         S: Default<W>,
         W: Clone,
@@ -59,7 +59,7 @@ pub mod write {
     /// of `nonblocking::spi::FullDuplex<W>`
     pub trait Default<W>: crate::nonblocking::spi::FullDuplex<W> {}
 
-    impl<W, S> crate::blocking::spi::Write<W> for S
+    impl<W, S> crate::spi::Write<W> for S
     where
         S: Default<W>,
         W: Clone,
@@ -83,7 +83,7 @@ pub mod write_iter {
     /// `nonblocking::spi::FullDuplex<W>`
     pub trait Default<W>: crate::nonblocking::spi::FullDuplex<W> {}
 
-    impl<W, S> crate::blocking::spi::WriteIter<W> for S
+    impl<W, S> crate::spi::WriteIter<W> for S
     where
         S: Default<W>,
         W: Clone,

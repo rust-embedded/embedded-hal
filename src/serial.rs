@@ -31,7 +31,7 @@ pub mod write {
     /// [`blocking::serial::Write`]: ../trait.Write.html
     pub trait Default<Word>: crate::nonblocking::serial::Write<Word> {}
 
-    impl<S, Word> crate::blocking::serial::Write<Word> for S
+    impl<S, Word> crate::serial::Write<Word> for S
     where
         S: Default<Word>,
         Word: Clone,

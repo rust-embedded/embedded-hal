@@ -7,7 +7,7 @@ use core::{convert::From, ops::Not};
 /// Conversion from `bool` and logical negation are also implemented
 /// for this type.
 /// ```rust
-/// # use embedded_hal::blocking::digital::PinState;
+/// # use embedded_hal::digital::PinState;
 /// let state = PinState::from(false);
 /// assert_eq!(state, PinState::Low);
 /// assert_eq!(!state, PinState::High);
@@ -100,8 +100,8 @@ pub trait ToggleableOutputPin {
 /// toggleable by software.
 ///
 /// ```
-/// use embedded_hal::blocking::digital::{OutputPin, StatefulOutputPin, ToggleableOutputPin};
-/// use embedded_hal::blocking::digital::toggleable;
+/// use embedded_hal::digital::{OutputPin, StatefulOutputPin, ToggleableOutputPin};
+/// use embedded_hal::digital::toggleable;
 /// use core::convert::Infallible;
 ///
 /// /// A virtual output pin that exists purely in software
@@ -182,7 +182,7 @@ pub trait InputPin {
 ///
 /// ```
 /// use core::time::Duration;
-/// use embedded_hal::blocking::digital::{IoPin, InputPin, OutputPin};
+/// use embedded_hal::digital::{IoPin, InputPin, OutputPin};
 ///
 /// pub fn ping_and_read<TInputPin, TOutputPin, TError>(
 ///     mut pin: TOutputPin, delay_fn: &dyn Fn(Duration) -> ()) -> Result<bool, TError>

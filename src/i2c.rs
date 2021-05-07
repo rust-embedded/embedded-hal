@@ -22,7 +22,7 @@
 //! Here is an example of an embedded-hal implementation of the `Write` trait
 //! for both modes:
 //! ```
-//! # use embedded_hal::blocking::i2c::{SevenBitAddress, TenBitAddress, Write};
+//! # use embedded_hal::i2c::{SevenBitAddress, TenBitAddress, Write};
 //! /// I2C0 hardware peripheral which supports both 7-bit and 10-bit addressing.
 //! pub struct I2c0;
 //!
@@ -52,7 +52,7 @@
 //! For demonstration purposes the address mode parameter has been omitted in this example.
 //!
 //! ```
-//! # use embedded_hal::blocking::i2c::WriteRead;
+//! # use embedded_hal::i2c::WriteRead;
 //! const ADDR: u8  = 0x15;
 //! # const TEMP_REGISTER: u8 = 0x1;
 //! pub struct TemperatureSensorDriver<I2C> {
@@ -75,7 +75,7 @@
 //! ### Device driver compatible only with 10-bit addresses
 //!
 //! ```
-//! # use embedded_hal::blocking::i2c::{TenBitAddress, WriteRead};
+//! # use embedded_hal::i2c::{TenBitAddress, WriteRead};
 //! const ADDR: u16  = 0x158;
 //! # const TEMP_REGISTER: u8 = 0x1;
 //! pub struct TemperatureSensorDriver<I2C> {
@@ -301,7 +301,7 @@ pub trait TransactionalIter<A: AddressMode = SevenBitAddress> {
 /// the `blocking::i2c::Write`, `blocking::i2c::Read` and `blocking::i2c::WriteRead`
 /// traits as well.
 /// ```
-/// use embedded_hal::blocking::i2c;
+/// use embedded_hal::i2c;
 ///
 /// struct I2c1;
 ///

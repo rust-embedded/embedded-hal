@@ -38,11 +38,11 @@
 /// # trait U32Ext { fn s(self) -> Seconds; }
 /// # impl U32Ext for u32 { fn s(self) -> Seconds { Seconds(self) } }
 /// # struct Qei1;
-/// # impl hal::blocking::qei::Qei for Qei1 {
+/// # impl hal::qei::Qei for Qei1 {
 /// #     type Error = Infallible;
 /// #     type Count = u16;
 /// #     fn count(&self) -> Result<u16, Self::Error> { Ok(0) }
-/// #     fn direction(&self) -> Result<::hal::blocking::qei::Direction, Self::Error> { unimplemented!() }
+/// #     fn direction(&self) -> Result<::hal::qei::Direction, Self::Error> { unimplemented!() }
 /// # }
 /// # struct Timer6;
 /// # impl hal::nonblocking::timer::CountDown for Timer6 {

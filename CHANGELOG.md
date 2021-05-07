@@ -14,7 +14,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Swap PWM channel arguments to references
 - All trait methods have been renamed to remove the `try_` prefix (i.e. `try_send` -> `send`) for consistency.
-- Moved all traits into two modules depending on the execution model: `blocking` and `nonblocking`.
+- Moved all non-blocking traits into a `nonblocking` module.
+- Move all blocking traits to the crate root.
 
 ## [v1.0.0-alpha.4] - 2020-11-11
 
