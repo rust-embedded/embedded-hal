@@ -5,7 +5,11 @@
 //! Implementing that marker trait will opt in your type into a blanket implementation.
 
 pub mod delay;
+pub mod digital;
 pub mod i2c;
+pub mod pwm;
+pub mod qei;
 pub mod rng;
 pub mod serial;
 pub mod spi;
+pub mod watchdog;
