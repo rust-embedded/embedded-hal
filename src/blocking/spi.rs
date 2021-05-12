@@ -32,8 +32,8 @@ pub trait WriteIter<W> {
 /// Blocking transfer
 pub mod transfer {
     /// Default implementation of `blocking::spi::Transfer<W>` for implementers of
-    /// `spi::FullDuplex<W>`
-    pub trait Default<W>: crate::spi::FullDuplex<W> {}
+    /// `nonblocking::spi::FullDuplex<W>`
+    pub trait Default<W>: crate::nb::spi::FullDuplex<W> {}
 
     impl<W, S> crate::blocking::spi::Transfer<W> for S
     where
@@ -55,8 +55,9 @@ pub mod transfer {
 
 /// Blocking write
 pub mod write {
-    /// Default implementation of `blocking::spi::Write<W>` for implementers of `spi::FullDuplex<W>`
-    pub trait Default<W>: crate::spi::FullDuplex<W> {}
+    /// Default implementation of `blocking::spi::Write<W>` for implementers
+    /// of `nonblocking::spi::FullDuplex<W>`
+    pub trait Default<W>: crate::nb::spi::FullDuplex<W> {}
 
     impl<W, S> crate::blocking::spi::Write<W> for S
     where
@@ -79,8 +80,8 @@ pub mod write {
 /// Blocking write (iterator version)
 pub mod write_iter {
     /// Default implementation of `blocking::spi::WriteIter<W>` for implementers of
-    /// `spi::FullDuplex<W>`
-    pub trait Default<W>: crate::spi::FullDuplex<W> {}
+    /// `nonblocking::spi::FullDuplex<W>`
+    pub trait Default<W>: crate::nb::spi::FullDuplex<W> {}
 
     impl<W, S> crate::blocking::spi::WriteIter<W> for S
     where
