@@ -1,7 +1,5 @@
 //! Random Number Generator Interface
 
-use nb;
-
 /// Nonblocking stream of random bytes.
 pub trait Read {
     /// An enumeration of RNG errors.

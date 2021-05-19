@@ -23,13 +23,13 @@ pub trait Write<Word> {
 pub mod write {
     /// Marker trait to opt into default blocking write implementation
     ///
-    /// Implementers of [`serial::Write`] can implement this marker trait
+    /// Implementers of [`nonblocking::serial::Write`] can implement this marker trait
     /// for their type. Doing so will automatically provide the default
     /// implementation of [`blocking::serial::Write`] for the type.
     ///
-    /// [`serial::Write`]: ../../serial/trait.Write.html
+    /// [`nonblocking::serial::Write`]: ../../nonblocking/serial/trait.Write.html
     /// [`blocking::serial::Write`]: ../trait.Write.html
-    pub trait Default<Word>: crate::serial::Write<Word> {}
+    pub trait Default<Word>: crate::nb::serial::Write<Word> {}
 
     impl<S, Word> crate::blocking::serial::Write<Word> for S
     where

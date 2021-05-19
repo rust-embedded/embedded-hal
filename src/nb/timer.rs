@@ -47,7 +47,7 @@
 /// #     pub fn on(&mut self) {}
 /// # }
 /// # struct Timer6;
-/// # impl hal::timer::CountDown for Timer6 {
+/// # impl hal::nb::timer::CountDown for Timer6 {
 /// #     type Error = Infallible;
 /// #     type Time = Seconds;
 /// #     fn start<T>(&mut self, _: T) -> Result<(), Self::Error> where T: Into<Seconds> { Ok(()) }

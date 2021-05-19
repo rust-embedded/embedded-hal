@@ -8,7 +8,7 @@
 ///
 /// ```
 /// # use core::marker::PhantomData;
-/// # use embedded_hal::adc::Channel;
+/// # use embedded_hal::nb::adc::Channel;
 ///
 /// struct Adc1; // Example ADC with single bank of 8 channels
 /// struct Gpio1Pin1<MODE>(PhantomData<MODE>);
@@ -55,7 +55,7 @@ pub trait Channel<ADC> {
 /// of the request (in contrast to continuous asynchronous sampling).
 ///
 /// ```
-/// use embedded_hal::adc::{Channel, OneShot};
+/// use embedded_hal::nb::adc::{Channel, OneShot};
 ///
 /// struct MyAdc; // 10-bit ADC, with 5 channels
 /// # impl MyAdc {

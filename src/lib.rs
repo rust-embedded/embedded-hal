@@ -145,7 +145,7 @@
 //!     // omitted: other error variants
 //! }
 //!
-//! impl hal::serial::Read<u8> for Serial<USART1> {
+//! impl hal::nb::serial::Read<u8> for Serial<USART1> {
 //!     type Error = Error;
 //!
 //!     fn read(&mut self) -> nb::Result<u8, Error> {
@@ -167,7 +167,7 @@
 //!     }
 //! }
 //!
-//! impl hal::serial::Write<u8> for Serial<USART1> {
+//! impl hal::nb::serial::Write<u8> for Serial<USART1> {
 //!     type Error = Error;
 //!
 //!     fn write(&mut self, byte: u8) -> nb::Result<(), Error> {
@@ -198,7 +198,7 @@
 //!
 //! ```
 //! use crate::stm32f1xx_hal::Serial1;
-//! use embedded_hal::serial::Write;
+//! use embedded_hal::nb::serial::Write;
 //! use nb::block;
 //!
 //! # fn main() {
@@ -248,7 +248,7 @@
 //!
 //! fn write_all<S>(serial: &mut S, buffer: &[u8]) -> Result<(), S::Error>
 //! where
-//!     S: hal::serial::Write<u8>
+//!     S: hal::nb::serial::Write<u8>
 //! {
 //!     for &byte in buffer {
 //!         block!(serial.write(byte))?;
@@ -281,8 +281,8 @@
 //!     timeout: T::Time,
 //! ) -> Result<u8, Error<S::Error, T::Error>>
 //! where
-//!     T: hal::timer::CountDown<Error = ()>,
-//!     S: hal::serial::Read<u8>,
+//!     T: hal::nb::timer::CountDown<Error = ()>,
+//!     S: hal::nb::serial::Read<u8>,
 //! {
 //!     timer.start(timeout).map_err(Error::TimedOut)?;
 //!
@@ -325,7 +325,7 @@
 //!
 //! fn flush<S>(serial: &mut S, cb: &mut CircularBuffer)
 //! where
-//!     S: hal::serial::Write<u8, Error = Infallible>,
+//!     S: hal::nb::serial::Write<u8, Error = Infallible>,
 //! {
 //!     loop {
 //!         if let Some(byte) = cb.peek() {
@@ -389,7 +389,7 @@
 //! #     fn deref_mut(&mut self) -> &mut T { self.0 }
 //! # }
 //! # struct Serial1;
-//! # impl hal::serial::Write<u8> for Serial1 {
+//! # impl hal::nb::serial::Write<u8> for Serial1 {
 //! #   type Error = Infallible;
 //! #   fn write(&mut self, _: u8) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #   fn flush(&mut self) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
@@ -408,19 +408,10 @@
 #![deny(missing_docs)]
 #![no_std]
 
-pub mod adc;
 pub mod blocking;
-pub mod capture;
-pub mod digital;
 pub mod fmt;
+pub mod nb;
 pub mod prelude;
-pub mod pwm;
-pub mod qei;
-pub mod rng;
-pub mod serial;
-pub mod spi;
-pub mod timer;
-pub mod watchdog;
 
 mod private {
     use crate::blocking::i2c::{SevenBitAddress, TenBitAddress};
