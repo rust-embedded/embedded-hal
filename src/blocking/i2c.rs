@@ -143,7 +143,7 @@ pub trait Write<A: AddressMode = SevenBitAddress> {
     /// Error type
     type Error;
 
-    /// Sends bytes to slave with address `address`
+    /// Writes bytes to slave with address `address`
     ///
     /// # I2C Events (contract)
     ///
@@ -167,7 +167,7 @@ pub trait WriteIter<A: AddressMode = SevenBitAddress> {
     /// Error type
     type Error;
 
-    /// Sends bytes to slave with address `address`
+    /// Writes bytes to slave with address `address`
     ///
     /// # I2C Events (contract)
     ///
@@ -182,7 +182,7 @@ pub trait WriteRead<A: AddressMode = SevenBitAddress> {
     /// Error type
     type Error;
 
-    /// Sends bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
+    /// Writes bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
     /// single transaction*
     ///
     /// # I2C Events (contract)
@@ -217,7 +217,7 @@ pub trait WriteIterRead<A: AddressMode = SevenBitAddress> {
     /// Error type
     type Error;
 
-    /// Sends bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
+    /// Writes bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
     /// single transaction*
     ///
     /// # I2C Events (contract)
