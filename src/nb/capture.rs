@@ -12,7 +12,7 @@
 /// #[macro_use(block)]
 /// extern crate nb;
 ///
-/// use hal::prelude::*;
+/// use hal::nb::capture::Capture;
 ///
 /// fn main() {
 ///     let mut capture: Capture1 = {

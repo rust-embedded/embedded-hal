@@ -244,7 +244,7 @@
 //! ```
 //! use embedded_hal as hal;
 //! use nb::block;
-//! use hal::prelude::*;
+//! use hal::nb::serial::Write;
 //!
 //! fn write_all<S>(serial: &mut S, buffer: &[u8]) -> Result<(), S::Error>
 //! where
@@ -266,7 +266,8 @@
 //! use embedded_hal as hal;
 //! use nb;
 //!
-//! use hal::prelude::*;
+//! use hal::nb::serial::Write;
+//! use hal::nb::timer::CountDown;
 //!
 //! enum Error<SE, TE> {
 //!     /// Serial interface error
@@ -320,7 +321,7 @@
 //! use embedded_hal as hal;
 //! use nb;
 //!
-//! use hal::prelude::*;
+//! use hal::nb::serial::Write;
 //! use ::core::convert::Infallible;
 //!
 //! fn flush<S>(serial: &mut S, cb: &mut CircularBuffer)
@@ -411,7 +412,6 @@
 pub mod blocking;
 pub mod fmt;
 pub mod nb;
-pub mod prelude;
 
 mod private {
     use crate::blocking::i2c::{SevenBitAddress, TenBitAddress};
