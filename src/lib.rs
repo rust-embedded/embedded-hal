@@ -193,7 +193,7 @@
 //!
 //! ### Blocking mode
 //!
-//! An example of sending a string over the serial interface in a blocking
+//! An example of writing a string over the serial interface in a blocking
 //! fashion:
 //!
 //! ```

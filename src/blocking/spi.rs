@@ -5,7 +5,7 @@ pub trait Transfer<W> {
     /// Error type
     type Error;
 
-    /// Sends `words` to the slave. Returns the `words` received from the slave
+    /// Writes `words` to the slave. Returns the `words` received from the slave
     fn transfer<'w>(&mut self, words: &'w mut [W]) -> Result<&'w [W], Self::Error>;
 }
 
@@ -14,7 +14,7 @@ pub trait Write<W> {
     /// Error type
     type Error;
 
-    /// Sends `words` to the slave, ignoring all the incoming words
+    /// Writes `words` to the slave, ignoring all the incoming words
     fn write(&mut self, words: &[W]) -> Result<(), Self::Error>;
 }
 
@@ -23,7 +23,7 @@ pub trait WriteIter<W> {
     /// Error type
     type Error;
 
-    /// Sends `words` to the slave, ignoring all the incoming words
+    /// Writes `words` to the slave, ignoring all the incoming words
     fn write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
     where
         WI: IntoIterator<Item = W>;
@@ -44,7 +44,7 @@ pub mod transfer {
 
         fn transfer<'w>(&mut self, words: &'w mut [W]) -> Result<&'w [W], S::Error> {
             for word in words.iter_mut() {
-                nb::block!(self.send(word.clone()))?;
+                nb::block!(self.write(word.clone()))?;
                 *word = nb::block!(self.read())?;
             }
 
@@ -68,7 +68,7 @@ pub mod write {
 
         fn write(&mut self, words: &[W]) -> Result<(), S::Error> {
             for word in words {
-                nb::block!(self.send(word.clone()))?;
+                nb::block!(self.write(word.clone()))?;
                 nb::block!(self.read())?;
             }
 
@@ -95,7 +95,7 @@ pub mod write_iter {
             WI: IntoIterator<Item = W>,
         {
             for word in words.into_iter() {
-                nb::block!(self.send(word.clone()))?;
+                nb::block!(self.write(word.clone()))?;
                 nb::block!(self.read())?;
             }
 
