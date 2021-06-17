@@ -59,7 +59,7 @@ Alternatively (needs Rust edition 2018):
 
 The prelude has been removed because it could make method calls ambiguous, since the method names are now
 the same across execution models.
-To overcome this, simply import the traits you wish to use individually.
+To overcome this, please import the traits you wish to use individually.
 If you run into ambiguous method calls, you can disambiguate using fully-qualified syntax (the error message
 from the compiler should already tell you how it should look like in your case) or tweak your trait imports or code
 to limit the scope of the trait imports and thus avoid ambiguity.
