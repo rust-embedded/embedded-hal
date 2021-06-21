@@ -407,10 +407,12 @@
 #![doc(html_root_url = "https://docs.rs/embedded-hal/1.0.0-alpha.4")]
 #![deny(missing_docs)]
 #![no_std]
+#![feature(generic_associated_types, min_type_alias_impl_trait)]
 
 pub mod blocking;
 pub mod fmt;
 pub mod nb;
+pub mod futures;
 pub mod prelude;
 
 mod private {
