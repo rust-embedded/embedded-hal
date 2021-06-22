@@ -3,7 +3,7 @@
 use core::{future::Future, mem::MaybeUninit};
 
 /// Async read + write
-pub trait ReadWrite<Word: 'static> {
+pub trait ReadWrite<Word> {
     /// Error type
     type Error;
 
@@ -18,7 +18,7 @@ pub trait ReadWrite<Word: 'static> {
 }
 
 /// Async read + write in place.
-pub trait ReadWriteInPlace<Word: 'static> {
+pub trait ReadWriteInPlace<Word> {
     /// Error type
     type Error;
 
@@ -33,7 +33,7 @@ pub trait ReadWriteInPlace<Word: 'static> {
 }
 
 /// Async write
-pub trait Write<W> {
+pub trait Write<Word> {
     /// Error type
     type Error;
 
@@ -43,11 +43,11 @@ pub trait Write<W> {
         Self: 'a;
 
     /// Writes `words` to the slave, ignoring all the incoming words
-    fn write<'a>(&'a mut self, words: &'a [W]) -> Self::WriteFuture<'a>;
+    fn write<'a>(&'a mut self, words: &'a [Word]) -> Self::WriteFuture<'a>;
 }
 
 /// Async read
-pub trait Read<W> {
+pub trait Read<Word> {
     /// Error type
     type Error;
 
@@ -59,5 +59,5 @@ pub trait Read<W> {
     /// Reads words from the slave without specifying any data to write.
     /// The SPI hardware will send data, though what data it sends is not defined
     /// by this trait. Some hardware can configure what values (e.g. all zeroes, all ones), some cannot.
-    fn read<'a>(&'a mut self, words: &'a mut [MaybeUninit<W>]) -> Self::ReadFuture<'a>;
+    fn read<'a>(&'a mut self, words: &'a mut [MaybeUninit<Word>]) -> Self::ReadFuture<'a>;
 }
