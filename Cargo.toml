@@ -18,8 +18,7 @@ version = "1.0.0-alpha.4" # remember to update html_root_url
 [features]
 # Enabling this feature enables the `futures` module using generic associated types (GATs), which are still unstable.
 # Therefore, this feature requires compiling on nightly.
-futures = []
-default = ["futures"]
+unstable-futures = []
 
 [dependencies]
 nb = "1"
