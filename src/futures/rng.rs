@@ -1,6 +1,6 @@
 //! Random Number Generator Interface
 
-use core::future::Future;
+use core::{future::Future, mem::MaybeUninit};
 
 /// Nonblocking stream of random bytes.
 pub trait Read {
@@ -10,10 +10,10 @@ pub trait Read {
     type Error;
 
     /// The future associated with the `read` method.
-    type ReadFuture<'a>: Future<Output=Result<usize, Self::Error>> + 'a
+    type ReadFuture<'a>: Future<Output=Result<&'a [u8], Self::Error>> + 'a
     where
         Self: 'a;
 
     /// Get a number of bytes from the RNG.
-    fn read<'a>(&'a mut self, buf: &'a mut [u8]) -> Self::ReadFuture<'a>;
+    fn read<'a>(&'a mut self, buf: &'a mut [MaybeUninit<u8>]) -> Self::ReadFuture<'a>;
 }

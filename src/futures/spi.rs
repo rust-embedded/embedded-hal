@@ -42,57 +42,6 @@ pub trait FullDuplex<Word> {
     fn write<'a>(&'a mut self, word: Word) -> Self::WriteFuture<'a>;
 }
 
-/// Clock polarity
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub enum Polarity {
-    /// Clock signal low when idle
-    IdleLow,
-    /// Clock signal high when idle
-    IdleHigh,
-}
-
-/// Clock phase
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub enum Phase {
-    /// Data in "captured" on the first clock transition
-    CaptureOnFirstTransition,
-    /// Data in "captured" on the second clock transition
-    CaptureOnSecondTransition,
-}
-
-/// SPI mode
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub struct Mode {
-    /// Clock polarity
-    pub polarity: Polarity,
-    /// Clock phase
-    pub phase: Phase,
-}
-
-/// Helper for CPOL = 0, CPHA = 0
-pub const MODE_0: Mode = Mode {
-    polarity: Polarity::IdleLow,
-    phase: Phase::CaptureOnFirstTransition,
-};
-
-/// Helper for CPOL = 0, CPHA = 1
-pub const MODE_1: Mode = Mode {
-    polarity: Polarity::IdleLow,
-    phase: Phase::CaptureOnSecondTransition,
-};
-
-/// Helper for CPOL = 1, CPHA = 0
-pub const MODE_2: Mode = Mode {
-    polarity: Polarity::IdleHigh,
-    phase: Phase::CaptureOnFirstTransition,
-};
-
-/// Helper for CPOL = 1, CPHA = 1
-pub const MODE_3: Mode = Mode {
-    polarity: Polarity::IdleHigh,
-    phase: Phase::CaptureOnSecondTransition,
-};
-
 /// Async transfer
 pub trait Transfer<Word: 'static> {
     /// Error type
@@ -104,9 +53,7 @@ pub trait Transfer<Word: 'static> {
         Self: 'a;
 
     /// Writes `words` to the slave. Returns the `words` received from the slave
-    fn transfer<'a>(&'a mut self, words: &'a mut [Word]) -> Self::TransferFuture<'a>
-    where
-        Self::Error: 'a;
+    fn transfer<'a>(&'a mut self, words: &'a mut [Word]) -> Self::TransferFuture<'a>;
 }
 
 /// Async write
@@ -121,23 +68,6 @@ pub trait Write<W> {
 
     /// Writes `words` to the slave, ignoring all the incoming words
     fn write<'a>(&'a mut self, words: &'a [W]) -> Self::WriteFuture<'a>;
-}
-
-/// Async write (iterator version)
-pub trait WriteIter<W> {
-    /// Error type
-    type Error;
-
-    /// Associated future for the `write_iter` method.
-    type WriteFuture<'a, WI>: Future<Output = Result<(), Self::Error>> + 'a
-    where
-        Self: 'a,
-        WI: 'a;
-
-    /// Writes `words` to the slave, ignoring all the incoming words
-    fn write_iter<'a, WI>(&'a mut self, words: WI) -> Self::WriteFuture<'a, WI>
-    where
-        WI: IntoIterator<Item = W> + 'a;
 }
 
 /// Async transfer
@@ -157,10 +87,7 @@ pub mod transfer {
 
         type TransferFuture<'a> where Self: 'a = impl Future<Output = Result<&'a [Word], S::Error>> + 'a;
 
-        fn transfer<'w>(&'w mut self, words: &'w mut [Word]) -> Self::TransferFuture<'w>
-        where
-            S::Error: 'w
-        {
+        fn transfer<'w>(&'w mut self, words: &'w mut [Word]) -> Self::TransferFuture<'w> {
             async move {
                 for word in words.iter_mut() {
                     self.write(word.clone()).await?;
@@ -202,39 +129,6 @@ pub mod write {
         }
     }
 }
-
-// /// Blocking write (iterator version)
-// pub mod write_iter {
-//     use core::future::Future;
-
-//     /// Default implementation of `blocking::spi::WriteIter<W>` for implementers of
-//     /// `nonblocking::spi::FullDuplex<W>`
-//     pub trait Default<W>: super::FullDuplex<W> {}
-
-//     impl<W, S> super::WriteIter<W> for S
-//     where
-//         S: Default<W>,
-//         W: Clone + 'static,
-//     {
-//         type Error = S::Error;
-
-//         type WriteFuture<'a, WI> where Self: 'a, WI: 'a = impl Future<Output = Result<(), S::Error>> + 'a;
-
-//         fn write_iter<'a, WI>(&'a mut self, words: WI) -> Self::WriteFuture<'a, WI>
-//         where
-//             WI: IntoIterator<Item = W> + 'a,
-//         {
-//             async move {
-//                 for word in words.into_iter() {
-//                     self.write(word.clone()).await?;
-//                     self.read().await?;
-//                 }
-
-//                 Ok(())
-//             }
-//         }
-//     }
-// }
 
 // /// Operation for transactional SPI trait
 // ///
