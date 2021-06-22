@@ -29,7 +29,7 @@ pub trait ReadWriteInPlace<Word: 'static> {
 
     /// Writes `words` to the slave from the `readwrite` buffer and reads words into the same buffer.
     /// This method uses a single `readwrite` buffer.
-    fn readwrite_inplace<'a>(&'a mut self, readwrite: &'a mut [MaybeUninit<Word>]) -> Self::ReadWriteInPlaceFuture<'a>;
+    fn readwrite_inplace<'a>(&'a mut self, readwrite: &'a mut [Word]) -> Self::ReadWriteInPlaceFuture<'a>;
 }
 
 /// Async write
