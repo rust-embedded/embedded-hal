@@ -2,46 +2,6 @@
 
 use core::future::Future;
 
-/// Full duplex (master mode)
-///
-/// # Notes
-///
-/// - It's the task of the user of this interface to manage the slave select lines
-///
-/// - Due to how full duplex SPI works each `read` call must be preceded by a `write` call.
-///
-/// - `read` calls only return the data received with the last `write` call.
-/// Previously received data is discarded
-///
-/// - Data is only guaranteed to be clocked out when the `read` call succeeds.
-/// The slave select line shouldn't be released before that.
-///
-/// - Some SPIs can work with 8-bit *and* 16-bit words. You can overload this trait with different
-/// `Word` types to allow operation in both modes.
-pub trait FullDuplex<Word> {
-    /// An enumeration of SPI errors
-    type Error;
-
-    /// The future associated with the `read` method.
-    type ReadFuture<'a>: Future<Output=Result<Word, Self::Error>> + 'a
-    where
-        Self: 'a;
-
-    /// The future associated with the `write` method.
-    type WriteFuture<'a>: Future<Output=Result<(), Self::Error>> + 'a
-    where
-        Self: 'a;
-
-    /// Reads the word stored in the shift register
-    ///
-    /// **NOTE** A word must be sent to the slave before attempting to call this
-    /// method.
-    fn read<'a>(&'a mut self) -> Self::ReadFuture<'a>;
-
-    /// Writes a word to the slave
-    fn write<'a>(&'a mut self, word: Word) -> Self::WriteFuture<'a>;
-}
-
 /// Async transfer
 pub trait Transfer<Word: 'static> {
     /// Error type
@@ -68,66 +28,6 @@ pub trait Write<W> {
 
     /// Writes `words` to the slave, ignoring all the incoming words
     fn write<'a>(&'a mut self, words: &'a [W]) -> Self::WriteFuture<'a>;
-}
-
-/// Async transfer
-pub mod transfer {
-    use core::future::Future;
-
-    /// Default implementation of `futures::spi::Transfer<W>` for implementers of
-    /// `futures::spi::FullDuplex<W>`
-    pub trait Default<Word>: super::FullDuplex<Word> {}
-
-    impl<Word, S> super::Transfer<Word> for S
-    where
-        S: Default<Word>,
-        Word: Clone + 'static,
-    {
-        type Error = S::Error;
-
-        type TransferFuture<'a> where Self: 'a = impl Future<Output = Result<&'a [Word], S::Error>> + 'a;
-
-        fn transfer<'w>(&'w mut self, words: &'w mut [Word]) -> Self::TransferFuture<'w> {
-            async move {
-                for word in words.iter_mut() {
-                    self.write(word.clone()).await?;
-                    *word = self.read().await?;
-                }
-
-                Ok(words as &'w [Word])
-            }
-        }
-    }
-}
-
-/// Blocking write
-pub mod write {
-    use core::future::Future;
-
-    /// Default implementation of `futures::spi::Write<W>` for implementers
-    /// of `futures::spi::FullDuplex<W>`
-    pub trait Default<W>: super::FullDuplex<W> {}
-
-    impl<W, S> super::Write<W> for S
-    where
-        S: Default<W>,
-        W: Clone + 'static,
-    {
-        type Error = S::Error;
-
-        type WriteFuture<'a> where Self: 'a = impl Future<Output = Result<(), S::Error>> + 'a;
-
-        fn write<'a>(&'a mut self, words: &'a [W]) -> Self::WriteFuture<'a> {
-            async move {
-                for word in words {
-                    self.write(word.clone()).await?;
-                    self.read().await?;
-                }
-
-                Ok(())
-            }
-        }
-    }
 }
 
 // /// Operation for transactional SPI trait
