@@ -3,12 +3,12 @@
 use core::{future::Future, mem::MaybeUninit};
 
 /// Async read + write
-pub trait ReadWrite<Word> {
+pub trait ReadWrite<Word: 'static> {
     /// Error type
     type Error;
 
     /// Associated future for the `transfer` method.
-    type ReadWriteFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type ReadWriteFuture<'a>: Future<Output = Result<&'a [Word], Self::Error>> + 'a
     where
         Self: 'a;
 
@@ -18,17 +18,19 @@ pub trait ReadWrite<Word> {
 }
 
 /// Async read + write in place.
-pub trait ReadWriteInPlace<Word> {
+pub trait ReadWriteInPlace<Word: 'static> {
     /// Error type
     type Error;
 
     /// Associated future for the `transfer` method.
-    type ReadWriteInPlaceFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type ReadWriteInPlaceFuture<'a>: Future<Output = Result<&'a [Word], Self::Error>> + 'a
     where
         Self: 'a;
 
     /// Writes `words` to the slave from the `readwrite` buffer and reads words into the same buffer.
     /// This method uses a single `readwrite` buffer.
+    ///
+    /// The returned buffer is the initialized `readwrite` buffer.
     fn readwrite_inplace<'a>(&'a mut self, readwrite: &'a mut [Word]) -> Self::ReadWriteInPlaceFuture<'a>;
 }
 
@@ -47,17 +49,19 @@ pub trait Write<Word> {
 }
 
 /// Async read
-pub trait Read<Word> {
+pub trait Read<Word: 'static> {
     /// Error type
     type Error;
 
     /// Associated future for the `read` method.
-    type ReadFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type ReadFuture<'a>: Future<Output = Result<&'a [Word], Self::Error>> + 'a
     where
         Self: 'a;
 
     /// Reads words from the slave without specifying any data to write.
     /// The SPI hardware will send data, though what data it sends is not defined
-    /// by this trait. Some hardware can configure what values (e.g. all zeroes, all ones), some cannot.
+    /// by this trait. Some hardware can configure what values (e.g. 0x00, 0xFF), some cannot.
+    ///
+    /// The returned buffer is the initialized `words` buffer.
     fn read<'a>(&'a mut self, words: &'a mut [MaybeUninit<Word>]) -> Self::ReadFuture<'a>;
 }

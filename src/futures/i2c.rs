@@ -82,12 +82,12 @@ pub trait WriteRead<A: AddressMode = SevenBitAddress> {
     /// Error type
     type Error;
     /// The future associated with the `write_read` method.
-    type WriteReadFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type WriteReadFuture<'a>: Future<Output = Result<&'a [u8], Self::Error>> + 'a
     where
         Self: 'a;
 
     /// Writes bytes to slave with address `address` and then reads enough bytes to fill `read` *in a
-    /// single transaction*
+    /// single transaction*. The returned buffer is the initialized `read` buffer.
     ///
     /// # I2C Events (contract)
     ///

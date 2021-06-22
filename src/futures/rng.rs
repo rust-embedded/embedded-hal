@@ -14,6 +14,6 @@ pub trait Read {
     where
         Self: 'a;
 
-    /// Get a number of bytes from the RNG.
+    /// Get a number of bytes from the RNG. The returned buffer is the initialized `buf`.
     fn read<'a>(&'a mut self, buf: &'a mut [MaybeUninit<u8>]) -> Self::ReadFuture<'a>;
 }
