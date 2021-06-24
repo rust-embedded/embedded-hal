@@ -22,8 +22,9 @@ pub use crate::blocking::qei::Qei as _embedded_hal_blocking_Qei;
 pub use crate::blocking::rng::Read as _embedded_hal_blocking_rng_Read;
 pub use crate::blocking::serial::Write as _embedded_hal_blocking_serial_Write;
 pub use crate::blocking::spi::{
-    Transfer as _embedded_hal_blocking_spi_Transfer, Write as _embedded_hal_blocking_spi_Write,
-    WriteIter as _embedded_hal_blocking_spi_WriteIter,
+    Read as _embedded_hal_blocking_spi_Read, Transfer as _embedded_hal_blocking_spi_Transfer,
+    TransferInplace as _embedded_hal_blocking_spi_TransferInplace,
+    Write as _embedded_hal_blocking_spi_Write, WriteIter as _embedded_hal_blocking_spi_WriteIter,
 };
 pub use crate::blocking::watchdog::Disable as _embedded_hal_blocking_watchdog_Disable;
 pub use crate::blocking::watchdog::Enable as _embedded_hal_blocking_watchdog_Enable;
