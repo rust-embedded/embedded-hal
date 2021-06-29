@@ -11,7 +11,8 @@
 /// #[macro_use(block)]
 /// extern crate nb;
 ///
-/// use hal::prelude::*;
+/// use hal::blocking::qei::Qei;
+/// use hal::nb::timer::CountDown;
 ///
 /// fn main() {
 ///     let mut qei: Qei1 = {
