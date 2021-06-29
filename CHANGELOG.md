@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   importing the `nb` crate directly in dependendent crates.
 - `blocking::Serial`: renamed `bwrite_all` to `write`, `bflush` to `flush.
 - Removed `prelude` to avoid method name conflicts between different flavors (blocking, nb) of the same trait. Traits must now be manually imported.
+- Removed the various `Default` traits because they interfered with upstream implementations. 
 
 ## [v1.0.0-alpha.4] - 2020-11-11
 
