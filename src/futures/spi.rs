@@ -2,28 +2,28 @@
 
 use core::{future::Future, mem::MaybeUninit};
 
-/// Async read + write
-pub trait ReadWrite<Word: 'static> {
+/// Async transfer
+pub trait Transfer<Word: 'static> {
     /// Error type
     type Error;
 
     /// Associated future for the `transfer` method.
-    type ReadWriteFuture<'a>: Future<Output = Result<&'a [Word], Self::Error>> + 'a
+    type TransferFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
     where
         Self: 'a;
 
     /// Writes `words` to the slave from the `write` buffer. Puts the words returned in the `read` buffer.
     /// This method uses separate `write` and `read` buffers.
-    fn readwrite<'a>(&'a mut self, write: &'a [Word], read: &'a mut [MaybeUninit<Word>]) -> Self::ReadWriteFuture<'a>;
+    fn transfer<'a>(&'a mut self, write: &'a [Word], read: &'a mut [MaybeUninit<Word>]) -> Self::TransferFuture<'a>;
 }
 
-/// Async read + write in place.
-pub trait ReadWriteInPlace<Word: 'static> {
+/// Async transfer in place.
+pub trait TransferInPlace<Word: 'static> {
     /// Error type
     type Error;
 
-    /// Associated future for the `transfer` method.
-    type ReadWriteInPlaceFuture<'a>: Future<Output = Result<&'a [Word], Self::Error>> + 'a
+    /// Associated future for the `transfer_inplace` method.
+    type TransferInPlaceFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
     where
         Self: 'a;
 
@@ -31,7 +31,7 @@ pub trait ReadWriteInPlace<Word: 'static> {
     /// This method uses a single `readwrite` buffer.
     ///
     /// The returned buffer is the initialized `readwrite` buffer.
-    fn readwrite_inplace<'a>(&'a mut self, readwrite: &'a mut [Word]) -> Self::ReadWriteInPlaceFuture<'a>;
+    fn transfer_inplace<'a>(&'a mut self, readwrite: &'a mut [Word]) -> Self::TransferInPlaceFuture<'a>;
 }
 
 /// Async write
@@ -54,7 +54,7 @@ pub trait Read<Word: 'static> {
     type Error;
 
     /// Associated future for the `read` method.
-    type ReadFuture<'a>: Future<Output = Result<&'a [Word], Self::Error>> + 'a
+    type ReadFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
     where
         Self: 'a;
 
