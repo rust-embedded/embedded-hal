@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Moved all traits into two modules depending on the execution model: `blocking` and `nb` (non-blocking).
 - Re-export `nb::{block!, Error, Result}` to avoid version mismatches. These should be used instead of
   importing the `nb` crate directly in dependendent crates.
+- `blocking::Serial`: renamed `bwrite_all` to `write`, `bflush` to `flush.
 
 ## [v1.0.0-alpha.4] - 2020-11-11
 
