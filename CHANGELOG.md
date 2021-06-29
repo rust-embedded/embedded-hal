@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Added `IoPin` trait for pins that can change between being inputs or outputs
   dynamically.
+- Added `futures` module that contains async traits (using unstable GATs) for I2C, RNG, Serial, SPI, and Timers.
 
 ### Changed
 - Swap PWM channel arguments to references
