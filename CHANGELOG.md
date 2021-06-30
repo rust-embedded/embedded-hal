@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `blocking::Serial`: renamed `bwrite_all` to `write`, `bflush` to `flush.
 - Removed `prelude` to avoid method name conflicts between different flavors (blocking, nb) of the same trait. Traits must now be manually imported.
 
+### Removed
+- Removed random number generation (`rng`) traits in favor of [rand_core](https://crates.io/crates/rand_core).
+
 ## [v1.0.0-alpha.4] - 2020-11-11
 
 ### Fixed
