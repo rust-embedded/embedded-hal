@@ -9,7 +9,7 @@
 /// ```
 /// extern crate embedded_hal as hal;
 ///
-/// use hal::prelude::*;
+/// use hal::blocking::pwm::Pwm;
 ///
 /// fn main() {
 ///     let mut pwm: Pwm1 = {
