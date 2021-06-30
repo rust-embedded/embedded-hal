@@ -9,6 +9,7 @@
   - [Method renaming](#method-renaming)
   - [`nb` dependency](#nb-dependency)
   - [Prelude](#prelude)
+  - [`rng` module](#rng-module)
   - [Features](#features)
   - [Use-case-specific help](#use-case-specific-help)
     - [For driver authors](#for-driver-authors)
@@ -26,10 +27,54 @@ non-blocking. In the future when we add asynchronous traits, we envision adding 
 All trait methods are now fallible so that they can be used in any possible situation.
 However, HAL implementations can also provide infallible versions of the methods.
 
+For example, an implementation similar to the one below would allow to use the GPIO pins as `OutputPin`s
+in any generic driver or implementation-agnostic code (by importing the `OutputPin` trait),
+as well as using the infallible methods in non-generic code, thus avoiding the need to use `unwrap()`
+the results in many cases and resulting in more succinct code.
+
+It should be noted that given this implementation, importing the `OutputPin` trait can result in
+ambiguous calls, so please remove the trait imports if you do not need them.
+
+```rust
+use core::convert::Infallible;
+use embedded_hal::blocking::digital::OutputPin;
+
+struct GpioPin;
+
+impl OutputPin for GpioPin {
+  type Error = Infallible;
+
+  fn set_high(&mut self) -> Result<(), Self::Error> {
+    // ...
+    Ok(())
+  }
+
+  fn set_low(&mut self) -> Result<(), Self::Error> {
+    // ...
+    Ok(())
+  }
+}
+
+impl GpioPin {
+  fn set_high(&mut self) {
+    // ...
+  }
+
+  fn set_low(&mut self) {
+    // ...
+  }
+}
+```
+
 ## Method renaming
 
 The methods in `SPI`, `I2C` and `Serial` traits for both `blocking` and `nb` execution models have been renamed
-to `write()`, `read()` and `flush()`.
+to `write()`, `read()` and `flush()` for consistency.
+
+In order to avoid method call ambiguity, only the traits from the corresponding execution model should be imported
+into the relevant scope. This is the reason why we have removed the prelude.
+
+For more on this, see [Prelude](#prelude).
 
 ## `nb` dependency
 
@@ -65,15 +110,21 @@ from the compiler should already tell you how it should look like in your case) 
 to limit the scope of the trait imports and thus avoid ambiguity.
 Please note that it is also possible to import traits *inside a function*.
 
+## `rng` module
+
+The `rng` module and its traits have been removed in favor of the [`rand_core`] traits.
+
+[`rand_core`]: https://crates.io/crates/rand_core
+
 ## Features
 
 The `unproven` feature has been removed and the traits have been marked as proven.
-In the past, managing unproven features, and having "sort of breaking" changes have been a struggling point.
+In the past, managing unproven features, and having "sort of breaking" changes has been a struggling point.
 Also, people tended to adopt `unproven` features quickly, but the features would take a very
 long time to stabilize.
 
 Instead, we would like to push experimentation OUT of the `embedded-hal` crate, allowing people to
-experiment externally, and merge when some kind of feasability had been proven.
+experiment externally, and merge when some kind of feasibility had been proven.
 
 ## Use-case-specific help
 
