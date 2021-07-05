@@ -8,6 +8,23 @@ This project is developed and maintained by the [HAL team][team].
 
 [API reference]: https://docs.rs/embedded-hal
 
+## Purpose
+This project provides traits used to write generic drivers for embedded systems. HAL libraries for
+specific platforms (microcontrollers etc) can implement these traits for peripherals such as
+General Purpose Input/Output (GPIO), and communications protocols. Drivers for specific hardware 
+devices can be written that interface with these
+traits, therefore being compatible with any platform that implements them.
+
+This project supports the most commonly-used features of supported peipherals. Drivers that need
+to access functionality not included here should interact with the intended platform directly.
+
+## Requirements
+1. Provide generic traits for GPIO, including getting and setting state (low / high)
+2. Provide generic traits to read and write using the most common communications protocols in embedded
+3. Provide generic traits for other peripherals that are suitably common, and easy to abstract over
+4. Provide both blocking, and nonblocking traits for all supported communications protocols
+5. Use fallible trait methods when applicable
+
 ## Releases
 
 At the moment we are working towards a `1.0.0` release (see [#177]). During this process we will
