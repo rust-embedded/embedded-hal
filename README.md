@@ -24,6 +24,7 @@ to access functionality not included here should interact with the intended plat
 3. Provide generic traits for other peripherals that are suitably common, and easy to abstract over
 4. Provide both blocking, and nonblocking traits for all supported communications protocols
 5. Use fallible trait methods when applicable
+6. Document each trait and method with a description, and example code
 
 ## Releases
 
