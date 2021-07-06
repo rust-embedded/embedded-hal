@@ -21,7 +21,7 @@
 //! use core::time::Duration;
 //!
 //! //! Wait until the `ready_pin` is high or timeout after 1 millisecond.
-//! //! Returns true is the pin became high or false if it timed-out.
+//! //! Returns true if the pin became high or false if it timed-out.
 //! async fn wait_until_ready_or_timeout<P, D>(ready_pin: &P, delay: &mut D) -> bool
 //! where
 //!     P: WaitForHigh,
