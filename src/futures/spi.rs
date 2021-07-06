@@ -12,8 +12,14 @@ pub trait Transfer<W: 'static> {
     where
         Self: 'a;
 
-    /// Writes `words` to the slave from the `write` buffer. Puts the words returned in the `read` buffer.
-    /// This method uses separate `write` and `read` buffers.
+    /// Writes and reads simultaneously. `write` is written to the slave on MOSI and
+    /// words received on MISO are stored in `read`.
+    ///
+    /// It is allowed for `read` and `write` to have different lengths, even zero length.
+    /// The transfer runs for `max(read.len(), write.len())` words. If `read` is shorter,
+    /// incoming words after `read` has been filled will be discarded. If `write` is shorter,
+    /// the value of words sent in MOSI after all `write` has been sent is implementation defined,
+    /// typically `0x00`, `0xFF`, or configurable.
     fn transfer<'a>(&'a mut self, write: &'a [W], read: &'a mut [W]) -> Self::TransferFuture<'a>;
 }
 
