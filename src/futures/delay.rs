@@ -5,7 +5,7 @@
 //! The `Delay` trait provides an asynchronous delay abstraction and it's meant to be used either
 //! to build higher-level abstractions like I/O timeouts or by itself.
 
-use core::future::Future;
+use core::{future::Future, time::Duration};
 
 /// Asynchronously wait a duration of time.
 pub trait Delay {
@@ -17,11 +17,8 @@ pub trait Delay {
     where
         Self: 'a;
 
-    /// The unit of time used by this delay timer.
-    type Time;
-
     /// Returns a future that will resolve when `duration` has passed.
     /// It is not guaranteed that _exactly_ `duration` will pass, but it will
     /// be `duration` or longer.
-    fn delay<'a>(&mut self, duration: impl Into<Self::Time>) -> Self::DelayFuture<'a>;
+    fn delay<'a>(&mut self, duration: Duration) -> Self::DelayFuture<'a>;
 }
