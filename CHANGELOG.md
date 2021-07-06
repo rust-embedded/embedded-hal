@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Added `IoPin` trait for pins that can change between being inputs or outputs
   dynamically.
-- Added `futures` module that contains asynchronous traits (using currently unstable GATs) for I2C, RNG, Serial, SPI, and Timers. These traits are behind the feature flag `unstable-futures`. The `futures` module currently needs Rust nightly and it is not included in `embedded-hal`'s SemVer guarantees. We may release breaking changes in any patch release. If you use this module, please use an `=1.x.x` crate version specification.
+- Added `futures` module that contains asynchronous traits (using currently unstable GATs) for I2C, RNG, Serial, SPI, digital pins, and delays. These traits are behind the feature flag `unstable-futures`. The `futures` module currently needs Rust nightly and it is not included in `embedded-hal`'s SemVer guarantees. We may release breaking changes in any patch release. If you use this module, please use an `=1.x.x` crate version specification.
 
 ### Changed
 - Swap PWM channel arguments to references
