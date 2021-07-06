@@ -12,10 +12,10 @@ use crate::blocking::digital::InputPin;
 /// /// Asynchronously wait until the `ready_pin` becomes high.
 /// async fn wait_until_ready<P>(ready_pin: &P)
 /// where
-///     P: AsyncInputPin,
+///     P: WaitFor,
 /// {
 ///     ready_pin
-///         .until_high()
+///         .wait_for_high()
 ///         .await
 ///         .expect("failed to await input pin")
 /// }
@@ -30,11 +30,11 @@ use crate::blocking::digital::InputPin;
 /// /// Returns true is the pin became high or false if it timed-out.
 /// async fn wait_until_ready_or_timeout<P, D>(ready_pin: &P, delay: &mut D) -> bool
 /// where
-///     P: AsyncInputPin,
+///     P: WaitFor,
 ///     D: Delay,
 /// {
 ///     futures::select_biased! {
-///         x => ready_pin.until_high() => {
+///         x => ready_pin.wait_for_high() => {
 ///             x.expect("failed to await input pin");
 ///             true
 ///         },
@@ -42,16 +42,25 @@ use crate::blocking::digital::InputPin;
 ///     }
 /// }
 /// ```
-pub trait AsyncInputPin: InputPin {
+pub trait WaitFor: InputPin {
     /// The future returned by the `until_high` function.
     type UntilHighFuture<'a>: Future<Output=Result<(), Self::Error>> + 'a;
 
     /// The future returned by the `until_low` function.
     type UntilLowFuture<'a>: Future<Output=Result<(), Self::Error>> + 'a;
 
-    /// Returns a future that resolves when this pin becomes high.
-    fn until_high<'a>(&self) -> Self::UntilHighFuture<'a>;
+    /// Returns a future that resolves when this pin _is_ high. If the pin
+    /// is already high, the future resolves immediately.
+    ///
+    /// # Note for implementers
+    /// The pin may have switched back to low before the task was run after
+    /// being woken. The future should still resolve in that case.
+    fn wait_for_high<'a>(&'a mut self) -> Self::UntilHighFuture<'a>;
 
-    /// Returns a future that resolves when this pin becomes high.
-    fn until_low<'a>(&self) -> Self::UntilLowFuture<'a>;
+    /// Returns a future that resolves when this pin becomes low.
+    ///
+    /// # Note for implementers
+    /// The pin may have switched back to high before the task was run after
+    /// being woken. The future should still resolve in that case.
+    fn wait_for_low<'a>(&'a mut self) -> Self::UntilLowFuture<'a>;
 }

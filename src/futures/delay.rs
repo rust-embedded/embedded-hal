@@ -32,5 +32,5 @@ pub trait Delay {
     /// Returns a future that will resolve when `duration` has passed.
     /// It is not guaranteed that _exactly_ `duration` will pass, but it will
     /// be `duration` or longer.
-    fn delay<'a>(&mut self, duration: Duration) -> Self::DelayFuture<'a>;
+    fn delay<'a>(&'a mut self, duration: Duration) -> Self::DelayFuture<'a>;
 }
