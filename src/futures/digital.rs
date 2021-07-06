@@ -42,7 +42,7 @@ use core::future::Future;
 /// Asynchronously wait for a pin to be high.
 pub trait WaitForHigh {
     /// The future returned by the `wait_for_high` function.
-    type HighFuture<'a>: Future<Output=()> + 'a
+    type HighFuture<'a>: Future<Output = ()> + 'a
     where
         Self: 'a;
 

@@ -412,9 +412,9 @@
 
 pub mod blocking;
 pub mod fmt;
-pub mod nb;
 #[cfg(feature = "unstable-futures")]
 pub mod futures;
+pub mod nb;
 
 mod private {
     use crate::blocking::i2c::{SevenBitAddress, TenBitAddress};

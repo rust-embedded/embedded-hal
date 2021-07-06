@@ -16,8 +16,8 @@
 //! Since 7-bit addressing is the mode of the majority of I2C devices,
 //! `SevenBitAddress` has been set as default mode and thus can be omitted if desired.
 
-use core::{future::Future, mem::MaybeUninit};
 pub use crate::blocking::i2c::{AddressMode, SevenBitAddress, TenBitAddress};
+use core::{future::Future, mem::MaybeUninit};
 
 /// Async read
 pub trait Read<A: AddressMode = SevenBitAddress> {

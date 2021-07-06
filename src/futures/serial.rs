@@ -11,7 +11,7 @@ pub trait Read<Word> {
     type Error;
 
     /// The future associated with the `read` method.
-    type ReadFuture<'a>: Future<Output=Result<(), Self::Error>> + 'a
+    type ReadFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
     where
         Self: 'a;
 
@@ -25,12 +25,12 @@ pub trait Write<Word> {
     type Error;
 
     /// The future associated with the `write` method.
-    type WriteFuture<'a>: Future<Output=Result<(), Self::Error>> + 'a
+    type WriteFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
     where
         Self: 'a;
 
     /// The future associated with the `flush` method.
-    type FlushFuture<'a>: Future<Output=Result<(), Self::Error>> + 'a
+    type FlushFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
     where
         Self: 'a;
 
