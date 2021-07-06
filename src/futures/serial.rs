@@ -11,12 +11,12 @@ pub trait Read<Word> {
     type Error;
 
     /// The future associated with the `read` method.
-    type ReadFuture<'a>: Future<Output=Result<Word, Self::Error>> + 'a
+    type ReadFuture<'a>: Future<Output=Result<(), Self::Error>> + 'a
     where
         Self: 'a;
 
-    /// Reads a single word from the serial interface
-    fn read<'a>(&'a mut self) -> Self::ReadFuture<'a>;
+    /// Reads words from the serial interface into the supplied slice.
+    fn read<'a>(&'a mut self, read: &'a mut [Word]) -> Self::ReadFuture<'a>;
 }
 
 /// Write half of a serial interface
