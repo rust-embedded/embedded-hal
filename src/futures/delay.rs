@@ -8,6 +8,18 @@
 use core::{future::Future, time::Duration};
 
 /// Asynchronously wait a duration of time.
+///
+/// # Example
+/// ```rust
+/// # use embedded_hal::futures::delay::Delay;
+/// use core::time::Duration;
+///
+/// async fn wait_100_micros<D: Delay>(timer: &D) {
+///     timer.delay(Duration::from_micros(100))
+///         .await
+///         .expect("failed to await on timer");
+/// }
+/// ```
 pub trait Delay {
     /// Enumeration of `Delay` errors.
     type Error;
