@@ -31,7 +31,7 @@ pub trait TransferInPlace<W: 'static> {
     /// This method uses a single `readwrite` buffer.
     ///
     /// The returned buffer is the initialized `readwrite` buffer.
-    fn transfer_inplace<'a>(&'a mut self, readwrite: &'a mut [W]) -> Self::TransferInPlaceFuture<'a>;
+    fn transfer_inplace<'a>(&'a mut self, words: &'a mut [W]) -> Self::TransferInPlaceFuture<'a>;
 }
 
 /// Async write
@@ -45,7 +45,7 @@ pub trait Write<W> {
         Self: 'a;
 
     /// Writes `words` to the slave, ignoring all the incoming words
-    fn write<'a>(&'a mut self, words: &'a [W]) -> Self::WriteFuture<'a>;
+    fn write<'a>(&'a mut self, write: &'a [W]) -> Self::WriteFuture<'a>;
 }
 
 /// Async read
@@ -63,5 +63,5 @@ pub trait Read<W: 'static> {
     /// by this trait. Some hardware can configure what values (e.g. 0x00, 0xFF), some cannot.
     ///
     /// The returned buffer is the initialized `words` buffer.
-    fn read<'a>(&'a mut self, words: &'a mut [W]) -> Self::ReadFuture<'a>;
+    fn read<'a>(&'a mut self, read: &'a mut [W]) -> Self::ReadFuture<'a>;
 }
