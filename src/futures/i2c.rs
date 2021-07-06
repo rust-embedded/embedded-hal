@@ -17,7 +17,7 @@
 //! `SevenBitAddress` has been set as default mode and thus can be omitted if desired.
 
 pub use crate::blocking::i2c::{AddressMode, SevenBitAddress, TenBitAddress};
-use core::{future::Future, mem::MaybeUninit};
+use core::future::Future;
 
 /// Async read
 pub trait Read<A: AddressMode = SevenBitAddress> {
@@ -46,7 +46,7 @@ pub trait Read<A: AddressMode = SevenBitAddress> {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
-    fn read<'a>(&'a mut self, address: A, read: &'a mut [MaybeUninit<u8>]) -> Self::ReadFuture<'a>;
+    fn read<'a>(&'a mut self, address: A, read: &'a mut [u8]) -> Self::ReadFuture<'a>;
 }
 
 /// Async write
@@ -112,6 +112,6 @@ pub trait WriteRead<A: AddressMode = SevenBitAddress> {
         &'a mut self,
         address: A,
         write: &'a [u8],
-        read: &'a mut [MaybeUninit<u8>],
+        read: &'a mut [u8],
     ) -> Self::WriteReadFuture<'a>;
 }
