@@ -18,9 +18,10 @@ traits, therefore being compatible with any platform that implements them.
 This project supports the most commonly-used features of supported peipherals. Drivers that need
 to access functionality not included here should interact with the intended platform directly.
 
-## Requirements
+## Project goals
 1. Provide generic traits for GPIO, including getting and setting state (low / high)
-2. Provide generic traits to read and write using the most common communications protocols in embedded
+2. Provide generic traits to read and write using the most common communications protocols in embedded -
+these should be sufficient for most platform-driver communication
 3. Provide generic traits for other peripherals that are suitably common, and easy to abstract over
 4. Provide both blocking, and nonblocking traits for all supported communications protocols
 5. Use fallible trait methods when applicable
