@@ -29,6 +29,12 @@ pub trait WriteIter<W> {
         WI: IntoIterator<Item = W>;
 }
 
+/// ManagedCS marker trait specifies that all `spi` operations will be preceded by
+/// asserting the CS pin, and followed by de-asserting the CS pin.
+///
+/// TODO: document wrappers that can be used where this is required
+pub trait ManagedCs {}
+
 /// Blocking transfer
 pub mod transfer {
     /// Default implementation of `blocking::spi::Transfer<W>` for implementers of
@@ -149,6 +155,145 @@ pub mod transactional {
             }
 
             Ok(())
+        }
+    }
+}
+
+/// Provides SpiWithCS wrapper around an spi::* and OutputPin impl
+pub mod spi_with_cs {
+
+    use core::fmt::Debug;
+    use core::marker::PhantomData;
+
+    use super::{ManagedCs, Transfer, Write, WriteIter};
+    use crate::digital::OutputPin;
+
+    /// SpiWithCS wraps an blocking::spi* implementation with Chip Select (CS)
+    /// pin management.
+    /// For sharing SPI between peripherals, see [shared-bus](https://crates.io/crates/shared-bus)
+    pub struct SpiWithCs<Spi, SpiError, Pin, PinError> {
+        spi: Spi,
+        cs: Pin,
+
+        _spi_err: PhantomData<SpiError>,
+        _pin_err: PhantomData<PinError>,
+    }
+
+    /// Underlying causes for errors. Either SPI communication or CS pin state setting error
+    #[derive(Clone, Debug, PartialEq)]
+    pub enum SpiWithCsError<SpiError, PinError> {
+        /// Underlying SPI communication error
+        Spi(SpiError),
+        /// Underlying chip-select pin state setting error
+        Pin(PinError),
+    }
+
+    /// ManagedCS marker trait indicates Chip Select management is automatic
+    impl<Spi, SpiError, Pin, PinError> ManagedCs for SpiWithCs<Spi, SpiError, Pin, PinError> {}
+
+    impl<Spi, SpiError, Pin, PinError> SpiWithCs<Spi, SpiError, Pin, PinError>
+    where
+        Pin: crate::digital::OutputPin<Error = PinError>,
+        SpiError: Debug,
+        PinError: Debug,
+    {
+        /// Create a new SpiWithCS wrapper with the provided Spi and Pin
+        pub fn new(spi: Spi, cs: Pin) -> Self {
+            Self {
+                spi,
+                cs,
+                _spi_err: PhantomData,
+                _pin_err: PhantomData,
+            }
+        }
+
+        /// Fetch references to the inner Spi and Pin types.
+        /// Note that using these directly will violate the `ManagedCs` constraint.
+        pub fn inner(&mut self) -> (&mut Spi, &mut Pin) {
+            (&mut self.spi, &mut self.cs)
+        }
+
+        /// Destroy the SpiWithCs wrapper, returning the bus and pin objects
+        pub fn destroy(self) -> (Spi, Pin) {
+            (self.spi, self.cs)
+        }
+    }
+
+    impl<Spi, SpiError, Pin, PinError> Transfer<u8> for SpiWithCs<Spi, SpiError, Pin, PinError>
+    where
+        Spi: Transfer<u8, Error = SpiError>,
+        Pin: OutputPin<Error = PinError>,
+        SpiError: Debug,
+        PinError: Debug,
+    {
+        type Error = SpiWithCsError<SpiError, PinError>;
+
+        /// Attempt an SPI transfer with automated CS assert/deassert
+        fn try_transfer<'w>(&mut self, data: &'w mut [u8]) -> Result<&'w [u8], Self::Error> {
+            // First assert CS
+            self.cs.try_set_low().map_err(SpiWithCsError::Pin)?;
+
+            // Attempt the transfer, storing the result for later
+            let spi_result = self.spi.try_transfer(data).map_err(SpiWithCsError::Spi);
+
+            // Deassert CS
+            self.cs.try_set_high().map_err(SpiWithCsError::Pin)?;
+
+            // Return failures
+            spi_result
+        }
+    }
+
+    impl<Spi, SpiError, Pin, PinError> Write<u8> for SpiWithCs<Spi, SpiError, Pin, PinError>
+    where
+        Spi: Write<u8, Error = SpiError>,
+        Pin: OutputPin<Error = PinError>,
+        SpiError: Debug,
+        PinError: Debug,
+    {
+        type Error = SpiWithCsError<SpiError, PinError>;
+
+        /// Attempt an SPI write with automated CS assert/deassert
+        fn try_write<'w>(&mut self, data: &'w [u8]) -> Result<(), Self::Error> {
+            // First assert CS
+            self.cs.try_set_low().map_err(SpiWithCsError::Pin)?;
+
+            // Attempt the transfer, storing the result for later
+            let spi_result = self.spi.try_write(data).map_err(SpiWithCsError::Spi);
+
+            // Deassert CS
+            self.cs.try_set_high().map_err(SpiWithCsError::Pin)?;
+
+            // Return failures
+            spi_result
+        }
+    }
+
+    impl<Spi, SpiError, Pin, PinError> WriteIter<u8> for SpiWithCs<Spi, SpiError, Pin, PinError>
+    where
+        Spi: WriteIter<u8, Error = SpiError>,
+        Pin: OutputPin<Error = PinError>,
+        SpiError: Debug,
+        PinError: Debug,
+    {
+        type Error = SpiWithCsError<SpiError, PinError>;
+
+        /// Attempt an SPI write_iter with automated CS assert/deassert
+        fn try_write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
+        where
+            WI: IntoIterator<Item = u8>,
+        {
+            // First assert CS
+            self.cs.try_set_low().map_err(SpiWithCsError::Pin)?;
+
+            // Attempt the transfer, storing the result for later
+            let spi_result = self.spi.try_write_iter(words).map_err(SpiWithCsError::Spi);
+
+            // Deassert CS
+            self.cs.try_set_high().map_err(SpiWithCsError::Pin)?;
+
+            // Return failures
+            spi_result
         }
     }
 }
