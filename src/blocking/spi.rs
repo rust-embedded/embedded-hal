@@ -5,8 +5,10 @@ pub trait Transfer<W> {
     /// Error type
     type Error;
 
-    /// Writes `words` to the slave. Returns the `words` received from the slave
-    fn transfer<'w>(&mut self, words: &'w mut [W]) -> Result<&'w [W], Self::Error>;
+    /// Writes and reads simultaneously. The contents of `words` are
+    /// written to the slave, and the received words are stored into the same
+    /// `words` buffer, overwriting it.
+    fn transfer(&mut self, words: &mut [W]) -> Result<(), Self::Error>;
 }
 
 /// Blocking write
@@ -42,13 +44,13 @@ pub mod transfer {
     {
         type Error = S::Error;
 
-        fn transfer<'w>(&mut self, words: &'w mut [W]) -> Result<&'w [W], S::Error> {
+        fn transfer(&mut self, words: &mut [W]) -> Result<(), S::Error> {
             for word in words.iter_mut() {
                 nb::block!(self.write(word.clone()))?;
                 *word = nb::block!(self.read())?;
             }
 
-            Ok(words)
+            Ok(())
         }
     }
 }
