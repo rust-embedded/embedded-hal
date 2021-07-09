@@ -18,37 +18,3 @@ pub trait Write<Word> {
     /// Block until the serial interface has sent all buffered words
     fn flush(&mut self) -> Result<(), Self::Error>;
 }
-
-/// Blocking serial write
-pub mod write {
-    /// Marker trait to opt into default blocking write implementation
-    ///
-    /// Implementers of [`nonblocking::serial::Write`] can implement this marker trait
-    /// for their type. Doing so will automatically provide the default
-    /// implementation of [`blocking::serial::Write`] for the type.
-    ///
-    /// [`nonblocking::serial::Write`]: ../../nonblocking/serial/trait.Write.html
-    /// [`blocking::serial::Write`]: ../trait.Write.html
-    pub trait Default<Word>: crate::nb::serial::Write<Word> {}
-
-    impl<S, Word> crate::blocking::serial::Write<Word> for S
-    where
-        S: Default<Word>,
-        Word: Clone,
-    {
-        type Error = S::Error;
-
-        fn write(&mut self, buffer: &[Word]) -> Result<(), Self::Error> {
-            for word in buffer {
-                nb::block!(self.write(word.clone()))?;
-            }
-
-            Ok(())
-        }
-
-        fn flush(&mut self) -> Result<(), Self::Error> {
-            nb::block!(self.flush())?;
-            Ok(())
-        }
-    }
-}
