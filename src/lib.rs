@@ -408,9 +408,12 @@
 #![doc(html_root_url = "https://docs.rs/embedded-hal/1.0.0-alpha.4")]
 #![deny(missing_docs)]
 #![no_std]
+#![cfg_attr(feature = "unstable-futures", feature(generic_associated_types))]
 
 pub mod blocking;
 pub mod fmt;
+#[cfg(feature = "unstable-futures")]
+pub mod futures;
 pub mod nb;
 
 mod private {
