@@ -9,7 +9,6 @@ pub mod digital;
 pub mod i2c;
 pub mod pwm;
 pub mod qei;
-pub mod rng;
 pub mod serial;
 pub mod spi;
 pub mod watchdog;

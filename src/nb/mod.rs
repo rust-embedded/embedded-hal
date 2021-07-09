@@ -17,7 +17,6 @@
 pub use nb::{block, Error, Result};
 pub mod adc;
 pub mod capture;
-pub mod rng;
 pub mod serial;
 pub mod spi;
 pub mod timer;
