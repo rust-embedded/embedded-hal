@@ -34,6 +34,11 @@
 //! advantage for application developers is that by adopting `embedded-hal` they can unlock all
 //! these drivers for their platform.
 //!
+//! - Trait methods must be fallible so that they can be used in any possible situation.
+//! Nevertheless, HAL implementations can additionally provide infallible versions of the same methods
+//! if they can never fail in their platform. This way, generic code can use the fallible abstractions
+//! provided here but platform-specific code can avoid fallibility-related boilerplate if possible.
+//!
 //! # Out of scope
 //!
 //! - Initialization and configuration stuff like "ensure this serial interface and that SPI

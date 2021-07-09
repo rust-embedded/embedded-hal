@@ -13,6 +13,27 @@ This project is developed and maintained by the [HAL team][team].
 
 [API reference]: https://docs.rs/embedded-hal
 
+## Scope
+
+`embedded-hal` serves as a foundation for building an ecosystem of platform agnostic drivers.
+(driver meaning library crates that let a target platform interface an external device like a digital
+sensor or a wireless transceiver).
+
+The advantage of this system is that by writing the driver as a generic library on top
+of `embedded-hal` driver authors can support any number of target
+platforms (e.g. Cortex-M microcontrollers, AVR microcontrollers, embedded Linux, etc.).
+
+The advantage for application developers is that by adopting `embedded-hal` they can unlock all
+these drivers for their platform.
+
+`embedded-hal` is not tied to a specific execution model like blocking or non-blocking.
+
+For functionality that goes beyond what is provided by `embedded-hal`, users are encouraged
+to use the target platform directly. Abstractions of common functionality can be proposed to be
+included into `embedded-hal` as described [below](#how-to-add-a-new-trait), though.
+
+See more about the design goals in [this documentation section](https://docs.rs/embedded-hal/latest/embedded_hal/#design-goals).
+
 ## Releases
 
 At the moment we are working towards a `1.0.0` release (see [#177]). During this process we will
