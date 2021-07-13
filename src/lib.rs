@@ -248,7 +248,7 @@
 //!
 //! fn write_all<S>(serial: &mut S, buffer: &[u8]) -> Result<(), S::Error>
 //! where
-//!     S: hal::nb::serial::Write<u8>
+//!     S: hal::nb::serial::Write<Word = u8>
 //! {
 //!     for &byte in buffer {
 //!         block!(serial.write(byte))?;
@@ -283,7 +283,7 @@
 //! ) -> Result<u8, Error<S::Error, T::Error>>
 //! where
 //!     T: hal::nb::timer::CountDown<Error = ()>,
-//!     S: hal::nb::serial::Read<u8>,
+//!     S: hal::nb::serial::Read<Word = u8>,
 //! {
 //!     timer.start(timeout).map_err(Error::TimedOut)?;
 //!
@@ -326,7 +326,7 @@
 //!
 //! fn flush<S>(serial: &mut S, cb: &mut CircularBuffer)
 //! where
-//!     S: hal::nb::serial::Write<u8, Error = Infallible>,
+//!     S: hal::nb::serial::Write<Word = u8, Error = Infallible>,
 //! {
 //!     loop {
 //!         if let Some(byte) = cb.peek() {
@@ -390,7 +390,8 @@
 //! #     fn deref_mut(&mut self) -> &mut T { self.0 }
 //! # }
 //! # struct Serial1;
-//! # impl hal::nb::serial::Write<u8> for Serial1 {
+//! # impl hal::nb::serial::Write for Serial1 {
+//! #   type Word = u8;
 //! #   type Error = Infallible;
 //! #   fn write(&mut self, _: u8) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #   fn flush(&mut self) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }

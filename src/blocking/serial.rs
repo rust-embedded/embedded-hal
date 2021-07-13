@@ -1,7 +1,10 @@
 //! Blocking serial API
 
 /// Write half of a serial interface (blocking variant)
-pub trait Write<Word> {
+pub trait Write {
+    /// Word type
+    type Word;
+
     /// The type of error that can occur when writing
     type Error;
 
@@ -13,7 +16,7 @@ pub trait Write<Word> {
     /// everything has been sent, call [`flush`] after this function returns.
     ///
     /// [`flush`]: #tymethod.flush
-    fn write(&mut self, buffer: &[Word]) -> Result<(), Self::Error>;
+    fn write(&mut self, buffer: &[Self::Word]) -> Result<(), Self::Error>;
 
     /// Block until the serial interface has sent all buffered words
     fn flush(&mut self) -> Result<(), Self::Error>;
@@ -29,16 +32,17 @@ pub mod write {
     ///
     /// [`nonblocking::serial::Write`]: ../../nonblocking/serial/trait.Write.html
     /// [`blocking::serial::Write`]: ../trait.Write.html
-    pub trait Default<Word>: crate::nb::serial::Write<Word> {}
+    pub trait Default: crate::nb::serial::Write {}
 
-    impl<S, Word> crate::blocking::serial::Write<Word> for S
+    impl<S> crate::blocking::serial::Write for S
     where
-        S: Default<Word>,
-        Word: Clone,
+        S: Default,
+        S::Word: Clone,
     {
+        type Word = S::Word;
         type Error = S::Error;
 
-        fn write(&mut self, buffer: &[Word]) -> Result<(), Self::Error> {
+        fn write(&mut self, buffer: &[Self::Word]) -> Result<(), Self::Error> {
             for word in buffer {
                 nb::block!(self.write(word.clone()))?;
             }

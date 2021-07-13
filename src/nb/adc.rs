@@ -64,23 +64,26 @@ pub trait Channel<ADC> {
 /// #     pub fn do_conversion(&mut self, chan: u8) -> u16 { 0xAA55_u16 }
 /// # }
 ///
-/// impl<WORD, PIN> OneShot<MyAdc, WORD, PIN> for MyAdc
+/// impl<PIN> OneShot<MyAdc, PIN> for MyAdc
 /// where
-///    WORD: From<u16>,
 ///    PIN: Channel<MyAdc, ID=u8>,
 /// {
+///    type Word = u16;
 ///    type Error = ();
 ///
-///    fn read(&mut self, pin: &mut PIN) -> nb::Result<WORD, Self::Error> {
+///    fn read(&mut self, pin: &mut PIN) -> nb::Result<Self::Word, Self::Error> {
 ///        let chan = 1 << pin.channel();
 ///        self.power_up();
 ///        let result = self.do_conversion(chan);
 ///        self.power_down();
-///        Ok(result.into())
+///        Ok(result)
 ///    }
 /// }
 /// ```
-pub trait OneShot<ADC, Word, Pin: Channel<ADC>> {
+pub trait OneShot<ADC, Pin: Channel<ADC>> {
+    /// Word type
+    type Word;
+
     /// Error type returned by ADC methods
     type Error;
 
@@ -88,5 +91,5 @@ pub trait OneShot<ADC, Word, Pin: Channel<ADC>> {
     ///
     /// This method takes a `Pin` reference, as it is expected that the ADC will be able to sample
     /// whatever channel underlies the pin.
-    fn read(&mut self, pin: &mut Pin) -> nb::Result<Word, Self::Error>;
+    fn read(&mut self, pin: &mut Pin) -> nb::Result<Self::Word, Self::Error>;
 }

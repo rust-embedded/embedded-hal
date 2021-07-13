@@ -4,21 +4,27 @@
 ///
 /// Some serial interfaces support different data sizes (8 bits, 9 bits, etc.);
 /// This can be encoded in this trait via the `Word` type parameter.
-pub trait Read<Word> {
+pub trait Read {
+    /// Word type
+    type Word;
+
     /// Read error
     type Error;
 
     /// Reads a single word from the serial interface
-    fn read(&mut self) -> nb::Result<Word, Self::Error>;
+    fn read(&mut self) -> nb::Result<Self::Word, Self::Error>;
 }
 
 /// Write half of a serial interface
-pub trait Write<Word> {
+pub trait Write {
+    /// Word type
+    type Word;
+
     /// Write error
     type Error;
 
     /// Writes a single word to the serial interface
-    fn write(&mut self, word: Word) -> nb::Result<(), Self::Error>;
+    fn write(&mut self, word: Self::Word) -> nb::Result<(), Self::Error>;
 
     /// Ensures that none of the previously written words are still buffered
     fn flush(&mut self) -> nb::Result<(), Self::Error>;
