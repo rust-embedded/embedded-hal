@@ -1,5 +1,7 @@
 //! Blocking SPI API
 
+pub use crate::nb::spi::{Mode, Phase, Polarity, MODE_0, MODE_1, MODE_2, MODE_3};
+
 /// Blocking transfer
 pub trait Transfer<W> {
     /// Error type
