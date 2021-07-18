@@ -11,8 +11,8 @@
 /// #[macro_use(block)]
 /// extern crate nb;
 ///
-/// use hal::blocking::qei::Qei;
-/// use hal::nb::timer::CountDown;
+/// use hal::qei::blocking::Qei;
+/// use hal::timer::nb::CountDown;
 ///
 /// fn main() {
 ///     let mut qei: Qei1 = {
@@ -39,14 +39,14 @@
 /// # trait U32Ext { fn s(self) -> Seconds; }
 /// # impl U32Ext for u32 { fn s(self) -> Seconds { Seconds(self) } }
 /// # struct Qei1;
-/// # impl hal::blocking::qei::Qei for Qei1 {
+/// # impl hal::qei::blocking::Qei for Qei1 {
 /// #     type Error = Infallible;
 /// #     type Count = u16;
 /// #     fn count(&self) -> Result<u16, Self::Error> { Ok(0) }
-/// #     fn direction(&self) -> Result<::hal::blocking::qei::Direction, Self::Error> { unimplemented!() }
+/// #     fn direction(&self) -> Result<::hal::qei::blocking::Direction, Self::Error> { unimplemented!() }
 /// # }
 /// # struct Timer6;
-/// # impl hal::nb::timer::CountDown for Timer6 {
+/// # impl hal::timer::nb::CountDown for Timer6 {
 /// #     type Error = Infallible;
 /// #     type Time = Seconds;
 /// #     fn start<T>(&mut self, _: T) -> Result<(), Infallible> where T: Into<Seconds> { Ok(()) }

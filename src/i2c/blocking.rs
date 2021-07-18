@@ -16,13 +16,17 @@
 //! Since 7-bit addressing is the mode of the majority of I2C devices,
 //! `SevenBitAddress` has been set as default mode and thus can be omitted if desired.
 //!
+//! In some cases it's possible to implement these blocking traits on top of one of the core HAL
+//! traits. To save boilerplate when that's the case a `Default` marker trait may be provided.
+//! Implementing that marker trait will opt in your type into a blanket implementation.
+//!
 //! ## Examples
 //!
 //! ### `embedded-hal` implementation for an MCU
 //! Here is an example of an embedded-hal implementation of the `Write` trait
 //! for both modes:
 //! ```
-//! # use embedded_hal::blocking::i2c::{SevenBitAddress, TenBitAddress, Write};
+//! # use embedded_hal::i2c::blocking::{SevenBitAddress, TenBitAddress, Write};
 //! /// I2C0 hardware peripheral which supports both 7-bit and 10-bit addressing.
 //! pub struct I2c0;
 //!
@@ -52,7 +56,7 @@
 //! For demonstration purposes the address mode parameter has been omitted in this example.
 //!
 //! ```
-//! # use embedded_hal::blocking::i2c::WriteRead;
+//! # use embedded_hal::i2c::blocking::WriteRead;
 //! const ADDR: u8  = 0x15;
 //! # const TEMP_REGISTER: u8 = 0x1;
 //! pub struct TemperatureSensorDriver<I2C> {
@@ -75,7 +79,7 @@
 //! ### Device driver compatible only with 10-bit addresses
 //!
 //! ```
-//! # use embedded_hal::blocking::i2c::{TenBitAddress, WriteRead};
+//! # use embedded_hal::i2c::blocking::{TenBitAddress, WriteRead};
 //! const ADDR: u16  = 0x158;
 //! # const TEMP_REGISTER: u8 = 0x1;
 //! pub struct TemperatureSensorDriver<I2C> {

@@ -15,9 +15,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Swap PWM channel arguments to references
 - All trait methods have been renamed to remove the `try_` prefix (i.e. `try_send` -> `send`) for consistency.
-- Moved all traits into two modules depending on the execution model: `blocking` and `nb` (non-blocking).
+- Moved all traits into two sub modules for each feature depending on the execution model: `blocking` and `nb` (non-blocking). For example, the spi traits can now be found under `embedded_hal::spi::blocking` or `embedded_hal::spi::nb`.
 - Re-export `nb::{block!, Error, Result}` to avoid version mismatches. These should be used instead of
-  importing the `nb` crate directly in dependendent crates.
+  importing the `nb` crate directly in dependent crates.
 - `blocking::Serial`: renamed `bwrite_all` to `write`, `bflush` to `flush.
 - Removed `prelude` to avoid method name conflicts between different flavors (blocking, nb) of the same trait. Traits must now be manually imported.
 - Removed the various `Default` marker traits.

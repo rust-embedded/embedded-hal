@@ -9,7 +9,7 @@
 /// ```
 /// extern crate embedded_hal as hal;
 ///
-/// use hal::blocking::pwm::Pwm;
+/// use hal::pwm::blocking::Pwm;
 ///
 /// fn main() {
 ///     let mut pwm: Pwm1 = {
@@ -34,7 +34,7 @@
 /// # impl U32Ext for u32 { fn khz(self) -> KiloHertz { KiloHertz(self) } }
 /// # enum Channel { _1, _2 }
 /// # struct Pwm1;
-/// # impl hal::blocking::pwm::Pwm for Pwm1 {
+/// # impl hal::pwm::blocking::Pwm for Pwm1 {
 /// #     type Error = Infallible;
 /// #     type Channel = Channel;
 /// #     type Time = KiloHertz;

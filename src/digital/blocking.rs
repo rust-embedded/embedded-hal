@@ -1,4 +1,8 @@
 //! Digital I/O
+//!
+//! In some cases it's possible to implement these blocking traits on top of one of the core HAL
+//! traits. To save boilerplate when that's the case a `Default` marker trait may be provided.
+//! Implementing that marker trait will opt in your type into a blanket implementation.
 
 use core::{convert::From, ops::Not};
 
@@ -7,7 +11,7 @@ use core::{convert::From, ops::Not};
 /// Conversion from `bool` and logical negation are also implemented
 /// for this type.
 /// ```rust
-/// # use embedded_hal::blocking::digital::PinState;
+/// # use embedded_hal::digital::blocking::PinState;
 /// let state = PinState::from(false);
 /// assert_eq!(state, PinState::Low);
 /// assert_eq!(!state, PinState::High);
@@ -115,7 +119,7 @@ pub trait InputPin {
 ///
 /// ```
 /// use core::time::Duration;
-/// use embedded_hal::blocking::digital::{IoPin, InputPin, OutputPin};
+/// use embedded_hal::digital::blocking::{IoPin, InputPin, OutputPin};
 ///
 /// pub fn ping_and_read<TInputPin, TOutputPin, TError>(
 ///     mut pin: TOutputPin, delay_fn: &dyn Fn(Duration) -> ()) -> Result<bool, TError>

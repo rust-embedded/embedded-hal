@@ -72,7 +72,7 @@
 //! Here's how a HAL trait may look like:
 //!
 //! ```
-//! use nb;
+//! use embedded_hal::nb;
 //!
 //! /// A serial interface
 //! pub trait Serial {
@@ -98,7 +98,7 @@
 //! those cases `nb::Result<_, Infallible>` is used.
 //!
 //! ```
-//! use nb;
+//! use embedded_hal::nb;
 //!
 //! # use std as core;
 //! use ::core::convert::Infallible;
@@ -131,7 +131,7 @@
 //! // An implementation of the `embedded-hal` traits for STM32F1xx microcontrollers
 //!
 //! use embedded_hal as hal;
-//! use nb;
+//! use hal::nb;
 //!
 //! // device crate
 //! use stm32f1::stm32f103::USART1;
@@ -150,7 +150,7 @@
 //!     // omitted: other error variants
 //! }
 //!
-//! impl hal::nb::serial::Read<u8> for Serial<USART1> {
+//! impl hal::serial::nb::Read<u8> for Serial<USART1> {
 //!     type Error = Error;
 //!
 //!     fn read(&mut self) -> nb::Result<u8, Error> {
@@ -172,7 +172,7 @@
 //!     }
 //! }
 //!
-//! impl hal::nb::serial::Write<u8> for Serial<USART1> {
+//! impl hal::serial::nb::Write<u8> for Serial<USART1> {
 //!     type Error = Error;
 //!
 //!     fn write(&mut self, byte: u8) -> nb::Result<(), Error> {
@@ -203,8 +203,8 @@
 //!
 //! ```
 //! use crate::stm32f1xx_hal::Serial1;
-//! use embedded_hal::nb::serial::Write;
-//! use nb::block;
+//! use embedded_hal::serial::nb::Write;
+//! use embedded_hal::nb::block;
 //!
 //! # fn main() {
 //! let mut serial: Serial1 = {
@@ -220,7 +220,7 @@
 //! # }
 //!
 //! # mod stm32f1xx_hal {
-//! #     use nb;
+//! #     use embedded_hal::nb;
 //! #     use core::convert::Infallible;
 //! #     pub struct Serial1;
 //! #     impl Serial1 {
@@ -248,12 +248,12 @@
 //!
 //! ```
 //! use embedded_hal as hal;
-//! use nb::block;
-//! use hal::nb::serial::Write;
+//! use hal::nb::block;
+//! use hal::serial::nb::Write;
 //!
 //! fn write_all<S>(serial: &mut S, buffer: &[u8]) -> Result<(), S::Error>
 //! where
-//!     S: hal::nb::serial::Write<u8>
+//!     S: hal::serial::nb::Write<u8>
 //! {
 //!     for &byte in buffer {
 //!         block!(serial.write(byte))?;
@@ -269,10 +269,10 @@
 //!
 //! ```
 //! use embedded_hal as hal;
-//! use nb;
+//! use hal::nb;
 //!
-//! use hal::nb::serial::Write;
-//! use hal::nb::timer::CountDown;
+//! use hal::serial::nb::Write;
+//! use hal::timer::nb::CountDown;
 //!
 //! enum Error<SE, TE> {
 //!     /// Serial interface error
@@ -287,8 +287,8 @@
 //!     timeout: T::Time,
 //! ) -> Result<u8, Error<S::Error, T::Error>>
 //! where
-//!     T: hal::nb::timer::CountDown<Error = ()>,
-//!     S: hal::nb::serial::Read<u8>,
+//!     T: hal::timer::nb::CountDown<Error = ()>,
+//!     S: hal::serial::nb::Read<u8>,
 //! {
 //!     timer.start(timeout).map_err(Error::TimedOut)?;
 //!
@@ -324,14 +324,14 @@
 //! ```
 //! # use std as core;
 //! use embedded_hal as hal;
-//! use nb;
+//! use hal::nb;
 //!
-//! use hal::nb::serial::Write;
+//! use hal::serial::nb::Write;
 //! use ::core::convert::Infallible;
 //!
 //! fn flush<S>(serial: &mut S, cb: &mut CircularBuffer)
 //! where
-//!     S: hal::nb::serial::Write<u8, Error = Infallible>,
+//!     S: hal::serial::nb::Write<u8, Error = Infallible>,
 //! {
 //!     loop {
 //!         if let Some(byte) = cb.peek() {
@@ -395,7 +395,7 @@
 //! #     fn deref_mut(&mut self) -> &mut T { self.0 }
 //! # }
 //! # struct Serial1;
-//! # impl hal::nb::serial::Write<u8> for Serial1 {
+//! # impl hal::serial::nb::Write<u8> for Serial1 {
 //! #   type Error = Infallible;
 //! #   fn write(&mut self, _: u8) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
 //! #   fn flush(&mut self) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
@@ -414,12 +414,21 @@
 #![deny(missing_docs)]
 #![no_std]
 
-pub mod blocking;
 pub mod fmt;
-pub mod nb;
+pub use nb;
+pub mod adc;
+pub mod delay;
+pub mod digital;
+pub mod i2c;
+pub mod pwm;
+pub mod qei;
+pub mod serial;
+pub mod spi;
+pub mod timer;
+pub mod watchdog;
 
 mod private {
-    use crate::blocking::i2c::{SevenBitAddress, TenBitAddress};
+    use crate::i2c::blocking::{SevenBitAddress, TenBitAddress};
     pub trait Sealed {}
 
     impl Sealed for SevenBitAddress {}
