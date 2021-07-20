@@ -428,7 +428,7 @@ pub mod timer;
 pub mod watchdog;
 
 mod private {
-    use crate::i2c::blocking::{SevenBitAddress, TenBitAddress};
+    use crate::i2c::{SevenBitAddress, TenBitAddress};
     pub trait Sealed {}
 
     impl Sealed for SevenBitAddress {}

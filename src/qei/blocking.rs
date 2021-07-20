@@ -1,5 +1,7 @@
 //! Quadrature encoder interface
 
+pub use super::Direction;
+
 /// Quadrature encoder interface
 ///
 /// # Examples
@@ -67,13 +69,4 @@ pub trait Qei {
 
     /// Returns the count direction
     fn direction(&self) -> Result<Direction, Self::Error>;
-}
-
-/// Count direction
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum Direction {
-    /// 3, 2, 1
-    Downcounting,
-    /// 1, 2, 3
-    Upcounting,
 }

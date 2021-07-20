@@ -1,5 +1,7 @@
 //! Timers
 
+pub use super::Periodic;
+
 /// A count down timer
 ///
 /// # Contract
@@ -78,9 +80,6 @@ pub trait CountDown {
     /// Implementers are suggested to panic on this scenario to signal a programmer error.
     fn wait(&mut self) -> nb::Result<(), Self::Error>;
 }
-
-/// Marker trait that indicates that a timer is periodic
-pub trait Periodic {}
 
 /// Trait for cancelable countdowns.
 pub trait Cancel: CountDown {

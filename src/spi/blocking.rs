@@ -4,6 +4,7 @@
 //! traits. To save boilerplate when that's the case a `Default` marker trait may be provided.
 //! Implementing that marker trait will opt in your type into a blanket implementation.
 
+pub use super::{Mode, Phase, Polarity, MODE_0, MODE_1, MODE_2, MODE_3};
 /// Blocking transfer
 pub trait Transfer<W> {
     /// Error type

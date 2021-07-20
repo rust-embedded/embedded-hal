@@ -1,5 +1,7 @@
 //! Serial Peripheral Interface
 
+pub use super::{Mode, Phase, Polarity, MODE_0, MODE_1, MODE_2, MODE_3};
+
 /// Full duplex (master mode)
 ///
 /// # Notes
@@ -29,54 +31,3 @@ pub trait FullDuplex<Word> {
     /// Writes a word to the slave
     fn write(&mut self, word: Word) -> nb::Result<(), Self::Error>;
 }
-
-/// Clock polarity
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Polarity {
-    /// Clock signal low when idle
-    IdleLow,
-    /// Clock signal high when idle
-    IdleHigh,
-}
-
-/// Clock phase
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Phase {
-    /// Data in "captured" on the first clock transition
-    CaptureOnFirstTransition,
-    /// Data in "captured" on the second clock transition
-    CaptureOnSecondTransition,
-}
-
-/// SPI mode
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct Mode {
-    /// Clock polarity
-    pub polarity: Polarity,
-    /// Clock phase
-    pub phase: Phase,
-}
-
-/// Helper for CPOL = 0, CPHA = 0
-pub const MODE_0: Mode = Mode {
-    polarity: Polarity::IdleLow,
-    phase: Phase::CaptureOnFirstTransition,
-};
-
-/// Helper for CPOL = 0, CPHA = 1
-pub const MODE_1: Mode = Mode {
-    polarity: Polarity::IdleLow,
-    phase: Phase::CaptureOnSecondTransition,
-};
-
-/// Helper for CPOL = 1, CPHA = 0
-pub const MODE_2: Mode = Mode {
-    polarity: Polarity::IdleHigh,
-    phase: Phase::CaptureOnFirstTransition,
-};
-
-/// Helper for CPOL = 1, CPHA = 1
-pub const MODE_3: Mode = Mode {
-    polarity: Polarity::IdleHigh,
-    phase: Phase::CaptureOnSecondTransition,
-};
