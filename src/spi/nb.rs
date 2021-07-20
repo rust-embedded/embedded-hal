@@ -1,7 +1,5 @@
 //! Serial Peripheral Interface
 
-pub use super::{Mode, Phase, Polarity, MODE_0, MODE_1, MODE_2, MODE_3};
-
 /// Full duplex (master mode)
 ///
 /// # Notes

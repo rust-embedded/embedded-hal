@@ -11,7 +11,7 @@ pub enum Direction {
 
 /// Blocking quadrature encoder interface traits
 pub mod blocking {
-    pub use super::Direction;
+    use super::Direction;
 
     /// Quadrature encoder interface
     ///
@@ -56,7 +56,7 @@ pub mod blocking {
     /// #     type Error = Infallible;
     /// #     type Count = u16;
     /// #     fn count(&self) -> Result<u16, Self::Error> { Ok(0) }
-    /// #     fn direction(&self) -> Result<::hal::qei::blocking::Direction, Self::Error> { unimplemented!() }
+    /// #     fn direction(&self) -> Result<::hal::qei::Direction, Self::Error> { unimplemented!() }
     /// # }
     /// # struct Timer6;
     /// # impl hal::timer::nb::CountDown for Timer6 {

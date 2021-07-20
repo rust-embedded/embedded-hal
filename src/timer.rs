@@ -5,7 +5,6 @@ pub trait Periodic {}
 
 /// Non-blocking timer traits
 pub mod nb {
-    pub use super::Periodic;
 
     /// A count down timer
     ///

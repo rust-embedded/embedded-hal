@@ -11,7 +11,7 @@ use core::{convert::From, ops::Not};
 /// Conversion from `bool` and logical negation are also implemented
 /// for this type.
 /// ```rust
-/// # use embedded_hal::digital::blocking::PinState;
+/// # use embedded_hal::digital::PinState;
 /// let state = PinState::from(false);
 /// assert_eq!(state, PinState::Low);
 /// assert_eq!(!state, PinState::High);
@@ -46,7 +46,7 @@ impl Not for PinState {
 
 /// Blocking digital I/O traits
 pub mod blocking {
-    pub use super::PinState;
+    use super::PinState;
 
     /// Single digital push-pull output pin
     pub trait OutputPin {
