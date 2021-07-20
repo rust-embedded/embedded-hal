@@ -1,5 +1,7 @@
 //! Input capture
 
+/// Non-blocking input capture traits
+pub mod nb {
 /// Input capture
 ///
 /// # Examples
@@ -91,4 +93,5 @@ pub trait Capture {
     fn set_resolution<R>(&mut self, resolution: R) -> Result<(), Self::Error>
     where
         R: Into<Self::Time>;
+}
 }
