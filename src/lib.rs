@@ -126,7 +126,7 @@
 //!
 //! [`stm32f1`]: https://crates.io/crates/stm32f1
 //!
-//! ```not_run
+//! ```no_run
 //! // crate: stm32f1xx-hal
 //! // An implementation of the `embedded-hal` traits for STM32F1xx microcontrollers
 //!
