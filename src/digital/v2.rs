@@ -2,6 +2,46 @@
 //!
 //! Version 2 / fallible traits. Infallible implementations should set Error to `!`.
 
+use core::{convert::From, ops::Not};
+
+/// Digital output pin state
+///
+/// Conversion from `bool` and logical negation are also implemented
+/// for this type.
+/// ```rust
+/// # use embedded_hal::digital::v2::PinState;
+/// let state = PinState::from(false);
+/// assert_eq!(state, PinState::Low);
+/// assert_eq!(!state, PinState::High);
+/// ```
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum PinState {
+    /// Low pin state
+    Low,
+    /// High pin state
+    High,
+}
+
+impl From<bool> for PinState {
+    fn from(value: bool) -> Self {
+        match value {
+            false => PinState::Low,
+            true => PinState::High,
+        }
+    }
+}
+
+impl Not for PinState {
+    type Output = PinState;
+
+    fn not(self) -> Self::Output {
+        match self {
+            PinState::High => PinState::Low,
+            PinState::Low => PinState::High,
+        }
+    }
+}
+
 /// Single digital push-pull output pin
 pub trait OutputPin {
     /// Error type
@@ -18,6 +58,17 @@ pub trait OutputPin {
     /// *NOTE* the actual electrical state of the pin may not actually be high, e.g. due to external
     /// electrical sources
     fn set_high(&mut self) -> Result<(), Self::Error>;
+
+    /// Drives the pin high or low depending on the provided value
+    ///
+    /// *NOTE* the actual electrical state of the pin may not actually be high or low, e.g. due to external
+    /// electrical sources
+    fn set_state(&mut self, state: PinState) -> Result<(), Self::Error> {
+        match state {
+            PinState::Low => self.set_low(),
+            PinState::High => self.set_high(),
+        }
+    }
 }
 
 /// Push-pull output pin that can read its output state
@@ -135,4 +186,31 @@ pub trait InputPin {
 
     /// Is the input pin low?
     fn is_low(&self) -> Result<bool, Self::Error>;
+}
+
+/// Single pin that can switch from input to output mode, and vice-versa.
+///
+/// Example use (assumes the `Error` type is the same for the `IoPin`,
+/// `InputPin`, and `OutputPin`):
+///
+/// *This trait is available if embedded-hal is built with the `"unproven"` feature.*
+#[cfg(feature = "unproven")]
+pub trait IoPin<TInput, TOutput>
+where
+    TInput: InputPin + IoPin<TInput, TOutput>,
+    TOutput: OutputPin + IoPin<TInput, TOutput>,
+{
+    /// Error type.
+    type Error;
+
+    /// Tries to convert this pin to input mode.
+    ///
+    /// If the pin is already in input mode, this method should succeed.
+    fn into_input_pin(self) -> Result<TInput, Self::Error>;
+
+    /// Tries to convert this pin to output mode with the given initial state.
+    ///
+    /// If the pin is already in the requested state, this method should
+    /// succeed.
+    fn into_output_pin(self, state: PinState) -> Result<TOutput, Self::Error>;
 }
