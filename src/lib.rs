@@ -992,3 +992,7 @@ pub enum Direction {
     /// 1, 2, 3
     Upcounting,
 }
+
+mod private {
+    pub trait Sealed {}
+}
