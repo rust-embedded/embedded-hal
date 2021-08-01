@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- `Transactional` SPI interface for executing groups of SPI transactions.
+- `Transactional` I2C interface for executing groups of I2C transactions.
+- 10-bit addressing mode for I2C traits.
+- `set_state` method for `OutputPin` using an input `PinState` value.
+- `IoPin` trait for pins that can change between being inputs or outputs
+  dynamically.
 
 ### Changed
 
