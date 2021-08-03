@@ -155,7 +155,7 @@
 //!
 //!     fn read(&mut self) -> nb::Result<u8, Error> {
 //!         // read the status register
-//!         let isr = self.usart.isr.read();
+//!         let isr = self.usart.sr.read();
 //!
 //!         if isr.ore().bit_is_set() {
 //!             // Error: Buffer overrun
@@ -164,7 +164,7 @@
 //!         // omitted: checks for other errors
 //!         else if isr.rxne().bit_is_set() {
 //!             // Data available: read the data register
-//!             Ok(self.usart.rdr.read().bits() as u8)
+//!             Ok(self.usart.dr.read().bits() as u8)
 //!         } else {
 //!             // No data available yet
 //!             Err(nb::Error::WouldBlock)
