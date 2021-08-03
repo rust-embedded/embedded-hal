@@ -9,7 +9,7 @@ env:
   RUSTFLAGS: '--deny warnings'
 
 jobs:
-  ci-linux:
+  ci-linux-test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
