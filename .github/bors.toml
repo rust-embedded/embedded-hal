@@ -6,6 +6,7 @@ status = [
   "ci-linux (stable, thumbv6m-none-eabi)",
   "ci-linux (stable, thumbv7m-none-eabi)",
   "ci-linux (1.35.0, x86_64-unknown-linux-gnu)",
-  "ci-linux-test (stable, x86_64-unknown-linux-gnu)",
+  "ci-linux-test (stable)",
+  "ci-linux-test (1.36.0, x86_64-unknown-linux-gnu)",
   "fmt",
 ]
