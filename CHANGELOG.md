@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v0.2.6] - 2021-08-03
+
 ### Added
+
+Backported non-breaking changes from the upcoming 1.0 release:
 
 - `Transactional` SPI interface for executing groups of SPI transactions.
 - `Transactional` I2C interface for executing groups of I2C transactions.
@@ -16,7 +20,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `IoPin` trait for pins that can change between being inputs or outputs
   dynamically.
 
-### Changed
 
 ## [v0.2.5] - 2021-04-28
 
@@ -121,7 +124,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.5...v0.2.x
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.6...v0.2.x
+[v0.2.6]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.5...v0.2.6
 [v0.2.5]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.4...v0.2.5
 [v0.2.4]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.3...v0.2.4
 [v0.2.3]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.2...v0.2.3
