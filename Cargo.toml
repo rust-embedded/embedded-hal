@@ -19,5 +19,5 @@ version = "1.0.0-alpha.4" # remember to update html_root_url
 nb = "1"
 
 [dev-dependencies.stm32f1]
-version = "0.12"
+version = "0.13"
 features = ["stm32f103", "rt"]
