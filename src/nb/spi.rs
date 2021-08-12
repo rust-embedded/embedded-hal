@@ -31,7 +31,7 @@ pub trait FullDuplex<Word> {
 }
 
 /// Clock polarity
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Polarity {
     /// Clock signal low when idle
     IdleLow,
@@ -40,7 +40,7 @@ pub enum Polarity {
 }
 
 /// Clock phase
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Phase {
     /// Data in "captured" on the first clock transition
     CaptureOnFirstTransition,
@@ -49,7 +49,7 @@ pub enum Phase {
 }
 
 /// SPI mode
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Mode {
     /// Clock polarity
     pub polarity: Polarity,
