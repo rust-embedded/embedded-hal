@@ -9,7 +9,7 @@ pub mod blocking {
         /// An enumeration of `Watchdog` errors.
         ///
         /// For infallible implementations, will be `Infallible`
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Triggers the watchdog. This must be done once the watchdog is started
         /// to prevent the processor being reset.
@@ -22,7 +22,7 @@ pub mod blocking {
         /// An enumeration of `Enable` errors.
         ///
         /// For infallible implementations, will be `Infallible`
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Unit of time used by the watchdog.
         type Time;
@@ -50,7 +50,7 @@ pub mod blocking {
         /// An enumeration of `Disable` errors.
         ///
         /// For infallible implementations, will be `Infallible`
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Disabled watchdog instance that can be enabled.
         type Target: Enable;

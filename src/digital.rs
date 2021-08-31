@@ -51,7 +51,7 @@ pub mod blocking {
     /// Single digital push-pull output pin
     pub trait OutputPin {
         /// Error type
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Drives the pin low
         ///
@@ -98,7 +98,7 @@ pub mod blocking {
     /// implemented. Otherwise, implement this using hardware mechanisms.
     pub trait ToggleableOutputPin {
         /// Error type
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Toggle pin output.
         fn toggle(&mut self) -> Result<(), Self::Error>;
@@ -107,7 +107,7 @@ pub mod blocking {
     /// Single digital input pin
     pub trait InputPin {
         /// Error type
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Is the input pin high?
         fn is_high(&self) -> Result<bool, Self::Error>;
@@ -125,7 +125,7 @@ pub mod blocking {
     /// use core::time::Duration;
     /// use embedded_hal::digital::blocking::{IoPin, InputPin, OutputPin};
     ///
-    /// pub fn ping_and_read<TInputPin, TOutputPin, TError>(
+    /// pub fn ping_and_read<TInputPin, TOutputPin, TError: core::fmt::Debug>(
     ///     mut pin: TOutputPin, delay_fn: &dyn Fn(Duration) -> ()) -> Result<bool, TError>
     /// where
     ///     TInputPin : InputPin<Error = TError> + IoPin<TInputPin, TOutputPin, Error = TError>,
@@ -148,7 +148,7 @@ pub mod blocking {
         TOutput: OutputPin + IoPin<TInput, TOutput>,
     {
         /// Error type.
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Tries to convert this pin to input mode.
         ///

@@ -63,7 +63,7 @@
 //!     i2c: I2C,
 //! }
 //!
-//! impl<I2C, E> TemperatureSensorDriver<I2C>
+//! impl<I2C, E: core::fmt::Debug> TemperatureSensorDriver<I2C>
 //! where
 //!     I2C: WriteRead<Error = E>,
 //! {
@@ -86,7 +86,7 @@
 //!     i2c: I2C,
 //! }
 //!
-//! impl<I2C, E> TemperatureSensorDriver<I2C>
+//! impl<I2C, E: core::fmt::Debug> TemperatureSensorDriver<I2C>
 //! where
 //!     I2C: WriteRead<TenBitAddress, Error = E>,
 //! {
@@ -124,7 +124,7 @@ pub mod blocking {
     /// Blocking read
     pub trait Read<A: AddressMode = SevenBitAddress> {
         /// Error type
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Reads enough bytes from slave with `address` to fill `buffer`
         ///
@@ -150,7 +150,7 @@ pub mod blocking {
     /// Blocking write
     pub trait Write<A: AddressMode = SevenBitAddress> {
         /// Error type
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Writes bytes to slave with address `address`
         ///
@@ -174,7 +174,7 @@ pub mod blocking {
     /// Blocking write (iterator version)
     pub trait WriteIter<A: AddressMode = SevenBitAddress> {
         /// Error type
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Writes bytes to slave with address `address`
         ///
@@ -189,7 +189,7 @@ pub mod blocking {
     /// Blocking write + read
     pub trait WriteRead<A: AddressMode = SevenBitAddress> {
         /// Error type
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Writes bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
         /// single transaction*
@@ -224,7 +224,7 @@ pub mod blocking {
     /// Blocking write (iterator version) + read
     pub trait WriteIterRead<A: AddressMode = SevenBitAddress> {
         /// Error type
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Writes bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
         /// single transaction*
@@ -258,7 +258,7 @@ pub mod blocking {
     /// This allows combining operations within an I2C transaction.
     pub trait Transactional<A: AddressMode = SevenBitAddress> {
         /// Error type
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Execute the provided operations on the I2C bus.
         ///
@@ -285,7 +285,7 @@ pub mod blocking {
     /// This allows combining operation within an I2C transaction.
     pub trait TransactionalIter<A: AddressMode = SevenBitAddress> {
         /// Error type
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Execute the provided operations on the I2C bus (iterator version).
         ///

@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Removed `prelude` to avoid method name conflicts between different flavors (blocking, nb) of the same trait. Traits must now be manually imported.
 - Removed the various `Default` marker traits.
 - Removed `&[W]` returned slice in `spi::blocking::Transfer`.
+- Require all associated error types to implement `core::fmt::Debug`.
 
 ### Removed
 - Removed random number generation (`rng`) traits in favor of [rand_core](https://crates.io/crates/rand_core).

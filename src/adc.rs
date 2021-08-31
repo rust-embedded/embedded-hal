@@ -84,7 +84,7 @@ pub mod nb {
     /// ```
     pub trait OneShot<ADC, Word, Pin: Channel<ADC>> {
         /// Error type returned by ADC methods
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Request that the ADC begin a conversion on the specified pin
         ///

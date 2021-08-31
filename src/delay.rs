@@ -15,7 +15,7 @@ pub mod blocking {
     /// implement this trait for different types of `UXX`.
     pub trait DelayMs<UXX> {
         /// Enumeration of `DelayMs` errors
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Pauses execution for `ms` milliseconds
         fn delay_ms(&mut self, ms: UXX) -> Result<(), Self::Error>;
@@ -27,7 +27,7 @@ pub mod blocking {
     /// implement this trait for different types of `UXX`.
     pub trait DelayUs<UXX> {
         /// Enumeration of `DelayMs` errors
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Pauses execution for `us` microseconds
         fn delay_us(&mut self, us: UXX) -> Result<(), Self::Error>;
