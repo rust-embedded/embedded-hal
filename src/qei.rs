@@ -81,4 +81,18 @@ pub mod blocking {
         /// Returns the count direction
         fn direction(&self) -> Result<Direction, Self::Error>;
     }
+
+    impl<T: Qei> Qei for &T {
+        type Error = T::Error;
+
+        type Count = T::Count;
+
+        fn count(&self) -> Result<Self::Count, Self::Error> {
+            (*self).count()
+        }
+
+        fn direction(&self) -> Result<Direction, Self::Error> {
+            (*self).direction()
+        }
+    }
 }

@@ -16,6 +16,14 @@ pub mod blocking {
         fn feed(&mut self) -> Result<(), Self::Error>;
     }
 
+    impl<T: Watchdog> Watchdog for &mut T {
+        type Error = T::Error;
+
+        fn feed(&mut self) -> Result<(), Self::Error> {
+            (*self).feed()
+        }
+    }
+
     /// Enables A watchdog timer to reset the processor if software is frozen or
     /// stalled.
     pub trait Enable {

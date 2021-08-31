@@ -22,3 +22,15 @@ pub trait Write<Word> {
     /// Block until the serial interface has sent all buffered words
     fn flush(&mut self) -> Result<(), Self::Error>;
 }
+
+impl<T: Write<Word>, Word> Write<Word> for &mut T {
+    type Error = T::Error;
+
+    fn write(&mut self, buffer: &[Word]) -> Result<(), Self::Error> {
+        (*self).write(buffer)
+    }
+
+    fn flush(&mut self) -> Result<(), Self::Error> {
+        (*self).flush()
+    }
+}

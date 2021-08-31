@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `IoPin` trait for pins that can change between being inputs or outputs
   dynamically.
 - Added `Debug` to all spi mode types.
+- Added blanket impls for references.
 
 ### Changed
 - Swap PWM channel arguments to references

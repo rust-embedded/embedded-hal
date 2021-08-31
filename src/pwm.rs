@@ -102,6 +102,51 @@ pub mod blocking {
             P: Into<Self::Time>;
     }
 
+    impl<T: Pwm> Pwm for &mut T {
+        type Error = T::Error;
+
+        type Channel = T::Channel;
+
+        type Time = T::Time;
+
+        type Duty = T::Duty;
+
+        fn disable(&mut self, channel: &Self::Channel) -> Result<(), Self::Error> {
+            (*self).disable(channel)
+        }
+
+        fn enable(&mut self, channel: &Self::Channel) -> Result<(), Self::Error> {
+            (*self).enable(channel)
+        }
+
+        fn get_period(&self) -> Result<Self::Time, Self::Error> {
+            (**self).get_period()
+        }
+
+        fn get_duty(&self, channel: &Self::Channel) -> Result<Self::Duty, Self::Error> {
+            (**self).get_duty(channel)
+        }
+
+        fn get_max_duty(&self) -> Result<Self::Duty, Self::Error> {
+            (**self).get_max_duty()
+        }
+
+        fn set_duty(
+            &mut self,
+            channel: &Self::Channel,
+            duty: Self::Duty,
+        ) -> Result<(), Self::Error> {
+            (*self).set_duty(channel, duty)
+        }
+
+        fn set_period<P>(&mut self, period: P) -> Result<(), Self::Error>
+        where
+            P: Into<Self::Time>,
+        {
+            (*self).set_period(period)
+        }
+    }
+
     /// A single PWM channel / pin
     ///
     /// See `Pwm` for details
@@ -132,5 +177,31 @@ pub mod blocking {
 
         /// Sets a new duty cycle
         fn set_duty(&mut self, duty: Self::Duty) -> Result<(), Self::Error>;
+    }
+
+    impl<T: PwmPin> PwmPin for &mut T {
+        type Error = T::Error;
+
+        type Duty = T::Duty;
+
+        fn disable(&mut self) -> Result<(), Self::Error> {
+            (*self).disable()
+        }
+
+        fn enable(&mut self) -> Result<(), Self::Error> {
+            (*self).enable()
+        }
+
+        fn get_duty(&self) -> Result<Self::Duty, Self::Error> {
+            (**self).get_duty()
+        }
+
+        fn get_max_duty(&self) -> Result<Self::Duty, Self::Error> {
+            (**self).get_max_duty()
+        }
+
+        fn set_duty(&mut self, duty: Self::Duty) -> Result<(), Self::Error> {
+            (*self).set_duty(duty)
+        }
     }
 }

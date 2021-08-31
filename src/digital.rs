@@ -77,6 +77,22 @@ pub mod blocking {
         }
     }
 
+    impl<T: OutputPin> OutputPin for &mut T {
+        type Error = T::Error;
+
+        fn set_low(&mut self) -> Result<(), Self::Error> {
+            (*self).set_low()
+        }
+
+        fn set_high(&mut self) -> Result<(), Self::Error> {
+            (*self).set_high()
+        }
+
+        fn set_state(&mut self, state: PinState) -> Result<(), Self::Error> {
+            (*self).set_state(state)
+        }
+    }
+
     /// Push-pull output pin that can read its output state
     pub trait StatefulOutputPin: OutputPin {
         /// Is the pin in drive high mode?
@@ -88,6 +104,16 @@ pub mod blocking {
         ///
         /// *NOTE* this does *not* read the electrical state of the pin
         fn is_set_low(&self) -> Result<bool, Self::Error>;
+    }
+
+    impl<T: StatefulOutputPin> StatefulOutputPin for &mut T {
+        fn is_set_high(&self) -> Result<bool, Self::Error> {
+            (**self).is_set_high()
+        }
+
+        fn is_set_low(&self) -> Result<bool, Self::Error> {
+            (**self).is_set_low()
+        }
     }
 
     /// Output pin that can be toggled
@@ -104,6 +130,14 @@ pub mod blocking {
         fn toggle(&mut self) -> Result<(), Self::Error>;
     }
 
+    impl<T: ToggleableOutputPin> ToggleableOutputPin for &mut T {
+        type Error = T::Error;
+
+        fn toggle(&mut self) -> Result<(), Self::Error> {
+            (*self).toggle()
+        }
+    }
+
     /// Single digital input pin
     pub trait InputPin {
         /// Error type
@@ -114,6 +148,18 @@ pub mod blocking {
 
         /// Is the input pin low?
         fn is_low(&self) -> Result<bool, Self::Error>;
+    }
+
+    impl<T: InputPin> InputPin for &T {
+        type Error = T::Error;
+
+        fn is_high(&self) -> Result<bool, Self::Error> {
+            (*self).is_high()
+        }
+
+        fn is_low(&self) -> Result<bool, Self::Error> {
+            (*self).is_low()
+        }
     }
 
     /// Single pin that can switch from input to output mode, and vice-versa.

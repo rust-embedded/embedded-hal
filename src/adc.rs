@@ -51,6 +51,14 @@ pub mod nb {
         fn channel(&self) -> Self::ID;
     }
 
+    impl<T: Channel<ADC>, ADC> Channel<ADC> for &T {
+        type ID = T::ID;
+
+        fn channel(&self) -> Self::ID {
+            (*self).channel()
+        }
+    }
+
     /// ADCs that sample on single channels per request, and do so at the time of the request.
     ///
     /// This trait is the interface to an ADC that is configured to read a specific channel at the time
@@ -91,5 +99,16 @@ pub mod nb {
         /// This method takes a `Pin` reference, as it is expected that the ADC will be able to sample
         /// whatever channel underlies the pin.
         fn read(&mut self, pin: &mut Pin) -> nb::Result<Word, Self::Error>;
+    }
+
+    impl<T, ADC, Word, Pin: Channel<ADC>> OneShot<ADC, Word, Pin> for &mut T
+    where
+        T: OneShot<ADC, Word, Pin>,
+    {
+        type Error = T::Error;
+
+        fn read(&mut self, pin: &mut Pin) -> nb::Result<Word, Self::Error> {
+            (*self).read(pin)
+        }
     }
 }
