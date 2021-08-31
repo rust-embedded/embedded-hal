@@ -64,7 +64,7 @@ pub mod nb {
         /// An enumeration of `CountDown` errors.
         ///
         /// For infallible implementations, will be `Infallible`
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// The unit of time used by this timer
         type Time;

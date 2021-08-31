@@ -54,7 +54,7 @@ pub mod blocking {
     // PWM channels. Here a certain number of channels are multiplexed in a single implementer.
     pub trait Pwm {
         /// Enumeration of `Pwm` errors
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Enumeration of channels that can be used with this `Pwm` interface
         ///
@@ -107,7 +107,7 @@ pub mod blocking {
     /// See `Pwm` for details
     pub trait PwmPin {
         /// Enumeration of `PwmPin` errors
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// Type for the `duty` methods
         ///

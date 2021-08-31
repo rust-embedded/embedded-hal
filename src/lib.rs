@@ -77,7 +77,7 @@
 //! /// A serial interface
 //! pub trait Serial {
 //!     /// Error type associated to this serial interface
-//!     type Error;
+//!     type Error: core::fmt::Debug;
 //!
 //!     /// Reads a single byte
 //!     fn read(&mut self) -> nb::Result<u8, Self::Error>;
@@ -144,6 +144,7 @@
 //! pub type Serial1 = Serial<USART1>;
 //!
 //! /// Serial interface error
+//! #[derive(Debug)]
 //! pub enum Error {
 //!     /// Buffer overrun
 //!     Overrun,

@@ -70,7 +70,7 @@ pub mod blocking {
     // reference implementation
     pub trait Qei {
         /// Enumeration of `Qei` errors
-        type Error;
+        type Error: core::fmt::Debug;
 
         /// The type of the value returned by `count`
         type Count;

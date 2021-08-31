@@ -59,7 +59,7 @@ pub trait Capture {
     ///
     /// - *overcapture*, the previous capture value was overwritten because it
     ///   was not read in a timely manner
-    type Error;
+    type Error: core::fmt::Debug;
 
     /// Enumeration of channels that can be used with this `Capture` interface
     ///
