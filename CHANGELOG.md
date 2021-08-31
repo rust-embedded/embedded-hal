@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Added `IoPin` trait for pins that can change between being inputs or outputs
   dynamically.
+- `Error` traits for SPI, I2C and Serial traits. The error types used in those must
+  implement these `Error` traits, which implies providing a conversion to a common
+  set of error kinds. Generic drivers using these interfaces can then convert the errors
+  to this common set to act upon them.
 - Added `Debug` to all spi mode types.
 - Add impls of all traits for references (`&T` or `&mut T` depending on the trait) when `T` implements the trait.
 

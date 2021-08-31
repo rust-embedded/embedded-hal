@@ -7,7 +7,7 @@
 /// Blocking transfer
 pub trait Transfer<W> {
     /// Error type
-    type Error: core::fmt::Debug;
+    type Error: crate::spi::Error;
 
     /// Writes and reads simultaneously. The contents of `words` are
     /// written to the slave, and the received words are stored into the same
@@ -26,7 +26,7 @@ impl<T: Transfer<W>, W> Transfer<W> for &mut T {
 /// Blocking write
 pub trait Write<W> {
     /// Error type
-    type Error: core::fmt::Debug;
+    type Error: crate::spi::Error;
 
     /// Writes `words` to the slave, ignoring all the incoming words
     fn write(&mut self, words: &[W]) -> Result<(), Self::Error>;
@@ -43,7 +43,7 @@ impl<T: Write<W>, W> Write<W> for &mut T {
 /// Blocking write (iterator version)
 pub trait WriteIter<W> {
     /// Error type
-    type Error: core::fmt::Debug;
+    type Error: crate::spi::Error;
 
     /// Writes `words` to the slave, ignoring all the incoming words
     fn write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
@@ -77,7 +77,7 @@ pub enum Operation<'a, W: 'static> {
 /// as part of a single SPI transaction
 pub trait Transactional<W: 'static> {
     /// Associated error type
-    type Error: core::fmt::Debug;
+    type Error: crate::spi::Error;
 
     /// Execute the provided transactions
     fn exec<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error>;

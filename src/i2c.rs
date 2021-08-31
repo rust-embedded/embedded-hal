@@ -26,13 +26,13 @@
 //! Here is an example of an embedded-hal implementation of the `Write` trait
 //! for both modes:
 //! ```
-//! # use embedded_hal::i2c::{SevenBitAddress, TenBitAddress, blocking::Write};
+//! # use embedded_hal::i2c::{ErrorKind, SevenBitAddress, TenBitAddress, blocking::Write};
 //! /// I2C0 hardware peripheral which supports both 7-bit and 10-bit addressing.
 //! pub struct I2c0;
 //!
 //! impl Write<SevenBitAddress> for I2c0
 //! {
-//! #   type Error = ();
+//! #   type Error = ErrorKind;
 //! #
 //!     fn write(&mut self, addr: u8, output: &[u8]) -> Result<(), Self::Error> {
 //!         // ...
@@ -42,7 +42,7 @@
 //!
 //! impl Write<TenBitAddress> for I2c0
 //! {
-//! #   type Error = ();
+//! #   type Error = ErrorKind;
 //! #
 //!     fn write(&mut self, addr: u16, output: &[u8]) -> Result<(), Self::Error> {
 //!         // ...
@@ -56,14 +56,14 @@
 //! For demonstration purposes the address mode parameter has been omitted in this example.
 //!
 //! ```
-//! # use embedded_hal::i2c::blocking::WriteRead;
+//! # use embedded_hal::i2c::{blocking::WriteRead, Error};
 //! const ADDR: u8  = 0x15;
 //! # const TEMP_REGISTER: u8 = 0x1;
 //! pub struct TemperatureSensorDriver<I2C> {
 //!     i2c: I2C,
 //! }
 //!
-//! impl<I2C, E: core::fmt::Debug> TemperatureSensorDriver<I2C>
+//! impl<I2C, E: Error> TemperatureSensorDriver<I2C>
 //! where
 //!     I2C: WriteRead<Error = E>,
 //! {
@@ -79,14 +79,14 @@
 //! ### Device driver compatible only with 10-bit addresses
 //!
 //! ```
-//! # use embedded_hal::i2c::{TenBitAddress, blocking::WriteRead};
+//! # use embedded_hal::i2c::{Error, TenBitAddress, blocking::WriteRead};
 //! const ADDR: u16  = 0x158;
 //! # const TEMP_REGISTER: u8 = 0x1;
 //! pub struct TemperatureSensorDriver<I2C> {
 //!     i2c: I2C,
 //! }
 //!
-//! impl<I2C, E: core::fmt::Debug> TemperatureSensorDriver<I2C>
+//! impl<I2C, E: Error> TemperatureSensorDriver<I2C>
 //! where
 //!     I2C: WriteRead<TenBitAddress, Error = E>,
 //! {
@@ -100,6 +100,58 @@
 //! ```
 
 use crate::private;
+
+/// I2C error
+pub trait Error: core::fmt::Debug {
+    /// Convert error to a generic I2C error kind
+    ///
+    /// By using this method, I2C errors freely defined by HAL implementations
+    /// can be converted to a set of generic I2C errors upon which generic
+    /// code can act.
+    fn kind(&self) -> ErrorKind;
+}
+
+/// I2C error kind
+///
+/// This represents a common set of I2C operation errors. HAL implementations are
+/// free to define more specific or additional error types. However, by providing
+/// a mapping to these common I2C errors, generic code can still react to them.
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[non_exhaustive]
+pub enum ErrorKind {
+    /// An unspecific bus error occurred
+    Bus,
+    /// The arbitration was lost, e.g. electrical problems with the clock signal
+    ArbitrationLoss,
+    /// A bus operation was not acknowledged, e.g. due to the addressed device not being available on
+    /// the bus or the device not being ready to process requests at the moment
+    NoAcknowledge,
+    /// The peripheral receive buffer was overrun
+    Overrun,
+    /// A different error occurred. The original error may contain more information.
+    Other,
+}
+
+impl Error for ErrorKind {
+    fn kind(&self) -> ErrorKind {
+        *self
+    }
+}
+
+impl core::fmt::Display for ErrorKind {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::Bus => write!(f, "An unspecific bus error occurred"),
+            Self::ArbitrationLoss => write!(f, "The arbitration was lost"),
+            Self::NoAcknowledge => write!(f, "A bus operation was not acknowledged"),
+            Self::Overrun => write!(f, "The peripheral receive buffer was overrun"),
+            Self::Other => write!(
+                f,
+                "A different error occurred. The original error may contain more information"
+            ),
+        }
+    }
+}
 
 /// Address mode (7-bit / 10-bit)
 ///
@@ -119,12 +171,12 @@ impl AddressMode for TenBitAddress {}
 /// Blocking I2C traits
 pub mod blocking {
 
-    use super::{AddressMode, SevenBitAddress};
+    use super::{AddressMode, Error, SevenBitAddress};
 
     /// Blocking read
     pub trait Read<A: AddressMode = SevenBitAddress> {
         /// Error type
-        type Error: core::fmt::Debug;
+        type Error: Error;
 
         /// Reads enough bytes from slave with `address` to fill `buffer`
         ///
@@ -158,7 +210,7 @@ pub mod blocking {
     /// Blocking write
     pub trait Write<A: AddressMode = SevenBitAddress> {
         /// Error type
-        type Error: core::fmt::Debug;
+        type Error: Error;
 
         /// Writes bytes to slave with address `address`
         ///
@@ -190,7 +242,7 @@ pub mod blocking {
     /// Blocking write (iterator version)
     pub trait WriteIter<A: AddressMode = SevenBitAddress> {
         /// Error type
-        type Error: core::fmt::Debug;
+        type Error: Error;
 
         /// Writes bytes to slave with address `address`
         ///
@@ -216,7 +268,7 @@ pub mod blocking {
     /// Blocking write + read
     pub trait WriteRead<A: AddressMode = SevenBitAddress> {
         /// Error type
-        type Error: core::fmt::Debug;
+        type Error: Error;
 
         /// Writes bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
         /// single transaction*
@@ -264,7 +316,7 @@ pub mod blocking {
     /// Blocking write (iterator version) + read
     pub trait WriteIterRead<A: AddressMode = SevenBitAddress> {
         /// Error type
-        type Error: core::fmt::Debug;
+        type Error: Error;
 
         /// Writes bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
         /// single transaction*
@@ -314,7 +366,7 @@ pub mod blocking {
     /// This allows combining operations within an I2C transaction.
     pub trait Transactional<A: AddressMode = SevenBitAddress> {
         /// Error type
-        type Error: core::fmt::Debug;
+        type Error: Error;
 
         /// Execute the provided operations on the I2C bus.
         ///
@@ -353,7 +405,7 @@ pub mod blocking {
     /// This allows combining operation within an I2C transaction.
     pub trait TransactionalIter<A: AddressMode = SevenBitAddress> {
         /// Error type
-        type Error: core::fmt::Debug;
+        type Error: Error;
 
         /// Execute the provided operations on the I2C bus (iterator version).
         ///
