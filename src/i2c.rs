@@ -63,7 +63,7 @@
 //!     i2c: I2C,
 //! }
 //!
-//! impl<I2C, E> TemperatureSensorDriver<I2C>
+//! impl<I2C, E: core::fmt::Debug> TemperatureSensorDriver<I2C>
 //! where
 //!     I2C: WriteRead<Error = E>,
 //! {
@@ -86,7 +86,7 @@
 //!     i2c: I2C,
 //! }
 //!
-//! impl<I2C, E> TemperatureSensorDriver<I2C>
+//! impl<I2C, E: core::fmt::Debug> TemperatureSensorDriver<I2C>
 //! where
 //!     I2C: WriteRead<TenBitAddress, Error = E>,
 //! {

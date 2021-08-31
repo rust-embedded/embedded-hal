@@ -125,7 +125,7 @@ pub mod blocking {
     /// use core::time::Duration;
     /// use embedded_hal::digital::blocking::{IoPin, InputPin, OutputPin};
     ///
-    /// pub fn ping_and_read<TInputPin, TOutputPin, TError>(
+    /// pub fn ping_and_read<TInputPin, TOutputPin, TError: core::fmt::Debug>(
     ///     mut pin: TOutputPin, delay_fn: &dyn Fn(Duration) -> ()) -> Result<bool, TError>
     /// where
     ///     TInputPin : InputPin<Error = TError> + IoPin<TInputPin, TOutputPin, Error = TError>,
