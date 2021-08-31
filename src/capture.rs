@@ -14,7 +14,7 @@ pub mod nb {
     /// #[macro_use(block)]
     /// extern crate nb;
     ///
-    /// use hal::nb::capture::Capture;
+    /// use hal::capture::nb::Capture;
     ///
     /// fn main() {
     ///     let mut capture: Capture1 = {
@@ -38,7 +38,7 @@ pub mod nb {
     /// # impl U32Ext for u32 { fn ms(self) -> MilliSeconds { MilliSeconds(self) } }
     /// # struct Capture1;
     /// # enum Channel { _1 }
-    /// # impl hal::nb::capture::Capture for Capture1 {
+    /// # impl hal::capture::nb::Capture for Capture1 {
     /// #     type Error = Infallible;
     /// #     type Capture = u16;
     /// #     type Channel = Channel;
