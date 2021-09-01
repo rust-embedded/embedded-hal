@@ -418,6 +418,7 @@
 pub mod fmt;
 pub use nb;
 pub mod adc;
+pub mod capture;
 pub mod delay;
 pub mod digital;
 pub mod i2c;
