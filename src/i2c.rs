@@ -119,7 +119,7 @@ pub trait Error: core::fmt::Debug {
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 #[non_exhaustive]
 pub enum ErrorKind {
-    /// An unspecific bus error occurred
+    /// Bus error occurred. e.g. A START or a STOP condition is detected and is not located after a multiple of 9 SCL clock pulses.
     Bus,
     /// The arbitration was lost, e.g. electrical problems with the clock signal
     ArbitrationLoss,
@@ -141,7 +141,7 @@ impl Error for ErrorKind {
 impl core::fmt::Display for ErrorKind {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
-            Self::Bus => write!(f, "An unspecific bus error occurred"),
+            Self::Bus => write!(f, "Bus error occurred"),
             Self::ArbitrationLoss => write!(f, "The arbitration was lost"),
             Self::NoAcknowledge => write!(f, "A bus operation was not acknowledged"),
             Self::Overrun => write!(f, "The peripheral receive buffer was overrun"),
