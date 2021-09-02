@@ -72,8 +72,6 @@ pub trait Error: core::fmt::Debug {
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 #[non_exhaustive]
 pub enum ErrorKind {
-    /// An unspecific bus error occurred
-    Bus,
     /// The peripheral receive buffer was overrun
     Overrun,
     /// Multiple devices on the SPI bus are trying across each other, e.g. in a multi-master setup
@@ -95,7 +93,6 @@ impl Error for ErrorKind {
 impl core::fmt::Display for ErrorKind {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
-            Self::Bus => write!(f, "An unspecific bus error occurred"),
             Self::Overrun => write!(f, "The peripheral receive buffer was overrun"),
             Self::ModeFault => write!(
                 f,
