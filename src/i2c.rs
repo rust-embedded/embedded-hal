@@ -151,7 +151,7 @@ pub mod blocking {
         type Error = T::Error;
 
         fn read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error> {
-            (*self).read(address, buffer)
+            T::read(self, address, buffer)
         }
     }
 
@@ -183,7 +183,7 @@ pub mod blocking {
         type Error = T::Error;
 
         fn write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error> {
-            (*self).write(address, bytes)
+            T::write(self, address, bytes)
         }
     }
 
@@ -209,7 +209,7 @@ pub mod blocking {
         where
             B: IntoIterator<Item = u8>,
         {
-            (*self).write_iter(address, bytes)
+            T::write_iter(self, address, bytes)
         }
     }
 
@@ -257,7 +257,7 @@ pub mod blocking {
             bytes: &[u8],
             buffer: &mut [u8],
         ) -> Result<(), Self::Error> {
-            (*self).write_read(address, bytes, buffer)
+            T::write_read(self, address, bytes, buffer)
         }
     }
 
@@ -294,7 +294,7 @@ pub mod blocking {
         where
             B: IntoIterator<Item = u8>,
         {
-            (*self).write_iter_read(address, bytes, buffer)
+            T::write_iter_read(self, address, bytes, buffer)
         }
     }
 
@@ -344,7 +344,7 @@ pub mod blocking {
             address: A,
             operations: &mut [Operation<'a>],
         ) -> Result<(), Self::Error> {
-            (*self).exec(address, operations)
+            T::exec(self, address, operations)
         }
     }
 
@@ -380,7 +380,7 @@ pub mod blocking {
         where
             O: IntoIterator<Item = Operation<'a>>,
         {
-            (*self).exec_iter(address, operations)
+            T::exec_iter(self, address, operations)
         }
     }
 }

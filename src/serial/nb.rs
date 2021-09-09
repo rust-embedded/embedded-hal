@@ -16,7 +16,7 @@ impl<T: Read<Word>, Word> Read<Word> for &mut T {
     type Error = T::Error;
 
     fn read(&mut self) -> nb::Result<Word, Self::Error> {
-        (*self).read()
+        T::read(self)
     }
 }
 
@@ -36,10 +36,10 @@ impl<T: Write<Word>, Word> Write<Word> for &mut T {
     type Error = T::Error;
 
     fn write(&mut self, word: Word) -> nb::Result<(), Self::Error> {
-        (*self).write(word)
+        T::write(self, word)
     }
 
     fn flush(&mut self) -> nb::Result<(), Self::Error> {
-        (*self).flush()
+        T::flush(self)
     }
 }

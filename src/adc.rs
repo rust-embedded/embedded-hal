@@ -55,7 +55,7 @@ pub mod nb {
         type ID = T::ID;
 
         fn channel(&self) -> Self::ID {
-            (*self).channel()
+            T::channel(self)
         }
     }
 
@@ -108,7 +108,7 @@ pub mod nb {
         type Error = T::Error;
 
         fn read(&mut self, pin: &mut Pin) -> nb::Result<Word, Self::Error> {
-            (*self).read(pin)
+            T::read(self, pin)
         }
     }
 }

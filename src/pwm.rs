@@ -112,23 +112,23 @@ pub mod blocking {
         type Duty = T::Duty;
 
         fn disable(&mut self, channel: &Self::Channel) -> Result<(), Self::Error> {
-            (*self).disable(channel)
+            T::disable(self, channel)
         }
 
         fn enable(&mut self, channel: &Self::Channel) -> Result<(), Self::Error> {
-            (*self).enable(channel)
+            T::enable(self, channel)
         }
 
         fn get_period(&self) -> Result<Self::Time, Self::Error> {
-            (**self).get_period()
+            T::get_period(self)
         }
 
         fn get_duty(&self, channel: &Self::Channel) -> Result<Self::Duty, Self::Error> {
-            (**self).get_duty(channel)
+            T::get_duty(self, channel)
         }
 
         fn get_max_duty(&self) -> Result<Self::Duty, Self::Error> {
-            (**self).get_max_duty()
+            T::get_max_duty(self)
         }
 
         fn set_duty(
@@ -136,14 +136,14 @@ pub mod blocking {
             channel: &Self::Channel,
             duty: Self::Duty,
         ) -> Result<(), Self::Error> {
-            (*self).set_duty(channel, duty)
+            T::set_duty(self, channel, duty)
         }
 
         fn set_period<P>(&mut self, period: P) -> Result<(), Self::Error>
         where
             P: Into<Self::Time>,
         {
-            (*self).set_period(period)
+            T::set_period(self, period)
         }
     }
 
@@ -185,23 +185,23 @@ pub mod blocking {
         type Duty = T::Duty;
 
         fn disable(&mut self) -> Result<(), Self::Error> {
-            (*self).disable()
+            T::disable(self)
         }
 
         fn enable(&mut self) -> Result<(), Self::Error> {
-            (*self).enable()
+            T::enable(self)
         }
 
         fn get_duty(&self) -> Result<Self::Duty, Self::Error> {
-            (**self).get_duty()
+            T::get_duty(self)
         }
 
         fn get_max_duty(&self) -> Result<Self::Duty, Self::Error> {
-            (**self).get_max_duty()
+            T::get_max_duty(self)
         }
 
         fn set_duty(&mut self, duty: Self::Duty) -> Result<(), Self::Error> {
-            (*self).set_duty(duty)
+            T::set_duty(self, duty)
         }
     }
 }

@@ -19,7 +19,7 @@ impl<T: Transfer<W>, W> Transfer<W> for &mut T {
     type Error = T::Error;
 
     fn transfer(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
-        (*self).transfer(words)
+        T::transfer(self, words)
     }
 }
 
@@ -36,7 +36,7 @@ impl<T: Write<W>, W> Write<W> for &mut T {
     type Error = T::Error;
 
     fn write(&mut self, words: &[W]) -> Result<(), Self::Error> {
-        (*self).write(words)
+        T::write(self, words)
     }
 }
 
@@ -58,7 +58,7 @@ impl<T: WriteIter<W>, W> WriteIter<W> for &mut T {
     where
         WI: IntoIterator<Item = W>,
     {
-        (*self).write_iter(words)
+        T::write_iter(self, words)
     }
 }
 
@@ -87,6 +87,6 @@ impl<T: Transactional<W>, W: 'static> Transactional<W> for &mut T {
     type Error = T::Error;
 
     fn exec<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error> {
-        (*self).exec(operations)
+        T::exec(self, operations)
     }
 }

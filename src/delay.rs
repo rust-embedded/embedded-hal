@@ -25,7 +25,7 @@ pub mod blocking {
         type Error = T::Error;
 
         fn delay_ms(&mut self, ms: UXX) -> Result<(), Self::Error> {
-            (*self).delay_ms(ms)
+            T::delay_ms(self, ms)
         }
     }
 
@@ -45,7 +45,7 @@ pub mod blocking {
         type Error = T::Error;
 
         fn delay_us(&mut self, us: UXX) -> Result<(), Self::Error> {
-            (*self).delay_us(us)
+            T::delay_us(self, us)
         }
     }
 }

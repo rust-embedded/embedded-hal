@@ -88,11 +88,11 @@ pub mod blocking {
         type Count = T::Count;
 
         fn count(&self) -> Result<Self::Count, Self::Error> {
-            (*self).count()
+            T::count(self)
         }
 
         fn direction(&self) -> Result<Direction, Self::Error> {
-            (*self).direction()
+            T::direction(self)
         }
     }
 }

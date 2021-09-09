@@ -27,10 +27,10 @@ impl<T: Write<Word>, Word> Write<Word> for &mut T {
     type Error = T::Error;
 
     fn write(&mut self, buffer: &[Word]) -> Result<(), Self::Error> {
-        (*self).write(buffer)
+        T::write(self, buffer)
     }
 
     fn flush(&mut self) -> Result<(), Self::Error> {
-        (*self).flush()
+        T::flush(self)
     }
 }

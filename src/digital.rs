@@ -81,15 +81,15 @@ pub mod blocking {
         type Error = T::Error;
 
         fn set_low(&mut self) -> Result<(), Self::Error> {
-            (*self).set_low()
+            T::set_low(self)
         }
 
         fn set_high(&mut self) -> Result<(), Self::Error> {
-            (*self).set_high()
+            T::set_high(self)
         }
 
         fn set_state(&mut self, state: PinState) -> Result<(), Self::Error> {
-            (*self).set_state(state)
+            T::set_state(self, state)
         }
     }
 
@@ -108,11 +108,11 @@ pub mod blocking {
 
     impl<T: StatefulOutputPin> StatefulOutputPin for &mut T {
         fn is_set_high(&self) -> Result<bool, Self::Error> {
-            (**self).is_set_high()
+            T::is_set_high(self)
         }
 
         fn is_set_low(&self) -> Result<bool, Self::Error> {
-            (**self).is_set_low()
+            T::is_set_low(self)
         }
     }
 
@@ -134,7 +134,7 @@ pub mod blocking {
         type Error = T::Error;
 
         fn toggle(&mut self) -> Result<(), Self::Error> {
-            (*self).toggle()
+            T::toggle(self)
         }
     }
 
@@ -154,11 +154,11 @@ pub mod blocking {
         type Error = T::Error;
 
         fn is_high(&self) -> Result<bool, Self::Error> {
-            (*self).is_high()
+            T::is_high(self)
         }
 
         fn is_low(&self) -> Result<bool, Self::Error> {
-            (*self).is_low()
+            T::is_low(self)
         }
     }
 

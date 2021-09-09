@@ -94,11 +94,11 @@ pub mod nb {
         where
             TIME: Into<Self::Time>,
         {
-            (*self).start(count)
+            T::start(self, count)
         }
 
         fn wait(&mut self) -> nb::Result<(), Self::Error> {
-            (*self).wait()
+            T::wait(self)
         }
     }
 
@@ -115,7 +115,7 @@ pub mod nb {
 
     impl<T: Cancel> Cancel for &mut T {
         fn cancel(&mut self) -> Result<(), Self::Error> {
-            (*self).cancel()
+            T::cancel(self)
         }
     }
 }

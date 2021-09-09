@@ -105,26 +105,26 @@ pub mod nb {
         type Capture = T::Capture;
 
         fn capture(&mut self, channel: Self::Channel) -> nb::Result<Self::Capture, Self::Error> {
-            (*self).capture(channel)
+            T::capture(self, channel)
         }
 
         fn disable(&mut self, channel: Self::Channel) -> Result<(), Self::Error> {
-            (*self).disable(channel)
+            T::disable(self, channel)
         }
 
         fn enable(&mut self, channel: Self::Channel) -> Result<(), Self::Error> {
-            (*self).enable(channel)
+            T::enable(self, channel)
         }
 
         fn get_resolution(&self) -> Result<Self::Time, Self::Error> {
-            (**self).get_resolution()
+            T::get_resolution(self)
         }
 
         fn set_resolution<R>(&mut self, resolution: R) -> Result<(), Self::Error>
         where
             R: Into<Self::Time>,
         {
-            (*self).set_resolution(resolution)
+            T::set_resolution(self, resolution)
         }
     }
 }

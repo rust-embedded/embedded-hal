@@ -20,7 +20,7 @@ pub mod blocking {
         type Error = T::Error;
 
         fn feed(&mut self) -> Result<(), Self::Error> {
-            (*self).feed()
+            T::feed(self)
         }
     }
 
