@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [v1.0.0-alpha.5] - 2021-09-11
+
+*** This is (also) an alpha release with breaking changes (sorry) ***
+
 ### Added
 - Added `IoPin` trait for pins that can change between being inputs or outputs
   dynamically.
@@ -167,7 +172,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.4...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.5...HEAD
+[v1.0.0-alpha.5]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.4...v1.0.0-alpha.5
 [v1.0.0-alpha.4]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.3...v1.0.0-alpha.4
 [v1.0.0-alpha.3]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.2...v1.0.0-alpha.3
 [v1.0.0-alpha.2]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.1...v1.0.0-alpha.2
