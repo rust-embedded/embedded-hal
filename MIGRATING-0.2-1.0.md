@@ -7,9 +7,12 @@
   - [Trait organization](#trait-organization)
   - [Fallibility](#fallibility)
   - [Method renaming](#method-renaming)
+  - [SPI transfer return type](#spi-transfer-return-type)
+  - [Error type bounds](#error-type-bounds)
   - [`nb` dependency](#nb-dependency)
   - [Prelude](#prelude)
   - [`rng` module](#rng-module)
+  - [Removed blanket implementations](#removed-blanket-implementations)
   - [Features](#features)
   - [Use-case-specific help](#use-case-specific-help)
     - [For driver authors](#for-driver-authors)
@@ -19,8 +22,10 @@
 
 ## Trait organization
 
-All traits have been organized in modules depending on their execution model. That includes `blocking` and `nb` for
+All traits have been organized in modules for each feature, each of these containing sub-modules depending on their execution model. That includes `blocking` and `nb` for
 non-blocking. In the future when we add asynchronous traits, we envision adding a `futures` (or similarly-named) module.
+
+Execution-model-independent definitions have been moved into the feature module. For example, SPI `Phase` is now defined in `embedded_hal::spi::Phase`. For convenience, these definitions are reexported in both of its blocking and non-blocking submodules.
 
 ## Fallibility
 
@@ -76,6 +81,38 @@ into the relevant scope. This is the reason why we have removed the prelude.
 
 For more on this, see [Prelude](#prelude).
 
+## SPI transfer return type
+
+The `transfer()` method in the trait `spi::blocking::Transfer` previously returned
+a slice of the output data.
+This slice is the same as the output buffer which is passed to the method, though, thus redundant and potentially confusing.
+The `transfer()` method now returns `Result<(), Self::Error>`.
+If you were using this return value, adapting the code should be straight forward by simply using the reception buffer which is passed.
+See an example:
+```rust
+let tx_data = [1, 2, 3, 4];
+let mut rx_data = [0; 4];
+let data = spi.transfer(&tx_data, &mut rx_data)?;
+println!("{:?}", data);
+// There is no need to do `let data = `, since we already have the data in `rx_data`.
+// Do this instead:
+spi.transfer(&tx_data, &mut rx_data)?;
+println!("{:?}", rx_data);
+```
+
+## Error type bounds
+
+All associated error types are now required to implement `core::fmt::Debug`.
+Usually it is enough to add a `#[derive(Debug)]` clause to your error types. For example:
+
+```diff
++ #[derive(Debug)]
+pub enum MyError {
+  InvalidInputData,
+  // ...
+}
+```
+
 ## `nb` dependency
 
 The `Result` type and `block!` macro from the [`nb`] crate are now reexported in `embeddeh_hal::nb`.
@@ -115,6 +152,13 @@ Please note that it is also possible to import traits *inside a function*.
 The `rng` module and its traits have been removed in favor of the [`rand_core`] traits.
 
 [`rand_core`]: https://crates.io/crates/rand_core
+
+## Removed blanket implementations
+
+There were several blanket implementations of blocking traits using the non-blocking
+traits as a base.
+Due to their relative simplicity and some technical concerns, these have been removed.
+Implementing them yourself is now necessary. This should be straight-forward.
 
 ## Features
 
