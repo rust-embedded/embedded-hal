@@ -74,7 +74,7 @@ pub trait Error: core::fmt::Debug {
 pub enum ErrorKind {
     /// The peripheral receive buffer was overrun
     Overrun,
-    /// Multiple devices on the SPI bus are trying across each other, e.g. in a multi-master setup
+    /// Multiple devices on the SPI bus are trying to drive the slave select pin, e.g. in a multi-master setup
     ModeFault,
     /// CRC does not match the received data
     Crc,
@@ -96,7 +96,7 @@ impl core::fmt::Display for ErrorKind {
             Self::Overrun => write!(f, "The peripheral receive buffer was overrun"),
             Self::ModeFault => write!(
                 f,
-                "Multiple devices on the SPI bus are trying across each other"
+                "Multiple devices on the SPI bus are trying to drive the slave select pin"
             ),
             Self::Crc => write!(f, "CRC does not match the received data"),
             Self::FrameFormat => write!(
