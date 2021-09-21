@@ -9,42 +9,34 @@
 
 /// Blocking delay traits
 pub mod blocking {
-    /// Millisecond delay
+    /// Microsecond delay
     ///
-    /// `UXX` denotes the range type of the delay time. `UXX` can be `u8`, `u16`, etc. A single type can
-    /// implement this trait for different types of `UXX`.
-    pub trait DelayMs<UXX> {
-        /// Enumeration of `DelayMs` errors
+    pub trait DelayUs {
+        /// Enumeration of `DelayUs` errors
         type Error: core::fmt::Debug;
 
-        /// Pauses execution for `ms` milliseconds
-        fn delay_ms(&mut self, ms: UXX) -> Result<(), Self::Error>;
-    }
+        /// Pauses execution for at minimum `us` microseconds. Pause can be longer
+        /// if the implementation requires it due to precision/timing issues.
+        fn delay_us(&mut self, us: u32) -> Result<(), Self::Error>;
 
-    impl<UXX, T: DelayMs<UXX>> DelayMs<UXX> for &mut T {
-        type Error = T::Error;
+        /// Pauses execution for at minimum `ms` milliseconds. Pause can be longer
+        /// if the implementation requires it due to precision/timing issues.
+        fn delay_ms(&mut self, ms: u32) -> Result<(), Self::Error> {
+            for _ in 0..ms {
+                self.delay_us(1000)?;
+            }
 
-        fn delay_ms(&mut self, ms: UXX) -> Result<(), Self::Error> {
-            T::delay_ms(self, ms)
+            Ok(())
         }
     }
 
-    /// Microsecond delay
-    ///
-    /// `UXX` denotes the range type of the delay time. `UXX` can be `u8`, `u16`, etc. A single type can
-    /// implement this trait for different types of `UXX`.
-    pub trait DelayUs<UXX> {
-        /// Enumeration of `DelayMs` errors
-        type Error: core::fmt::Debug;
-
-        /// Pauses execution for `us` microseconds
-        fn delay_us(&mut self, us: UXX) -> Result<(), Self::Error>;
-    }
-
-    impl<UXX, T: DelayUs<UXX>> DelayUs<UXX> for &mut T {
+    impl<T> DelayUs for &mut T
+    where
+        T: DelayUs,
+    {
         type Error = T::Error;
 
-        fn delay_us(&mut self, us: UXX) -> Result<(), Self::Error> {
+        fn delay_us(&mut self, us: u32) -> Result<(), Self::Error> {
             T::delay_us(self, us)
         }
     }
