@@ -9,27 +9,12 @@
 
 /// Blocking delay traits
 pub mod blocking {
-    /// Millisecond delay
-    ///
-    /// `UXX` denotes the range type of the delay time. `UXX` can be `u8`, `u16`, etc. A single type can
-    /// implement this trait for different types of `UXX`.
-    pub trait DelayMs<UXX> {
-        /// Enumeration of `DelayMs` errors
-        type Error: core::fmt::Debug;
-
-        /// Pauses execution for `ms` milliseconds
-        fn delay_ms(&mut self, ms: UXX) -> Result<(), Self::Error>;
-    }
-
-    /// Microsecond delay
-    ///
-    /// `UXX` denotes the range type of the delay time. `UXX` can be `u8`, `u16`, etc. A single type can
-    /// implement this trait for different types of `UXX`.
-    pub trait DelayUs<UXX> {
-        /// Enumeration of `DelayMs` errors
+    /// Simple microsecond delay
+    pub trait DelayUs {
+        /// Enumeration of `DelayUs` errors
         type Error: core::fmt::Debug;
 
         /// Pauses execution for `us` microseconds
-        fn delay_us(&mut self, us: UXX) -> Result<(), Self::Error>;
+        fn delay_us(&mut self, us: u32) -> Result<(), Self::Error>;
     }
 }

@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Removed the various `Default` marker traits.
 - Removed `&[W]` returned slice in `spi::blocking::Transfer`.
 - Require all associated error types to implement `core::fmt::Debug`.
+- Simplified delay traits: removed `DelayMs`, changed `DelayUs` to use u32 instead of generic width integers.
 
 ### Removed
 - Removed random number generation (`rng`) traits in favor of [rand_core](https://crates.io/crates/rand_core).
