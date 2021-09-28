@@ -94,4 +94,37 @@ pub mod nb {
         where
             R: Into<Self::Time>;
     }
+
+    impl<T: Capture> Capture for &mut T {
+        type Error = T::Error;
+
+        type Channel = T::Channel;
+
+        type Time = T::Time;
+
+        type Capture = T::Capture;
+
+        fn capture(&mut self, channel: Self::Channel) -> nb::Result<Self::Capture, Self::Error> {
+            T::capture(self, channel)
+        }
+
+        fn disable(&mut self, channel: Self::Channel) -> Result<(), Self::Error> {
+            T::disable(self, channel)
+        }
+
+        fn enable(&mut self, channel: Self::Channel) -> Result<(), Self::Error> {
+            T::enable(self, channel)
+        }
+
+        fn get_resolution(&self) -> Result<Self::Time, Self::Error> {
+            T::get_resolution(self)
+        }
+
+        fn set_resolution<R>(&mut self, resolution: R) -> Result<(), Self::Error>
+        where
+            R: Into<Self::Time>,
+        {
+            T::set_resolution(self, resolution)
+        }
+    }
 }

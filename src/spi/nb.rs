@@ -29,3 +29,15 @@ pub trait FullDuplex<Word> {
     /// Writes a word to the slave
     fn write(&mut self, word: Word) -> nb::Result<(), Self::Error>;
 }
+
+impl<T: FullDuplex<Word>, Word> FullDuplex<Word> for &mut T {
+    type Error = T::Error;
+
+    fn read(&mut self) -> nb::Result<Word, Self::Error> {
+        T::read(self)
+    }
+
+    fn write(&mut self, word: Word) -> nb::Result<(), Self::Error> {
+        T::write(self, word)
+    }
+}

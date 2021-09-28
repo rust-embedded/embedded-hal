@@ -85,6 +85,23 @@ pub mod nb {
         fn wait(&mut self) -> nb::Result<(), Self::Error>;
     }
 
+    impl<T: CountDown> CountDown for &mut T {
+        type Error = T::Error;
+
+        type Time = T::Time;
+
+        fn start<TIME>(&mut self, count: TIME) -> Result<(), Self::Error>
+        where
+            TIME: Into<Self::Time>,
+        {
+            T::start(self, count)
+        }
+
+        fn wait(&mut self) -> nb::Result<(), Self::Error> {
+            T::wait(self)
+        }
+    }
+
     /// Trait for cancelable countdowns.
     pub trait Cancel: CountDown {
         /// Tries to cancel this countdown.
@@ -94,5 +111,11 @@ pub mod nb {
         /// An error will be returned if the countdown has already been canceled or was never started.
         /// An error is also returned if the countdown is not `Periodic` and has already expired.
         fn cancel(&mut self) -> Result<(), Self::Error>;
+    }
+
+    impl<T: Cancel> Cancel for &mut T {
+        fn cancel(&mut self) -> Result<(), Self::Error> {
+            T::cancel(self)
+        }
     }
 }

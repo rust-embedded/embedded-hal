@@ -15,6 +15,14 @@ pub trait Transfer<W> {
     fn transfer(&mut self, words: &mut [W]) -> Result<(), Self::Error>;
 }
 
+impl<T: Transfer<W>, W> Transfer<W> for &mut T {
+    type Error = T::Error;
+
+    fn transfer(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
+        T::transfer(self, words)
+    }
+}
+
 /// Blocking write
 pub trait Write<W> {
     /// Error type
@@ -22,6 +30,14 @@ pub trait Write<W> {
 
     /// Writes `words` to the slave, ignoring all the incoming words
     fn write(&mut self, words: &[W]) -> Result<(), Self::Error>;
+}
+
+impl<T: Write<W>, W> Write<W> for &mut T {
+    type Error = T::Error;
+
+    fn write(&mut self, words: &[W]) -> Result<(), Self::Error> {
+        T::write(self, words)
+    }
 }
 
 /// Blocking write (iterator version)
@@ -33,6 +49,17 @@ pub trait WriteIter<W> {
     fn write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
     where
         WI: IntoIterator<Item = W>;
+}
+
+impl<T: WriteIter<W>, W> WriteIter<W> for &mut T {
+    type Error = T::Error;
+
+    fn write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
+    where
+        WI: IntoIterator<Item = W>,
+    {
+        T::write_iter(self, words)
+    }
 }
 
 /// Operation for transactional SPI trait
@@ -54,4 +81,12 @@ pub trait Transactional<W: 'static> {
 
     /// Execute the provided transactions
     fn exec<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error>;
+}
+
+impl<T: Transactional<W>, W: 'static> Transactional<W> for &mut T {
+    type Error = T::Error;
+
+    fn exec<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error> {
+        T::exec(self, operations)
+    }
 }

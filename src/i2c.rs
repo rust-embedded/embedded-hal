@@ -147,6 +147,14 @@ pub mod blocking {
         fn read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error>;
     }
 
+    impl<A: AddressMode, T: Read<A>> Read<A> for &mut T {
+        type Error = T::Error;
+
+        fn read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error> {
+            T::read(self, address, buffer)
+        }
+    }
+
     /// Blocking write
     pub trait Write<A: AddressMode = SevenBitAddress> {
         /// Error type
@@ -171,6 +179,14 @@ pub mod blocking {
         fn write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error>;
     }
 
+    impl<A: AddressMode, T: Write<A>> Write<A> for &mut T {
+        type Error = T::Error;
+
+        fn write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error> {
+            T::write(self, address, bytes)
+        }
+    }
+
     /// Blocking write (iterator version)
     pub trait WriteIter<A: AddressMode = SevenBitAddress> {
         /// Error type
@@ -184,6 +200,17 @@ pub mod blocking {
         fn write_iter<B>(&mut self, address: A, bytes: B) -> Result<(), Self::Error>
         where
             B: IntoIterator<Item = u8>;
+    }
+
+    impl<A: AddressMode, T: WriteIter<A>> WriteIter<A> for &mut T {
+        type Error = T::Error;
+
+        fn write_iter<B>(&mut self, address: A, bytes: B) -> Result<(), Self::Error>
+        where
+            B: IntoIterator<Item = u8>,
+        {
+            T::write_iter(self, address, bytes)
+        }
     }
 
     /// Blocking write + read
@@ -221,6 +248,19 @@ pub mod blocking {
         ) -> Result<(), Self::Error>;
     }
 
+    impl<A: AddressMode, T: WriteRead<A>> WriteRead<A> for &mut T {
+        type Error = T::Error;
+
+        fn write_read(
+            &mut self,
+            address: A,
+            bytes: &[u8],
+            buffer: &mut [u8],
+        ) -> Result<(), Self::Error> {
+            T::write_read(self, address, bytes, buffer)
+        }
+    }
+
     /// Blocking write (iterator version) + read
     pub trait WriteIterRead<A: AddressMode = SevenBitAddress> {
         /// Error type
@@ -240,6 +280,22 @@ pub mod blocking {
         ) -> Result<(), Self::Error>
         where
             B: IntoIterator<Item = u8>;
+    }
+
+    impl<A: AddressMode, T: WriteIterRead<A>> WriteIterRead<A> for &mut T {
+        type Error = T::Error;
+
+        fn write_iter_read<B>(
+            &mut self,
+            address: A,
+            bytes: B,
+            buffer: &mut [u8],
+        ) -> Result<(), Self::Error>
+        where
+            B: IntoIterator<Item = u8>,
+        {
+            T::write_iter_read(self, address, bytes, buffer)
+        }
     }
 
     /// Transactional I2C operation.
@@ -280,6 +336,18 @@ pub mod blocking {
         ) -> Result<(), Self::Error>;
     }
 
+    impl<A: AddressMode, T: Transactional<A>> Transactional<A> for &mut T {
+        type Error = T::Error;
+
+        fn exec<'a>(
+            &mut self,
+            address: A,
+            operations: &mut [Operation<'a>],
+        ) -> Result<(), Self::Error> {
+            T::exec(self, address, operations)
+        }
+    }
+
     /// Transactional I2C interface (iterator version).
     ///
     /// This allows combining operation within an I2C transaction.
@@ -303,5 +371,16 @@ pub mod blocking {
         fn exec_iter<'a, O>(&mut self, address: A, operations: O) -> Result<(), Self::Error>
         where
             O: IntoIterator<Item = Operation<'a>>;
+    }
+
+    impl<A: AddressMode, T: TransactionalIter<A>> TransactionalIter<A> for &mut T {
+        type Error = T::Error;
+
+        fn exec_iter<'a, O>(&mut self, address: A, operations: O) -> Result<(), Self::Error>
+        where
+            O: IntoIterator<Item = Operation<'a>>,
+        {
+            T::exec_iter(self, address, operations)
+        }
     }
 }

@@ -21,6 +21,14 @@ pub mod blocking {
         fn delay_ms(&mut self, ms: UXX) -> Result<(), Self::Error>;
     }
 
+    impl<UXX, T: DelayMs<UXX>> DelayMs<UXX> for &mut T {
+        type Error = T::Error;
+
+        fn delay_ms(&mut self, ms: UXX) -> Result<(), Self::Error> {
+            T::delay_ms(self, ms)
+        }
+    }
+
     /// Microsecond delay
     ///
     /// `UXX` denotes the range type of the delay time. `UXX` can be `u8`, `u16`, etc. A single type can
@@ -31,5 +39,13 @@ pub mod blocking {
 
         /// Pauses execution for `us` microseconds
         fn delay_us(&mut self, us: UXX) -> Result<(), Self::Error>;
+    }
+
+    impl<UXX, T: DelayUs<UXX>> DelayUs<UXX> for &mut T {
+        type Error = T::Error;
+
+        fn delay_us(&mut self, us: UXX) -> Result<(), Self::Error> {
+            T::delay_us(self, us)
+        }
     }
 }

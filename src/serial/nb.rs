@@ -12,6 +12,14 @@ pub trait Read<Word> {
     fn read(&mut self) -> nb::Result<Word, Self::Error>;
 }
 
+impl<T: Read<Word>, Word> Read<Word> for &mut T {
+    type Error = T::Error;
+
+    fn read(&mut self) -> nb::Result<Word, Self::Error> {
+        T::read(self)
+    }
+}
+
 /// Write half of a serial interface
 pub trait Write<Word> {
     /// Write error
@@ -22,4 +30,16 @@ pub trait Write<Word> {
 
     /// Ensures that none of the previously written words are still buffered
     fn flush(&mut self) -> nb::Result<(), Self::Error>;
+}
+
+impl<T: Write<Word>, Word> Write<Word> for &mut T {
+    type Error = T::Error;
+
+    fn write(&mut self, word: Word) -> nb::Result<(), Self::Error> {
+        T::write(self, word)
+    }
+
+    fn flush(&mut self) -> nb::Result<(), Self::Error> {
+        T::flush(self)
+    }
 }
