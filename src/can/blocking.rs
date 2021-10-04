@@ -6,7 +6,7 @@ pub trait Can {
     type Frame: crate::can::Frame;
 
     /// Associated error type.
-    type Error;
+    type Error: crate::can::Error;
 
     /// Puts a frame in the transmit buffer. Blocks until space is available in
     /// the transmit buffer.
