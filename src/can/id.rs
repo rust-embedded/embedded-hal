@@ -25,7 +25,7 @@ impl StandardId {
 
     /// Creates a new `StandardId` without checking if it is inside the valid range.
     #[inline]
-    pub const unsafe fn new_unchecked(raw: u16) -> Self {
+    pub const fn new_unchecked(raw: u16) -> Self {
         Self(raw)
     }
 
