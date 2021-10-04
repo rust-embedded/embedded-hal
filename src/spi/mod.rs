@@ -76,8 +76,6 @@ pub enum ErrorKind {
     Overrun,
     /// Multiple devices on the SPI bus are trying to drive the slave select pin, e.g. in a multi-master setup
     ModeFault,
-    /// CRC does not match the received data
-    Crc,
     /// Received data does not conform to the peripheral configuration
     FrameFormat,
     /// A different error occurred. The original error may contain more information.
@@ -98,7 +96,6 @@ impl core::fmt::Display for ErrorKind {
                 f,
                 "Multiple devices on the SPI bus are trying to drive the slave select pin"
             ),
-            Self::Crc => write!(f, "CRC does not match the received data"),
             Self::FrameFormat => write!(
                 f,
                 "Received data does not conform to the peripheral configuration"
