@@ -123,9 +123,10 @@ pub enum ErrorKind {
     Bus,
     /// The arbitration was lost, e.g. electrical problems with the clock signal
     ArbitrationLoss,
-    /// A bus operation was not acknowledged, e.g. due to the addressed device not being available on
-    /// the bus or the device not being ready to process requests at the moment
-    NoAcknowledge,
+    /// The device did not acknowledge its address. The device may be missing.
+    NoAcknowledgeAddress,
+    /// The device did not acknowled the data. It may not be ready to process requests at the moment.
+    NoAcknowledgeData,
     /// The peripheral receive buffer was overrun
     Overrun,
     /// A different error occurred. The original error may contain more information.
@@ -143,7 +144,8 @@ impl core::fmt::Display for ErrorKind {
         match self {
             Self::Bus => write!(f, "Bus error occurred"),
             Self::ArbitrationLoss => write!(f, "The arbitration was lost"),
-            Self::NoAcknowledge => write!(f, "A bus operation was not acknowledged"),
+            Self::NoAcknowledgeAddress => write!(f, "The device did not acknowledge its address"),
+            Self::NoAcknowledgeData => write!(f, "The device did not acknowledge the data"),
             Self::Overrun => write!(f, "The peripheral receive buffer was overrun"),
             Self::Other => write!(
                 f,
