@@ -119,7 +119,8 @@ pub trait Error: core::fmt::Debug {
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 #[non_exhaustive]
 pub enum ErrorKind {
-    /// Bus error occurred. e.g. A START or a STOP condition is detected and is not located after a multiple of 9 SCL clock pulses.
+    /// Bus error occurred. e.g. A START or a STOP condition is detected and is not
+    /// located after a multiple of 9 SCL clock pulses.
     Bus,
     /// The arbitration was lost, e.g. electrical problems with the clock signal
     ArbitrationLoss,
