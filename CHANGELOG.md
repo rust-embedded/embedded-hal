@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Removed
+- Removed `DelayMs` in favor of `DelayUs` with `u32` as type for clarity.
 
 ## [v1.0.0-alpha.5] - 2021-09-11
 
