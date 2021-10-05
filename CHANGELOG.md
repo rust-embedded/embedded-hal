@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   implement these `Error` traits, which implies providing a conversion to a common
   set of error kinds. Generic drivers using these interfaces can then convert the errors
   to this common set to act upon them.
+- The `NoAcknowledgeAddress` and `NoAcknowledgeData` variants of the I2C `Error`
+  trait have been merged into `NoAcknowledge` with a `NoAcknowledgeSource` field
+  to differentiate between the two events. An additional `Unknown` variant is
+  provided in `NoAcknowledgeSource` for devices that can't differentiate between
+  the two events.
 
 ### Removed
 - Removed `DelayMs` in favor of `DelayUs` with `u32` as type for clarity.
