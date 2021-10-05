@@ -7,7 +7,7 @@
 /// Write half of a serial interface (blocking variant)
 pub trait Write<Word> {
     /// The type of error that can occur when writing
-    type Error: core::fmt::Debug;
+    type Error: crate::serial::Error;
 
     /// Writes a slice, blocking until everything has been written
     ///

@@ -16,7 +16,7 @@ jobs:
         rust: [stable]
 
         include:
-          - rust: 1.36.0 # Higher than the MSRV due to dependencies.
+          - rust: 1.40.0
             TARGET: x86_64-unknown-linux-gnu
 
           # Test nightly but don't fail

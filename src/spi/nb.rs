@@ -18,7 +18,7 @@
 /// `Word` types to allow operation in both modes.
 pub trait FullDuplex<Word> {
     /// An enumeration of SPI errors
-    type Error: core::fmt::Debug;
+    type Error: crate::spi::Error;
 
     /// Reads the word stored in the shift register
     ///

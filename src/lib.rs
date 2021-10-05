@@ -143,24 +143,16 @@
 //! // convenience type alias
 //! pub type Serial1 = Serial<USART1>;
 //!
-//! /// Serial interface error
-//! #[derive(Debug)]
-//! pub enum Error {
-//!     /// Buffer overrun
-//!     Overrun,
-//!     // omitted: other error variants
-//! }
-//!
 //! impl hal::serial::nb::Read<u8> for Serial<USART1> {
-//!     type Error = Error;
+//!     type Error = hal::serial::ErrorKind;
 //!
-//!     fn read(&mut self) -> nb::Result<u8, Error> {
+//!     fn read(&mut self) -> nb::Result<u8, Self::Error> {
 //!         // read the status register
 //!         let isr = self.usart.sr.read();
 //!
 //!         if isr.ore().bit_is_set() {
 //!             // Error: Buffer overrun
-//!             Err(nb::Error::Other(Error::Overrun))
+//!             Err(nb::Error::Other(Self::Error::Overrun))
 //!         }
 //!         // omitted: checks for other errors
 //!         else if isr.rxne().bit_is_set() {
@@ -174,14 +166,14 @@
 //! }
 //!
 //! impl hal::serial::nb::Write<u8> for Serial<USART1> {
-//!     type Error = Error;
+//!     type Error = hal::serial::ErrorKind;
 //!
-//!     fn write(&mut self, byte: u8) -> nb::Result<(), Error> {
+//!     fn write(&mut self, byte: u8) -> nb::Result<(), Self::Error> {
 //!         // Similar to the `read` implementation
 //!         # Ok(())
 //!     }
 //!
-//!     fn flush(&mut self) -> nb::Result<(), Error> {
+//!     fn flush(&mut self) -> nb::Result<(), Self::Error> {
 //!         // Similar to the `read` implementation
 //!         # Ok(())
 //!     }
@@ -327,12 +319,11 @@
 //! use embedded_hal as hal;
 //! use hal::nb;
 //!
-//! use hal::serial::nb::Write;
-//! use ::core::convert::Infallible;
+//! use hal::serial::{ErrorKind, nb::Write};
 //!
 //! fn flush<S>(serial: &mut S, cb: &mut CircularBuffer)
 //! where
-//!     S: hal::serial::nb::Write<u8, Error = Infallible>,
+//!     S: hal::serial::nb::Write<u8, Error = ErrorKind>,
 //! {
 //!     loop {
 //!         if let Some(byte) = cb.peek() {
@@ -397,9 +388,9 @@
 //! # }
 //! # struct Serial1;
 //! # impl hal::serial::nb::Write<u8> for Serial1 {
-//! #   type Error = Infallible;
-//! #   fn write(&mut self, _: u8) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
-//! #   fn flush(&mut self) -> nb::Result<(), Infallible> { Err(::nb::Error::WouldBlock) }
+//! #   type Error = ErrorKind;
+//! #   fn write(&mut self, _: u8) -> nb::Result<(), Self::Error> { Err(::nb::Error::WouldBlock) }
+//! #   fn flush(&mut self) -> nb::Result<(), Self::Error> { Err(::nb::Error::WouldBlock) }
 //! # }
 //! # struct CircularBuffer;
 //! # impl CircularBuffer {
