@@ -86,7 +86,7 @@ pub enum ErrorKind {
 
     /// An ACK  error shall be detected by a transmitter whenever it does not
     /// monitor a dominant bit during the ACK slot.
-    Ack,
+    Acknowledge,
 
     /// A different error occurred. The original error may contain more information.
     Other,
@@ -112,7 +112,7 @@ impl core::fmt::Display for ErrorKind {
                 f,
                 "A fixed-form bit field contains one or more illegal bits"
             ),
-            Self::Ack => write!(f, "Transmitted frame was not acknowledged"),
+            Self::Acknowledge => write!(f, "Transmitted frame was not acknowledged"),
             Self::Other => write!(
                 f,
                 "A different error occurred. The original error may contain more information"
