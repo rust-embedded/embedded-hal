@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   implement these `Error` traits, which implies providing a conversion to a common
   set of error kinds. Generic drivers using these interfaces can then convert the errors
   to this common set to act upon them.
+- `ManagedCS` trait for SPI, signals that CS is managed by the driver to allow
+  shared use of an SPI bus, as well as an `SpiWithCs` wrapper implementing this
+  over an Spi and Pin implementation.
 
 ### Removed
 - Removed `DelayMs` in favor of `DelayUs` with `u32` as type for clarity.

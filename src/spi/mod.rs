@@ -107,3 +107,15 @@ impl core::fmt::Display for ErrorKind {
         }
     }
 }
+
+/// ManagedChipSelect marker trait indicates the CS pin is managed by the underlying driver.
+///
+/// This specifies that `spi` operations will be grouped:
+/// preceded by asserting the CS pin, and followed by
+/// de-asserting the CS pin, prior to returning from the method.
+///
+/// This is important for shared bus access to ensure that only one CS can be asserted at a given time.
+/// To support shared use, drivers should require this (and not manage their own CS pins).
+///
+/// For usage examples see: [`crate::spi::blocking::SpiWithCs`].
+pub trait ManagedChipSelect {}
