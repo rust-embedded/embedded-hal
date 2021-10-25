@@ -61,7 +61,7 @@ impl ExtendedId {
 
     /// Creates a new `ExtendedId` without checking if it is inside the valid range.
     #[inline]
-    pub const unsafe fn new_unchecked(raw: u32) -> Self {
+    pub const fn new_unchecked(raw: u32) -> Self {
         Self(raw)
     }
 
