@@ -16,7 +16,7 @@ jobs:
         rust: [stable]
 
         include:
-          - rust: 1.40.0
+          - rust: 1.46.0
             TARGET: x86_64-unknown-linux-gnu
 
           # Test nightly but don't fail
