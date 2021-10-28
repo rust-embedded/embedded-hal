@@ -24,6 +24,9 @@ impl StandardId {
     }
 
     /// Creates a new `StandardId` without checking if it is inside the valid range.
+    ///
+    /// # Safety
+    /// Using this method can create an invalid ID and is thus marked as unsafe.
     #[inline]
     pub const unsafe fn new_unchecked(raw: u16) -> Self {
         Self(raw)
@@ -60,6 +63,9 @@ impl ExtendedId {
     }
 
     /// Creates a new `ExtendedId` without checking if it is inside the valid range.
+    ///
+    /// # Safety
+    /// Using this method can create an invalid ID and is thus marked as unsafe.
     #[inline]
     pub const unsafe fn new_unchecked(raw: u32) -> Self {
         Self(raw)
