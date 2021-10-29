@@ -10,12 +10,14 @@ pub use id::*;
 /// A CAN2.0 Frame
 pub trait Frame: Sized {
     /// Creates a new frame.
-    /// Returns an error when the data slice is too long.
-    fn new(id: impl Into<Id>, data: &[u8]) -> Result<Self, ()>;
+    ///
+    /// This will return `None` if the data slice is too long.
+    fn new(id: impl Into<Id>, data: &[u8]) -> Option<Self>;
 
     /// Creates a new remote frame (RTR bit set).
-    /// Returns an error when the data length code (DLC) is not valid.
-    fn new_remote(id: impl Into<Id>, dlc: usize) -> Result<Self, ()>;
+    ///
+    /// This will return `None` if the data length code (DLC) is not valid.
+    fn new_remote(id: impl Into<Id>, dlc: usize) -> Option<Self>;
 
     /// Returns true if this frame is a extended frame.
     fn is_extended(&self) -> bool;

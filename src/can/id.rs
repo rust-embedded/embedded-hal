@@ -24,6 +24,9 @@ impl StandardId {
     }
 
     /// Creates a new `StandardId` without checking if it is inside the valid range.
+    ///
+    /// # Safety
+    /// Using this method can create an invalid ID and is thus marked as unsafe.
     #[inline]
     pub const unsafe fn new_unchecked(raw: u16) -> Self {
         Self(raw)
@@ -60,6 +63,9 @@ impl ExtendedId {
     }
 
     /// Creates a new `ExtendedId` without checking if it is inside the valid range.
+    ///
+    /// # Safety
+    /// Using this method can create an invalid ID and is thus marked as unsafe.
     #[inline]
     pub const unsafe fn new_unchecked(raw: u32) -> Self {
         Self(raw)
@@ -99,5 +105,56 @@ impl From<ExtendedId> for Id {
     #[inline]
     fn from(id: ExtendedId) -> Self {
         Id::Extended(id)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn standard_id_new() {
+        assert_eq!(
+            StandardId::new(StandardId::MAX.as_raw()),
+            Some(StandardId::MAX)
+        );
+    }
+
+    #[test]
+    fn standard_id_new_out_of_range() {
+        assert_eq!(StandardId::new(StandardId::MAX.as_raw() + 1), None);
+    }
+
+    #[test]
+    fn standard_id_new_unchecked_out_of_range() {
+        let id = StandardId::MAX.as_raw() + 1;
+        assert_eq!(unsafe { StandardId::new_unchecked(id) }, StandardId(id));
+    }
+
+    #[test]
+    fn extended_id_new() {
+        assert_eq!(
+            ExtendedId::new(ExtendedId::MAX.as_raw()),
+            Some(ExtendedId::MAX)
+        );
+    }
+
+    #[test]
+    fn extended_id_new_out_of_range() {
+        assert_eq!(ExtendedId::new(ExtendedId::MAX.as_raw() + 1), None);
+    }
+
+    #[test]
+    fn extended_id_new_unchecked_out_of_range() {
+        let id = ExtendedId::MAX.as_raw() + 1;
+        assert_eq!(unsafe { ExtendedId::new_unchecked(id) }, ExtendedId(id));
+    }
+
+    #[test]
+    fn get_standard_id_from_extended_id() {
+        assert_eq!(
+            Some(ExtendedId::MAX.standard_id()),
+            StandardId::new((ExtendedId::MAX.0 >> 18) as u16)
+        );
     }
 }
