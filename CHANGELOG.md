@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+- Backport CAN interface from the upcoming 1.0 release.
+
 ## [v0.2.6] - 2021-08-03
 
 ### Added
