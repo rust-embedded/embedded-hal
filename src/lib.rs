@@ -691,6 +691,7 @@ extern crate void;
 
 pub mod adc;
 pub mod blocking;
+pub mod can;
 pub mod digital;
 pub mod fmt;
 pub mod prelude;
