@@ -119,18 +119,36 @@ pub trait Error: core::fmt::Debug {
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 #[non_exhaustive]
 pub enum ErrorKind {
-    /// Bus error occurred. e.g. A START or a STOP condition is detected and is not located after a multiple of 9 SCL clock pulses.
+    /// Bus error occurred. e.g. A START or a STOP condition is detected and is not
+    /// located after a multiple of 9 SCL clock pulses.
     Bus,
     /// The arbitration was lost, e.g. electrical problems with the clock signal
     ArbitrationLoss,
-    /// The device did not acknowledge its address. The device may be missing.
-    NoAcknowledgeAddress,
-    /// The device did not acknowled the data. It may not be ready to process requests at the moment.
-    NoAcknowledgeData,
+    /// A bus operation was not acknowledged, e.g. due to the addressed device not
+    /// being available on the bus or the device not being ready to process requests
+    /// at the moment
+    NoAcknowledge(NoAcknowledgeSource),
     /// The peripheral receive buffer was overrun
     Overrun,
     /// A different error occurred. The original error may contain more information.
     Other,
+}
+
+/// I2C no acknowledge error source
+///
+/// In cases where it is possible, a device should indicate if a no acknowledge
+/// response was received to an address versus a no acknowledge to a data byte.
+/// Where it is not possible to differentiate, `Unknown` should be indicated.
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub enum NoAcknowledgeSource {
+    /// The device did not acknowledge its address. The device may be missing.
+    Address,
+    /// The device did not acknowledge the data. It may not be ready to process
+    /// requests at the moment.
+    Data,
+    /// Either the device did not acknowledge its address or the data, but it is
+    /// unknown which.
+    Unknown,
 }
 
 impl Error for ErrorKind {
@@ -144,13 +162,22 @@ impl core::fmt::Display for ErrorKind {
         match self {
             Self::Bus => write!(f, "Bus error occurred"),
             Self::ArbitrationLoss => write!(f, "The arbitration was lost"),
-            Self::NoAcknowledgeAddress => write!(f, "The device did not acknowledge its address"),
-            Self::NoAcknowledgeData => write!(f, "The device did not acknowledge the data"),
+            Self::NoAcknowledge(s) => s.fmt(f),
             Self::Overrun => write!(f, "The peripheral receive buffer was overrun"),
             Self::Other => write!(
                 f,
                 "A different error occurred. The original error may contain more information"
             ),
+        }
+    }
+}
+
+impl core::fmt::Display for NoAcknowledgeSource {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::Address => write!(f, "The device did not acknowledge its address"),
+            Self::Data => write!(f, "The device did not acknowledge the data"),
+            Self::Unknown => write!(f, "The device did not acknowledge its address or the data"),
         }
     }
 }
