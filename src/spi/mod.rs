@@ -1,7 +1,15 @@
 //! SPI traits
 
+use crate::private::Sealed;
+
 pub mod blocking;
 pub mod nb;
+
+/// Marker trait for SPI Word
+pub trait SpiWord: Sealed {
+    /// Specified data size type
+    type Data: Sized;
+}
 
 /// 8-bit SPI Word (default)
 pub type U8 = u8;
@@ -11,6 +19,23 @@ pub struct U9;
 pub struct U16;
 /// 18-bit SPI Word
 pub struct U18;
+
+impl Sealed for U9 {}
+impl Sealed for U16 {}
+impl Sealed for U18 {}
+
+impl SpiWord for U8 {
+    type Data = u8;
+}
+impl SpiWord for U9 {
+    type Data = u16;
+}
+impl SpiWord for U16 {
+    type Data = u16;
+}
+impl SpiWord for U18 {
+    type Data = u32;
+}
 
 /// Clock polarity
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
