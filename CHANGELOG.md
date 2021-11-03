@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- Use `u8` as default SPI Word type
+- Use `u8` as default SPI as Serial Word type
 
 ### Added
 - Added `Can` Controller Area Network traits.

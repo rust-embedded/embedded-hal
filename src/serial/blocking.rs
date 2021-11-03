@@ -5,7 +5,7 @@
 //! Implementing that marker trait will opt in your type into a blanket implementation.
 
 /// Write half of a serial interface (blocking variant)
-pub trait Write<Word> {
+pub trait Write<Word = u8> {
     /// The type of error that can occur when writing
     type Error: crate::serial::Error;
 
