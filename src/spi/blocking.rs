@@ -9,11 +9,21 @@ pub trait Read<W = u8>: ErrorType {
     /// The word value sent on MOSI during reading is implementation-defined,
     /// typically `0x00`, `0xFF`, or configurable.
     fn read(&mut self, words: &mut [W]) -> Result<(), Self::Error>;
+
+    /// Reads all slices in `words` from the slave as part of a single SPI transaction.
+    ///
+    /// The word value sent on MOSI during reading is implementation-defined,
+    /// typically `0x00`, `0xFF`, or configurable.
+    fn read_batch(&mut self, words: &mut [&mut [W]]) -> Result<(), Self::Error>;
 }
 
 impl<T: Read<W>, W> Read<W> for &mut T {
     fn read(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
         T::read(self, words)
+    }
+
+    fn read_batch(&mut self, words: &mut [&mut [W]]) -> Result<(), Self::Error> {
+        T::read_batch(self, words)
     }
 }
 
@@ -21,6 +31,9 @@ impl<T: Read<W>, W> Read<W> for &mut T {
 pub trait Write<W = u8>: ErrorType {
     /// Writes `words` to the slave, ignoring all the incoming words
     fn write(&mut self, words: &[W]) -> Result<(), Self::Error>;
+
+    /// Writes all slices in `words` to the slave as part of a single SPI transaction, ignoring all the incoming words
+    fn write_batch(&mut self, words: &[&[W]]) -> Result<(), Self::Error>;
 
     /// Writes `words` to the slave, ignoring all the incoming words
     fn write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
@@ -31,6 +44,10 @@ pub trait Write<W = u8>: ErrorType {
 impl<T: Write<W>, W> Write<W> for &mut T {
     fn write(&mut self, words: &[W]) -> Result<(), Self::Error> {
         T::write(self, words)
+    }
+
+    fn write_batch(&mut self, words: &[&[W]]) -> Result<(), Self::Error> {
+        T::write_batch(self, words)
     }
 
     fn write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
