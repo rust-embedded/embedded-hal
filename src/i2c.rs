@@ -16,10 +16,6 @@
 //! Since 7-bit addressing is the mode of the majority of I2C devices,
 //! `SevenBitAddress` has been set as default mode and thus can be omitted if desired.
 //!
-//! In some cases it's possible to implement these blocking traits on top of one of the core HAL
-//! traits. To save boilerplate when that's the case a `Default` marker trait may be provided.
-//! Implementing that marker trait will opt in your type into a blanket implementation.
-//!
 //! ## Examples
 //!
 //! ### `embedded-hal` implementation for an MCU
