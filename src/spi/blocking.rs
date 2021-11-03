@@ -58,7 +58,7 @@ impl<T: Write<W>, W> Write<W> for &mut T {
     }
 }
 
-/// Operation for transactional SPI trait
+/// Operation for ReadWrite::batch
 ///
 /// This allows composition of SPI operations into a single bus transaction
 #[derive(Debug, PartialEq)]
@@ -91,7 +91,7 @@ pub trait ReadWrite<W = u8>: Read<W> + Write<W> {
     fn transfer_inplace(&mut self, words: &mut [W]) -> Result<(), Self::Error>;
 
     /// Execute multiple actions as part of a single SPI transaction
-    fn exec<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error>;
+    fn batch<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error>;
 }
 
 impl<T: ReadWrite<W>, W> ReadWrite<W> for &mut T {
@@ -103,7 +103,7 @@ impl<T: ReadWrite<W>, W> ReadWrite<W> for &mut T {
         T::transfer_inplace(self, words)
     }
 
-    fn exec<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error> {
-        T::exec(self, operations)
+    fn batch<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error> {
+        T::batch(self, operations)
     }
 }
