@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 ### Added
+- Default SPI word types
 - Added `Can` Controller Area Network traits.
 - `Error` traits for SPI, I2C and Serial traits. The error types used in those must
   implement these `Error` traits, which implies providing a conversion to a common

@@ -1,5 +1,7 @@
 //! Serial Peripheral Interface
 
+use super::U8;
+
 /// Full duplex (master mode)
 ///
 /// # Notes
@@ -16,7 +18,7 @@
 ///
 /// - Some SPIs can work with 8-bit *and* 16-bit words. You can overload this trait with different
 /// `Word` types to allow operation in both modes.
-pub trait FullDuplex<Word> {
+pub trait FullDuplex<Word = U8> {
     /// An enumeration of SPI errors
     type Error: crate::spi::Error;
 

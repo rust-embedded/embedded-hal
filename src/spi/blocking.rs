@@ -4,8 +4,10 @@
 //! traits. To save boilerplate when that's the case a `Default` marker trait may be provided.
 //! Implementing that marker trait will opt in your type into a blanket implementation.
 
+use super::U8;
+
 /// Blocking transfer
-pub trait Transfer<W> {
+pub trait Transfer<W = U8> {
     /// Error type
     type Error: crate::spi::Error;
 
@@ -24,7 +26,7 @@ impl<T: Transfer<W>, W> Transfer<W> for &mut T {
 }
 
 /// Blocking write
-pub trait Write<W> {
+pub trait Write<W = U8> {
     /// Error type
     type Error: crate::spi::Error;
 
@@ -41,7 +43,7 @@ impl<T: Write<W>, W> Write<W> for &mut T {
 }
 
 /// Blocking write (iterator version)
-pub trait WriteIter<W> {
+pub trait WriteIter<W = U8> {
     /// Error type
     type Error: crate::spi::Error;
 
@@ -66,7 +68,7 @@ impl<T: WriteIter<W>, W> WriteIter<W> for &mut T {
 ///
 /// This allows composition of SPI operations into a single bus transaction
 #[derive(Debug, PartialEq)]
-pub enum Operation<'a, W: 'static> {
+pub enum Operation<'a, W: 'static = U8> {
     /// Write data from the provided buffer, discarding read data
     Write(&'a [W]),
     /// Write data out while reading data into the provided buffer
@@ -75,7 +77,7 @@ pub enum Operation<'a, W: 'static> {
 
 /// Transactional trait allows multiple actions to be executed
 /// as part of a single SPI transaction
-pub trait Transactional<W: 'static> {
+pub trait Transactional<W: 'static = U8> {
     /// Associated error type
     type Error: crate::spi::Error;
 

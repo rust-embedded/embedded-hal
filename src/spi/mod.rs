@@ -3,6 +3,15 @@
 pub mod blocking;
 pub mod nb;
 
+/// 8-bit SPI Word (default)
+pub type U8 = u8;
+/// 9-bit SPI Word
+pub struct U9;
+/// 16-bit SPI Word
+pub struct U16;
+/// 18-bit SPI Word
+pub struct U18;
+
 /// Clock polarity
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Polarity {
