@@ -25,22 +25,16 @@ pub mod blocking {
     /// extern crate nb;
     ///
     /// use hal::qei::blocking::Qei;
-    /// use hal::timer::nb::CountDown;
     ///
     /// fn main() {
     ///     let mut qei: Qei1 = {
     ///         // ..
     /// #       Qei1
     ///     };
-    ///     let mut timer: Timer6 = {
-    ///         // ..
-    /// #       Timer6
-    ///     };
     ///
     ///
     ///     let before = qei.count().unwrap();
-    ///     timer.start(1.s()).unwrap();
-    ///     block!(timer.wait());
+    ///     // wait some time
     ///     let after = qei.count().unwrap();
     ///
     ///     let speed = after.wrapping_sub(before);
@@ -48,22 +42,12 @@ pub mod blocking {
     /// }
     ///
     /// # use core::convert::Infallible;
-    /// # struct Seconds(u32);
-    /// # trait U32Ext { fn s(self) -> Seconds; }
-    /// # impl U32Ext for u32 { fn s(self) -> Seconds { Seconds(self) } }
     /// # struct Qei1;
     /// # impl hal::qei::blocking::Qei for Qei1 {
     /// #     type Error = Infallible;
     /// #     type Count = u16;
     /// #     fn count(&self) -> Result<u16, Self::Error> { Ok(0) }
     /// #     fn direction(&self) -> Result<::hal::qei::Direction, Self::Error> { unimplemented!() }
-    /// # }
-    /// # struct Timer6;
-    /// # impl hal::timer::nb::CountDown for Timer6 {
-    /// #     type Error = Infallible;
-    /// #     type Time = Seconds;
-    /// #     fn start<T>(&mut self, _: T) -> Result<(), Infallible> where T: Into<Seconds> { Ok(()) }
-    /// #     fn wait(&mut self) -> ::nb::Result<(), Infallible> { Ok(()) }
     /// # }
     /// ```
     // unproven reason: needs to be re-evaluated in the new singletons world. At the very least this needs a
