@@ -4,7 +4,7 @@
 ///
 /// Some serial interfaces support different data sizes (8 bits, 9 bits, etc.);
 /// This can be encoded in this trait via the `Word` type parameter.
-pub trait Read<Word> {
+pub trait Read<Word = u8> {
     /// Read error
     type Error: crate::serial::Error;
 
@@ -21,7 +21,7 @@ impl<T: Read<Word>, Word> Read<Word> for &mut T {
 }
 
 /// Write half of a serial interface
-pub trait Write<Word> {
+pub trait Write<Word = u8> {
     /// Write error
     type Error: crate::serial::Error;
 

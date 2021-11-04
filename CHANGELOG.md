@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Use `u8` as default SPI as Serial Word type
+
 ### Added
 - Added `Can` Controller Area Network traits.
 - `Error` traits for SPI, I2C and Serial traits. The error types used in those must
