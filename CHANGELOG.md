@@ -35,6 +35,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   dynamically.
 - Added `Debug` to all spi mode types.
 - Add impls of all traits for references (`&T` or `&mut T` depending on the trait) when `T` implements the trait.
+- SPI: Added blocking `Read` trait and `Read` transactional operation
+- SPI: Added blocking `Transfer` trait with separate buffers (single-buffer `Transfer` has been renamed `TransferInplace`)
 
 ### Changed
 - Swap PWM channel arguments to references

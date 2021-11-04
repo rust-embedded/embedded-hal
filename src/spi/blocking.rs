@@ -1,21 +1,65 @@
 //! Blocking SPI API
 
-/// Blocking transfer
+/// Blocking transfer with separate buffers
 pub trait Transfer<W = u8> {
+    /// Error type
+    type Error: crate::spi::Error;
+
+    /// Writes and reads simultaneously. `write` is written to the slave on MOSI and
+    /// words received on MISO are stored in `read`.
+    ///
+    /// It is allowed for `read` and `write` to have different lengths, even zero length.
+    /// The transfer runs for `max(read.len(), write.len())` words. If `read` is shorter,
+    /// incoming words after `read` has been filled will be discarded. If `write` is shorter,
+    /// the value of words sent in MOSI after all `write` has been sent is implementation-defined,
+    /// typically `0x00`, `0xFF`, or configurable.
+    fn transfer(&mut self, read: &mut [W], write: &[W]) -> Result<(), Self::Error>;
+}
+
+impl<T: Transfer<W>, W> Transfer<W> for &mut T {
+    type Error = T::Error;
+
+    fn transfer(&mut self, read: &mut [W], write: &[W]) -> Result<(), Self::Error> {
+        T::transfer(self, read, write)
+    }
+}
+
+/// Blocking transfer with single buffer (in-place)
+pub trait TransferInplace<W = u8> {
     /// Error type
     type Error: crate::spi::Error;
 
     /// Writes and reads simultaneously. The contents of `words` are
     /// written to the slave, and the received words are stored into the same
     /// `words` buffer, overwriting it.
-    fn transfer(&mut self, words: &mut [W]) -> Result<(), Self::Error>;
+    fn transfer_inplace(&mut self, words: &mut [W]) -> Result<(), Self::Error>;
 }
 
-impl<T: Transfer<W>, W> Transfer<W> for &mut T {
+impl<T: TransferInplace<W>, W> TransferInplace<W> for &mut T {
     type Error = T::Error;
 
-    fn transfer(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
-        T::transfer(self, words)
+    fn transfer_inplace(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
+        T::transfer_inplace(self, words)
+    }
+}
+
+/// Blocking read
+pub trait Read<W = u8> {
+    /// Error type
+    type Error: crate::spi::Error;
+
+    /// Reads `words` from the slave.
+    ///
+    /// The word value sent on MOSI during reading is implementation-defined,
+    /// typically `0x00`, `0xFF`, or configurable.
+    fn read(&mut self, words: &mut [W]) -> Result<(), Self::Error>;
+}
+
+impl<T: Read<W>, W> Read<W> for &mut T {
+    type Error = T::Error;
+
+    fn read(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
+        T::read(self, words)
     }
 }
 
@@ -63,10 +107,14 @@ impl<T: WriteIter<W>, W> WriteIter<W> for &mut T {
 /// This allows composition of SPI operations into a single bus transaction
 #[derive(Debug, PartialEq)]
 pub enum Operation<'a, W: 'static = u8> {
+    /// Read data into the provided buffer.
+    Read(&'a mut [W]),
     /// Write data from the provided buffer, discarding read data
     Write(&'a [W]),
     /// Write data out while reading data into the provided buffer
-    Transfer(&'a mut [W]),
+    Transfer(&'a mut [W], &'a [W]),
+    /// Write data out while reading data into the provided buffer
+    TransferInplace(&'a mut [W]),
 }
 
 /// Transactional trait allows multiple actions to be executed
