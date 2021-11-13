@@ -83,28 +83,18 @@ list.
 
 [awesome-embedded-rust]: https://github.com/rust-embedded/awesome-embedded-rust#driver-crates
 
-### Adding support for an `embedded-hal` `-alpha` version in a HAL implementation
+### Supporting different (alpha and non-alpha) HALs
 
-It is possible for HAL implementations to support both the latest `0.2.x` version of `embedded-hal`
-as well as the latest `1.0.0-alpha` version side by side. This has several big advantadges:
-- Allows for a more gradual upgrade process within the community.
-- Allows for a faster upgrade to `1.0` once it comes out.
-- Provides more oportunities to test the new `embedded-hal` version.
+[embedded-hal-compat](https://github.com/ryankurte/embedded-hal-compat) provides shims
+to support interoperability between the latest `0.2.x` and `1.0.0-alpha.N` HALs, allowing one to use
+incompatible HAL components (generally) without alteration.
+See the [docs](https://docs.rs/embedded-hal-compat/) for examples.
 
-This approach has been implemented in [LPC8xx HAL](https://github.com/lpc-rs/lpc8xx-hal). Here are the steps:
+It is also possible for HAL implementations to support both the latest `0.2.x` and `1.0.0-alpha.N` versions
+side by side, for an example see [LPC8xx HAL](https://github.com/lpc-rs/lpc8xx-hal).
 
-1. Add a dependency to the latest `embedded-hal` version to `Cargo.toml`.
-   Use the `package` attribute to refer to it by another name, to prevent name collision
-   ([example](https://github.com/lpc-rs/lpc8xx-hal/blob/a2b774e8a9ef025fb5119ddfb09e1b190e510896/Cargo.toml#L44-L46)).
-2. Import the traits into the module where they should be implemented.
-   Change their name using `as` to prevent name collisions
-   ([example](https://github.com/lpc-rs/lpc8xx-hal/blob/a2b774e8a9ef025fb5119ddfb09e1b190e510896/src/gpio.rs#L49-L53)).
-3. Implement the traits next to their non-alpha versions
-   ([example](https://github.com/lpc-rs/lpc8xx-hal/blob/a2b774e8a9ef025fb5119ddfb09e1b190e510896/src/gpio.rs#L767-L782)).
-
-While none of this is hard, some HAL maintainers might prefer not to add a dependency on an alpha version.
-The main drawback of this approach is that it requires ongoing updates, as new `embedded-hal` alpha versions come out.
-As stated before, `embedded-hal` `-alpha` versions are _not guaranteed_ to be compatible with each other.
+Note that `embedded-hal` `-alpha` versions are a moving target and _not guaranteed_ to be compatible.
+Because of this we only aim to support the latest `-alpha`.
 
 ## Minimum Supported Rust Version (MSRV)
 
