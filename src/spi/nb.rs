@@ -16,7 +16,7 @@
 ///
 /// - Some SPIs can work with 8-bit *and* 16-bit words. You can overload this trait with different
 /// `Word` types to allow operation in both modes.
-pub trait FullDuplex<Word = u8> {
+pub trait FullDuplex<Word: Copy = u8> {
     /// An enumeration of SPI errors
     type Error: crate::spi::Error;
 
@@ -30,7 +30,7 @@ pub trait FullDuplex<Word = u8> {
     fn write(&mut self, word: Word) -> nb::Result<(), Self::Error>;
 }
 
-impl<T: FullDuplex<Word>, Word> FullDuplex<Word> for &mut T {
+impl<T: FullDuplex<Word>, Word: Copy> FullDuplex<Word> for &mut T {
     type Error = T::Error;
 
     fn read(&mut self) -> nb::Result<Word, Self::Error> {

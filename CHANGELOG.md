@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Use `u8` as default SPI as Serial Word type
 - The Minimum Supported Rust Version (MSRV) is now 1.46.0
+- Require all SPI and Serial word types to be `Copy`.
 
 ### Added
 - Added `Can` Controller Area Network traits.
