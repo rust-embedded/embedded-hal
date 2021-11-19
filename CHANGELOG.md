@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-### Changed
 
+## [v1.0.0-alpha.6] - 2021-11-19
+
+*** This is (also) an alpha release with breaking changes (sorry) ***
+
+### Changed
 - Use `u8` as default SPI as Serial Word type
+- The Minimum Supported Rust Version (MSRV) is now 1.46.0
 
 ### Added
 - Added `Can` Controller Area Network traits.
@@ -17,11 +22,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   implement these `Error` traits, which implies providing a conversion to a common
   set of error kinds. Generic drivers using these interfaces can then convert the errors
   to this common set to act upon them.
-- The `NoAcknowledgeAddress` and `NoAcknowledgeData` variants of the I2C `Error`
-  trait have been merged into `NoAcknowledge` with a `NoAcknowledgeSource` field
-  to differentiate between the two events. An additional `Unknown` variant is
-  provided in `NoAcknowledgeSource` for devices that can't differentiate between
-  the two events.
 
 ### Removed
 - Removed `DelayMs` in favor of `DelayUs` with `u32` as type for clarity.
@@ -193,7 +193,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.5...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.6...HEAD
+[v1.0.0-alpha.6]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.5...v1.0.0-alpha.6
 [v1.0.0-alpha.5]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.4...v1.0.0-alpha.5
 [v1.0.0-alpha.4]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.3...v1.0.0-alpha.4
 [v1.0.0-alpha.3]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.2...v1.0.0-alpha.3

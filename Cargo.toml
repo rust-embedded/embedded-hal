@@ -13,11 +13,11 @@ license = "MIT OR Apache-2.0"
 name = "embedded-hal"
 readme = "README.md"
 repository = "https://github.com/rust-embedded/embedded-hal"
-version = "1.0.0-alpha.5" # remember to update html_root_url
+version = "1.0.0-alpha.6"
 
 [dependencies]
 nb = "1"
 
 [dev-dependencies.stm32f1]
-version = "0.13"
+version = "0.14"
 features = ["stm32f103", "rt"]
