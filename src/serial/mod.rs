@@ -13,6 +13,12 @@ pub trait Error: core::fmt::Debug {
     fn kind(&self) -> ErrorKind;
 }
 
+impl Error for core::convert::Infallible {
+    fn kind(&self) -> ErrorKind {
+        match *self {}
+    }
+}
+
 /// Serial error kind
 ///
 /// This represents a common set of serial operation errors. HAL implementations are

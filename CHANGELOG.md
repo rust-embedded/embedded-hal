@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- `Error` traits for Can, SPI, I2C and Serial are implemented for Infallible
 
 ## [v1.0.0-alpha.6] - 2021-11-19
 
