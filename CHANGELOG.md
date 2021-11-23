@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - `spi`: traits now enforce all impls on the same struct (eg `Transfer` and `Write`) have the same `Error` type. 
+- `spi/blocking`: unified traits into `Read`, `Write`, `ReadWrite`.
+- `spi/blocking`: renamed Transactional `exec` to `batch`.
+- `spi/blocking`: Added `read_batch`, `write_batch` methods.
 
 ## [v1.0.0-alpha.6] - 2021-11-19
 
