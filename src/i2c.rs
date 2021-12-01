@@ -202,6 +202,8 @@ impl AddressMode for TenBitAddress {}
 /// Blocking I2C traits
 pub mod blocking {
 
+    use core::cell::RefCell;
+
     use super::{AddressMode, Error, SevenBitAddress};
 
     /// Blocking read
@@ -238,6 +240,14 @@ pub mod blocking {
         }
     }
 
+    impl<'a, A: AddressMode, T: Read<A>> Read<A> for &'a RefCell<T> {
+        type Error = T::Error;
+
+        fn read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error> {
+            self.borrow_mut().read(address, buffer)
+        }
+    }
+
     /// Blocking write
     pub trait Write<A: AddressMode = SevenBitAddress> {
         /// Error type
@@ -270,6 +280,14 @@ pub mod blocking {
         }
     }
 
+    impl<'a, A: AddressMode, T: Write<A>> Write<A> for &'a RefCell<T> {
+        type Error = T::Error;
+
+        fn write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error> {
+            self.borrow_mut().write(address, bytes)
+        }
+    }
+
     /// Blocking write (iterator version)
     pub trait WriteIter<A: AddressMode = SevenBitAddress> {
         /// Error type
@@ -293,6 +311,17 @@ pub mod blocking {
             B: IntoIterator<Item = u8>,
         {
             T::write_iter(self, address, bytes)
+        }
+    }
+
+    impl<'a, A: AddressMode, T: WriteIter<A>> WriteIter<A> for &'a RefCell<T> {
+        type Error = T::Error;
+
+        fn write_iter<B>(&mut self, address: A, bytes: B) -> Result<(), Self::Error>
+        where
+            B: IntoIterator<Item = u8>,
+        {
+            self.borrow_mut().write_iter(address, bytes)
         }
     }
 
@@ -344,6 +373,19 @@ pub mod blocking {
         }
     }
 
+    impl<'a, A: AddressMode, T: WriteRead<A>> WriteRead<A> for &'a RefCell<T> {
+        type Error = T::Error;
+
+        fn write_read(
+            &mut self,
+            address: A,
+            bytes: &[u8],
+            buffer: &mut [u8],
+        ) -> Result<(), Self::Error> {
+            self.borrow_mut().write_read(address, bytes, buffer)
+        }
+    }
+
     /// Blocking write (iterator version) + read
     pub trait WriteIterRead<A: AddressMode = SevenBitAddress> {
         /// Error type
@@ -378,6 +420,22 @@ pub mod blocking {
             B: IntoIterator<Item = u8>,
         {
             T::write_iter_read(self, address, bytes, buffer)
+        }
+    }
+
+    impl<'a, A: AddressMode, T: WriteIterRead<A>> WriteIterRead<A> for &'a RefCell<T> {
+        type Error = T::Error;
+
+        fn write_iter_read<B>(
+            &mut self,
+            address: A,
+            bytes: B,
+            buffer: &mut [u8],
+        ) -> Result<(), Self::Error>
+        where
+            B: IntoIterator<Item = u8>,
+        {
+            self.borrow_mut().write_iter_read(address, bytes, buffer)
         }
     }
 
@@ -431,6 +489,18 @@ pub mod blocking {
         }
     }
 
+    impl<'a, A: AddressMode, T: Transactional<A>> Transactional<A> for &'a RefCell<T> {
+        type Error = T::Error;
+
+        fn exec<'b>(
+            &mut self,
+            address: A,
+            operations: &mut [Operation<'b>],
+        ) -> Result<(), Self::Error> {
+            self.borrow_mut().exec(address, operations)
+        }
+    }
+
     /// Transactional I2C interface (iterator version).
     ///
     /// This allows combining operation within an I2C transaction.
@@ -464,6 +534,17 @@ pub mod blocking {
             O: IntoIterator<Item = Operation<'a>>,
         {
             T::exec_iter(self, address, operations)
+        }
+    }
+
+    impl<'a, A: AddressMode, T: TransactionalIter<A>> TransactionalIter<A> for &'a RefCell<T> {
+        type Error = T::Error;
+
+        fn exec_iter<'b, O>(&mut self, address: A, operations: O) -> Result<(), Self::Error>
+        where
+            O: IntoIterator<Item = Operation<'b>>,
+        {
+            self.borrow_mut().exec_iter(address, operations)
         }
     }
 }

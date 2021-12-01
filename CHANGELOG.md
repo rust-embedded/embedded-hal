@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - `Error` traits for Can, SPI, I2C and Serial are implemented for Infallible
+- Implement all I2C traits for `&RefCell`
 
 ## [v1.0.0-alpha.6] - 2021-11-19
 
