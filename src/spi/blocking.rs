@@ -70,7 +70,7 @@ pub enum Operation<'a, W: 'static = u8> {
     /// Write data out while reading data into the provided buffer
     Transfer(&'a mut [W], &'a [W]),
     /// Write data out while reading data into the provided buffer
-    TransferInplace(&'a mut [W]),
+    TransferInPlace(&'a mut [W]),
 }
 
 /// Blocking read-write SPI
@@ -88,7 +88,7 @@ pub trait ReadWrite<W = u8>: Read<W> + Write<W> {
     /// Writes and reads simultaneously. The contents of `words` are
     /// written to the slave, and the received words are stored into the same
     /// `words` buffer, overwriting it.
-    fn transfer_inplace(&mut self, words: &mut [W]) -> Result<(), Self::Error>;
+    fn transfer_in_place(&mut self, words: &mut [W]) -> Result<(), Self::Error>;
 
     /// Execute multiple actions as part of a single SPI transaction
     fn batch<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error>;
@@ -99,8 +99,8 @@ impl<T: ReadWrite<W>, W> ReadWrite<W> for &mut T {
         T::transfer(self, read, write)
     }
 
-    fn transfer_inplace(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
-        T::transfer_inplace(self, words)
+    fn transfer_in_place(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
+        T::transfer_in_place(self, words)
     }
 
     fn batch<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error> {
