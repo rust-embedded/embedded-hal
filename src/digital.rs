@@ -113,11 +113,6 @@ pub mod blocking {
     }
 
     /// Output pin that can be toggled
-    ///
-    /// See [toggleable](toggleable) to use a software implementation if
-    /// both [OutputPin](trait.OutputPin.html) and
-    /// [StatefulOutputPin](trait.StatefulOutputPin.html) are
-    /// implemented. Otherwise, implement this using hardware mechanisms.
     pub trait ToggleableOutputPin {
         /// Error type
         type Error: core::fmt::Debug;
