@@ -1,0 +1,15 @@
+[package]
+name = "embedded-hal-async"
+version = "0.1.0"
+edition = "2021"
+categories = ["asynchronous", "embedded", "hardware-support", "no-std"]
+description = " A Hardware Abstraction Layer (HAL) for embedded systems, async version"
+documentation = "https://docs.rs/embedded-hal-async"
+keywords = ["hal", "IO", "async"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/rust-embedded/embedded-hal"
+
+[dependencies]
+nb = "1"
+embedded-hal = { version = "1.0.0-alpha.6", path = ".." }
