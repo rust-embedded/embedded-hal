@@ -1,5 +1,7 @@
 //! Serial Peripheral Interface
 
+use super::ErrorType;
+
 /// Full duplex (master mode)
 ///
 /// # Notes
@@ -16,10 +18,7 @@
 ///
 /// - Some SPIs can work with 8-bit *and* 16-bit words. You can overload this trait with different
 /// `Word` types to allow operation in both modes.
-pub trait FullDuplex<Word = u8> {
-    /// An enumeration of SPI errors
-    type Error: crate::spi::Error;
-
+pub trait FullDuplex<Word = u8>: ErrorType {
     /// Reads the word stored in the shift register
     ///
     /// **NOTE** A word must be sent to the slave before attempting to call this
@@ -31,8 +30,6 @@ pub trait FullDuplex<Word = u8> {
 }
 
 impl<T: FullDuplex<Word>, Word> FullDuplex<Word> for &mut T {
-    type Error = T::Error;
-
     fn read(&mut self) -> nb::Result<Word, Self::Error> {
         T::read(self)
     }
