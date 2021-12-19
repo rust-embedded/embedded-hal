@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - `Error` traits for Can, SPI, I2C and Serial are implemented for Infallible
 
+### Changed
+- `spi`: traits now enforce all impls on the same struct (eg `Transfer` and `Write`) have the same `Error` type. 
+
 ## [v1.0.0-alpha.6] - 2021-11-19
 
 *** This is (also) an alpha release with breaking changes (sorry) ***
