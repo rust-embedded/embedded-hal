@@ -2,40 +2,7 @@
 
 use super::ErrorType;
 
-/// Blocking transfer with separate buffers
-pub trait Transfer<W = u8>: ErrorType {
-    /// Writes and reads simultaneously. `write` is written to the slave on MOSI and
-    /// words received on MISO are stored in `read`.
-    ///
-    /// It is allowed for `read` and `write` to have different lengths, even zero length.
-    /// The transfer runs for `max(read.len(), write.len())` words. If `read` is shorter,
-    /// incoming words after `read` has been filled will be discarded. If `write` is shorter,
-    /// the value of words sent in MOSI after all `write` has been sent is implementation-defined,
-    /// typically `0x00`, `0xFF`, or configurable.
-    fn transfer(&mut self, read: &mut [W], write: &[W]) -> Result<(), Self::Error>;
-}
-
-impl<T: Transfer<W>, W> Transfer<W> for &mut T {
-    fn transfer(&mut self, read: &mut [W], write: &[W]) -> Result<(), Self::Error> {
-        T::transfer(self, read, write)
-    }
-}
-
-/// Blocking transfer with single buffer (in-place)
-pub trait TransferInplace<W = u8>: ErrorType {
-    /// Writes and reads simultaneously. The contents of `words` are
-    /// written to the slave, and the received words are stored into the same
-    /// `words` buffer, overwriting it.
-    fn transfer_inplace(&mut self, words: &mut [W]) -> Result<(), Self::Error>;
-}
-
-impl<T: TransferInplace<W>, W> TransferInplace<W> for &mut T {
-    fn transfer_inplace(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
-        T::transfer_inplace(self, words)
-    }
-}
-
-/// Blocking read
+/// Blocking read-only SPI
 pub trait Read<W = u8>: ErrorType {
     /// Reads `words` from the slave.
     ///
@@ -50,27 +17,22 @@ impl<T: Read<W>, W> Read<W> for &mut T {
     }
 }
 
-/// Blocking write
+/// Blocking write-only SPI
 pub trait Write<W = u8>: ErrorType {
     /// Writes `words` to the slave, ignoring all the incoming words
     fn write(&mut self, words: &[W]) -> Result<(), Self::Error>;
-}
 
-impl<T: Write<W>, W> Write<W> for &mut T {
-    fn write(&mut self, words: &[W]) -> Result<(), Self::Error> {
-        T::write(self, words)
-    }
-}
-
-/// Blocking write (iterator version)
-pub trait WriteIter<W = u8>: ErrorType {
     /// Writes `words` to the slave, ignoring all the incoming words
     fn write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
     where
         WI: IntoIterator<Item = W>;
 }
 
-impl<T: WriteIter<W>, W> WriteIter<W> for &mut T {
+impl<T: Write<W>, W> Write<W> for &mut T {
+    fn write(&mut self, words: &[W]) -> Result<(), Self::Error> {
+        T::write(self, words)
+    }
+
     fn write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
     where
         WI: IntoIterator<Item = W>,
@@ -94,14 +56,36 @@ pub enum Operation<'a, W: 'static = u8> {
     TransferInplace(&'a mut [W]),
 }
 
-/// Transactional trait allows multiple actions to be executed
-/// as part of a single SPI transaction
-pub trait Transactional<W: 'static = u8>: ErrorType {
-    /// Execute the provided transactions
+/// Blocking read-write SPI
+pub trait ReadWrite<W = u8>: Read<W> + Write<W> {
+    /// Writes and reads simultaneously. `write` is written to the slave on MOSI and
+    /// words received on MISO are stored in `read`.
+    ///
+    /// It is allowed for `read` and `write` to have different lengths, even zero length.
+    /// The transfer runs for `max(read.len(), write.len())` words. If `read` is shorter,
+    /// incoming words after `read` has been filled will be discarded. If `write` is shorter,
+    /// the value of words sent in MOSI after all `write` has been sent is implementation-defined,
+    /// typically `0x00`, `0xFF`, or configurable.
+    fn transfer(&mut self, read: &mut [W], write: &[W]) -> Result<(), Self::Error>;
+
+    /// Writes and reads simultaneously. The contents of `words` are
+    /// written to the slave, and the received words are stored into the same
+    /// `words` buffer, overwriting it.
+    fn transfer_inplace(&mut self, words: &mut [W]) -> Result<(), Self::Error>;
+
+    /// Execute multiple actions as part of a single SPI transaction
     fn exec<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error>;
 }
 
-impl<T: Transactional<W>, W: 'static> Transactional<W> for &mut T {
+impl<T: ReadWrite<W>, W> ReadWrite<W> for &mut T {
+    fn transfer(&mut self, read: &mut [W], write: &[W]) -> Result<(), Self::Error> {
+        T::transfer(self, read, write)
+    }
+
+    fn transfer_inplace(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
+        T::transfer_inplace(self, words)
+    }
+
     fn exec<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error> {
         T::exec(self, operations)
     }
