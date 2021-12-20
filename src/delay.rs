@@ -39,5 +39,9 @@ pub mod blocking {
         fn delay_us(&mut self, us: u32) -> Result<(), Self::Error> {
             T::delay_us(self, us)
         }
+
+        fn delay_ms(&mut self, ms: u32) -> Result<(), Self::Error> {
+            T::delay_ms(self, ms)
+        }
     }
 }
