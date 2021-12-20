@@ -22,22 +22,70 @@
 //! Here is an example of an embedded-hal implementation of the `Write` trait
 //! for both modes:
 //! ```
-//! # use embedded_hal::i2c::{ErrorKind, ErrorType, SevenBitAddress, TenBitAddress, blocking::Write};
+//! # use embedded_hal::i2c::{ErrorKind, ErrorType, SevenBitAddress, TenBitAddress, blocking::{I2c, Operation}};
 //! /// I2C0 hardware peripheral which supports both 7-bit and 10-bit addressing.
 //! pub struct I2c0;
 //!
 //! # impl ErrorType for I2c0 { type Error = ErrorKind; }
-//! impl Write<SevenBitAddress> for I2c0
+//! impl I2c<SevenBitAddress> for I2c0
 //! {
-//!     fn write(&mut self, addr: u8, output: &[u8]) -> Result<(), Self::Error> {
+//!     fn read(&mut self, addr: u8, buffer: &mut [u8]) -> Result<(), Self::Error> {
+//!         // ...
+//! #       Ok(())
+//!     }
+//!     fn write(&mut self, addr: u8, bytes: &[u8]) -> Result<(), Self::Error> {
+//!         // ...
+//! #       Ok(())
+//!     }
+//!     fn write_iter<B: IntoIterator<Item = u8>>(&mut self, addr: u8, bytes: B) -> Result<(), Self::Error> {
+//!         // ...
+//! #       Ok(())
+//!     }
+//!     fn write_read(&mut self, addr: u8, bytes: &[u8], buffer: &mut [u8]) -> Result<(), Self::Error> {
+//!         // ...
+//! #       Ok(())
+//!     }
+//!     fn write_iter_read<B: IntoIterator<Item = u8>>(&mut self, addr: u8, bytes: B, buffer: &mut [u8]) -> Result<(), Self::Error> {
+//!         // ...
+//! #       Ok(())
+//!     }
+//!     fn transaction<'a>(&mut self, address: u8, operations: &mut [Operation<'a>]) -> Result<(), Self::Error> {
+//!         // ...
+//! #       Ok(())
+//!     }
+//!     fn transaction_iter<'a, O: IntoIterator<Item = Operation<'a>>>(&mut self, address: u8, operations: O) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
 //! }
 //!
-//! impl Write<TenBitAddress> for I2c0
+//! impl I2c<TenBitAddress> for I2c0
 //! {
-//!     fn write(&mut self, addr: u16, output: &[u8]) -> Result<(), Self::Error> {
+//!     fn read(&mut self, addr: u16, buffer: &mut [u8]) -> Result<(), Self::Error> {
+//!         // ...
+//! #       Ok(())
+//!     }
+//!     fn write(&mut self, addr: u16, bytes: &[u8]) -> Result<(), Self::Error> {
+//!         // ...
+//! #       Ok(())
+//!     }
+//!     fn write_iter<B: IntoIterator<Item = u8>>(&mut self, addr: u16, bytes: B) -> Result<(), Self::Error> {
+//!         // ...
+//! #       Ok(())
+//!     }
+//!     fn write_read(&mut self, addr: u16, bytes: &[u8], buffer: &mut [u8]) -> Result<(), Self::Error> {
+//!         // ...
+//! #       Ok(())
+//!     }
+//!     fn write_iter_read<B: IntoIterator<Item = u8>>(&mut self, addr: u16, bytes: B, buffer: &mut [u8]) -> Result<(), Self::Error> {
+//!         // ...
+//! #       Ok(())
+//!     }
+//!     fn transaction<'a>(&mut self, address: u16, operations: &mut [Operation<'a>]) -> Result<(), Self::Error> {
+//!         // ...
+//! #       Ok(())
+//!     }
+//!     fn transaction_iter<'a, O: IntoIterator<Item = Operation<'a>>>(&mut self, address: u16, operations: O) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
@@ -49,7 +97,7 @@
 //! For demonstration purposes the address mode parameter has been omitted in this example.
 //!
 //! ```
-//! # use embedded_hal::i2c::{blocking::WriteRead, Error};
+//! # use embedded_hal::i2c::{blocking::I2c, Error};
 //! const ADDR: u8  = 0x15;
 //! # const TEMP_REGISTER: u8 = 0x1;
 //! pub struct TemperatureSensorDriver<I2C> {
@@ -58,7 +106,7 @@
 //!
 //! impl<I2C, E: Error> TemperatureSensorDriver<I2C>
 //! where
-//!     I2C: WriteRead<Error = E>,
+//!     I2C: I2c<Error = E>,
 //! {
 //!     pub fn read_temperature(&mut self) -> Result<u8, E> {
 //!         let mut temp = [0];
@@ -72,7 +120,7 @@
 //! ### Device driver compatible only with 10-bit addresses
 //!
 //! ```
-//! # use embedded_hal::i2c::{Error, TenBitAddress, blocking::WriteRead};
+//! # use embedded_hal::i2c::{Error, TenBitAddress, blocking::I2c};
 //! const ADDR: u16  = 0x158;
 //! # const TEMP_REGISTER: u8 = 0x1;
 //! pub struct TemperatureSensorDriver<I2C> {
@@ -81,7 +129,7 @@
 //!
 //! impl<I2C, E: Error> TemperatureSensorDriver<I2C>
 //! where
-//!     I2C: WriteRead<TenBitAddress, Error = E>,
+//!     I2C: I2c<TenBitAddress, Error = E>,
 //! {
 //!     pub fn read_temperature(&mut self) -> Result<u8, E> {
 //!         let mut temp = [0];
@@ -213,8 +261,19 @@ pub mod blocking {
 
     use super::{AddressMode, ErrorType, SevenBitAddress};
 
-    /// Blocking read
-    pub trait Read<A: AddressMode = SevenBitAddress>: ErrorType {
+    /// Transactional I2C operation.
+    ///
+    /// Several operations can be combined as part of a transaction.
+    #[derive(Debug, PartialEq)]
+    pub enum Operation<'a> {
+        /// Read data into the provided buffer
+        Read(&'a mut [u8]),
+        /// Write data from the provided buffer
+        Write(&'a [u8]),
+    }
+
+    /// Blocking I2C
+    pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
         /// Reads enough bytes from slave with `address` to fill `buffer`
         ///
         /// # I2C Events (contract)
@@ -234,16 +293,7 @@ pub mod blocking {
         /// - `NMAK` = master no acknowledge
         /// - `SP` = stop condition
         fn read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error>;
-    }
 
-    impl<A: AddressMode, T: Read<A>> Read<A> for &mut T {
-        fn read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error> {
-            T::read(self, address, buffer)
-        }
-    }
-
-    /// Blocking write
-    pub trait Write<A: AddressMode = SevenBitAddress>: ErrorType {
         /// Writes bytes to slave with address `address`
         ///
         /// # I2C Events (contract)
@@ -261,37 +311,16 @@ pub mod blocking {
         /// - `Bi` = ith byte of data
         /// - `SP` = stop condition
         fn write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error>;
-    }
 
-    impl<A: AddressMode, T: Write<A>> Write<A> for &mut T {
-        fn write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error> {
-            T::write(self, address, bytes)
-        }
-    }
-
-    /// Blocking write (iterator version)
-    pub trait WriteIter<A: AddressMode = SevenBitAddress>: ErrorType {
         /// Writes bytes to slave with address `address`
         ///
         /// # I2C Events (contract)
         ///
-        /// Same as `Write`
+        /// Same as the `write` method
         fn write_iter<B>(&mut self, address: A, bytes: B) -> Result<(), Self::Error>
         where
             B: IntoIterator<Item = u8>;
-    }
 
-    impl<A: AddressMode, T: WriteIter<A>> WriteIter<A> for &mut T {
-        fn write_iter<B>(&mut self, address: A, bytes: B) -> Result<(), Self::Error>
-        where
-            B: IntoIterator<Item = u8>,
-        {
-            T::write_iter(self, address, bytes)
-        }
-    }
-
-    /// Blocking write + read
-    pub trait WriteRead<A: AddressMode = SevenBitAddress>: ErrorType {
         /// Writes bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
         /// single transaction*
         ///
@@ -320,27 +349,13 @@ pub mod blocking {
             bytes: &[u8],
             buffer: &mut [u8],
         ) -> Result<(), Self::Error>;
-    }
 
-    impl<A: AddressMode, T: WriteRead<A>> WriteRead<A> for &mut T {
-        fn write_read(
-            &mut self,
-            address: A,
-            bytes: &[u8],
-            buffer: &mut [u8],
-        ) -> Result<(), Self::Error> {
-            T::write_read(self, address, bytes, buffer)
-        }
-    }
-
-    /// Blocking write (iterator version) + read
-    pub trait WriteIterRead<A: AddressMode = SevenBitAddress>: ErrorType {
         /// Writes bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
         /// single transaction*
         ///
         /// # I2C Events (contract)
         ///
-        /// Same as the `WriteRead` trait
+        /// Same as the `write_read` method
         fn write_iter_read<B>(
             &mut self,
             address: A,
@@ -349,37 +364,7 @@ pub mod blocking {
         ) -> Result<(), Self::Error>
         where
             B: IntoIterator<Item = u8>;
-    }
 
-    impl<A: AddressMode, T: WriteIterRead<A>> WriteIterRead<A> for &mut T {
-        fn write_iter_read<B>(
-            &mut self,
-            address: A,
-            bytes: B,
-            buffer: &mut [u8],
-        ) -> Result<(), Self::Error>
-        where
-            B: IntoIterator<Item = u8>,
-        {
-            T::write_iter_read(self, address, bytes, buffer)
-        }
-    }
-
-    /// Transactional I2C operation.
-    ///
-    /// Several operations can be combined as part of a transaction.
-    #[derive(Debug, PartialEq)]
-    pub enum Operation<'a> {
-        /// Read data into the provided buffer
-        Read(&'a mut [u8]),
-        /// Write data from the provided buffer
-        Write(&'a [u8]),
-    }
-
-    /// Transactional I2C interface.
-    ///
-    /// This allows combining operations within an I2C transaction.
-    pub trait Transactional<A: AddressMode = SevenBitAddress>: ErrorType {
         /// Execute the provided operations on the I2C bus.
         ///
         /// Transaction contract:
@@ -393,27 +378,12 @@ pub mod blocking {
         /// - `SAD+R/W` = slave address followed by bit 1 to indicate reading or 0 to indicate writing
         /// - `SR` = repeated start condition
         /// - `SP` = stop condition
-        fn exec<'a>(
+        fn transaction<'a>(
             &mut self,
             address: A,
             operations: &mut [Operation<'a>],
         ) -> Result<(), Self::Error>;
-    }
 
-    impl<A: AddressMode, T: Transactional<A>> Transactional<A> for &mut T {
-        fn exec<'a>(
-            &mut self,
-            address: A,
-            operations: &mut [Operation<'a>],
-        ) -> Result<(), Self::Error> {
-            T::exec(self, address, operations)
-        }
-    }
-
-    /// Transactional I2C interface (iterator version).
-    ///
-    /// This allows combining operation within an I2C transaction.
-    pub trait TransactionalIter<A: AddressMode = SevenBitAddress>: ErrorType {
         /// Execute the provided operations on the I2C bus (iterator version).
         ///
         /// Transaction contract:
@@ -427,17 +397,61 @@ pub mod blocking {
         /// - `SAD+R/W` = slave address followed by bit 1 to indicate reading or 0 to indicate writing
         /// - `SR` = repeated start condition
         /// - `SP` = stop condition
-        fn exec_iter<'a, O>(&mut self, address: A, operations: O) -> Result<(), Self::Error>
+        fn transaction_iter<'a, O>(&mut self, address: A, operations: O) -> Result<(), Self::Error>
         where
             O: IntoIterator<Item = Operation<'a>>;
     }
 
-    impl<A: AddressMode, T: TransactionalIter<A>> TransactionalIter<A> for &mut T {
-        fn exec_iter<'a, O>(&mut self, address: A, operations: O) -> Result<(), Self::Error>
+    impl<A: AddressMode, T: I2c<A>> I2c<A> for &mut T {
+        fn read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error> {
+            T::read(self, address, buffer)
+        }
+
+        fn write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error> {
+            T::write(self, address, bytes)
+        }
+
+        fn write_iter<B>(&mut self, address: A, bytes: B) -> Result<(), Self::Error>
+        where
+            B: IntoIterator<Item = u8>,
+        {
+            T::write_iter(self, address, bytes)
+        }
+
+        fn write_read(
+            &mut self,
+            address: A,
+            bytes: &[u8],
+            buffer: &mut [u8],
+        ) -> Result<(), Self::Error> {
+            T::write_read(self, address, bytes, buffer)
+        }
+
+        fn write_iter_read<B>(
+            &mut self,
+            address: A,
+            bytes: B,
+            buffer: &mut [u8],
+        ) -> Result<(), Self::Error>
+        where
+            B: IntoIterator<Item = u8>,
+        {
+            T::write_iter_read(self, address, bytes, buffer)
+        }
+
+        fn transaction<'a>(
+            &mut self,
+            address: A,
+            operations: &mut [Operation<'a>],
+        ) -> Result<(), Self::Error> {
+            T::transaction(self, address, operations)
+        }
+
+        fn transaction_iter<'a, O>(&mut self, address: A, operations: O) -> Result<(), Self::Error>
         where
             O: IntoIterator<Item = Operation<'a>>,
         {
-            T::exec_iter(self, address, operations)
+            T::transaction_iter(self, address, operations)
         }
     }
 }

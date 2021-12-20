@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - `i2c`: traits now enforce all impls on the same struct have the same `Error` type.
+- `i2c`: unify all traits into a single `I2c` trait.
 
 ## [v1.0.0-alpha.6] - 2021-11-19
 
