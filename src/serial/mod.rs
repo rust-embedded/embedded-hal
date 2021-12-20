@@ -63,3 +63,15 @@ impl core::fmt::Display for ErrorKind {
         }
     }
 }
+
+/// Serial error type trait
+///
+/// This just defines the error type, to be used by the other traits.
+pub trait ErrorType {
+    /// Error type
+    type Error: Error;
+}
+
+impl<T: ErrorType> ErrorType for &mut T {
+    type Error = T::Error;
+}
