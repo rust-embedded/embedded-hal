@@ -4,7 +4,7 @@
 ///
 /// Some serial interfaces support different data sizes (8 bits, 9 bits, etc.);
 /// This can be encoded in this trait via the `Word` type parameter.
-pub trait Read<Word = u8> {
+pub trait Read<Word: Copy = u8> {
     /// Read error
     type Error: crate::serial::Error;
 
@@ -12,7 +12,7 @@ pub trait Read<Word = u8> {
     fn read(&mut self) -> nb::Result<Word, Self::Error>;
 }
 
-impl<T: Read<Word>, Word> Read<Word> for &mut T {
+impl<T: Read<Word>, Word: Copy> Read<Word> for &mut T {
     type Error = T::Error;
 
     fn read(&mut self) -> nb::Result<Word, Self::Error> {
@@ -21,7 +21,7 @@ impl<T: Read<Word>, Word> Read<Word> for &mut T {
 }
 
 /// Write half of a serial interface
-pub trait Write<Word = u8> {
+pub trait Write<Word: Copy = u8> {
     /// Write error
     type Error: crate::serial::Error;
 
@@ -32,7 +32,7 @@ pub trait Write<Word = u8> {
     fn flush(&mut self) -> nb::Result<(), Self::Error>;
 }
 
-impl<T: Write<Word>, Word> Write<Word> for &mut T {
+impl<T: Write<Word>, Word: Copy> Write<Word> for &mut T {
     type Error = T::Error;
 
     fn write(&mut self, word: Word) -> nb::Result<(), Self::Error> {

@@ -1,7 +1,7 @@
 //! Blocking SPI API
 
 /// Blocking transfer with separate buffers
-pub trait Transfer<W = u8> {
+pub trait Transfer<W: Copy = u8> {
     /// Error type
     type Error: crate::spi::Error;
 
@@ -16,7 +16,7 @@ pub trait Transfer<W = u8> {
     fn transfer(&mut self, read: &mut [W], write: &[W]) -> Result<(), Self::Error>;
 }
 
-impl<T: Transfer<W>, W> Transfer<W> for &mut T {
+impl<T: Transfer<W>, W: Copy> Transfer<W> for &mut T {
     type Error = T::Error;
 
     fn transfer(&mut self, read: &mut [W], write: &[W]) -> Result<(), Self::Error> {
@@ -25,7 +25,7 @@ impl<T: Transfer<W>, W> Transfer<W> for &mut T {
 }
 
 /// Blocking transfer with single buffer (in-place)
-pub trait TransferInplace<W = u8> {
+pub trait TransferInplace<W: Copy = u8> {
     /// Error type
     type Error: crate::spi::Error;
 
@@ -35,7 +35,7 @@ pub trait TransferInplace<W = u8> {
     fn transfer_inplace(&mut self, words: &mut [W]) -> Result<(), Self::Error>;
 }
 
-impl<T: TransferInplace<W>, W> TransferInplace<W> for &mut T {
+impl<T: TransferInplace<W>, W: Copy> TransferInplace<W> for &mut T {
     type Error = T::Error;
 
     fn transfer_inplace(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
@@ -44,7 +44,7 @@ impl<T: TransferInplace<W>, W> TransferInplace<W> for &mut T {
 }
 
 /// Blocking read
-pub trait Read<W = u8> {
+pub trait Read<W: Copy = u8> {
     /// Error type
     type Error: crate::spi::Error;
 
@@ -55,7 +55,7 @@ pub trait Read<W = u8> {
     fn read(&mut self, words: &mut [W]) -> Result<(), Self::Error>;
 }
 
-impl<T: Read<W>, W> Read<W> for &mut T {
+impl<T: Read<W>, W: Copy> Read<W> for &mut T {
     type Error = T::Error;
 
     fn read(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
@@ -64,7 +64,7 @@ impl<T: Read<W>, W> Read<W> for &mut T {
 }
 
 /// Blocking write
-pub trait Write<W = u8> {
+pub trait Write<W: Copy = u8> {
     /// Error type
     type Error: crate::spi::Error;
 
@@ -72,7 +72,7 @@ pub trait Write<W = u8> {
     fn write(&mut self, words: &[W]) -> Result<(), Self::Error>;
 }
 
-impl<T: Write<W>, W> Write<W> for &mut T {
+impl<T: Write<W>, W: Copy> Write<W> for &mut T {
     type Error = T::Error;
 
     fn write(&mut self, words: &[W]) -> Result<(), Self::Error> {
@@ -81,7 +81,7 @@ impl<T: Write<W>, W> Write<W> for &mut T {
 }
 
 /// Blocking write (iterator version)
-pub trait WriteIter<W = u8> {
+pub trait WriteIter<W: Copy = u8> {
     /// Error type
     type Error: crate::spi::Error;
 
@@ -91,7 +91,7 @@ pub trait WriteIter<W = u8> {
         WI: IntoIterator<Item = W>;
 }
 
-impl<T: WriteIter<W>, W> WriteIter<W> for &mut T {
+impl<T: WriteIter<W>, W: Copy> WriteIter<W> for &mut T {
     type Error = T::Error;
 
     fn write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
@@ -106,7 +106,7 @@ impl<T: WriteIter<W>, W> WriteIter<W> for &mut T {
 ///
 /// This allows composition of SPI operations into a single bus transaction
 #[derive(Debug, PartialEq)]
-pub enum Operation<'a, W: 'static = u8> {
+pub enum Operation<'a, W: 'static + Copy = u8> {
     /// Read data into the provided buffer.
     Read(&'a mut [W]),
     /// Write data from the provided buffer, discarding read data
@@ -119,7 +119,7 @@ pub enum Operation<'a, W: 'static = u8> {
 
 /// Transactional trait allows multiple actions to be executed
 /// as part of a single SPI transaction
-pub trait Transactional<W: 'static = u8> {
+pub trait Transactional<W: 'static + Copy = u8> {
     /// Associated error type
     type Error: crate::spi::Error;
 
@@ -127,7 +127,7 @@ pub trait Transactional<W: 'static = u8> {
     fn exec<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error>;
 }
 
-impl<T: Transactional<W>, W: 'static> Transactional<W> for &mut T {
+impl<T: Transactional<W>, W: 'static + Copy> Transactional<W> for &mut T {
     type Error = T::Error;
 
     fn exec<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error> {
