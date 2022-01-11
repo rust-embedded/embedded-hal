@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 - Fixed blanket impl of `DelayUs` not covering the `delay_ms` method.
+### Changed
+- `spi`: traits now enforce all impls on the same struct (eg `Transfer` and `Write`) have the same `Error` type. 
 
 ## [v1.0.0-alpha.6] - 2021-11-19
 
