@@ -12,7 +12,7 @@ An asynchronous Hardware Abstraction Layer (HAL) for embedded systems.
 This crate contains asynchronous versions of the [`embedded-hal`] traits and shares its scope and [design goals].
 The purpose of this crate is to iterate over these trait versions before integrating them into [`embedded-hal`].
 
-**NOTE** This HAL is in active development.
+**NOTE** These traits are still experimental. At least one breaking change to this crate is expected in the future (changing from GATs to `async fn`), but there might be more.
 
 <!-- This project is developed and maintained by the [HAL team][team]. -->
 
