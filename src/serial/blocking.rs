@@ -1,10 +1,7 @@
 //! Blocking serial API
 
 /// Write half of a serial interface (blocking variant)
-pub trait Write<Word: Copy = u8> {
-    /// The type of error that can occur when writing
-    type Error: crate::serial::Error;
-
+pub trait Write<Word: Copy = u8>: super::ErrorType {
     /// Writes a slice, blocking until everything has been written
     ///
     /// An implementation can choose to buffer the write, returning `Ok(())`
@@ -20,8 +17,6 @@ pub trait Write<Word: Copy = u8> {
 }
 
 impl<T: Write<Word>, Word: Copy> Write<Word> for &mut T {
-    type Error = T::Error;
-
     fn write(&mut self, buffer: &[Word]) -> Result<(), Self::Error> {
         T::write(self, buffer)
     }

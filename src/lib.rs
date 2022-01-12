@@ -143,9 +143,11 @@
 //! // convenience type alias
 //! pub type Serial1 = Serial<USART1>;
 //!
-//! impl hal::serial::nb::Read<u8> for Serial<USART1> {
+//! impl hal::serial::ErrorType for Serial<USART1> {
 //!     type Error = hal::serial::ErrorKind;
+//! }
 //!
+//! impl hal::serial::nb::Read<u8> for Serial<USART1> {
 //!     fn read(&mut self) -> nb::Result<u8, Self::Error> {
 //!         // read the status register
 //!         let isr = self.usart.sr.read();
@@ -166,8 +168,6 @@
 //! }
 //!
 //! impl hal::serial::nb::Write<u8> for Serial<USART1> {
-//!     type Error = hal::serial::ErrorKind;
-//!
 //!     fn write(&mut self, byte: u8) -> nb::Result<(), Self::Error> {
 //!         // Similar to the `read` implementation
 //!         # Ok(())
@@ -387,8 +387,10 @@
 //! #     fn deref_mut(&mut self) -> &mut T { self.0 }
 //! # }
 //! # struct Serial1;
-//! # impl hal::serial::nb::Write<u8> for Serial1 {
+//! # impl hal::serial::ErrorType for Serial1 {
 //! #   type Error = ErrorKind;
+//! # }
+//! # impl hal::serial::nb::Write<u8> for Serial1 {
 //! #   fn write(&mut self, _: u8) -> nb::Result<(), Self::Error> { Err(::nb::Error::WouldBlock) }
 //! #   fn flush(&mut self) -> nb::Result<(), Self::Error> { Err(::nb::Error::WouldBlock) }
 //! # }
