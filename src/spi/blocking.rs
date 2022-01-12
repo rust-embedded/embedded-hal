@@ -3,7 +3,7 @@
 use super::ErrorType;
 
 /// Blocking transfer with separate buffers
-pub trait Transfer<W = u8>: ErrorType {
+pub trait Transfer<Word = u8>: ErrorType {
     /// Writes and reads simultaneously. `write` is written to the slave on MOSI and
     /// words received on MISO are stored in `read`.
     ///
@@ -12,68 +12,68 @@ pub trait Transfer<W = u8>: ErrorType {
     /// incoming words after `read` has been filled will be discarded. If `write` is shorter,
     /// the value of words sent in MOSI after all `write` has been sent is implementation-defined,
     /// typically `0x00`, `0xFF`, or configurable.
-    fn transfer(&mut self, read: &mut [W], write: &[W]) -> Result<(), Self::Error>;
+    fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error>;
 }
 
-impl<T: Transfer<W>, W: Copy> Transfer<W> for &mut T {
-    fn transfer(&mut self, read: &mut [W], write: &[W]) -> Result<(), Self::Error> {
+impl<T: Transfer<Word>, Word: Copy> Transfer<Word> for &mut T {
+    fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
         T::transfer(self, read, write)
     }
 }
 
 /// Blocking transfer with single buffer (in-place)
-pub trait TransferInplace<W: Copy = u8>: ErrorType {
+pub trait TransferInplace<Word: Copy = u8>: ErrorType {
     /// Writes and reads simultaneously. The contents of `words` are
     /// written to the slave, and the received words are stored into the same
     /// `words` buffer, overwriting it.
-    fn transfer_inplace(&mut self, words: &mut [W]) -> Result<(), Self::Error>;
+    fn transfer_inplace(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
 }
 
-impl<T: TransferInplace<W>, W: Copy> TransferInplace<W> for &mut T {
-    fn transfer_inplace(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
+impl<T: TransferInplace<Word>, Word: Copy> TransferInplace<Word> for &mut T {
+    fn transfer_inplace(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
         T::transfer_inplace(self, words)
     }
 }
 
 /// Blocking read
-pub trait Read<W: Copy = u8>: ErrorType {
+pub trait Read<Word: Copy = u8>: ErrorType {
     /// Reads `words` from the slave.
     ///
     /// The word value sent on MOSI during reading is implementation-defined,
     /// typically `0x00`, `0xFF`, or configurable.
-    fn read(&mut self, words: &mut [W]) -> Result<(), Self::Error>;
+    fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
 }
 
-impl<T: Read<W>, W: Copy> Read<W> for &mut T {
-    fn read(&mut self, words: &mut [W]) -> Result<(), Self::Error> {
+impl<T: Read<Word>, Word: Copy> Read<Word> for &mut T {
+    fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
         T::read(self, words)
     }
 }
 
 /// Blocking write
-pub trait Write<W: Copy = u8>: ErrorType {
+pub trait Write<Word: Copy = u8>: ErrorType {
     /// Writes `words` to the slave, ignoring all the incoming words
-    fn write(&mut self, words: &[W]) -> Result<(), Self::Error>;
+    fn write(&mut self, words: &[Word]) -> Result<(), Self::Error>;
 }
 
-impl<T: Write<W>, W: Copy> Write<W> for &mut T {
-    fn write(&mut self, words: &[W]) -> Result<(), Self::Error> {
+impl<T: Write<Word>, Word: Copy> Write<Word> for &mut T {
+    fn write(&mut self, words: &[Word]) -> Result<(), Self::Error> {
         T::write(self, words)
     }
 }
 
 /// Blocking write (iterator version)
-pub trait WriteIter<W: Copy = u8>: ErrorType {
+pub trait WriteIter<Word: Copy = u8>: ErrorType {
     /// Writes `words` to the slave, ignoring all the incoming words
     fn write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
     where
-        WI: IntoIterator<Item = W>;
+        WI: IntoIterator<Item = Word>;
 }
 
-impl<T: WriteIter<W>, W: Copy> WriteIter<W> for &mut T {
+impl<T: WriteIter<Word>, Word: Copy> WriteIter<Word> for &mut T {
     fn write_iter<WI>(&mut self, words: WI) -> Result<(), Self::Error>
     where
-        WI: IntoIterator<Item = W>,
+        WI: IntoIterator<Item = Word>,
     {
         T::write_iter(self, words)
     }
@@ -83,26 +83,26 @@ impl<T: WriteIter<W>, W: Copy> WriteIter<W> for &mut T {
 ///
 /// This allows composition of SPI operations into a single bus transaction
 #[derive(Debug, PartialEq)]
-pub enum Operation<'a, W: 'static + Copy = u8> {
+pub enum Operation<'a, Word: 'static + Copy = u8> {
     /// Read data into the provided buffer.
-    Read(&'a mut [W]),
+    Read(&'a mut [Word]),
     /// Write data from the provided buffer, discarding read data
-    Write(&'a [W]),
+    Write(&'a [Word]),
     /// Write data out while reading data into the provided buffer
-    Transfer(&'a mut [W], &'a [W]),
+    Transfer(&'a mut [Word], &'a [Word]),
     /// Write data out while reading data into the provided buffer
-    TransferInplace(&'a mut [W]),
+    TransferInplace(&'a mut [Word]),
 }
 
 /// Transactional trait allows multiple actions to be executed
 /// as part of a single SPI transaction
-pub trait Transactional<W: 'static + Copy = u8>: ErrorType {
+pub trait Transactional<Word: 'static + Copy = u8>: ErrorType {
     /// Execute the provided transactions
-    fn exec<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error>;
+    fn exec<'a>(&mut self, operations: &mut [Operation<'a, Word>]) -> Result<(), Self::Error>;
 }
 
-impl<T: Transactional<W>, W: 'static + Copy> Transactional<W> for &mut T {
-    fn exec<'a>(&mut self, operations: &mut [Operation<'a, W>]) -> Result<(), Self::Error> {
+impl<T: Transactional<Word>, Word: 'static + Copy> Transactional<Word> for &mut T {
+    fn exec<'a>(&mut self, operations: &mut [Operation<'a, Word>]) -> Result<(), Self::Error> {
         T::exec(self, operations)
     }
 }
