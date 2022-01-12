@@ -9,3 +9,6 @@
 
 #![deny(missing_docs)]
 #![no_std]
+#![feature(generic_associated_types)]
+
+pub mod delay;

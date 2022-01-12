@@ -5,16 +5,15 @@ on:
 
 name: Clippy check
 jobs:
-  clippy_check:
+  clippy_check-async:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: stable
+          toolchain: nightly
           override: true
           components: clippy
-      - uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - run: cargo clippy
+        working-directory: embedded-hal-async
