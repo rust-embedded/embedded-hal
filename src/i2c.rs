@@ -22,14 +22,13 @@
 //! Here is an example of an embedded-hal implementation of the `Write` trait
 //! for both modes:
 //! ```
-//! # use embedded_hal::i2c::{ErrorKind, SevenBitAddress, TenBitAddress, blocking::Write};
+//! # use embedded_hal::i2c::{ErrorKind, ErrorType, SevenBitAddress, TenBitAddress, blocking::Write};
 //! /// I2C0 hardware peripheral which supports both 7-bit and 10-bit addressing.
 //! pub struct I2c0;
 //!
+//! # impl ErrorType for I2c0 { type Error = ErrorKind; }
 //! impl Write<SevenBitAddress> for I2c0
 //! {
-//! #   type Error = ErrorKind;
-//! #
 //!     fn write(&mut self, addr: u8, output: &[u8]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
@@ -38,8 +37,6 @@
 //!
 //! impl Write<TenBitAddress> for I2c0
 //! {
-//! #   type Error = ErrorKind;
-//! #
 //!     fn write(&mut self, addr: u16, output: &[u8]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
@@ -184,6 +181,18 @@ impl core::fmt::Display for NoAcknowledgeSource {
     }
 }
 
+/// I2C error type trait
+///
+/// This just defines the error type, to be used by the other traits.
+pub trait ErrorType {
+    /// Error type
+    type Error: Error;
+}
+
+impl<T: ErrorType> ErrorType for &mut T {
+    type Error = T::Error;
+}
+
 /// Address mode (7-bit / 10-bit)
 ///
 /// Note: This trait is sealed and should not be implemented outside of this crate.
@@ -202,13 +211,10 @@ impl AddressMode for TenBitAddress {}
 /// Blocking I2C traits
 pub mod blocking {
 
-    use super::{AddressMode, Error, SevenBitAddress};
+    use super::{AddressMode, ErrorType, SevenBitAddress};
 
     /// Blocking read
-    pub trait Read<A: AddressMode = SevenBitAddress> {
-        /// Error type
-        type Error: Error;
-
+    pub trait Read<A: AddressMode = SevenBitAddress>: ErrorType {
         /// Reads enough bytes from slave with `address` to fill `buffer`
         ///
         /// # I2C Events (contract)
@@ -231,18 +237,13 @@ pub mod blocking {
     }
 
     impl<A: AddressMode, T: Read<A>> Read<A> for &mut T {
-        type Error = T::Error;
-
         fn read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error> {
             T::read(self, address, buffer)
         }
     }
 
     /// Blocking write
-    pub trait Write<A: AddressMode = SevenBitAddress> {
-        /// Error type
-        type Error: Error;
-
+    pub trait Write<A: AddressMode = SevenBitAddress>: ErrorType {
         /// Writes bytes to slave with address `address`
         ///
         /// # I2C Events (contract)
@@ -263,18 +264,13 @@ pub mod blocking {
     }
 
     impl<A: AddressMode, T: Write<A>> Write<A> for &mut T {
-        type Error = T::Error;
-
         fn write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error> {
             T::write(self, address, bytes)
         }
     }
 
     /// Blocking write (iterator version)
-    pub trait WriteIter<A: AddressMode = SevenBitAddress> {
-        /// Error type
-        type Error: Error;
-
+    pub trait WriteIter<A: AddressMode = SevenBitAddress>: ErrorType {
         /// Writes bytes to slave with address `address`
         ///
         /// # I2C Events (contract)
@@ -286,8 +282,6 @@ pub mod blocking {
     }
 
     impl<A: AddressMode, T: WriteIter<A>> WriteIter<A> for &mut T {
-        type Error = T::Error;
-
         fn write_iter<B>(&mut self, address: A, bytes: B) -> Result<(), Self::Error>
         where
             B: IntoIterator<Item = u8>,
@@ -297,10 +291,7 @@ pub mod blocking {
     }
 
     /// Blocking write + read
-    pub trait WriteRead<A: AddressMode = SevenBitAddress> {
-        /// Error type
-        type Error: Error;
-
+    pub trait WriteRead<A: AddressMode = SevenBitAddress>: ErrorType {
         /// Writes bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
         /// single transaction*
         ///
@@ -332,8 +323,6 @@ pub mod blocking {
     }
 
     impl<A: AddressMode, T: WriteRead<A>> WriteRead<A> for &mut T {
-        type Error = T::Error;
-
         fn write_read(
             &mut self,
             address: A,
@@ -345,10 +334,7 @@ pub mod blocking {
     }
 
     /// Blocking write (iterator version) + read
-    pub trait WriteIterRead<A: AddressMode = SevenBitAddress> {
-        /// Error type
-        type Error: Error;
-
+    pub trait WriteIterRead<A: AddressMode = SevenBitAddress>: ErrorType {
         /// Writes bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
         /// single transaction*
         ///
@@ -366,8 +352,6 @@ pub mod blocking {
     }
 
     impl<A: AddressMode, T: WriteIterRead<A>> WriteIterRead<A> for &mut T {
-        type Error = T::Error;
-
         fn write_iter_read<B>(
             &mut self,
             address: A,
@@ -395,10 +379,7 @@ pub mod blocking {
     /// Transactional I2C interface.
     ///
     /// This allows combining operations within an I2C transaction.
-    pub trait Transactional<A: AddressMode = SevenBitAddress> {
-        /// Error type
-        type Error: Error;
-
+    pub trait Transactional<A: AddressMode = SevenBitAddress>: ErrorType {
         /// Execute the provided operations on the I2C bus.
         ///
         /// Transaction contract:
@@ -420,8 +401,6 @@ pub mod blocking {
     }
 
     impl<A: AddressMode, T: Transactional<A>> Transactional<A> for &mut T {
-        type Error = T::Error;
-
         fn exec<'a>(
             &mut self,
             address: A,
@@ -434,10 +413,7 @@ pub mod blocking {
     /// Transactional I2C interface (iterator version).
     ///
     /// This allows combining operation within an I2C transaction.
-    pub trait TransactionalIter<A: AddressMode = SevenBitAddress> {
-        /// Error type
-        type Error: Error;
-
+    pub trait TransactionalIter<A: AddressMode = SevenBitAddress>: ErrorType {
         /// Execute the provided operations on the I2C bus (iterator version).
         ///
         /// Transaction contract:
@@ -457,8 +433,6 @@ pub mod blocking {
     }
 
     impl<A: AddressMode, T: TransactionalIter<A>> TransactionalIter<A> for &mut T {
-        type Error = T::Error;
-
         fn exec_iter<'a, O>(&mut self, address: A, operations: O) -> Result<(), Self::Error>
         where
             O: IntoIterator<Item = Operation<'a>>,
