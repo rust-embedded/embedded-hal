@@ -2,6 +2,21 @@
 
 use core::{convert::From, ops::Not};
 
+/// GPIO error type trait
+///
+/// This just defines the error type, to be used by the other traits.
+pub trait ErrorType {
+    /// Error type
+    type Error: core::fmt::Debug;
+}
+
+impl<T: ErrorType> ErrorType for &T {
+    type Error = T::Error;
+}
+impl<T: ErrorType> ErrorType for &mut T {
+    type Error = T::Error;
+}
+
 /// Digital output pin state
 ///
 /// Conversion from `bool` and logical negation are also implemented
@@ -45,10 +60,7 @@ pub mod blocking {
     use super::PinState;
 
     /// Single digital push-pull output pin
-    pub trait OutputPin {
-        /// Error type
-        type Error: core::fmt::Debug;
-
+    pub trait OutputPin: super::ErrorType {
         /// Drives the pin low
         ///
         /// *NOTE* the actual electrical state of the pin may not actually be low, e.g. due to external
@@ -74,8 +86,6 @@ pub mod blocking {
     }
 
     impl<T: OutputPin> OutputPin for &mut T {
-        type Error = T::Error;
-
         fn set_low(&mut self) -> Result<(), Self::Error> {
             T::set_low(self)
         }
@@ -113,27 +123,19 @@ pub mod blocking {
     }
 
     /// Output pin that can be toggled
-    pub trait ToggleableOutputPin {
-        /// Error type
-        type Error: core::fmt::Debug;
-
+    pub trait ToggleableOutputPin: super::ErrorType {
         /// Toggle pin output.
         fn toggle(&mut self) -> Result<(), Self::Error>;
     }
 
     impl<T: ToggleableOutputPin> ToggleableOutputPin for &mut T {
-        type Error = T::Error;
-
         fn toggle(&mut self) -> Result<(), Self::Error> {
             T::toggle(self)
         }
     }
 
     /// Single digital input pin
-    pub trait InputPin {
-        /// Error type
-        type Error: core::fmt::Debug;
-
+    pub trait InputPin: super::ErrorType {
         /// Is the input pin high?
         fn is_high(&self) -> Result<bool, Self::Error>;
 
@@ -142,8 +144,6 @@ pub mod blocking {
     }
 
     impl<T: InputPin> InputPin for &T {
-        type Error = T::Error;
-
         fn is_high(&self) -> Result<bool, Self::Error> {
             T::is_high(self)
         }

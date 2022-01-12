@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - `spi`: traits now enforce all impls on the same struct (eg `Transfer` and `Write`) have the same `Error` type. 
 
+### Changed
+- `digital`: traits now enforce all impls on the same struct have the same `Error` type.
+
 ## [v1.0.0-alpha.6] - 2021-11-19
 
 *** This is (also) an alpha release with breaking changes (sorry) ***
