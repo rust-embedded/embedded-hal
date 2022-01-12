@@ -12,3 +12,4 @@
 #![feature(generic_associated_types)]
 
 pub mod delay;
+pub mod i2c;
