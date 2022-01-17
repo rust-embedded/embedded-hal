@@ -403,7 +403,7 @@
 //!
 //! # fn main() {}
 //! ```
-
+#![feature(negative_impls)]
 #![deny(missing_docs)]
 #![no_std]
 

@@ -136,13 +136,10 @@ pub trait ManagedCs: ErrorType {
     type Inner: ErrorType;
 
     /// Execute the provided closure within a CS assertion
-    fn with_cs<F: FnMut(&mut Self::Inner) -> Result<(), Self::Error>>(
+    fn with_cs<R>(
         &mut self,
-        f: F,
-    ) -> Result<(), Self::Error>;
-
-    /// Reference the inner SPI object without manipulating CS
-    fn inner(&mut self) -> &mut Self::Inner;
+        f: impl FnMut(&mut Self::Inner) -> Result<R, Self::Error>,
+    ) -> Result<R, Self::Error>;
 }
 
 /// Alternate managed CS trait
@@ -163,13 +160,13 @@ pub trait ManagedCs: ErrorType {
 /// ```
 pub trait ManagedCsAlt: ErrorType {
     /// Execute the provided closure within a CS assertion
-    fn with_cs<F: FnMut(&mut Self) -> Result<(), Self::Error>>(
+    fn with_cs<R>(
         &mut self,
-        f: F,
-    ) -> Result<(), Self::Error>;
+        f: impl FnMut(&mut Self) -> Result<R, Self::Error>,
+    ) -> Result<R, Self::Error>;
 }
 
-/// These default conflict with the &mut impls, we could just not have them / require folks to always call [`ManagedCs::with_cs`]?
+/// These defaults conflict with the &mut impls, we could just not have them / require folks to always call [`ManagedCs::with_cs`]?
 mod defaults {
     use super::*;
 
@@ -261,6 +258,22 @@ where
         SpiWithCsError<<Spi as ErrorType>::Error, <Pin as crate::digital::ErrorType>::Error>;
 }
 
+impl<Spi, Pin> SpiWithCs<Spi, Pin>
+where
+    Spi: ErrorType,
+    Pin: crate::digital::blocking::OutputPin + crate::digital::ErrorType,
+{
+    /// Create a new SpiWithCs wrapper using the provided SPI peripheral and CS pin
+    pub fn new(spi: Spi, cs: Pin) -> Self {
+        Self { spi, cs }
+    }
+
+    /// Fetch a reference to the inner SPI object without manipulating CS
+    pub fn inner(&mut self) -> &mut Spi {
+        &mut self.spi
+    }
+}
+
 /// [`ManagedCs`] implementation for [`SpiWithCs`] wrapper.
 /// Provides `with_cs` function that asserts and deasserts CS
 impl<Spi, Pin> ManagedCs for SpiWithCs<Spi, Pin>
@@ -271,10 +284,10 @@ where
     type Inner = Spi;
 
     /// Executes the provided closure within a CS assertion
-    fn with_cs<F: FnMut(&mut Self::Inner) -> Result<(), Self::Error>>(
+    fn with_cs<R>(
         &mut self,
-        mut f: F,
-    ) -> Result<(), Self::Error> {
+        mut f: impl FnMut(&mut Self::Inner) -> Result<R, Self::Error>,
+    ) -> Result<R, Self::Error> {
         self.cs.set_low().map_err(SpiWithCsError::Pin)?;
 
         let r = f(&mut self.spi);
@@ -283,10 +296,17 @@ where
 
         r
     }
+}
 
-    /// Reference the inner SPI object without manipulating CS
-    fn inner(&mut self) -> &mut Self::Inner {
-        &mut self.spi
+impl<T: ManagedCs> ManagedCs for &mut T {
+    type Inner = T::Inner;
+
+    /// Executes the provided closure within a CS assertion
+    fn with_cs<R>(
+        &mut self,
+        f: impl FnMut(&mut Self::Inner) -> Result<R, Self::Error>,
+    ) -> Result<R, Self::Error> {
+        T::with_cs(self, f)
     }
 }
 
@@ -298,10 +318,10 @@ where
     Pin: crate::digital::blocking::OutputPin + crate::digital::ErrorType,
 {
     /// Executes the provided closure within a CS assertion
-    fn with_cs<F: FnMut(&mut Self) -> Result<(), Self::Error>>(
+    fn with_cs<R>(
         &mut self,
-        mut f: F,
-    ) -> Result<(), Self::Error> {
+        mut f: impl FnMut(&mut Self) -> Result<R, Self::Error>,
+    ) -> Result<R, Self::Error> {
         self.cs.set_low().map_err(SpiWithCsError::Pin)?;
 
         let r = f(self);
