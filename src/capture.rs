@@ -47,7 +47,7 @@ pub mod nb {
     /// #     fn disable(&mut self, _: Channel) -> Result<(), Self::Error> { unimplemented!() }
     /// #     fn enable(&mut self, _: Channel) -> Result<(), Self::Error> { unimplemented!() }
     /// #     fn get_resolution(&self) -> Result<MilliSeconds, Self::Error> { unimplemented!() }
-    /// #     fn set_resolution<T>(&mut self, _: T) -> Result<(), Self::Error> where T: Into<MilliSeconds> { Ok(()) }
+    /// #     fn set_resolution(&mut self, _: MilliSeconds) -> Result<(), Self::Error> { Ok(()) }
     /// # }
     /// ```
     // unproven reason: pre-singletons API. With singletons a `CapturePin` (cf. `PwmPin`) trait seems more
@@ -90,9 +90,7 @@ pub mod nb {
         fn get_resolution(&self) -> Result<Self::Time, Self::Error>;
 
         /// Sets the resolution of the capture timer
-        fn set_resolution<R>(&mut self, resolution: R) -> Result<(), Self::Error>
-        where
-            R: Into<Self::Time>;
+        fn set_resolution(&mut self, resolution: Self::Time) -> Result<(), Self::Error>;
     }
 
     impl<T: Capture> Capture for &mut T {
@@ -120,10 +118,7 @@ pub mod nb {
             T::get_resolution(self)
         }
 
-        fn set_resolution<R>(&mut self, resolution: R) -> Result<(), Self::Error>
-        where
-            R: Into<Self::Time>,
-        {
+        fn set_resolution(&mut self, resolution: Self::Time) -> Result<(), Self::Error> {
             T::set_resolution(self, resolution)
         }
     }

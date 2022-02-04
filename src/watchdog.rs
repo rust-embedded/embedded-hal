@@ -44,9 +44,7 @@ pub mod blocking {
         ///
         /// This consumes the value and returns the `Watchdog` trait that you must
         /// `feed()`.
-        fn start<T>(self, period: T) -> Result<Self::Target, Self::Error>
-        where
-            T: Into<Self::Time>;
+        fn start(self, period: Self::Time) -> Result<Self::Target, Self::Error>;
     }
 
     /// Disables a running watchdog timer so the processor won't be reset.

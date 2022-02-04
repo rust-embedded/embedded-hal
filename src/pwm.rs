@@ -47,7 +47,7 @@ pub mod blocking {
     /// #     fn get_max_duty(&self) -> Result<u16, Self::Error> { Ok(0) }
     /// #     fn set_duty(&mut self, _: &Channel, _: u16) -> Result<(), Self::Error> { Ok(()) }
     /// #     fn get_period(&self) -> Result<KiloHertz, Self::Error> { unimplemented!() }
-    /// #     fn set_period<T>(&mut self, _: T) -> Result<(), Self::Error> where T: Into<KiloHertz> { Ok(()) }
+    /// #     fn set_period(&mut self, _: KiloHertz) -> Result<(), Self::Error> { Ok(()) }
     /// # }
     /// ```
     // unproven reason: pre-singletons API. The `PwmPin` trait seems more useful because it models independent
@@ -97,9 +97,7 @@ pub mod blocking {
         ) -> Result<(), Self::Error>;
 
         /// Sets a new PWM period
-        fn set_period<P>(&mut self, period: P) -> Result<(), Self::Error>
-        where
-            P: Into<Self::Time>;
+        fn set_period(&mut self, period: Self::Time) -> Result<(), Self::Error>;
     }
 
     impl<T: Pwm> Pwm for &mut T {
@@ -139,10 +137,7 @@ pub mod blocking {
             T::set_duty(self, channel, duty)
         }
 
-        fn set_period<P>(&mut self, period: P) -> Result<(), Self::Error>
-        where
-            P: Into<Self::Time>,
-        {
+        fn set_period(&mut self, period: Self::Time) -> Result<(), Self::Error> {
             T::set_period(self, period)
         }
     }

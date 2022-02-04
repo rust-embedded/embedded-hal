@@ -56,7 +56,7 @@ pub mod nb {
     /// # impl hal::timer::nb::CountDown for Timer6 {
     /// #     type Error = Infallible;
     /// #     type Time = Seconds;
-    /// #     fn start<T>(&mut self, _: T) -> Result<(), Self::Error> where T: Into<Seconds> { Ok(()) }
+    /// #     fn start(&mut self, _: Seconds) -> Result<(), Self::Error> { Ok(()) }
     /// #     fn wait(&mut self) -> ::nb::Result<(), Infallible> { Ok(()) }
     /// # }
     /// ```
@@ -70,9 +70,7 @@ pub mod nb {
         type Time;
 
         /// Starts a new count down
-        fn start<T>(&mut self, count: T) -> Result<(), Self::Error>
-        where
-            T: Into<Self::Time>;
+        fn start(&mut self, count: Self::Time) -> Result<(), Self::Error>;
 
         /// Non-blockingly "waits" until the count down finishes
         ///
@@ -90,10 +88,7 @@ pub mod nb {
 
         type Time = T::Time;
 
-        fn start<TIME>(&mut self, count: TIME) -> Result<(), Self::Error>
-        where
-            TIME: Into<Self::Time>,
-        {
+        fn start(&mut self, count: Self::Time) -> Result<(), Self::Error> {
             T::start(self, count)
         }
 

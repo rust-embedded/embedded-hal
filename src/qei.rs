@@ -62,7 +62,7 @@ pub mod blocking {
     /// # impl hal::timer::nb::CountDown for Timer6 {
     /// #     type Error = Infallible;
     /// #     type Time = Seconds;
-    /// #     fn start<T>(&mut self, _: T) -> Result<(), Infallible> where T: Into<Seconds> { Ok(()) }
+    /// #     fn start(&mut self, _: Seconds) -> Result<(), Infallible> { Ok(()) }
     /// #     fn wait(&mut self) -> ::nb::Result<(), Infallible> { Ok(()) }
     /// # }
     /// ```
