@@ -26,10 +26,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `i2c`: unify all traits into a single `I2c` trait.
 
 ### Removed
-- Traits with unconstrained associated types and their modules (See: [#324]):
+- Traits with unconstrained associated types and their modules (See: [#324], [#354]):
     - `capture::Capture`
     - `pwm::Pwm`
     - `pwm::PwmPin`
+    - `qei::Qei`
     - `timer::Cancel`
     - `timer::CountDown`
     - `timer::Periodic`
@@ -39,6 +40,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 [#324]: https://github.com/rust-embedded/embedded-hal/pull/324/
+[#354]: https://github.com/rust-embedded/embedded-hal/pull/354
 
 ## [v1.0.0-alpha.6] - 2021-11-19
 
