@@ -258,60 +258,6 @@
 //! # fn main() {}
 //! ```
 //!
-//! - Blocking serial read with timeout
-//!
-//! ```
-//! use embedded_hal as hal;
-//! use hal::nb;
-//!
-//! use hal::serial::nb::Write;
-//! use hal::timer::nb::CountDown;
-//!
-//! enum Error<SE, TE> {
-//!     /// Serial interface error
-//!     Serial(SE),
-//!     /// Timeout error
-//!     TimedOut(TE),
-//! }
-//!
-//! fn read_with_timeout<S, T>(
-//!     serial: &mut S,
-//!     timer: &mut T,
-//!     timeout: T::Time,
-//! ) -> Result<u8, Error<S::Error, T::Error>>
-//! where
-//!     T: hal::timer::nb::CountDown<Error = ()>,
-//!     S: hal::serial::nb::Read<u8>,
-//! {
-//!     timer.start(timeout).map_err(Error::TimedOut)?;
-//!
-//!     loop {
-//!         match serial.read() {
-//!             // raise error
-//!             Err(nb::Error::Other(e)) => return Err(Error::Serial(e)),
-//!             Err(nb::Error::WouldBlock) => {
-//!                 // no data available yet, check the timer below
-//!             },
-//!             Ok(byte) => return Ok(byte),
-//!         }
-//!
-//!         match timer.wait() {
-//!             Err(nb::Error::Other(e)) => {
-//!                 // The error type specified by `timer.wait()` is `!`, which
-//!                 // means no error can actually occur. The Rust compiler
-//!                 // still forces us to provide this match arm, though.
-//!                 unreachable!()
-//!             },
-//!             // no timeout yet, try again
-//!             Err(nb::Error::WouldBlock) => continue,
-//!             Ok(()) => return Err(Error::TimedOut(())),
-//!         }
-//!     }
-//! }
-//!
-//! # fn main() {}
-//! ```
-//!
 //! - Buffered serial interface with periodic flushing in interrupt handler
 //!
 //! ```
@@ -411,16 +357,12 @@ pub mod fmt;
 pub use nb;
 pub mod adc;
 pub mod can;
-pub mod capture;
 pub mod delay;
 pub mod digital;
 pub mod i2c;
-pub mod pwm;
 pub mod qei;
 pub mod serial;
 pub mod spi;
-pub mod timer;
-pub mod watchdog;
 
 mod private {
     use crate::i2c::{SevenBitAddress, TenBitAddress};
