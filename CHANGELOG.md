@@ -25,6 +25,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `i2c`: traits now enforce all impls on the same struct have the same `Error` type.
 - `i2c`: unify all traits into a single `I2c` trait.
 
+### Removed
+- Traits with unconstrained associated types and their modules (See: [#324]):
+    - `capture::Capture`
+    - `pwm::Pwm`
+    - `pwm::PwmPin`
+    - `timer::Cancel`
+    - `timer::CountDown`
+    - `timer::Periodic`
+    - `watchdog::Disable`
+    - `watchdog::Enable`
+    - `watchdog::Watchdog`
+
+
+[#324]: https://github.com/rust-embedded/embedded-hal/pull/324/
+
 ## [v1.0.0-alpha.6] - 2021-11-19
 
 *** This is (also) an alpha release with breaking changes (sorry) ***
