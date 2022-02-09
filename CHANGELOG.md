@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v0.2.7] - 2022-02-09
+
+### Added
+
 - Backport CAN interface from the upcoming 1.0 release.
 
 ## [v0.2.6] - 2021-08-03
@@ -126,7 +130,8 @@ Backported non-breaking changes from the upcoming 1.0 release:
 
 Initial release
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.6...v0.2.x
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.7...v0.2.x
+[v0.2.7]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.6...v0.2.7
 [v0.2.6]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.5...v0.2.6
 [v0.2.5]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.4...v0.2.5
 [v0.2.4]: https://github.com/rust-embedded/embedded-hal/compare/v0.2.3...v0.2.4
