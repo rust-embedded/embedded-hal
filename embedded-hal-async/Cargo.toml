@@ -14,4 +14,4 @@ repository = "https://github.com/rust-embedded/embedded-hal"
 version = "0.0.1"
 
 [dependencies]
-embedded-hal = { version = "=1.0.0-alpha.6", path = ".." }
+embedded-hal = { version = "=1.0.0-alpha.7", path = ".." }

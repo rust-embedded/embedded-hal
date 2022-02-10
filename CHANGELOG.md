@@ -7,21 +7,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v1.0.0-alpha.7] - 2022-02-09
+
+*** This is (also) an alpha release with breaking changes (sorry) ***
+
 ### Added
-- `Error` traits for Can, SPI, I2C and Serial are implemented for Infallible
+- `Error` traits for CAN, SPI, I2C and Serial are implemented for `Infallible`.
 
 ### Fixed
 - Fixed blanket impl of `DelayUs` not covering the `delay_ms` method.
-### Changed
-- `spi`: traits now enforce all impls on the same struct (eg `Transfer` and `Write`) have the same `Error` type. 
 
 ### Changed
+- `spi`: traits now enforce all impls on the same struct (eg `Transfer` and `Write`) have the same `Error` type.
 - `digital`: traits now enforce all impls on the same struct have the same `Error` type.
-
-### Changed
 - `serial`: traits now enforce all impls on the same struct have the same `Error` type.
-
-### Changed
 - `i2c`: traits now enforce all impls on the same struct have the same `Error` type.
 - `i2c`: unify all traits into a single `I2c` trait.
 
@@ -99,8 +98,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - `Transactional` SPI interface for executing groups of SPI transactions.
 - `Transactional` I2C interface for executing groups of I2C transactions.
-
-### Changed
 
 
 ## [v1.0.0-alpha.2] - 2020-10-16
@@ -228,7 +225,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.6...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.7...HEAD
+[v1.0.0-alpha.7]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.6...v1.0.0-alpha.7
 [v1.0.0-alpha.6]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.5...v1.0.0-alpha.6
 [v1.0.0-alpha.5]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.4...v1.0.0-alpha.5
 [v1.0.0-alpha.4]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.3...v1.0.0-alpha.4
