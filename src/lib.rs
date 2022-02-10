@@ -360,7 +360,6 @@ pub mod can;
 pub mod delay;
 pub mod digital;
 pub mod i2c;
-pub mod qei;
 pub mod serial;
 pub mod spi;
 
