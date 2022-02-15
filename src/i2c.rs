@@ -244,7 +244,7 @@ impl<T: ErrorType> ErrorType for &mut T {
 /// Address mode (7-bit / 10-bit)
 ///
 /// Note: This trait is sealed and should not be implemented outside of this crate.
-pub trait AddressMode: private::Sealed {}
+pub trait AddressMode: private::Sealed + 'static {}
 
 /// 7-bit address mode type
 pub type SevenBitAddress = u8;

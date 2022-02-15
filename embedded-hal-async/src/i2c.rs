@@ -107,9 +107,10 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     ) -> Self::WriteReadFuture<'a>;
 
     /// Future returned by the `transaction` method.
-    type TransactionFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type TransactionFuture<'a, 'b>: Future<Output = Result<(), Self::Error>> + 'a
     where
-        Self: 'a;
+        Self: 'a,
+        'b: 'a;
 
     /// Execute the provided operations on the I2C bus as a single transaction.
     ///
@@ -124,11 +125,11 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `SAD+R/W` = slave address followed by bit 1 to indicate reading or 0 to indicate writing
     /// - `SR` = repeated start condition
     /// - `SP` = stop condition
-    fn transaction<'a>(
+    fn transaction<'a, 'b>(
         &'a mut self,
         address: A,
-        operations: &mut [Operation<'a>],
-    ) -> Self::TransactionFuture<'a>;
+        operations: &'a mut [Operation<'b>],
+    ) -> Self::TransactionFuture<'a, 'b>;
 }
 
 impl<A: AddressMode, T: I2c<A>> I2c<A> for &mut T {
@@ -164,16 +165,17 @@ impl<A: AddressMode, T: I2c<A>> I2c<A> for &mut T {
         T::write_read(self, address, bytes, buffer)
     }
 
-    type TransactionFuture<'a>
+    type TransactionFuture<'a, 'b>
     where
         Self: 'a,
-    = T::TransactionFuture<'a>;
+        'b: 'a,
+    = T::TransactionFuture<'a, 'b>;
 
-    fn transaction<'a>(
+    fn transaction<'a, 'b>(
         &'a mut self,
         address: A,
-        operations: &mut [Operation<'a>],
-    ) -> Self::TransactionFuture<'a> {
+        operations: &'a mut [Operation<'b>],
+    ) -> Self::TransactionFuture<'a, 'b> {
         T::transaction(self, address, operations)
     }
 }
