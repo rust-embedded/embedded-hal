@@ -84,6 +84,8 @@ pub enum ErrorKind {
     ModeFault,
     /// Received data does not conform to the peripheral configuration
     FrameFormat,
+    /// An error occured while asserting or deasserting the Chip Select pin.
+    ChipSelectFault,
     /// A different error occurred. The original error may contain more information.
     Other,
 }
@@ -105,6 +107,10 @@ impl core::fmt::Display for ErrorKind {
             Self::FrameFormat => write!(
                 f,
                 "Received data does not conform to the peripheral configuration"
+            ),
+            Self::ChipSelectFault => write!(
+                f,
+                "An error occured while asserting or deasserting the Chip Select pin"
             ),
             Self::Other => write!(
                 f,
