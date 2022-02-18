@@ -172,6 +172,54 @@ pub trait SpiDevice: ErrorType {
         &mut self,
         f: impl FnOnce(&mut Self::Bus) -> Result<R, <Self::Bus as ErrorType>::Error>,
     ) -> Result<R, Self::Error>;
+
+    /// Do a write within a transaction.
+    ///
+    /// This is a convenience method equivalent to `device.transaction(|bus| bus.write(buf))`.
+    ///
+    /// See also: [`SpiDevice::transaction`], [`SpiBusWrite::write`]
+    fn write(&mut self, buf: &[u8]) -> Result<(), Self::Error>
+    where
+        Self::Bus: SpiBusWrite,
+    {
+        self.transaction(|bus| bus.write(buf))
+    }
+
+    /// Do a read within a transaction.
+    ///
+    /// This is a convenience method equivalent to `device.transaction(|bus| bus.read(buf))`.
+    ///
+    /// See also: [`SpiDevice::transaction`], [`SpiBusRead::read`]
+    fn read(&mut self, buf: &mut [u8]) -> Result<(), Self::Error>
+    where
+        Self::Bus: SpiBusRead,
+    {
+        self.transaction(|bus| bus.read(buf))
+    }
+
+    /// Do a transfer within a transaction.
+    ///
+    /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer(read, write))`.
+    ///
+    /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer`]
+    fn transfer(&mut self, read: &mut [u8], write: &[u8]) -> Result<(), Self::Error>
+    where
+        Self::Bus: SpiBus,
+    {
+        self.transaction(|bus| bus.transfer(read, write))
+    }
+
+    /// Do an in-place transfer within a transaction.
+    ///
+    /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer_in_place(buf))`.
+    ///
+    /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer_in_place`]
+    fn transfer_in_place(&mut self, buf: &mut [u8]) -> Result<(), Self::Error>
+    where
+        Self::Bus: SpiBus,
+    {
+        self.transaction(|bus| bus.transfer_in_place(buf))
+    }
 }
 
 impl<T: SpiDevice> SpiDevice for &mut T {
