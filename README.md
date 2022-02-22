@@ -52,6 +52,7 @@ version and an `-alpha` version side by side in a HAL.
 
 - [How-to: add a new trait](docs/how-to-add-a-new-trait.md)
 - [Version policy](docs/version-policy.md)
+- [MSRV](docs/msrv.md)
 
 ## Implementations and drivers
 
@@ -72,6 +73,8 @@ on crates.io.
 
 This crate is guaranteed to compile on stable Rust 1.46 and up. It *might*
 compile with older versions but that may change in any new patch release.
+
+See [here](docs/msrv.md) for details on how the MSRV may be upgraded.
 
 ## License
 
