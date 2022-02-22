@@ -295,7 +295,12 @@ pub trait SpiBusRead<Word: Copy = u8>: ErrorType {
     ///
     /// Implementations are allowed to return before the operation is
     /// complete. See the [module-level documentation](self) for details.
-    fn read_slice(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
+    fn read_slice(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
+        for word in words {
+            *word = self.read_word()?;
+        }
+        Ok(())
+    }
 }
 
 impl<T: SpiBusRead<Word>, Word: Copy> SpiBusRead<Word> for &mut T {
@@ -320,7 +325,13 @@ pub trait SpiBusWrite<Word: Copy = u8>: ErrorType {
     ///
     /// Implementations are allowed to return before the operation is
     /// complete. See the [module-level documentation](self) for details.
-    fn write_slice(&mut self, words: &[Word]) -> Result<(), Self::Error>;
+    fn write_slice(&mut self, words: &[Word]) -> Result<(), Self::Error> {
+        for word in words {
+            self.write_word(*word)?;
+        }
+
+        Ok(())
+    }
 }
 
 impl<T: SpiBusWrite<Word>, Word: Copy> SpiBusWrite<Word> for &mut T {
@@ -356,7 +367,19 @@ pub trait SpiBus<Word: Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
     ///
     /// Implementations are allowed to return before the operation is
     /// complete. See the [module-level documentation](self) for details.
-    fn transfer_slice(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error>;
+    fn transfer_slice(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
+        for (read_word, write_word) in read.iter_mut().zip(write) {
+            *read_word = self.transfer_word(*write_word)?;
+        }
+
+        let transfered_words = core::cmp::min(read.len(), write.len());
+
+        match read.len().cmp(&write.len()) {
+            core::cmp::Ordering::Less => self.write_slice(&write[transfered_words..]),
+            core::cmp::Ordering::Equal => Ok(()),
+            core::cmp::Ordering::Greater => self.read_slice(&mut read[transfered_words..]),
+        }
+    }
 
     /// Write and read simultaneously. The contents of `words` are
     /// written to the slave, and the received words are stored into the same
@@ -364,7 +387,12 @@ pub trait SpiBus<Word: Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
     ///
     /// Implementations are allowed to return before the operation is
     /// complete. See the [module-level documentation](self) for details.
-    fn transfer_slice_in_place(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
+    fn transfer_slice_in_place(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
+        for word in words {
+            *word = self.transfer_word(*word)?;
+        }
+        Ok(())
+    }
 }
 
 impl<T: SpiBus<Word>, Word: Copy> SpiBus<Word> for &mut T {
