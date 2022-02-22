@@ -54,8 +54,17 @@ version and an `-alpha` version side by side in a HAL.
 - [Version policy](docs/version-policy.md)
 
 ## Implementations and drivers
-For a list of `embedded-hal` implementations and driver crates check the [awesome-embedded-rust]
-list.
+
+For a non-exhaustive list of `embedded-hal` implementations and driver crates check the
+[awesome-embedded-rust] list.
+
+You may be able to find even more HAL implementation crates and driver crates by searching for the
+[`embedded-hal-impl`], [`embedded-hal-driver`] and [`embedded-hal`][embedded-hal-kw] keywords
+on crates.io.
+
+[`embedded-hal-impl`]: https://crates.io/keywords/embedded-hal-impl
+[`embedded-hal-driver`]: https://crates.io/keywords/embedded-hal-driver
+[embedded-hal-kw]: https://crates.io/keywords/embedded-hal
 
 [awesome-embedded-rust]: https://github.com/rust-embedded/awesome-embedded-rust#driver-crates
 
