@@ -78,8 +78,8 @@
 //!
 //!         // `transaction` asserts and deasserts CS for us. No need to do it manually!
 //!         self.spi.transaction(|bus| {
-//!             bus.write(&[0x90])?;
-//!             bus.read(&mut buf)
+//!             bus.write_slice(&[0x90])?;
+//!             bus.read_slice(&mut buf)
 //!         }).map_err(MyError::Spi)?;
 //!
 //!         Ok(buf)
@@ -113,8 +113,8 @@
 //!
 //!     pub fn read_foo(&mut self) -> Result<[u8; 2], MyError<SPI::Error>> {
 //!         let mut buf = [0; 2];
-//!         self.spi.write(&[0x90]).map_err(MyError::Spi)?;
-//!         self.spi.read(&mut buf).map_err(MyError::Spi)?;
+//!         self.spi.write_slice(&[0x90]).map_err(MyError::Spi)?;
+//!         self.spi.read_slice(&mut buf).map_err(MyError::Spi)?;
 //!         Ok(buf)
 //!     }
 //! }
@@ -202,54 +202,54 @@ pub trait SpiDevice: ErrorType {
 
     /// Do a write within a transaction.
     ///
-    /// This is a convenience method equivalent to `device.transaction(|bus| bus.write(buf))`.
+    /// This is a convenience method equivalent to `device.transaction(|bus| bus.write_slice(buf))`.
     ///
-    /// See also: [`SpiDevice::transaction`], [`SpiBusWrite::write`]
-    fn write<Word>(&mut self, buf: &[Word]) -> Result<(), Self::Error>
+    /// See also: [`SpiDevice::transaction`], [`SpiBusWrite::write_slice`]
+    fn write_slice<Word>(&mut self, buf: &[Word]) -> Result<(), Self::Error>
     where
         Self::Bus: SpiBusWrite<Word>,
         Word: Copy,
     {
-        self.transaction(|bus| bus.write(buf))
+        self.transaction(|bus| bus.write_slice(buf))
     }
 
     /// Do a read within a transaction.
     ///
-    /// This is a convenience method equivalent to `device.transaction(|bus| bus.read(buf))`.
+    /// This is a convenience method equivalent to `device.transaction(|bus| bus.read_slice(buf))`.
     ///
-    /// See also: [`SpiDevice::transaction`], [`SpiBusRead::read`]
-    fn read<Word>(&mut self, buf: &mut [Word]) -> Result<(), Self::Error>
+    /// See also: [`SpiDevice::transaction`], [`SpiBusRead::read_slice`]
+    fn read_slice<Word>(&mut self, buf: &mut [Word]) -> Result<(), Self::Error>
     where
         Self::Bus: SpiBusRead<Word>,
         Word: Copy,
     {
-        self.transaction(|bus| bus.read(buf))
+        self.transaction(|bus| bus.read_slice(buf))
     }
 
     /// Do a transfer within a transaction.
     ///
-    /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer(read, write))`.
+    /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer_slice(read, write))`.
     ///
-    /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer`]
-    fn transfer<Word>(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error>
+    /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer_slice`]
+    fn transfer_slice<Word>(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error>
     where
         Self::Bus: SpiBus<Word>,
         Word: Copy,
     {
-        self.transaction(|bus| bus.transfer(read, write))
+        self.transaction(|bus| bus.transfer_slice(read, write))
     }
 
     /// Do an in-place transfer within a transaction.
     ///
-    /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer_in_place(buf))`.
+    /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer_slice_in_place(buf))`.
     ///
-    /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer_in_place`]
-    fn transfer_in_place<Word>(&mut self, buf: &mut [Word]) -> Result<(), Self::Error>
+    /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer_slice_in_place`]
+    fn transfer_slice_in_place<Word>(&mut self, buf: &mut [Word]) -> Result<(), Self::Error>
     where
         Self::Bus: SpiBus<Word>,
         Word: Copy,
     {
-        self.transaction(|bus| bus.transfer_in_place(buf))
+        self.transaction(|bus| bus.transfer_slice_in_place(buf))
     }
 }
 
@@ -286,12 +286,12 @@ pub trait SpiBusRead<Word: Copy = u8>: SpiBusFlush {
     ///
     /// Implementations are allowed to return before the operation is
     /// complete. See the [module-level documentation](self) for details.
-    fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
+    fn read_slice(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
 }
 
 impl<T: SpiBusRead<Word>, Word: Copy> SpiBusRead<Word> for &mut T {
-    fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
-        T::read(self, words)
+    fn read_slice(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
+        T::read_slice(self, words)
     }
 }
 
@@ -301,12 +301,12 @@ pub trait SpiBusWrite<Word: Copy = u8>: SpiBusFlush {
     ///
     /// Implementations are allowed to return before the operation is
     /// complete. See the [module-level documentation](self) for details.
-    fn write(&mut self, words: &[Word]) -> Result<(), Self::Error>;
+    fn write_slice(&mut self, words: &[Word]) -> Result<(), Self::Error>;
 }
 
 impl<T: SpiBusWrite<Word>, Word: Copy> SpiBusWrite<Word> for &mut T {
-    fn write(&mut self, words: &[Word]) -> Result<(), Self::Error> {
-        T::write(self, words)
+    fn write_slice(&mut self, words: &[Word]) -> Result<(), Self::Error> {
+        T::write_slice(self, words)
     }
 }
 
@@ -327,7 +327,7 @@ pub trait SpiBus<Word: Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
     ///
     /// Implementations are allowed to return before the operation is
     /// complete. See the [module-level documentation](self) for details.
-    fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error>;
+    fn transfer_slice(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error>;
 
     /// Write and read simultaneously. The contents of `words` are
     /// written to the slave, and the received words are stored into the same
@@ -335,16 +335,16 @@ pub trait SpiBus<Word: Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
     ///
     /// Implementations are allowed to return before the operation is
     /// complete. See the [module-level documentation](self) for details.
-    fn transfer_in_place(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
+    fn transfer_slice_in_place(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
 }
 
 impl<T: SpiBus<Word>, Word: Copy> SpiBus<Word> for &mut T {
-    fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
-        T::transfer(self, read, write)
+    fn transfer_slice(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
+        T::transfer_slice(self, read, write)
     }
 
-    fn transfer_in_place(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
-        T::transfer_in_place(self, words)
+    fn transfer_slice_in_place(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
+        T::transfer_slice_in_place(self, words)
     }
 }
 
