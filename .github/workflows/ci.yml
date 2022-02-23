@@ -21,7 +21,7 @@ jobs:
 
         include:
           # Test MSRV
-          - rust: 1.46.0
+          - rust: 1.54.0
             TARGET: x86_64-unknown-linux-gnu
 
           # Test nightly but don't fail
