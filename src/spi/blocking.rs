@@ -178,9 +178,10 @@ pub trait SpiDevice: ErrorType {
     /// This is a convenience method equivalent to `device.transaction(|bus| bus.write(buf))`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBusWrite::write`]
-    fn write(&mut self, buf: &[u8]) -> Result<(), Self::Error>
+    fn write<Word>(&mut self, buf: &[Word]) -> Result<(), Self::Error>
     where
-        Self::Bus: SpiBusWrite,
+        Self::Bus: SpiBusWrite<Word>,
+        Word: Copy,
     {
         self.transaction(|bus| bus.write(buf))
     }
@@ -190,9 +191,10 @@ pub trait SpiDevice: ErrorType {
     /// This is a convenience method equivalent to `device.transaction(|bus| bus.read(buf))`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBusRead::read`]
-    fn read(&mut self, buf: &mut [u8]) -> Result<(), Self::Error>
+    fn read<Word>(&mut self, buf: &mut [Word]) -> Result<(), Self::Error>
     where
-        Self::Bus: SpiBusRead,
+        Self::Bus: SpiBusRead<Word>,
+        Word: Copy,
     {
         self.transaction(|bus| bus.read(buf))
     }
@@ -202,9 +204,10 @@ pub trait SpiDevice: ErrorType {
     /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer(read, write))`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer`]
-    fn transfer(&mut self, read: &mut [u8], write: &[u8]) -> Result<(), Self::Error>
+    fn transfer<Word>(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error>
     where
-        Self::Bus: SpiBus,
+        Self::Bus: SpiBus<Word>,
+        Word: Copy,
     {
         self.transaction(|bus| bus.transfer(read, write))
     }
@@ -214,9 +217,10 @@ pub trait SpiDevice: ErrorType {
     /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer_in_place(buf))`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer_in_place`]
-    fn transfer_in_place(&mut self, buf: &mut [u8]) -> Result<(), Self::Error>
+    fn transfer_in_place<Word>(&mut self, buf: &mut [Word]) -> Result<(), Self::Error>
     where
-        Self::Bus: SpiBus,
+        Self::Bus: SpiBus<Word>,
+        Word: Copy,
     {
         self.transaction(|bus| bus.transfer_in_place(buf))
     }
