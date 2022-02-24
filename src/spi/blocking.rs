@@ -143,7 +143,7 @@
 //!
 //! # Flushing
 //!
-//! To improve performance, Bus implementations are allowed to return before the operation is finished, i.e. when the bus is still not
+//! To improve performance, [`SpiBus`] implementations are allowed to return before the operation is finished, i.e. when the bus is still not
 //! idle.
 //!
 //! When using a [`SpiBus`], call [`flush`](SpiBusFlush::flush) to wait for operations to actually finish. Examples of situations
