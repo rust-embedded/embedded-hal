@@ -13,6 +13,8 @@ We follow these rules when upgrading it:
 
 - We will not update the MSRV on any patch release: \_.\_.*Z*.
 - We may upgrade the MSRV on any *major* or *minor* release: *X*.*Y*.\_.
+- We may upgrade the MSRV in any preliminary version release (e.g. an `-alpha` release) as
+  these serve as preparation for the final release.
 - MSRV upgrades will be clearly stated in the changelog.
 
 This applies both to `0._._` releases as well as `>=1._._` releases.
