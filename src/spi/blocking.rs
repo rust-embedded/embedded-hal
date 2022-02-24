@@ -140,6 +140,32 @@
 //!
 //! HALs **must not** add infrastructure for sharing at the [`SpiBus`] level. User code owning a [`SpiBus`] must have the guarantee
 //! of exclusive access.
+//!
+//! # Flushing
+//!
+//! To improve performance, [`SpiBus`] implementations are allowed to return before the operation is finished, i.e. when the bus is still not
+//! idle.
+//!
+//! When using a [`SpiBus`], call [`flush`](SpiBusFlush::flush) to wait for operations to actually finish. Examples of situations
+//! where this is needed are:
+//! - To synchronize SPI activity and GPIO activity, for example before deasserting a CS pin.
+//! - Before deinitializing the hardware SPI peripheral.
+//!
+//! When using a [`SpiDevice`], you can still call [`flush`](SpiBusFlush::flush) on the bus within a transaction.
+//! It's very rarely needed, because [`transaction`](SpiDevice::transaction) already flushes for you
+//! before deasserting CS. For example, you may need it to synchronize with GPIOs other than CS, such as DCX pins
+//! sometimes found in SPI displays.
+//!
+//! For example, for [`write`](SpiBusWrite::write) operations, it is common for hardware SPI peripherals to have a small
+//! FIFO buffer, usually 1-4 bytes. Software writes data to the FIFO, and the peripheral sends it on MOSI at its own pace,
+//! at the specified SPI frequency. It is allowed for an implementation of [`write`](SpiBusWrite::write) to return as soon
+//! as all the data has been written to the FIFO, before it is actually sent. Calling [`flush`](SpiBusFlush::flush) would
+//! wait until all the bits have actually been sent, the FIFO is empty, and the bus is idle.
+//!
+//! This still applies to other operations such as [`read`](SpiBusRead::read) or [`transfer`](SpiBus::transfer). It is less obvious
+//! why, because these methods can't return before receiving all the read data. However it's still technically possible
+//! for them to return before the bus is idle. For example, assuming SPI mode 0, the last bit is sampled on the first (rising) edge
+//! of SCK, at which point a method could return, but the second (falling) SCK edge still has to happen before the bus is idle.
 
 use core::fmt::Debug;
 
@@ -162,6 +188,7 @@ pub trait SpiDevice: ErrorType {
     /// - Locks the bus
     /// - Asserts the CS (Chip Select) pin.
     /// - Calls `f` with an exclusive reference to the bus, which can then be used to do transfers against the device.
+    /// - [Flushes](SpiBusFlush::flush) the bus.
     /// - Deasserts the CS pin.
     /// - Unlocks the bus.
     ///
@@ -236,12 +263,29 @@ impl<T: SpiDevice> SpiDevice for &mut T {
     }
 }
 
+/// Flush support for SPI bus
+pub trait SpiBusFlush: ErrorType {
+    /// Blocks until all operations have completed and the bus is idle.
+    ///
+    /// See the [module-level documentation](self) for important usage information.
+    fn flush(&mut self) -> Result<(), Self::Error>;
+}
+
+impl<T: SpiBusFlush> SpiBusFlush for &mut T {
+    fn flush(&mut self) -> Result<(), Self::Error> {
+        T::flush(self)
+    }
+}
+
 /// Read-only SPI bus
-pub trait SpiBusRead<Word: Copy = u8>: ErrorType {
+pub trait SpiBusRead<Word: Copy = u8>: SpiBusFlush {
     /// Reads `words` from the slave.
     ///
     /// The word value sent on MOSI during reading is implementation-defined,
     /// typically `0x00`, `0xFF`, or configurable.
+    ///
+    /// Implementations are allowed to return before the operation is
+    /// complete. See the [module-level documentation](self) for detials.
     fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
 }
 
@@ -252,8 +296,11 @@ impl<T: SpiBusRead<Word>, Word: Copy> SpiBusRead<Word> for &mut T {
 }
 
 /// Write-only SPI bus
-pub trait SpiBusWrite<Word: Copy = u8>: ErrorType {
+pub trait SpiBusWrite<Word: Copy = u8>: SpiBusFlush {
     /// Writes `words` to the slave, ignoring all the incoming words
+    ///
+    /// Implementations are allowed to return before the operation is
+    /// complete. See the [module-level documentation](self) for detials.
     fn write(&mut self, words: &[Word]) -> Result<(), Self::Error>;
 }
 
@@ -277,11 +324,17 @@ pub trait SpiBus<Word: Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
     /// incoming words after `read` has been filled will be discarded. If `write` is shorter,
     /// the value of words sent in MOSI after all `write` has been sent is implementation-defined,
     /// typically `0x00`, `0xFF`, or configurable.
+    ///
+    /// Implementations are allowed to return before the operation is
+    /// complete. See the [module-level documentation](self) for detials.
     fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error>;
 
     /// Writes and reads simultaneously. The contents of `words` are
     /// written to the slave, and the received words are stored into the same
     /// `words` buffer, overwriting it.
+    ///
+    /// Implementations are allowed to return before the operation is
+    /// complete. See the [module-level documentation](self) for detials.
     fn transfer_in_place(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
 }
 
@@ -335,7 +388,7 @@ impl<BUS, CS> ExclusiveDevice<BUS, CS> {
 
 impl<BUS, CS> ErrorType for ExclusiveDevice<BUS, CS>
 where
-    BUS: ErrorType,
+    BUS: SpiBusFlush,
     CS: OutputPin,
 {
     type Error = ExclusiveDeviceError<BUS::Error, CS::Error>;
@@ -343,7 +396,7 @@ where
 
 impl<BUS, CS> SpiDevice for ExclusiveDevice<BUS, CS>
 where
-    BUS: ErrorType,
+    BUS: SpiBusFlush,
     CS: OutputPin,
 {
     type Bus = BUS;
@@ -356,10 +409,12 @@ where
 
         let f_res = f(&mut self.bus);
 
-        // If the closure fails, it's important to still deassert CS.
+        // On failure, it's important to still flush and deassert CS.
+        let flush_res = self.bus.flush();
         let cs_res = self.cs.set_high();
 
         let f_res = f_res.map_err(ExclusiveDeviceError::Spi)?;
+        flush_res.map_err(ExclusiveDeviceError::Spi)?;
         cs_res.map_err(ExclusiveDeviceError::Cs)?;
 
         Ok(f_res)
