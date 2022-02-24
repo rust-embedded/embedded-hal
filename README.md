@@ -30,7 +30,7 @@ these drivers for their platform.
 
 For functionality that goes beyond what is provided by `embedded-hal`, users are encouraged
 to use the target platform directly. Abstractions of common functionality can be proposed to be
-included into `embedded-hal` as described [below](#how-to-add-a-new-trait), though.
+included into `embedded-hal` as described [in this guide](docs/how-to-add-a-new-trait.md), though.
 
 See more about the design goals in [this documentation section](https://docs.rs/embedded-hal/latest/embedded_hal/#design-goals).
 
@@ -43,63 +43,38 @@ They are provided as early previews for community testing and preparation for th
 If you use an alpha release, we recommend you choose an exact version specification in your
 `Cargo.toml` like: `embedded-hal = "=1.0.0-alpha.2"`
 
-See below for a way to implement both an `embedded-hal` `0.2.x` version and an `-alpha` version
-side by side in a HAL.
+See [this guide](docs/version-policy.md) for a way to implement both an `embedded-hal` `0.2.x`
+version and an `-alpha` version side by side in a HAL.
 
 [#177]: https://github.com/rust-embedded/embedded-hal/issues/177
 
-## How-to: add a new trait
+## Documents
 
-This is the suggested approach to adding a new trait to `embedded-hal`
-
-### Research / Discussion
-
-Ideally, before proposing a new trait, or set of traits, you should check for an existing issue
-suggesting the need for the trait, as well as any related works / use cases / requirements that
-are useful to consider in the design of the trait.
-
-These issues will be labeled as `discussion` in the issue tracker.
-
-### Implementation / Demonstration
-
-Proposed traits should then be implemented and demonstrated, either by forking `embedded-hal` or by creating a new crate with the intent of integrating this into `embedded-hal` once the traits have stabilized. You may find [cargo workspaces](https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html) and [patch](https://doc.rust-lang.org/edition-guide/rust-2018/cargo-and-crates-io/replacing-dependencies-with-patch.html) useful for the forking approach.
-
-Traits should be demonstrated with at least *two* implementations on different platforms and *one* generic driver built on the trait. Where it is possible we suggest an implementation on a microcontroller, and implementation for [linux](https://github.com/rust-embedded/linux-embedded-hal), and a driver (or drivers where requirements are more complex) with bounds using the trait.
-
-### Proposing a trait
-
-Once the trait has been demonstrated a PR should be opened to merge the new trait(s) into `embedded-hal`. This should include a link to the previous discussion issue.
-
-If there is determined to be more than one alternative then there should be further discussion to
-try to single out the best option. Once there is consensus this will be merged into the `embedded-hal` repository.
-
-These issues / PRs will be labeled as `proposal`s in the issue tracker.
-
+- [How-to: add a new trait](docs/how-to-add-a-new-trait.md)
+- [Version policy](docs/version-policy.md)
+- [MSRV](docs/msrv.md)
 
 ## Implementations and drivers
 
-For a list of `embedded-hal` implementations and driver crates check the [awesome-embedded-rust]
-list.
+For a non-exhaustive list of `embedded-hal` implementations and driver crates check the
+[awesome-embedded-rust] list.
+
+You may be able to find even more HAL implementation crates and driver crates by searching for the
+[`embedded-hal-impl`], [`embedded-hal-driver`] and [`embedded-hal`][embedded-hal-kw] keywords
+on crates.io.
+
+[`embedded-hal-impl`]: https://crates.io/keywords/embedded-hal-impl
+[`embedded-hal-driver`]: https://crates.io/keywords/embedded-hal-driver
+[embedded-hal-kw]: https://crates.io/keywords/embedded-hal
 
 [awesome-embedded-rust]: https://github.com/rust-embedded/awesome-embedded-rust#driver-crates
-
-### Supporting different (alpha and non-alpha) HALs
-
-[embedded-hal-compat](https://github.com/ryankurte/embedded-hal-compat) provides shims
-to support interoperability between the latest `0.2.x` and `1.0.0-alpha.N` HALs, allowing one to use
-incompatible HAL components (generally) without alteration.
-See the [docs](https://docs.rs/embedded-hal-compat/) for examples.
-
-It is also possible for HAL implementations to support both the latest `0.2.x` and `1.0.0-alpha.N` versions
-side by side, for an example see [LPC8xx HAL](https://github.com/lpc-rs/lpc8xx-hal).
-
-Note that `embedded-hal` `-alpha` versions are a moving target and _not guaranteed_ to be compatible.
-Because of this we only aim to support the latest `-alpha`.
 
 ## Minimum Supported Rust Version (MSRV)
 
 This crate is guaranteed to compile on stable Rust 1.54 and up. It *might*
 compile with older versions but that may change in any new patch release.
+
+See [here](docs/msrv.md) for details on how the MSRV may be upgraded.
 
 ## License
 
