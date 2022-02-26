@@ -285,7 +285,7 @@ pub trait SpiBusRead<Word: Copy = u8>: SpiBusFlush {
     /// typically `0x00`, `0xFF`, or configurable.
     ///
     /// Implementations are allowed to return before the operation is
-    /// complete. See the [module-level documentation](self) for detials.
+    /// complete. See the [module-level documentation](self) for details.
     fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
 }
 
@@ -300,7 +300,7 @@ pub trait SpiBusWrite<Word: Copy = u8>: SpiBusFlush {
     /// Writes `words` to the slave, ignoring all the incoming words
     ///
     /// Implementations are allowed to return before the operation is
-    /// complete. See the [module-level documentation](self) for detials.
+    /// complete. See the [module-level documentation](self) for details.
     fn write(&mut self, words: &[Word]) -> Result<(), Self::Error>;
 }
 
@@ -326,7 +326,7 @@ pub trait SpiBus<Word: Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
     /// typically `0x00`, `0xFF`, or configurable.
     ///
     /// Implementations are allowed to return before the operation is
-    /// complete. See the [module-level documentation](self) for detials.
+    /// complete. See the [module-level documentation](self) for details.
     fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error>;
 
     /// Writes and reads simultaneously. The contents of `words` are
@@ -334,7 +334,7 @@ pub trait SpiBus<Word: Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
     /// `words` buffer, overwriting it.
     ///
     /// Implementations are allowed to return before the operation is
-    /// complete. See the [module-level documentation](self) for detials.
+    /// complete. See the [module-level documentation](self) for details.
     fn transfer_in_place(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
 }
 
