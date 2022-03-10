@@ -74,3 +74,35 @@ pub trait Wait: embedded_hal::digital::ErrorType {
     /// Wait for the pin to undergo any transition, i.e low to high OR high to low.
     fn wait_for_any_edge<'a>(&'a mut self) -> Self::WaitForAnyEdgeFuture<'a>;
 }
+
+impl<T: Wait> Wait for &mut T {
+    type WaitForHighFuture<'a> = T::WaitForHighFuture<'a> where Self: 'a;
+
+    fn wait_for_high<'a>(&'a mut self) -> Self::WaitForHighFuture<'a> {
+        T::wait_for_high(self)
+    }
+
+    type WaitForLowFuture<'a> = T::WaitForLowFuture<'a> where Self: 'a;
+
+    fn wait_for_low<'a>(&'a mut self) -> Self::WaitForLowFuture<'a> {
+        T::wait_for_low(self)
+    }
+
+    type WaitForRisingEdgeFuture<'a> = T::WaitForRisingEdgeFuture<'a> where Self: 'a;
+
+    fn wait_for_rising_edge<'a>(&'a mut self) -> Self::WaitForRisingEdgeFuture<'a> {
+        T::wait_for_rising_edge(self)
+    }
+
+    type WaitForFallingEdgeFuture<'a> = T::WaitForFallingEdgeFuture<'a> where Self: 'a;
+
+    fn wait_for_falling_edge<'a>(&'a mut self) -> Self::WaitForFallingEdgeFuture<'a> {
+        T::wait_for_falling_edge(self)
+    }
+
+    type WaitForAnyEdgeFuture<'a> = T::WaitForAnyEdgeFuture<'a> where Self: 'a;
+
+    fn wait_for_any_edge<'a>(&'a mut self) -> Self::WaitForAnyEdgeFuture<'a> {
+        T::wait_for_any_edge(self)
+    }
+}
