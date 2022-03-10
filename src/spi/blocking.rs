@@ -175,8 +175,8 @@ use super::{Error, ErrorKind};
 
 /// SPI device trait
 ///
-/// SpiDevice represents ownership over a single SPI device on a (possibly shared) bus, selected
-/// with a CS pin.
+/// `SpiDevice` represents ownership over a single SPI device on a (possibly shared) bus, selected
+/// with a CS (Chip Select) pin.
 ///
 /// See the [module-level documentation](self) for important usage information.
 pub trait SpiDevice: ErrorType {
@@ -192,9 +192,9 @@ pub trait SpiDevice: ErrorType {
     /// - Deasserts the CS pin.
     /// - Unlocks the bus.
     ///
-    /// The lock mechanism is implementation-defined. The only requirement is it must prevent two
+    /// The locking mechanism is implementation-defined. The only requirement is it must prevent two
     /// transactions from executing concurrently against the same bus. Examples of implementations are:
-    /// critical sections, blocking mutexes, or returning an error or panicking if the bus is already busy.
+    /// critical sections, blocking mutexes, returning an error or panicking if the bus is already busy.
     fn transaction<R>(
         &mut self,
         f: impl FnOnce(&mut Self::Bus) -> Result<R, <Self::Bus as ErrorType>::Error>,
@@ -265,7 +265,7 @@ impl<T: SpiDevice> SpiDevice for &mut T {
 
 /// Flush support for SPI bus
 pub trait SpiBusFlush: ErrorType {
-    /// Blocks until all operations have completed and the bus is idle.
+    /// Wait until all operations have completed and the bus is idle.
     ///
     /// See the [module-level documentation](self) for important usage information.
     fn flush(&mut self) -> Result<(), Self::Error>;
@@ -279,7 +279,7 @@ impl<T: SpiBusFlush> SpiBusFlush for &mut T {
 
 /// Read-only SPI bus
 pub trait SpiBusRead<Word: Copy = u8>: SpiBusFlush {
-    /// Reads `words` from the slave.
+    /// Read `words` from the slave.
     ///
     /// The word value sent on MOSI during reading is implementation-defined,
     /// typically `0x00`, `0xFF`, or configurable.
@@ -297,7 +297,7 @@ impl<T: SpiBusRead<Word>, Word: Copy> SpiBusRead<Word> for &mut T {
 
 /// Write-only SPI bus
 pub trait SpiBusWrite<Word: Copy = u8>: SpiBusFlush {
-    /// Writes `words` to the slave, ignoring all the incoming words
+    /// Write `words` to the slave, ignoring all the incoming words
     ///
     /// Implementations are allowed to return before the operation is
     /// complete. See the [module-level documentation](self) for details.
@@ -312,11 +312,11 @@ impl<T: SpiBusWrite<Word>, Word: Copy> SpiBusWrite<Word> for &mut T {
 
 /// Read-write SPI bus
 ///
-/// SpiBus represents **exclusive ownership** over the whole SPI bus, with SCK, MOSI and MISO pins.
+/// `SpiBus` represents **exclusive ownership** over the whole SPI bus, with SCK, MOSI and MISO pins.
 ///
 /// See the [module-level documentation](self) for important information on SPI Bus vs Device traits.
 pub trait SpiBus<Word: Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
-    /// Writes and reads simultaneously. `write` is written to the slave on MOSI and
+    /// Write and read simultaneously. `write` is written to the slave on MOSI and
     /// words received on MISO are stored in `read`.
     ///
     /// It is allowed for `read` and `write` to have different lengths, even zero length.
@@ -329,7 +329,7 @@ pub trait SpiBus<Word: Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
     /// complete. See the [module-level documentation](self) for details.
     fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error>;
 
-    /// Writes and reads simultaneously. The contents of `words` are
+    /// Write and read simultaneously. The contents of `words` are
     /// written to the slave, and the received words are stored into the same
     /// `words` buffer, overwriting it.
     ///
@@ -388,7 +388,7 @@ impl<BUS, CS> ExclusiveDevice<BUS, CS> {
 
 impl<BUS, CS> ErrorType for ExclusiveDevice<BUS, CS>
 where
-    BUS: SpiBusFlush,
+    BUS: ErrorType,
     CS: OutputPin,
 {
     type Error = ExclusiveDeviceError<BUS::Error, CS::Error>;
