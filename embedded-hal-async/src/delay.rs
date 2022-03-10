@@ -32,19 +32,13 @@ where
 {
     type Error = T::Error;
 
-    type DelayUsFuture<'a>
-    where
-        Self: 'a,
-    = T::DelayUsFuture<'a>;
+    type DelayUsFuture<'a> = T::DelayUsFuture<'a> where Self: 'a;
 
     fn delay_us(&mut self, us: u32) -> Self::DelayUsFuture<'_> {
         T::delay_us(self, us)
     }
 
-    type DelayMsFuture<'a>
-    where
-        Self: 'a,
-    = T::DelayMsFuture<'a>;
+    type DelayMsFuture<'a> = T::DelayMsFuture<'a> where Self: 'a;
 
     fn delay_ms(&mut self, ms: u32) -> Self::DelayMsFuture<'_> {
         T::delay_ms(self, ms)

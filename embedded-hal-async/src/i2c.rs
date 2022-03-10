@@ -133,28 +133,19 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
 }
 
 impl<A: AddressMode, T: I2c<A>> I2c<A> for &mut T {
-    type ReadFuture<'a>
-    where
-        Self: 'a,
-    = T::ReadFuture<'a>;
+    type ReadFuture<'a> = T::ReadFuture<'a> where Self: 'a;
 
     fn read<'a>(&'a mut self, address: A, buffer: &'a mut [u8]) -> Self::ReadFuture<'a> {
         T::read(self, address, buffer)
     }
 
-    type WriteFuture<'a>
-    where
-        Self: 'a,
-    = T::WriteFuture<'a>;
+    type WriteFuture<'a> = T::WriteFuture<'a> where Self: 'a;
 
     fn write<'a>(&'a mut self, address: A, bytes: &'a [u8]) -> Self::WriteFuture<'a> {
         T::write(self, address, bytes)
     }
 
-    type WriteReadFuture<'a>
-    where
-        Self: 'a,
-    = T::WriteReadFuture<'a>;
+    type WriteReadFuture<'a> = T::WriteReadFuture<'a> where Self: 'a;
 
     fn write_read<'a>(
         &'a mut self,
@@ -165,11 +156,7 @@ impl<A: AddressMode, T: I2c<A>> I2c<A> for &mut T {
         T::write_read(self, address, bytes, buffer)
     }
 
-    type TransactionFuture<'a, 'b>
-    where
-        Self: 'a,
-        'b: 'a,
-    = T::TransactionFuture<'a, 'b>;
+    type TransactionFuture<'a, 'b> = T::TransactionFuture<'a, 'b> where Self: 'a, 'b: 'a;
 
     fn transaction<'a, 'b>(
         &'a mut self,
