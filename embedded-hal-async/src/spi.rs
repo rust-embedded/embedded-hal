@@ -53,6 +53,164 @@ pub trait SpiDevice: ErrorType {
             > + 'a;
 }
 
+/// Helper methods for SpiDevice.
+///
+/// This is automatically implemented for all `T: SpiDevice`, you can directly
+/// use the methods on any `SpiDevice`.
+pub trait SpiDeviceExt: SpiDevice {
+    /// Future returned by the `read` method.
+    type ReadFuture<'a, Word>: Future<Output = Result<(), Self::Error>> + 'a
+    where
+        Self: 'a,
+        Self::Bus: SpiBusRead<Word>,
+        Word: Copy + 'static;
+
+    /// Do a read within a transaction.
+    ///
+    /// This is a convenience method equivalent to `device.transaction(|bus| bus.read(buf))`.
+    ///
+    /// See also: [`SpiDevice::transaction`], [`SpiBusRead::read`]
+    fn read<'a, Word>(&'a mut self, buf: &'a mut [Word]) -> Self::ReadFuture<'a, Word>
+    where
+        Self::Bus: SpiBusRead<Word>,
+        Word: Copy + 'static;
+
+    /// Future returned by the `write` method.
+    type WriteFuture<'a, Word>: Future<Output = Result<(), Self::Error>> + 'a
+    where
+        Self: 'a,
+        Self::Bus: SpiBusWrite<Word>,
+        Word: Copy + 'static;
+
+    /// Do a write within a transaction.
+    ///
+    /// This is a convenience method equivalent to `device.transaction(|bus| bus.write(buf))`.
+    ///
+    /// See also: [`SpiDevice::transaction`], [`SpiBusWrite::write`]
+    fn write<'a, Word>(&'a mut self, buf: &'a [Word]) -> Self::WriteFuture<'a, Word>
+    where
+        Self::Bus: SpiBusWrite<Word>,
+        Word: Copy + 'static;
+
+    /// Future returned by the `transfer` method.
+    type TransferFuture<'a, Word>: Future<Output = Result<(), Self::Error>> + 'a
+    where
+        Self: 'a,
+        Self::Bus: SpiBus<Word>,
+        Word: Copy + 'static;
+
+    /// Do a transfer within a transaction.
+    ///
+    /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer(read, write))`.
+    ///
+    /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer`]
+    fn transfer<'a, Word>(
+        &'a mut self,
+        read: &'a mut [Word],
+        write: &'a [Word],
+    ) -> Self::TransferFuture<'a, Word>
+    where
+        Self::Bus: SpiBus<Word>,
+        Word: Copy + 'static;
+
+    /// Future returned by the `transfer_in_place` method.
+    type TransferInPlaceFuture<'a, Word>: Future<Output = Result<(), Self::Error>> + 'a
+    where
+        Self: 'a,
+        Self::Bus: SpiBus<Word>,
+        Word: Copy + 'static;
+
+    /// Do an in-place transfer within a transaction.
+    ///
+    /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer_in_place(buf))`.
+    ///
+    /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer_in_place`]
+    fn transfer_in_place<'a, Word>(
+        &'a mut self,
+        buf: &'a mut [Word],
+    ) -> Self::TransferInPlaceFuture<'a, Word>
+    where
+        Self::Bus: SpiBus<Word>,
+        Word: Copy + 'static;
+}
+
+impl<T: SpiDevice> SpiDeviceExt for T {
+    type ReadFuture<'a, Word> = impl Future<Output = Result<(), Self::Error>> + 'a
+    where
+        Self: 'a,
+        Self::Bus: SpiBusRead<Word>,
+        Word: Copy + 'static;
+
+    fn read<'a, Word>(&'a mut self, buf: &'a mut [Word]) -> Self::ReadFuture<'a, Word>
+    where
+        Self::Bus: SpiBusRead<Word>,
+        Word: Copy + 'static,
+    {
+        self.transaction(move |bus| async move {
+            let res = bus.read(buf).await;
+            (bus, res)
+        })
+    }
+
+    type WriteFuture<'a, Word> = impl Future<Output = Result<(), Self::Error>> + 'a
+    where
+        Self: 'a,
+        Self::Bus: SpiBusWrite<Word>,
+        Word: Copy + 'static;
+
+    fn write<'a, Word>(&'a mut self, buf: &'a [Word]) -> Self::WriteFuture<'a, Word>
+    where
+        Self::Bus: SpiBusWrite<Word>,
+        Word: Copy + 'static,
+    {
+        self.transaction(move |bus| async move {
+            let res = bus.write(buf).await;
+            (bus, res)
+        })
+    }
+
+    type TransferFuture<'a, Word> = impl Future<Output = Result<(), Self::Error>> + 'a
+        where
+            Self: 'a,
+            Self::Bus: SpiBus<Word>,
+            Word: Copy + 'static;
+
+    fn transfer<'a, Word>(
+        &'a mut self,
+        read: &'a mut [Word],
+        write: &'a [Word],
+    ) -> Self::TransferFuture<'a, Word>
+    where
+        Self::Bus: SpiBus<Word>,
+        Word: Copy + 'static,
+    {
+        self.transaction(move |bus| async move {
+            let res = bus.transfer(read, write).await;
+            (bus, res)
+        })
+    }
+
+    type TransferInPlaceFuture<'a, Word> = impl Future<Output = Result<(), Self::Error>> + 'a
+    where
+        Self: 'a,
+        Self::Bus: SpiBus<Word>,
+        Word: Copy + 'static;
+
+    fn transfer_in_place<'a, Word>(
+        &'a mut self,
+        buf: &'a mut [Word],
+    ) -> Self::TransferInPlaceFuture<'a, Word>
+    where
+        Self::Bus: SpiBus<Word>,
+        Word: Copy + 'static,
+    {
+        self.transaction(move |bus| async move {
+            let res = bus.transfer_in_place(buf).await;
+            (bus, res)
+        })
+    }
+}
+
 impl<T: SpiDevice> SpiDevice for &mut T {
     type Bus = T::Bus;
 
