@@ -78,7 +78,7 @@
 //!
 //!         // `transaction` asserts and deasserts CS for us. No need to do it manually!
 //!         self.spi.transaction(|bus| {
-//!             bus.write_slice(&[0x90])?;
+//!             bus.write_word(0x90)?;
 //!             bus.read_slice(&mut buf)
 //!         }).map_err(MyError::Spi)?;
 //!
@@ -113,7 +113,7 @@
 //!
 //!     pub fn read_foo(&mut self) -> Result<[u8; 2], MyError<SPI::Error>> {
 //!         let mut buf = [0; 2];
-//!         self.spi.write_slice(&[0x90]).map_err(MyError::Spi)?;
+//!         self.spi.write_word(0x90).map_err(MyError::Spi)?;
 //!         self.spi.read_slice(&mut buf).map_err(MyError::Spi)?;
 //!         Ok(buf)
 //!     }
@@ -278,8 +278,17 @@ impl<T: SpiBusFlush> SpiBusFlush for &mut T {
 }
 
 /// Read-only SPI bus
-pub trait SpiBusRead<Word: Copy = u8>: SpiBusFlush {
-    /// Read `words` from the slave.
+pub trait SpiBusRead<Word: Copy = u8>: ErrorType {
+    /// Reads a single `word` from the slave.
+    ///
+    /// The word value sent on MOSI during reading is implementation-defined,
+    /// typically `0x00`, `0xFF`, or configurable.
+    ///
+    /// Implementations are allowed to return before the operation is
+    /// complete. See the [module-level documentation](self) for details.
+    fn read_word(&mut self) -> Result<Word, Self::Error>;
+
+    /// Reads `words` from the slave.
     ///
     /// The word value sent on MOSI during reading is implementation-defined,
     /// typically `0x00`, `0xFF`, or configurable.
@@ -290,14 +299,24 @@ pub trait SpiBusRead<Word: Copy = u8>: SpiBusFlush {
 }
 
 impl<T: SpiBusRead<Word>, Word: Copy> SpiBusRead<Word> for &mut T {
+    fn read_word(&mut self) -> Result<Word, Self::Error> {
+        T::read_word(self)
+    }
+
     fn read_slice(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
         T::read_slice(self, words)
     }
 }
 
 /// Write-only SPI bus
-pub trait SpiBusWrite<Word: Copy = u8>: SpiBusFlush {
-    /// Write `words` to the slave, ignoring all the incoming words
+pub trait SpiBusWrite<Word: Copy = u8>: ErrorType {
+    /// Writes a single `words` to the slave, ignoring the incoming word
+    ///
+    /// Implementations are allowed to return before the operation is
+    /// complete. See the [module-level documentation](self) for details.
+    fn write_word(&mut self, word: Word) -> Result<(), Self::Error>;
+
+    /// Writes `words` to the slave, ignoring all the incoming words
     ///
     /// Implementations are allowed to return before the operation is
     /// complete. See the [module-level documentation](self) for details.
@@ -305,6 +324,10 @@ pub trait SpiBusWrite<Word: Copy = u8>: SpiBusFlush {
 }
 
 impl<T: SpiBusWrite<Word>, Word: Copy> SpiBusWrite<Word> for &mut T {
+    fn write_word(&mut self, word: Word) -> Result<(), Self::Error> {
+        T::write_word(self, word)
+    }
+
     fn write_slice(&mut self, words: &[Word]) -> Result<(), Self::Error> {
         T::write_slice(self, words)
     }
@@ -316,6 +339,12 @@ impl<T: SpiBusWrite<Word>, Word: Copy> SpiBusWrite<Word> for &mut T {
 ///
 /// See the [module-level documentation](self) for important information on SPI Bus vs Device traits.
 pub trait SpiBus<Word: Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
+    /// Write and read a word simultaneously.
+    ///
+    /// Implementations are allowed to return before the operation is
+    /// complete. See the [module-level documentation](self) for details.
+    fn transfer_word(&mut self, word: Word) -> Result<Word, Self::Error>;
+
     /// Write and read simultaneously. `write` is written to the slave on MOSI and
     /// words received on MISO are stored in `read`.
     ///
@@ -339,6 +368,10 @@ pub trait SpiBus<Word: Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
 }
 
 impl<T: SpiBus<Word>, Word: Copy> SpiBus<Word> for &mut T {
+    fn transfer_word(&mut self, word: Word) -> Result<Word, Self::Error> {
+        T::transfer_word(self, word)
+    }
+
     fn transfer_slice(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
         T::transfer_slice(self, read, write)
     }
