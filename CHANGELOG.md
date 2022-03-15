@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `spi`: unify all traits into `SpiReadBus`, `SpiWriteBus` and `SpiBus` (read-write).
 - `spi`: Add `SpiDevice` trait to represent a single device in a (possibly shared) bus, with managed chip-select (CS) pin.
 - `spi`: Clarify that implementations are allowed to return before operations are finished, add `flush` to wait until finished.
+- `spi`: Rename all methods that deal with slices to include "slice".
+- `spi`: Add `read_word`, `write_word`, and `transfer_word` methods.
+- `spi`: Add default implementations for slice methods based on word methods.
 
 ## [v1.0.0-alpha.7] - 2022-02-09
 
