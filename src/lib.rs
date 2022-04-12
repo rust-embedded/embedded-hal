@@ -355,7 +355,6 @@
 
 pub mod fmt;
 pub use nb;
-pub mod adc;
 pub mod can;
 pub mod delay;
 pub mod digital;
