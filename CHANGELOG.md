@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `spi`: Add `SpiDevice` trait to represent a single device in a (possibly shared) bus, with managed chip-select (CS) pin.
 - `spi`: Clarify that implementations are allowed to return before operations are finished, add `flush` to wait until finished.
 
+### Removed
+- ADC traits: `adc::nb::OneShot` and `adc::nb::Channel`.
+
 ## [v1.0.0-alpha.7] - 2022-02-09
 
 *** This is (also) an alpha release with breaking changes (sorry) ***
