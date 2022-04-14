@@ -41,7 +41,7 @@ release alpha versions like `1.0.0-alpha.1` and `1.0.0-alpha.2`.
 Alpha releases are **not guaranteed** to be compatible with each other.
 They are provided as early previews for community testing and preparation for the final release.
 If you use an alpha release, we recommend you choose an exact version specification in your
-`Cargo.toml` like: `embedded-hal = "=1.0.0-alpha.2"`
+`Cargo.toml` like: `embedded-hal = "=1.0.0-alpha.8"`
 
 See [this guide](docs/version-policy.md) for a way to implement both an `embedded-hal` `0.2.x`
 version and an `-alpha` version side by side in a HAL.
