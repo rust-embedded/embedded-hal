@@ -238,7 +238,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.7...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.8...HEAD
+[v1.0.0-alpha.8]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.7...v1.0.0-alpha.8
 [v1.0.0-alpha.7]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.6...v1.0.0-alpha.7
 [v1.0.0-alpha.6]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.5...v1.0.0-alpha.6
 [v1.0.0-alpha.5]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.4...v1.0.0-alpha.5
