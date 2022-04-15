@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v1.0.0-alpha.8] - 2022-04-15
+
+*** This is (also) an alpha release with breaking changes (sorry) ***
+
 ### Changed
 - The Minimum Supported Rust Version (MSRV) is now 1.54.0
 - `spi`: unify all traits into `SpiReadBus`, `SpiWriteBus` and `SpiBus` (read-write).

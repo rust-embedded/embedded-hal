@@ -13,7 +13,7 @@ license = "MIT OR Apache-2.0"
 name = "embedded-hal"
 readme = "README.md"
 repository = "https://github.com/rust-embedded/embedded-hal"
-version = "1.0.0-alpha.7"
+version = "1.0.0-alpha.8"
 
 [dependencies]
 nb = "1"
