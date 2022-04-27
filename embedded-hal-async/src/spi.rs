@@ -22,13 +22,8 @@ pub trait SpiDevice: ErrorType {
     where
         Self: 'a,
         R: 'a,
-        F: FnOnce(&'a mut Self::Bus) -> Fut + 'a,
-        Fut: Future<
-                Output = (
-                    &'a mut Self::Bus,
-                    Result<R, <Self::Bus as ErrorType>::Error>,
-                ),
-            > + 'a;
+        F: FnOnce(*mut Self::Bus) -> Fut + 'a,
+        Fut: Future<Output = Result<R, <Self::Bus as ErrorType>::Error>> + 'a;
 
     /// Perform a transaction against the device.
     ///
@@ -42,15 +37,14 @@ pub trait SpiDevice: ErrorType {
     /// The locking mechanism is implementation-defined. The only requirement is it must prevent two
     /// transactions from executing concurrently against the same bus. Examples of implementations are:
     /// critical sections, blocking mutexes, async mutexes, returning an error or panicking if the bus is already busy.
+    ///
+    /// The current state of the Rust typechecker doesn't allow expressing the necessary lifetime constraints, so
+    /// the `f` closure receives a lifetime-less `*mut Bus` raw pointer instead. The pointer is guaranteed
+    /// to be valid for the entire duration the closure is running, so dereferencing it is safe.
     fn transaction<'a, R, F, Fut>(&'a mut self, f: F) -> Self::TransactionFuture<'a, R, F, Fut>
     where
-        F: FnOnce(&'a mut Self::Bus) -> Fut + 'a,
-        Fut: Future<
-                Output = (
-                    &'a mut Self::Bus,
-                    Result<R, <Self::Bus as ErrorType>::Error>,
-                ),
-            > + 'a;
+        F: FnOnce(*mut Self::Bus) -> Fut + 'a,
+        Fut: Future<Output = Result<R, <Self::Bus as ErrorType>::Error>> + 'a;
 }
 
 /// Helper methods for SpiDevice.
@@ -147,8 +141,9 @@ impl<T: SpiDevice> SpiDeviceExt for T {
         Word: Copy + 'static,
     {
         self.transaction(move |bus| async move {
-            let res = bus.read(buf).await;
-            (bus, res)
+            // safety: `bus` is a valid pointer we're allowed to use for the duration of the closure.
+            let bus = unsafe { &mut *bus };
+            bus.read(buf).await
         })
     }
 
@@ -164,8 +159,9 @@ impl<T: SpiDevice> SpiDeviceExt for T {
         Word: Copy + 'static,
     {
         self.transaction(move |bus| async move {
-            let res = bus.write(buf).await;
-            (bus, res)
+            // safety: `bus` is a valid pointer we're allowed to use for the duration of the closure.
+            let bus = unsafe { &mut *bus };
+            bus.write(buf).await
         })
     }
 
@@ -185,8 +181,9 @@ impl<T: SpiDevice> SpiDeviceExt for T {
         Word: Copy + 'static,
     {
         self.transaction(move |bus| async move {
-            let res = bus.transfer(read, write).await;
-            (bus, res)
+            // safety: `bus` is a valid pointer we're allowed to use for the duration of the closure.
+            let bus = unsafe { &mut *bus };
+            bus.transfer(read, write).await
         })
     }
 
@@ -205,8 +202,9 @@ impl<T: SpiDevice> SpiDeviceExt for T {
         Word: Copy + 'static,
     {
         self.transaction(move |bus| async move {
-            let res = bus.transfer_in_place(buf).await;
-            (bus, res)
+            // safety: `bus` is a valid pointer we're allowed to use for the duration of the closure.
+            let bus = unsafe { &mut *bus };
+            bus.transfer_in_place(buf).await
         })
     }
 }
@@ -216,18 +214,13 @@ impl<T: SpiDevice> SpiDevice for &mut T {
 
     type TransactionFuture<'a, R, F, Fut> = T::TransactionFuture<'a, R, F, Fut>
     where
-        Self: 'a, R: 'a, F: FnOnce(&'a mut Self::Bus) -> Fut + 'a,
-        Fut: Future<Output = (&'a mut Self::Bus, Result<R, <Self::Bus as ErrorType>::Error>)> + 'a;
+        Self: 'a, R: 'a, F: FnOnce(*mut Self::Bus) -> Fut + 'a,
+        Fut: Future<Output = Result<R, <Self::Bus as ErrorType>::Error>> + 'a;
 
     fn transaction<'a, R, F, Fut>(&'a mut self, f: F) -> Self::TransactionFuture<'a, R, F, Fut>
     where
-        F: FnOnce(&'a mut Self::Bus) -> Fut + 'a,
-        Fut: Future<
-                Output = (
-                    &'a mut Self::Bus,
-                    Result<R, <Self::Bus as ErrorType>::Error>,
-                ),
-            > + 'a,
+        F: FnOnce(*mut Self::Bus) -> Fut + 'a,
+        Fut: Future<Output = Result<R, <Self::Bus as ErrorType>::Error>> + 'a,
     {
         T::transaction(self, f)
     }
@@ -449,27 +442,22 @@ where
 
     type TransactionFuture<'a, R, F, Fut> = impl Future<Output = Result<R, Self::Error>> + 'a
     where
-        Self: 'a, R: 'a, F: FnOnce(&'a mut Self::Bus) -> Fut + 'a,
-        Fut: Future<Output = (&'a mut Self::Bus, Result<R, <Self::Bus as ErrorType>::Error>)> + 'a;
+        Self: 'a, R: 'a, F: FnOnce(*mut Self::Bus) -> Fut + 'a,
+        Fut: Future<Output =  Result<R, <Self::Bus as ErrorType>::Error>> + 'a;
 
     fn transaction<'a, R, F, Fut>(&'a mut self, f: F) -> Self::TransactionFuture<'a, R, F, Fut>
     where
         R: 'a,
-        F: FnOnce(&'a mut Self::Bus) -> Fut + 'a,
-        Fut: Future<
-                Output = (
-                    &'a mut Self::Bus,
-                    Result<R, <Self::Bus as ErrorType>::Error>,
-                ),
-            > + 'a,
+        F: FnOnce(*mut Self::Bus) -> Fut + 'a,
+        Fut: Future<Output = Result<R, <Self::Bus as ErrorType>::Error>> + 'a,
     {
         async move {
             self.cs.set_low().map_err(ExclusiveDeviceError::Cs)?;
 
-            let (bus, f_res) = f(&mut self.bus).await;
+            let f_res = f(&mut self.bus).await;
 
             // On failure, it's important to still flush and deassert CS.
-            let flush_res = bus.flush().await;
+            let flush_res = self.bus.flush().await;
             let cs_res = self.cs.set_high();
 
             let f_res = f_res.map_err(ExclusiveDeviceError::Spi)?;
