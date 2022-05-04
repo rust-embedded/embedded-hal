@@ -25,7 +25,7 @@ pub use embedded_hal::i2c::{
 /// Async i2c
 pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// Future returned by the `read` method.
-    type ReadFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type ReadFuture<'a>: Future<Output = Result<(), Self::Error>>
     where
         Self: 'a;
 
@@ -50,7 +50,7 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     fn read<'a>(&'a mut self, address: A, read: &'a mut [u8]) -> Self::ReadFuture<'a>;
 
     /// Future returned by the `write` method.
-    type WriteFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type WriteFuture<'a>: Future<Output = Result<(), Self::Error>>
     where
         Self: 'a;
 
@@ -73,7 +73,7 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     fn write<'a>(&'a mut self, address: A, write: &'a [u8]) -> Self::WriteFuture<'a>;
 
     /// Future returned by the `write_read` method.
-    type WriteReadFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type WriteReadFuture<'a>: Future<Output = Result<(), Self::Error>>
     where
         Self: 'a;
 
@@ -107,7 +107,7 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     ) -> Self::WriteReadFuture<'a>;
 
     /// Future returned by the `transaction` method.
-    type TransactionFuture<'a, 'b>: Future<Output = Result<(), Self::Error>> + 'a
+    type TransactionFuture<'a, 'b>: Future<Output = Result<(), Self::Error>>
     where
         Self: 'a,
         'b: 'a;

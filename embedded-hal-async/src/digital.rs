@@ -21,7 +21,7 @@ use core::future::Future;
 /// Asynchronously wait for GPIO pin state.
 pub trait Wait: embedded_hal::digital::ErrorType {
     /// The future returned by the `wait_for_high` function.
-    type WaitForHighFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type WaitForHighFuture<'a>: Future<Output = Result<(), Self::Error>>
     where
         Self: 'a;
 
@@ -33,7 +33,7 @@ pub trait Wait: embedded_hal::digital::ErrorType {
     fn wait_for_high<'a>(&'a mut self) -> Self::WaitForHighFuture<'a>;
 
     /// The future returned by `wait_for_low`.
-    type WaitForLowFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type WaitForLowFuture<'a>: Future<Output = Result<(), Self::Error>>
     where
         Self: 'a;
 
@@ -45,7 +45,7 @@ pub trait Wait: embedded_hal::digital::ErrorType {
     fn wait_for_low<'a>(&'a mut self) -> Self::WaitForLowFuture<'a>;
 
     /// The future returned from `wait_for_rising_edge`.
-    type WaitForRisingEdgeFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type WaitForRisingEdgeFuture<'a>: Future<Output = Result<(), Self::Error>>
     where
         Self: 'a;
 
@@ -56,7 +56,7 @@ pub trait Wait: embedded_hal::digital::ErrorType {
     fn wait_for_rising_edge<'a>(&'a mut self) -> Self::WaitForRisingEdgeFuture<'a>;
 
     /// The future returned from `wait_for_falling_edge`.
-    type WaitForFallingEdgeFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type WaitForFallingEdgeFuture<'a>: Future<Output = Result<(), Self::Error>>
     where
         Self: 'a;
 
@@ -67,7 +67,7 @@ pub trait Wait: embedded_hal::digital::ErrorType {
     fn wait_for_falling_edge<'a>(&'a mut self) -> Self::WaitForFallingEdgeFuture<'a>;
 
     /// The future returned from `wait_for_any_edge`.
-    type WaitForAnyEdgeFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type WaitForAnyEdgeFuture<'a>: Future<Output = Result<(), Self::Error>>
     where
         Self: 'a;
 
