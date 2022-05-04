@@ -8,7 +8,7 @@ pub trait DelayUs {
     type Error: core::fmt::Debug;
 
     /// The future returned by the `delay_us` function.
-    type DelayUsFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type DelayUsFuture<'a>: Future<Output = Result<(), Self::Error>>
     where
         Self: 'a;
 
@@ -17,7 +17,7 @@ pub trait DelayUs {
     fn delay_us(&mut self, us: u32) -> Self::DelayUsFuture<'_>;
 
     /// The future returned by the `delay_ms` function.
-    type DelayMsFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type DelayMsFuture<'a>: Future<Output = Result<(), Self::Error>>
     where
         Self: 'a;
 

@@ -46,7 +46,7 @@ pub trait SpiDevice: ErrorType {
     type Bus: ErrorType;
 
     /// Future returned by the `transaction` method.
-    type TransactionFuture<'a, R, F, Fut>: Future<Output = Result<R, Self::Error>> + 'a
+    type TransactionFuture<'a, R, F, Fut>: Future<Output = Result<R, Self::Error>>
     where
         Self: 'a,
         R: 'a,
@@ -170,7 +170,7 @@ impl<T: SpiDevice> SpiDevice for &mut T {
 /// Flush support for SPI bus
 pub trait SpiBusFlush: ErrorType {
     /// Future returned by the `flush` method.
-    type FlushFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type FlushFuture<'a>: Future<Output = Result<(), Self::Error>>
     where
         Self: 'a;
 
@@ -191,7 +191,7 @@ impl<T: SpiBusFlush> SpiBusFlush for &mut T {
 /// Read-only SPI bus
 pub trait SpiBusRead<Word: 'static + Copy = u8>: SpiBusFlush {
     /// Future returned by the `read` method.
-    type ReadFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type ReadFuture<'a>: Future<Output = Result<(), Self::Error>>
     where
         Self: 'a;
 
@@ -216,7 +216,7 @@ impl<T: SpiBusRead<Word>, Word: 'static + Copy> SpiBusRead<Word> for &mut T {
 /// Write-only SPI
 pub trait SpiBusWrite<Word: 'static + Copy = u8>: SpiBusFlush {
     /// Future returned by the `write` method.
-    type WriteFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type WriteFuture<'a>: Future<Output = Result<(), Self::Error>>
     where
         Self: 'a;
 
@@ -242,7 +242,7 @@ impl<T: SpiBusWrite<Word>, Word: 'static + Copy> SpiBusWrite<Word> for &mut T {
 /// See (the docs on embedded-hal)[embedded_hal::spi::blocking] for important information on SPI Bus vs Device traits.
 pub trait SpiBus<Word: 'static + Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
     /// Future returned by the `transfer` method.
-    type TransferFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type TransferFuture<'a>: Future<Output = Result<(), Self::Error>>
     where
         Self: 'a;
 
@@ -264,7 +264,7 @@ pub trait SpiBus<Word: 'static + Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word
     ) -> Self::TransferFuture<'a>;
 
     /// Future returned by the `transfer_in_place` method.
-    type TransferInPlaceFuture<'a>: Future<Output = Result<(), Self::Error>> + 'a
+    type TransferInPlaceFuture<'a>: Future<Output = Result<(), Self::Error>>
     where
         Self: 'a;
 
@@ -381,7 +381,7 @@ where
 {
     type Bus = BUS;
 
-    type TransactionFuture<'a, R, F, Fut> = impl Future<Output = Result<R, Self::Error>> + 'a
+    type TransactionFuture<'a, R, F, Fut> = impl Future<Output = Result<R, Self::Error>>
     where
         Self: 'a, R: 'a, F: FnOnce(*mut Self::Bus) -> Fut + 'a,
         Fut: Future<Output =  Result<R, <Self::Bus as ErrorType>::Error>> + 'a;
