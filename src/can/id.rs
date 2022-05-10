@@ -194,7 +194,12 @@ mod tests {
 
     #[test]
     fn cmp_id() {
-        assert!(Id::Standard(StandardId::MAX) < Id::Standard(StandardId::ZERO));
-        assert!(Id::Extended(ExtendedId::MAX) < Id::Extended(ExtendedId::ZERO));
+        assert!(StandardId::ZERO < StandardId::MAX);
+        assert!(ExtendedId::ZERO < ExtendedId::MAX);
+
+        assert!(Id::Standard(StandardId::ZERO) < Id::Extended(ExtendedId::ZERO));
+        assert!(Id::Extended(ExtendedId::ZERO) < Id::Extended(ExtendedId::MAX));
+        assert!(Id::Extended(ExtendedId((1 << 11) - 1)) < Id::Standard(StandardId(1)));
+        assert!(Id::Standard(StandardId(1)) < Id::Extended(ExtendedId::MAX));
     }
 }
