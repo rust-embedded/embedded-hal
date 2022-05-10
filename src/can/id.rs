@@ -85,13 +85,37 @@ impl ExtendedId {
 }
 
 /// A CAN Identifier (standard or extended).
-#[derive(Debug, Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum Id {
     /// Standard 11-bit Identifier (`0..=0x7FF`).
     Standard(StandardId),
 
     /// Extended 29-bit Identifier (`0..=0x1FFF_FFFF`).
     Extended(ExtendedId),
+}
+
+impl Ord for Id {
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+        let split_id = |id: &Id| {
+            let (standard_id_part, ide_bit, extended_id_part) = match id {
+                Id::Standard(StandardId(x)) => (*x, 0, 0),
+                Id::Extended(x) => (
+                    x.standard_id().0,
+                    1,
+                    x.0 & ((1 << 18) - 1), // Bit ID-17 to ID-0
+                ),
+            };
+            (standard_id_part, ide_bit, extended_id_part)
+        };
+
+        split_id(self).cmp(&split_id(other))
+    }
+}
+
+impl PartialOrd for Id {
+    fn partial_cmp(&self, other: &Id) -> Option<core::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl From<StandardId> for Id {
@@ -156,5 +180,21 @@ mod tests {
             Some(ExtendedId::MAX.standard_id()),
             StandardId::new((ExtendedId::MAX.0 >> 18) as u16)
         );
+    }
+
+    #[test]
+    fn cmp_standard() {
+        assert!(StandardId::MAX < StandardId::ZERO);
+    }
+
+    #[test]
+    fn cmp_extended() {
+        assert!(ExtendedId::MAX < ExtendedId::ZERO);
+    }
+
+    #[test]
+    fn cmp_id() {
+        assert!(Id::Standard(StandardId::MAX) < Id::Standard(StandardId::ZERO));
+        assert!(Id::Extended(ExtendedId::MAX) < Id::Extended(ExtendedId::ZERO));
     }
 }
