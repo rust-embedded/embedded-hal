@@ -183,16 +183,6 @@ mod tests {
     }
 
     #[test]
-    fn cmp_standard() {
-        assert!(StandardId::MAX < StandardId::ZERO);
-    }
-
-    #[test]
-    fn cmp_extended() {
-        assert!(ExtendedId::MAX < ExtendedId::ZERO);
-    }
-
-    #[test]
     fn cmp_id() {
         assert!(StandardId::ZERO < StandardId::MAX);
         assert!(ExtendedId::ZERO < ExtendedId::MAX);
