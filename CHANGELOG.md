@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- I2S traits
+
 ## [v1.0.0-alpha.8] - 2022-04-15
 
 *** This is (also) an alpha release with breaking changes (sorry) ***
