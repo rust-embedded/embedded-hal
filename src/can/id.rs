@@ -94,6 +94,20 @@ pub enum Id {
     Extended(ExtendedId),
 }
 
+/// Implement `Ord` according to the CAN arbitration rules
+///
+/// When performing arbitration, frames are looked at bit for bit starting
+/// from the beginning. A bit with the value 0 is dominant and a bit with
+/// value of 1 is recessive.
+///
+/// When two devices are sending frames at the same time, as soon as the first
+/// bit is found which differs, the frame with the corresponding dominant
+/// 0 bit will win and get to send the rest of the frame.
+///
+/// This implementation of `Ord` for `Id` will take this into consideration
+/// and when comparing two different instances of `Id` the "smallest" will
+/// always be the id which would form the most dominant frame, all other
+/// things being equal.
 impl Ord for Id {
     fn cmp(&self, other: &Self) -> core::cmp::Ordering {
         let split_id = |id: &Id| {
