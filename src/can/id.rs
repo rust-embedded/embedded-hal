@@ -1,7 +1,7 @@
 //! CAN Identifiers.
 
 /// Standard 11-bit CAN Identifier (`0..=0x7FF`).
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Hash)]
 pub struct StandardId(u16);
 
 impl StandardId {
@@ -40,7 +40,7 @@ impl StandardId {
 }
 
 /// Extended 29-bit CAN Identifier (`0..=1FFF_FFFF`).
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, PartialOrd, Ord, Hash)]
 pub struct ExtendedId(u32);
 
 impl ExtendedId {
@@ -85,13 +85,51 @@ impl ExtendedId {
 }
 
 /// A CAN Identifier (standard or extended).
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum Id {
     /// Standard 11-bit Identifier (`0..=0x7FF`).
     Standard(StandardId),
 
     /// Extended 29-bit Identifier (`0..=0x1FFF_FFFF`).
     Extended(ExtendedId),
+}
+
+/// Implement `Ord` according to the CAN arbitration rules
+///
+/// When performing arbitration, frames are looked at bit for bit starting
+/// from the beginning. A bit with the value 0 is dominant and a bit with
+/// value of 1 is recessive.
+///
+/// When two devices are sending frames at the same time, as soon as the first
+/// bit is found which differs, the frame with the corresponding dominant
+/// 0 bit will win and get to send the rest of the frame.
+///
+/// This implementation of `Ord` for `Id` will take this into consideration
+/// and when comparing two different instances of `Id` the "smallest" will
+/// always be the ID which would form the most dominant frame, all other
+/// things being equal.
+impl Ord for Id {
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+        let split_id = |id: &Id| {
+            let (standard_id_part, ide_bit, extended_id_part) = match id {
+                Id::Standard(StandardId(x)) => (*x, 0, 0),
+                Id::Extended(x) => (
+                    x.standard_id().0,
+                    1,
+                    x.0 & ((1 << 18) - 1), // Bit ID-17 to ID-0
+                ),
+            };
+            (standard_id_part, ide_bit, extended_id_part)
+        };
+
+        split_id(self).cmp(&split_id(other))
+    }
+}
+
+impl PartialOrd for Id {
+    fn partial_cmp(&self, other: &Id) -> Option<core::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl From<StandardId> for Id {
@@ -156,5 +194,16 @@ mod tests {
             Some(ExtendedId::MAX.standard_id()),
             StandardId::new((ExtendedId::MAX.0 >> 18) as u16)
         );
+    }
+
+    #[test]
+    fn cmp_id() {
+        assert!(StandardId::ZERO < StandardId::MAX);
+        assert!(ExtendedId::ZERO < ExtendedId::MAX);
+
+        assert!(Id::Standard(StandardId::ZERO) < Id::Extended(ExtendedId::ZERO));
+        assert!(Id::Extended(ExtendedId::ZERO) < Id::Extended(ExtendedId::MAX));
+        assert!(Id::Extended(ExtendedId((1 << 11) - 1)) < Id::Standard(StandardId(1)));
+        assert!(Id::Standard(StandardId(1)) < Id::Extended(ExtendedId::MAX));
     }
 }
