@@ -106,7 +106,7 @@ pub enum Id {
 ///
 /// This implementation of `Ord` for `Id` will take this into consideration
 /// and when comparing two different instances of `Id` the "smallest" will
-/// always be the id which would form the most dominant frame, all other
+/// always be the ID which would form the most dominant frame, all other
 /// things being equal.
 impl Ord for Id {
     fn cmp(&self, other: &Self) -> core::cmp::Ordering {
