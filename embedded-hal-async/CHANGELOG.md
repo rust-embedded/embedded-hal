@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+### Changed
+
+- spi: device helper methods (`read`, `write`, `transfer`...) are now default methods in `SpiDevice` instead of an `SpiDeviceExt` extension trait.
+- spi: the `SpiDevice::transaction` closure now gets a raw pointer to the `SpiBus` to work around Rust borrow checker limitations.
+
+
 ## [v0.1.0-alpha.0] - 2022-04-17
 
 First release to crates.io
