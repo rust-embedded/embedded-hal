@@ -14,13 +14,11 @@ The purpose of this crate is to iterate over these trait versions before integra
 
 **NOTE** These traits are still experimental. At least one breaking change to this crate is expected in the future (changing from GATs to `async fn`), but there might be more.
 
-<!-- This project is developed and maintained by the [HAL team][team]. -->
+This project is developed and maintained by the [HAL team][team].
 
-<!--
 ## [API reference]
 
 [API reference]: https://docs.rs/embedded-hal-async
--->
 
 <!--
 ## Minimum Supported Rust Version (MSRV)
