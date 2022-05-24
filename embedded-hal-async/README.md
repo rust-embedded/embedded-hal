@@ -1,7 +1,7 @@
-<!--
 [![crates.io](https://img.shields.io/crates/d/embedded-hal-async.svg)](https://crates.io/crates/embedded-hal-async)
 [![crates.io](https://img.shields.io/crates/v/embedded-hal-async.svg)](https://crates.io/crates/embedded-hal-async)
 [![Documentation](https://docs.rs/embedded-hal-async/badge.svg)](https://docs.rs/embedded-hal-async)
+<!--
 ![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.46+-blue.svg)
 -->
 
