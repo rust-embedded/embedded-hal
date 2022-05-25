@@ -1,7 +1,7 @@
-<!--
 [![crates.io](https://img.shields.io/crates/d/embedded-hal-async.svg)](https://crates.io/crates/embedded-hal-async)
 [![crates.io](https://img.shields.io/crates/v/embedded-hal-async.svg)](https://crates.io/crates/embedded-hal-async)
 [![Documentation](https://docs.rs/embedded-hal-async/badge.svg)](https://docs.rs/embedded-hal-async)
+<!--
 ![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.46+-blue.svg)
 -->
 
@@ -14,13 +14,11 @@ The purpose of this crate is to iterate over these trait versions before integra
 
 **NOTE** These traits are still experimental. At least one breaking change to this crate is expected in the future (changing from GATs to `async fn`), but there might be more.
 
-<!-- This project is developed and maintained by the [HAL team][team]. -->
+This project is developed and maintained by the [HAL team][team].
 
-<!--
 ## [API reference]
 
 [API reference]: https://docs.rs/embedded-hal-async
--->
 
 <!--
 ## Minimum Supported Rust Version (MSRV)
