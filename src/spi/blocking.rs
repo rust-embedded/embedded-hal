@@ -33,7 +33,7 @@
 //!
 //! - [`SpiBus`]: Read-write access. This is the most commonly used.
 //! - [`SpiBusRead`]: Read-only access, for example a bus with a MISO pin but no MOSI pin.
-//! - [`SpiBusWrite`]: Read-write access, for example a bus with a MOSI pin but no MISO pin.
+//! - [`SpiBusWrite`]: Write-only access, for example a bus with a MOSI pin but no MISO pin.
 //!
 //! ## Device
 //!
