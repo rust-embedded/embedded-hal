@@ -2,10 +2,11 @@
 
 use core::{fmt::Debug, future::Future};
 
+use embedded_hal::digital::OutputPin;
+use embedded_hal::spi as blocking;
 pub use embedded_hal::spi::{
     Error, ErrorKind, ErrorType, Mode, Phase, Polarity, MODE_0, MODE_1, MODE_2, MODE_3,
 };
-use embedded_hal::{digital::blocking::OutputPin, spi::blocking};
 
 type ReadFuture<'a, T, Word>
 where
