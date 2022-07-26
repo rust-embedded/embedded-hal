@@ -3,10 +3,10 @@
 /// A blocking CAN interface that is able to transmit and receive frames.
 pub trait Can {
     /// Associated frame type.
-    type Frame: crate::can::Frame;
+    type Frame: crate::Frame;
 
     /// Associated error type.
-    type Error: crate::can::Error;
+    type Error: crate::Error;
 
     /// Puts a frame in the transmit buffer. Blocks until space is available in
     /// the transmit buffer.

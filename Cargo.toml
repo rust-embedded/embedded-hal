@@ -14,10 +14,3 @@ name = "embedded-hal"
 readme = "README.md"
 repository = "https://github.com/rust-embedded/embedded-hal"
 version = "1.0.0-alpha.8"
-
-[dependencies]
-nb = "1"
-
-[dev-dependencies.stm32f1]
-version = "0.14"
-features = ["stm32f103", "rt"]

@@ -1,0 +1,20 @@
+[package]
+name = "embedded-hal-nb"
+version = "1.0.0-alpha.1"
+edition = "2018"
+
+categories = ["embedded", "hardware-support", "no-std"]
+description = "Non-blocking Hardware Abstraction Layer (HAL) for embedded systems using the `nb` crate."
+documentation = "https://docs.rs/embedded-hal-nb"
+keywords = ["hal", "IO"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/rust-embedded/embedded-hal"
+
+[dependencies]
+embedded-hal = { version = "=1.0.0-alpha.8", path = ".." }
+nb = "1"
+
+[dev-dependencies.stm32f1]
+version = "0.14"
+features = ["stm32f103", "rt"]
