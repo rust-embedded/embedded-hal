@@ -7,7 +7,7 @@
 //! **NOTE** The traits and modules in this crate should follow the same structure as in
 //! `embedded-hal` to ease merging and migration.
 
-#![deny(missing_docs)]
+#![warn(missing_docs)]
 #![no_std]
 #![feature(generic_associated_types)]
 #![feature(type_alias_impl_trait)]

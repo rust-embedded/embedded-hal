@@ -350,7 +350,7 @@
 //! # fn main() {}
 //! ```
 
-#![deny(missing_docs)]
+#![warn(missing_docs)]
 #![no_std]
 
 pub mod fmt;
