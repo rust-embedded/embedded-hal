@@ -51,8 +51,8 @@ pub trait Wait: embedded_hal::digital::ErrorType {
 
     /// Wait for the pin to undergo a transition from low to high.
     ///
-    /// If the pin is already low, this does *not* return immediately, it'll wait for the
-    /// pin to go high and then low again.
+    /// If the pin is already high, this does *not* return immediately, it'll wait for the
+    /// pin to go low and then high again.
     fn wait_for_rising_edge<'a>(&'a mut self) -> Self::WaitForRisingEdgeFuture<'a>;
 
     /// The future returned from `wait_for_falling_edge`.

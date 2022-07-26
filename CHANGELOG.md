@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Implement `PartialOrd`, `Ord`, `Hash` for `can::StandardId`, `can::ExtendedId` and `can::Id` according to CAN bus arbitration rules
 
+### Fixed
+- Fixed documentation for `wait_for_rising_edge`.
+
 ## [v1.0.0-alpha.8] - 2022-04-15
 
 *** This is (also) an alpha release with breaking changes (sorry) ***
