@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Fixed documentation for `wait_for_rising_edge`.
 
+### Removed
+- `digital::blocking::IoPin` traits.
+
 ## [v1.0.0-alpha.8] - 2022-04-15
 
 *** This is (also) an alpha release with breaking changes (sorry) ***
