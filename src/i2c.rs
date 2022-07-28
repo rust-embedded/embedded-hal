@@ -59,12 +59,12 @@
 //! To improve performance, [`I2cBus`] implementations are allowed to return before the operation is finished, i.e. when the bus is still not
 //! idle.
 //!
-//! When using a [`I2cBus`], call [`flush`](I2cBus::flush) to wait for operations to actually finish. Examples of situations
+//! When using an [`I2cBus`], call [`flush`](I2cBus::flush) to wait for operations to actually finish. Examples of situations
 //! where this is needed are:
 //! - To synchronize I2C activity and GPIO activity during a transaction.
 //! - Before deinitializing the hardware I2C peripheral.
 //!
-//! When using a [`I2cDevice`], you can still call [`flush`](I2cBus::flush) on the bus within a transaction.
+//! When using an [`I2cDevice`], you can still call [`flush`](I2cBus::flush) on the bus within a transaction.
 //! It's very rarely needed, because [`transaction`](I2cDevice::transaction) already flushes the bus for you
 //! when finished.
 //!
@@ -336,7 +336,7 @@ impl AddressMode for SevenBitAddress {}
 
 impl AddressMode for TenBitAddress {}
 
-/// Direction of an i2c transfer.
+/// Direction of an I2C transfer.
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Direction {
     /// I2C read (RnW bit is 1)
@@ -366,8 +366,8 @@ pub mod blocking {
         /// - [Flushes](I2cBus::flush) the bus.
         /// - Unlocks the bus.
         ///
-        /// The locking mechanism is implementation-defined. The only requirement is it must prevent two
-        /// transactions from executing concurrently against the same bus. Examples of implementations are:
+        /// The locking mechanism is implementation-defined. The only requirement is that it must prevent two
+        /// transactions from executing concurrently on the same bus. Examples of implementations are:
         /// critical sections, blocking mutexes, returning an error or panicking if the bus is already busy.
         fn transaction<R>(
             &mut self,
@@ -444,12 +444,12 @@ pub mod blocking {
     pub trait I2cBusBase: ErrorType {
         /// Read data bytes from the SPI device.
         ///
-        /// This is an error if the bus is not in "started" state, or if it's started for the wrong
+        /// This returns an error if the bus is not in "started" state, or if it's started for the wrong
         /// direction. You must have called [`start`](I2cBus::start)
         /// before calling this method with the correct direction.
         fn read(&mut self, bytes: &mut [u8]) -> Result<(), Self::Error>;
 
-        /// Write data bytes to the SPI device.
+        /// Write data bytes to the I2C device.
         ///
         /// This is an error if the bus is not in "started" state, or if it's started for the wrong
         /// direction. You must have called [`start`](I2cBus::start)
