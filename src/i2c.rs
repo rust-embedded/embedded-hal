@@ -3,7 +3,7 @@
 //! # Bus vs Device
 //!
 //! I2C allows sharing a single bus between many I2C devices. The SDA and SCL lines are
-//! wired in parallel to all the devices. When starting a transfer an "address" is sent
+//! wired in parallel to all devices. When starting a transfer an "address" is sent
 //! so that the addressed device can respond and all the others can ignore the transfer.
 //!
 #![doc= include_str!("i2c-shared-bus.svg")]
