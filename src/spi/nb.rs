@@ -1,4 +1,4 @@
-//! Serial Peripheral Interface
+//! SPI master mode traits using `nb`.
 
 use super::ErrorType;
 

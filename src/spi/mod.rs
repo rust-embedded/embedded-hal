@@ -1,4 +1,4 @@
-//! SPI traits
+//! SPI master mode traits.
 
 pub mod blocking;
 pub mod nb;

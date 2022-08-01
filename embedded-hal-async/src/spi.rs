@@ -1,4 +1,4 @@
-//! Serial Peripheral Interface
+//! SPI master mode traits.
 
 use core::{fmt::Debug, future::Future};
 
