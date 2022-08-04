@@ -1,4 +1,4 @@
-//! Blocking SPI API
+//! Blocking SPI master mode traits.
 //!
 //! # Bus vs Device
 //!
