@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Removed
 - `digital::blocking::IoPin` traits.
+- `spi::blocking::ExclusiveDevice` and `spi::blocking::ExclusiveDeviceError`. These have been moved to a separate crate.
 
 ## [v1.0.0-alpha.8] - 2022-04-15
 
