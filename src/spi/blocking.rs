@@ -195,6 +195,9 @@ pub trait SpiDevice: ErrorType {
     /// The locking mechanism is implementation-defined. The only requirement is it must prevent two
     /// transactions from executing concurrently against the same bus. Examples of implementations are:
     /// critical sections, blocking mutexes, returning an error or panicking if the bus is already busy.
+    ///
+    /// On bus errors the implementation should try to deassert CS.
+    /// If an error occurs while deasserting CS the bus error should take priority as the return value.
     fn transaction<R>(
         &mut self,
         f: impl FnOnce(&mut Self::Bus) -> Result<R, <Self::Bus as ErrorType>::Error>,

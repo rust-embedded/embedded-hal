@@ -66,6 +66,9 @@ pub trait SpiDevice: ErrorType {
     /// transactions from executing concurrently against the same bus. Examples of implementations are:
     /// critical sections, blocking mutexes, async mutexes, returning an error or panicking if the bus is already busy.
     ///
+    /// On bus errors the implementation should try to deassert CS.
+    /// If an error occurs while deasserting CS the bus error should take priority as the return value.
+    ///
     /// The current state of the Rust typechecker doesn't allow expressing the necessary lifetime constraints, so
     /// the `f` closure receives a lifetime-less `*mut Bus` raw pointer instead. The pointer is guaranteed
     /// to be valid for the entire duration the closure is running, so dereferencing it is safe.
