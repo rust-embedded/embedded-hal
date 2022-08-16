@@ -1,4 +1,4 @@
-//! Device-sharing mechanisms for [`embedded-hal`], a Hardware Abstraction Layer (HAL) for embedded systems.
+//! Bus/Device connection mechanisms for [`embedded-hal`], a Hardware Abstraction Layer (HAL) for embedded systems.
 //!
 //! It is possible to connect several peripherals to a bus like SPI or I2C.
 //! To support this, `embedded-hal` provides the `SpiBus` and `SpiDevice` traits in the case of SPI, for example.

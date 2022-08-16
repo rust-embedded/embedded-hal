@@ -1,13 +1,13 @@
-[![crates.io](https://img.shields.io/crates/d/embedded-hal-shared.svg)](https://crates.io/crates/embedded-hal-shared)
-[![crates.io](https://img.shields.io/crates/v/embedded-hal-shared.svg)](https://crates.io/crates/embedded-hal-shared)
-[![Documentation](https://docs.rs/embedded-hal-shared/badge.svg)](https://docs.rs/embedded-hal-shared)
+[![crates.io](https://img.shields.io/crates/d/embedded-hal-bus.svg)](https://crates.io/crates/embedded-hal-bus)
+[![crates.io](https://img.shields.io/crates/v/embedded-hal-bus.svg)](https://crates.io/crates/embedded-hal-bus)
+[![Documentation](https://docs.rs/embedded-hal-bus/badge.svg)](https://docs.rs/embedded-hal-bus)
 <!--
-![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.46+-blue.svg)
+![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.54+-blue.svg)
 -->
 
-# `embedded-hal-shared`
+# `embedded-hal-bus`
 
-Device-sharing mechanisms for [`embedded-hal`], a Hardware Abstraction Layer (HAL) for embedded systems.
+Bus/Device connection mechanisms for [`embedded-hal`], a Hardware Abstraction Layer (HAL) for embedded systems.
 
 It is possible to connect several peripherals to a bus like SPI or I2C.
 To support this, `embedded-hal` provides the `SpiBus` and `SpiDevice` traits in the case of SPI, for example.
@@ -24,12 +24,12 @@ This project is developed and maintained by the [HAL team][team].
 
 ## [API reference]
 
-[API reference]: https://docs.rs/embedded-hal-shared
+[API reference]: https://docs.rs/embedded-hal-bus
 
 <!--
 ## Minimum Supported Rust Version (MSRV)
 
-This crate is guaranteed to compile on stable Rust 1.46 and up. It *might*
+This crate is guaranteed to compile on stable Rust 1.54 and up. It *might*
 compile with older versions but that may change in any new patch release.
 -->
 
