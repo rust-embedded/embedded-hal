@@ -14,4 +14,5 @@
 #![warn(missing_docs)]
 #![no_std]
 
+pub mod i2c;
 pub mod spi;

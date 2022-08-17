@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-...
+### Added
+- `ExclusiveDevice` implementation for I2C.
 
 ## [v0.1.0-alpha.0] - 2022-08-17
 
