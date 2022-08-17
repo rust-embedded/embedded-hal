@@ -1,9 +1,7 @@
 [![crates.io](https://img.shields.io/crates/d/embedded-hal-bus.svg)](https://crates.io/crates/embedded-hal-bus)
 [![crates.io](https://img.shields.io/crates/v/embedded-hal-bus.svg)](https://crates.io/crates/embedded-hal-bus)
 [![Documentation](https://docs.rs/embedded-hal-bus/badge.svg)](https://docs.rs/embedded-hal-bus)
-<!--
 ![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.54+-blue.svg)
--->
 
 # `embedded-hal-bus`
 
@@ -26,12 +24,14 @@ This project is developed and maintained by the [HAL team][team].
 
 [API reference]: https://docs.rs/embedded-hal-bus
 
-<!--
 ## Minimum Supported Rust Version (MSRV)
+
 
 This crate is guaranteed to compile on stable Rust 1.54 and up. It *might*
 compile with older versions but that may change in any new patch release.
--->
+
+See [here](../docs/msrv.md) for details on how the MSRV may be upgraded.
+
 
 ## License
 

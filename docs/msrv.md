@@ -6,7 +6,7 @@ that may change in any new patch release.
 
 ## How the MSRV will be upgraded
 
-For `embedded-hal`, we do not consider upgrading the MSRV a strictly breaking change as defined by
+For this library, we do not consider upgrading the MSRV a strictly breaking change as defined by
 [SemVer](https://semver.org).
 
 We follow these rules when upgrading it:
@@ -23,8 +23,7 @@ For example:
 
 For a given `x.y.z` release, we may upgrade the MSRV on `x` and `y` releases but not on `z` releases.
 
-If your MSRV upgrade policy differs from this, you are advised to specify the
-`embedded-hal` dependency in your `Cargo.toml` accordingly.
+If your MSRV upgrade policy differs from this, you are advised to specify the dependency in your `Cargo.toml` accordingly.
 
 See the [Rust Embedded Working Group MSRV RFC](https://github.com/rust-embedded/wg/blob/master/rfcs/0523-msrv-2020.md)
 for more background information and reasoning.
