@@ -1,0 +1,17 @@
+[package]
+authors = [
+  "The Embedded HAL Team and Contributors <embedded-hal@teams.rust-embedded.org>",
+]
+categories = ["embedded", "hardware-support", "no-std"]
+description = "Bus/Device connection mechanisms for embedded-hal, a Hardware Abstraction Layer (HAL) for embedded systems"
+documentation = "https://docs.rs/embedded-hal-bus"
+edition = "2018"
+keywords = ["hal", "IO"]
+license = "MIT OR Apache-2.0"
+name = "embedded-hal-bus"
+readme = "README.md"
+repository = "https://github.com/rust-embedded/embedded-hal"
+version = "0.1.0-alpha.1"
+
+[dependencies]
+embedded-hal = { version = "=1.0.0-alpha.8", path = ".." }
