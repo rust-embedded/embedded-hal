@@ -140,8 +140,6 @@
 //! }
 //! ```
 
-use crate::private;
-
 /// I2C error
 pub trait Error: core::fmt::Debug {
     /// Convert error to a generic I2C error kind
@@ -241,10 +239,17 @@ impl<T: ErrorType> ErrorType for &mut T {
     type Error = T::Error;
 }
 
+mod private {
+    pub trait Sealed {}
+}
+
 /// Address mode (7-bit / 10-bit)
 ///
 /// Note: This trait is sealed and should not be implemented outside of this crate.
-pub trait AddressMode: private::Sealed + 'static {}
+pub trait AddressMode: private::Sealed + 'static {
+    #[doc(hidden)]
+    const GENERAL_CALL_ADDR: Self;
+}
 
 /// 7-bit address mode type
 pub type SevenBitAddress = u8;
@@ -252,13 +257,18 @@ pub type SevenBitAddress = u8;
 /// 10-bit address mode type
 pub type TenBitAddress = u16;
 
-impl AddressMode for SevenBitAddress {}
+impl private::Sealed for SevenBitAddress {}
+impl AddressMode for SevenBitAddress {
+    const GENERAL_CALL_ADDR: Self = 0;
+}
 
-impl AddressMode for TenBitAddress {}
+impl private::Sealed for TenBitAddress {}
+impl AddressMode for TenBitAddress {
+    const GENERAL_CALL_ADDR: Self = 0;
+}
 
 /// Blocking I2C traits
 pub mod blocking {
-
     use super::{AddressMode, ErrorType, SevenBitAddress};
 
     /// Transactional I2C operation.
@@ -400,6 +410,16 @@ pub mod blocking {
         fn transaction_iter<'a, O>(&mut self, address: A, operations: O) -> Result<(), Self::Error>
         where
             O: IntoIterator<Item = Operation<'a>>;
+
+        /// Request a software reset for all devices connected to the I2C bus.
+        ///
+        /// # Note
+        ///
+        /// This I2C feature is optional. It depends on each individual device whether or not it responds to this command.
+        #[inline]
+        fn software_reset(&mut self) -> Result<(), Self::Error> {
+            self.write(A::GENERAL_CALL_ADDR, &[0x06])
+        }
     }
 
     impl<A: AddressMode, T: I2c<A>> I2c<A> for &mut T {

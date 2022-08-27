@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [v0.1.0-alpha.1] - 2022-05-24
 
+### Added
+
+- `I2c::software_reset` for resetting all (supported) devices connected to the bus.
+
 ### Changed
 
 - spi: device helper methods (`read`, `write`, `transfer`...) are now default methods in `SpiDevice` instead of an `SpiDeviceExt` extension trait.

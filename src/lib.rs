@@ -361,11 +361,3 @@ pub mod digital;
 pub mod i2c;
 pub mod serial;
 pub mod spi;
-
-mod private {
-    use crate::i2c::{SevenBitAddress, TenBitAddress};
-    pub trait Sealed {}
-
-    impl Sealed for SevenBitAddress {}
-    impl Sealed for TenBitAddress {}
-}

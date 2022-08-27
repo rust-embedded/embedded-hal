@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Implement `PartialOrd`, `Ord`, `Hash` for `can::StandardId`, `can::ExtendedId` and `can::Id` according to CAN bus arbitration rules
+- `I2c::software_reset` for resetting all (supported) devices connected to the bus.
 
 ### Fixed
 - Fixed documentation for `wait_for_rising_edge`.

@@ -130,6 +130,16 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
         address: A,
         operations: &'a mut [Operation<'b>],
     ) -> Self::TransactionFuture<'a, 'b>;
+
+    /// Request a software reset for all devices connected to the I2C bus.
+    ///
+    /// # Note
+    ///
+    /// This I2C feature is optional. It depends on each individual device whether or not it responds to this command.
+    #[inline]
+    fn software_reset<'a>(&'a mut self) -> Self::WriteFuture<'a> {
+        self.write(A::GENERAL_CALL_ADDR, &[0x06])
+    }
 }
 
 impl<A: AddressMode, T: I2c<A>> I2c<A> for &mut T {
