@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - spi: device helper methods (`read`, `write`, `transfer`...) are now default methods in `SpiDevice` instead of an `SpiDeviceExt` extension trait.
 - spi: the `SpiDevice::transaction` closure now gets a raw pointer to the `SpiBus` to work around Rust borrow checker limitations.
+- spi: the `SpiDevice` trait is now unsafe to implement due to the raw pointer workaround.
 
 
 ## [v0.1.0-alpha.0] - 2022-04-17

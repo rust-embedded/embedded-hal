@@ -41,7 +41,11 @@ where
 /// with a CS (Chip Select) pin.
 ///
 /// See (the docs on embedded-hal)[embedded_hal::spi::blocking] for important information on SPI Bus vs Device traits.
-pub trait SpiDevice: ErrorType {
+///
+/// # Safety
+///
+/// See [`SpiDevice::transaction`] for details.
+pub unsafe trait SpiDevice: ErrorType {
     /// SPI Bus type for this device.
     type Bus: ErrorType;
 
@@ -69,9 +73,13 @@ pub trait SpiDevice: ErrorType {
     /// On bus errors the implementation should try to deassert CS.
     /// If an error occurs while deasserting CS the bus error should take priority as the return value.
     ///
+    /// # Safety
+    ///
     /// The current state of the Rust typechecker doesn't allow expressing the necessary lifetime constraints, so
-    /// the `f` closure receives a lifetime-less `*mut Bus` raw pointer instead. The pointer is guaranteed
-    /// to be valid for the entire duration the closure is running, so dereferencing it is safe.
+    /// the `f` closure receives a lifetime-less `*mut Bus` raw pointer instead.
+    ///
+    /// Implementers of the `SpiDevice` trait must guarantee that the pointer is valid and dereferencable
+    /// for the entire duration of the closure.
     fn transaction<'a, R, F, Fut>(&'a mut self, f: F) -> Self::TransactionFuture<'a, R, F, Fut>
     where
         F: FnOnce(*mut Self::Bus) -> Fut + 'a,
@@ -153,7 +161,7 @@ pub trait SpiDevice: ErrorType {
     }
 }
 
-impl<T: SpiDevice> SpiDevice for &mut T {
+unsafe impl<T: SpiDevice> SpiDevice for &mut T {
     type Bus = T::Bus;
 
     type TransactionFuture<'a, R, F, Fut> = T::TransactionFuture<'a, R, F, Fut>
@@ -377,7 +385,7 @@ where
     }
 }
 
-impl<BUS, CS> SpiDevice for ExclusiveDevice<BUS, CS>
+unsafe impl<BUS, CS> SpiDevice for ExclusiveDevice<BUS, CS>
 where
     BUS: SpiBusFlush,
     CS: OutputPin,
