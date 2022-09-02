@@ -35,6 +35,46 @@ where
     Word: Copy + 'static,
 = impl Future<Output = Result<(), T::Error>>;
 
+#[macro_export]
+/// This macro is a workaround for the workaround in [`SpiDevice::transaction`]
+///
+/// # Examples
+///
+/// ```
+/// use embedded_hal_async::spi::{transaction_helper, SpiBus, SpiBusRead, SpiBusWrite, SpiDevice};
+///
+/// pub async fn transaction_example<SPI>(mut device: SPI) -> Result<u32, SPI::Error>
+/// where
+///     SPI: SpiDevice,
+///     SPI::Bus: SpiBus,
+/// {
+///     transaction_helper!(&mut device, move |bus| async move {
+///         // Unlike `SpiDevice::transaction`, we don't need to
+///         // manually dereference a pointer in order to use the bus.
+///         bus.write(&[42]).await?;
+///         let mut data = [0; 4];
+///         bus.read(&mut data).await?;
+///         Ok(u32::from_be_bytes(data))
+///     })
+///     .await
+/// }
+/// ```
+macro_rules! spi_transaction_helper {
+    ($device:expr, move |$bus:ident| async move $closure_body:expr) => {
+        $crate::spi::SpiDevice::transaction($device, move |$bus| async move {
+            // Safety: Implementers of the `SpiDevice` trait guarantee that the pointer is
+            // valid and dereferencable for the entire duration of the closure.
+            let $bus = unsafe { &mut *$bus };
+            let result = $closure_body;
+            ::core::mem::drop($bus); // Ensure that the bus reference was not moved out of the closure
+            result
+        })
+    };
+}
+
+#[doc(inline)]
+pub use spi_transaction_helper as transaction_helper;
+
 /// SPI device trait
 ///
 /// `SpiDevice` represents ownership over a single SPI device on a (possibly shared) bus, selected
@@ -95,11 +135,7 @@ pub unsafe trait SpiDevice: ErrorType {
         Self::Bus: SpiBusRead<Word>,
         Word: Copy + 'static,
     {
-        self.transaction(move |bus| async move {
-            // safety: `bus` is a valid pointer we're allowed to use for the duration of the closure.
-            let bus = unsafe { &mut *bus };
-            bus.read(buf).await
-        })
+        transaction_helper!(self, move |bus| async move { bus.read(buf).await })
     }
 
     /// Do a write within a transaction.
@@ -112,11 +148,7 @@ pub unsafe trait SpiDevice: ErrorType {
         Self::Bus: SpiBusWrite<Word>,
         Word: Copy + 'static,
     {
-        self.transaction(move |bus| async move {
-            // safety: `bus` is a valid pointer we're allowed to use for the duration of the closure.
-            let bus = unsafe { &mut *bus };
-            bus.write(buf).await
-        })
+        transaction_helper!(self, move |bus| async move { bus.write(buf).await })
     }
 
     /// Do a transfer within a transaction.
@@ -133,11 +165,10 @@ pub unsafe trait SpiDevice: ErrorType {
         Self::Bus: SpiBus<Word>,
         Word: Copy + 'static,
     {
-        self.transaction(move |bus| async move {
-            // safety: `bus` is a valid pointer we're allowed to use for the duration of the closure.
-            let bus = unsafe { &mut *bus };
-            bus.transfer(read, write).await
-        })
+        transaction_helper!(
+            self,
+            move |bus| async move { bus.transfer(read, write).await }
+        )
     }
 
     /// Do an in-place transfer within a transaction.
@@ -153,11 +184,10 @@ pub unsafe trait SpiDevice: ErrorType {
         Self::Bus: SpiBus<Word>,
         Word: Copy + 'static,
     {
-        self.transaction(move |bus| async move {
-            // safety: `bus` is a valid pointer we're allowed to use for the duration of the closure.
-            let bus = unsafe { &mut *bus };
-            bus.transfer_in_place(buf).await
-        })
+        transaction_helper!(
+            self,
+            move |bus| async move { bus.transfer_in_place(buf).await }
+        )
     }
 }
 

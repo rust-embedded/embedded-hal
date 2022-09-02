@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [v0.1.0-alpha.1] - 2022-05-24
 
+### Added
+
+- spi: added a transaction helper macro as a workaround for the raw pointer workaround.
+
 ### Changed
 
 - spi: device helper methods (`read`, `write`, `transfer`...) are now default methods in `SpiDevice` instead of an `SpiDeviceExt` extension trait.
