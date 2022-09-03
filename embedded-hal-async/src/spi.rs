@@ -66,7 +66,8 @@ macro_rules! spi_transaction_helper {
             // valid and dereferencable for the entire duration of the closure.
             let $bus = unsafe { &mut *$bus };
             let result = $closure_body;
-            ::core::mem::drop($bus); // Ensure that the bus reference was not moved out of the closure
+            let $bus = $bus; // Ensure that the bus reference was not moved out of the closure
+            let _ = $bus; // Silence the "unused variable" warning from prevous line
             result
         })
     };
