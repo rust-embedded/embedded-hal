@@ -59,6 +59,24 @@ where
 ///     .await
 /// }
 /// ```
+///
+/// Note that the compiler will prevent you from moving the bus reference outside of the closure
+/// ```compile_fail
+/// # use embedded_hal_async::spi::{transaction_helper, SpiBus, SpiBusRead, SpiBusWrite, SpiDevice};
+/// #
+/// # pub async fn smuggle_test<SPI>(mut device: SPI) -> Result<(), SPI::Error>
+/// # where
+/// #     SPI: SpiDevice,
+/// #     SPI::Bus: SpiBus,
+/// # {
+///     let mut bus_smuggler: Option<&mut SPI::Bus> = None;
+///     transaction_helper!(&mut device, move |bus| async move {
+///         bus_smuggler = Some(bus);
+///         Ok(())
+///     })
+///     .await
+/// # }
+/// ```
 macro_rules! spi_transaction_helper {
     ($device:expr, move |$bus:ident| async move $closure_body:expr) => {
         $crate::spi::SpiDevice::transaction($device, move |$bus| {
