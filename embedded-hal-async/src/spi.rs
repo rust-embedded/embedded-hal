@@ -91,6 +91,45 @@ macro_rules! spi_transaction_helper {
             }
         })
     };
+    ($device:expr, move |$bus:ident| async $closure_body:expr) => {
+        $crate::spi::SpiDevice::transaction($device, move |$bus| {
+            // Safety: Implementers of the `SpiDevice` trait guarantee that the pointer is
+            // valid and dereferencable for the entire duration of the closure.
+            let $bus = unsafe { &mut *$bus };
+            async {
+                let result = $closure_body;
+                let $bus = $bus; // Ensure that the bus reference was not moved out of the closure
+                let _ = $bus; // Silence the "unused variable" warning from prevous line
+                result
+            }
+        })
+    };
+    ($device:expr, |$bus:ident| async move $closure_body:expr) => {
+        $crate::spi::SpiDevice::transaction($device, |$bus| {
+            // Safety: Implementers of the `SpiDevice` trait guarantee that the pointer is
+            // valid and dereferencable for the entire duration of the closure.
+            let $bus = unsafe { &mut *$bus };
+            async move {
+                let result = $closure_body;
+                let $bus = $bus; // Ensure that the bus reference was not moved out of the closure
+                let _ = $bus; // Silence the "unused variable" warning from prevous line
+                result
+            }
+        })
+    };
+    ($device:expr, |$bus:ident| async $closure_body:expr) => {
+        $crate::spi::SpiDevice::transaction($device, |$bus| {
+            // Safety: Implementers of the `SpiDevice` trait guarantee that the pointer is
+            // valid and dereferencable for the entire duration of the closure.
+            let $bus = unsafe { &mut *$bus };
+            async {
+                let result = $closure_body;
+                let $bus = $bus; // Ensure that the bus reference was not moved out of the closure
+                let _ = $bus; // Silence the "unused variable" warning from prevous line
+                result
+            }
+        })
+    };
 }
 
 #[doc(inline)]
