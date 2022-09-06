@@ -7,6 +7,21 @@
 //! **NOTE** If you want to use an alpha release of the 1.0.0 version, use an exact version
 //! specifier in your `Cargo.toml` like: `embedded-hal = "=1.0.0-alpha.2"`.
 //!
+//! # Companion crates
+//!
+//! The main `embedded-hal` crate contains only blocking traits, where the operation is done
+//! synchronously before returning. Check out the following crates, which contain versions
+//! of the traits for other execution models:
+//!
+//! - [`embedded-hal-async`](https://docs.rs/embedded-hal-async): async/await-based.
+//! - [`embedded-hal-nb`](https://docs.rs/embedded-hal-nb): polling-based, using the `nb` crate.
+//!
+//! The [`embedded-hal-bus`](https://docs.rs/embedded-hal-bus) crate provides utilities for sharing
+//! SPI and I2C buses.
+//!
+//! Additionally, more domain-specific traits are available in separate crates:
+//! - [`embedded-can`](https://docs.rs/embedded-can): Controller Area Network (CAN)
+//!
 //! # Design goals
 //!
 //! The HAL
