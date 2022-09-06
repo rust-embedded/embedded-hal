@@ -3,26 +3,27 @@ on:
     branches: [ staging, trying, master ]
   pull_request:
 
-name: Test Suite
+name: Continuous integration
 
 env:
   RUSTFLAGS: '--deny warnings'
 
 jobs:
-  ci-linux-test:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        rust: [stable]
+        # All generated code should be running on stable now
+        rust:
+          - stable
+          - 1.54.0  # MSRV
+          - nightly
 
-        include:
-          - rust: 1.54.0
-            TARGET: x86_64-unknown-linux-gnu
-
-          # Test nightly but don't fail
-          - rust: nightly
-            experimental: true
-            TARGET: x86_64-unknown-linux-gnu
+        # The default target we're compiling on and for
+        target:
+          - x86_64-unknown-linux-gnu
+          - thumbv6m-none-eabi
+          - thumbv7m-none-eabi
 
     steps:
       - uses: actions/checkout@v2
@@ -30,8 +31,13 @@ jobs:
         with:
           profile: minimal
           toolchain: ${{ matrix.rust }}
-          target: ${{ matrix.TARGET }}
+          target: ${{ matrix.target }}
           override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: test
+
+      - run: sed -i '/nightly-only/d' Cargo.toml 
+        if: matrix.toolchain != 'nightly'
+
+      - run: cargo check --target=${{ matrix.target }}
+
+      - run: cargo test --target=${{ matrix.target }}
+        if: contains(matrix.target, 'linux')
