@@ -284,13 +284,13 @@ pub trait SpiBusFlush: ErrorType {
     /// Wait until all operations have completed and the bus is idle.
     ///
     /// See (the docs on embedded-hal)[embedded_hal::spi::blocking] for information on flushing.
-    fn flush<'a>(&'a mut self) -> Self::FlushFuture<'a>;
+    fn flush(&mut self) -> Self::FlushFuture<'_>;
 }
 
 impl<T: SpiBusFlush> SpiBusFlush for &mut T {
     type FlushFuture<'a> = T::FlushFuture<'a> where Self: 'a;
 
-    fn flush<'a>(&'a mut self) -> Self::FlushFuture<'a> {
+    fn flush(&mut self) -> Self::FlushFuture<'_> {
         T::flush(self)
     }
 }

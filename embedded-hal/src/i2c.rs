@@ -259,7 +259,7 @@ impl AddressMode for TenBitAddress {}
 /// Transactional I2C operation.
 ///
 /// Several operations can be combined as part of a transaction.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Operation<'a> {
     /// Read data into the provided buffer
     Read(&'a mut [u8]),
