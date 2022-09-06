@@ -1,8 +1,10 @@
 //! SPI master mode traits using `nb`.
 
-use super::ErrorType;
+pub use embedded_hal::spi::{
+    Error, ErrorKind, ErrorType, Mode, Phase, Polarity, MODE_0, MODE_1, MODE_2, MODE_3,
+};
 
-/// Full duplex (master mode)
+/// Full duplex SPI (master mode)
 ///
 /// # Notes
 ///

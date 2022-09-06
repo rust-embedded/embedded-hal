@@ -5,16 +5,16 @@ on:
 
 name: Clippy check
 jobs:
-  clippy_check:
+  clippy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: stable
+          # embedded-hal-async needs nightly.
+          # Use a pinned version to avoid spontaneous breakages (new clippy lints are added often)
+          toolchain: nightly-2022-09-05  
           override: true
           components: clippy
-      - uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - run: cargo clippy -- --deny=warnings

@@ -1,4 +1,7 @@
-//! Controller Area Network
+//! Controller Area Network (CAN) traits
+
+#![warn(missing_docs)]
+#![no_std]
 
 pub mod blocking;
 pub mod nb;

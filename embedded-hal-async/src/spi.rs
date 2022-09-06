@@ -2,10 +2,11 @@
 
 use core::{fmt::Debug, future::Future};
 
+use embedded_hal::digital::OutputPin;
+use embedded_hal::spi as blocking;
 pub use embedded_hal::spi::{
     Error, ErrorKind, ErrorType, Mode, Phase, Polarity, MODE_0, MODE_1, MODE_2, MODE_3,
 };
-use embedded_hal::{digital::blocking::OutputPin, spi::blocking};
 
 type ReadFuture<'a, T, Word>
 where
@@ -188,13 +189,13 @@ pub trait SpiBusFlush: ErrorType {
     /// Wait until all operations have completed and the bus is idle.
     ///
     /// See (the docs on embedded-hal)[embedded_hal::spi::blocking] for information on flushing.
-    fn flush<'a>(&'a mut self) -> Self::FlushFuture<'a>;
+    fn flush(&mut self) -> Self::FlushFuture<'_>;
 }
 
 impl<T: SpiBusFlush> SpiBusFlush for &mut T {
     type FlushFuture<'a> = T::FlushFuture<'a> where Self: 'a;
 
-    fn flush<'a>(&'a mut self) -> Self::FlushFuture<'a> {
+    fn flush(&mut self) -> Self::FlushFuture<'_> {
         T::flush(self)
     }
 }

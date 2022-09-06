@@ -16,9 +16,4 @@ jobs:
           toolchain: nightly
           override: true
           components: rustfmt
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
-      - run: cargo fmt --all -- --check
-        working-directory: embedded-hal-async
+      - run: cargo fmt --check
