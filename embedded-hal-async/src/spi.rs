@@ -41,14 +41,14 @@ where
 /// # Examples
 ///
 /// ```
-/// use embedded_hal_async::spi::{transaction_helper, SpiBus, SpiBusRead, SpiBusWrite, SpiDevice};
+/// use embedded_hal_async::spi::{transaction, SpiBus, SpiBusRead, SpiBusWrite, SpiDevice};
 ///
 /// pub async fn transaction_example<SPI>(mut device: SPI) -> Result<u32, SPI::Error>
 /// where
 ///     SPI: SpiDevice,
 ///     SPI::Bus: SpiBus,
 /// {
-///     transaction_helper!(&mut device, move |bus| async move {
+///     transaction!(&mut device, move |bus| async move {
 ///         // Unlike `SpiDevice::transaction`, we don't need to
 ///         // manually dereference a pointer in order to use the bus.
 ///         bus.write(&[42]).await?;
@@ -62,7 +62,7 @@ where
 ///
 /// Note that the compiler will prevent you from moving the bus reference outside of the closure
 /// ```compile_fail
-/// # use embedded_hal_async::spi::{transaction_helper, SpiBus, SpiBusRead, SpiBusWrite, SpiDevice};
+/// # use embedded_hal_async::spi::{transaction, SpiBus, SpiBusRead, SpiBusWrite, SpiDevice};
 /// #
 /// # pub async fn smuggle_test<SPI>(mut device: SPI) -> Result<(), SPI::Error>
 /// # where
@@ -70,14 +70,14 @@ where
 /// #     SPI::Bus: SpiBus,
 /// # {
 ///     let mut bus_smuggler: Option<&mut SPI::Bus> = None;
-///     transaction_helper!(&mut device, move |bus| async move {
+///     transaction!(&mut device, move |bus| async move {
 ///         bus_smuggler = Some(bus);
 ///         Ok(())
 ///     })
 ///     .await
 /// # }
 /// ```
-macro_rules! spi_transaction_helper {
+macro_rules! spi_transaction {
     ($device:expr, move |$bus:ident| async move $closure_body:expr) => {
         $crate::spi::SpiDevice::transaction($device, move |$bus| {
             // Safety: Implementers of the `SpiDevice` trait guarantee that the pointer is
@@ -133,7 +133,7 @@ macro_rules! spi_transaction_helper {
 }
 
 #[doc(inline)]
-pub use spi_transaction_helper as transaction_helper;
+pub use spi_transaction as transaction;
 
 /// SPI device trait
 ///
@@ -195,7 +195,7 @@ pub unsafe trait SpiDevice: ErrorType {
         Self::Bus: SpiBusRead<Word>,
         Word: Copy + 'static,
     {
-        transaction_helper!(self, move |bus| async move { bus.read(buf).await })
+        transaction!(self, move |bus| async move { bus.read(buf).await })
     }
 
     /// Do a write within a transaction.
@@ -208,7 +208,7 @@ pub unsafe trait SpiDevice: ErrorType {
         Self::Bus: SpiBusWrite<Word>,
         Word: Copy + 'static,
     {
-        transaction_helper!(self, move |bus| async move { bus.write(buf).await })
+        transaction!(self, move |bus| async move { bus.write(buf).await })
     }
 
     /// Do a transfer within a transaction.
@@ -225,7 +225,7 @@ pub unsafe trait SpiDevice: ErrorType {
         Self::Bus: SpiBus<Word>,
         Word: Copy + 'static,
     {
-        transaction_helper!(
+        transaction!(
             self,
             move |bus| async move { bus.transfer(read, write).await }
         )
@@ -244,7 +244,7 @@ pub unsafe trait SpiDevice: ErrorType {
         Self::Bus: SpiBus<Word>,
         Word: Copy + 'static,
     {
-        transaction_helper!(
+        transaction!(
             self,
             move |bus| async move { bus.transfer_in_place(buf).await }
         )
