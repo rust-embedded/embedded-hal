@@ -160,6 +160,10 @@ pub unsafe trait SpiDevice: ErrorType {
 
     /// Perform a transaction against the device.
     ///
+    /// **NOTE:**
+    /// It is not recommended to use this method directly, because it requires `unsafe` code to dereference the raw pointer.
+    /// Instead, the [`transaction!`] macro should be used, which handles this safely inside the macro.
+    /// 
     /// - Locks the bus
     /// - Asserts the CS (Chip Select) pin.
     /// - Calls `f` with an exclusive reference to the bus, which can then be used to do transfers against the device.
