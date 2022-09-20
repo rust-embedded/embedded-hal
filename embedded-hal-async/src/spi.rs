@@ -36,7 +36,8 @@ where
 = impl Future<Output = Result<(), T::Error>>;
 
 #[macro_export]
-/// This macro is a workaround for the workaround in [`SpiDevice::transaction`]
+/// Do an SPI transaction on a bus.
+/// This is a safe wrapper for [SpiDevice::transaction], which handles dereferencing the raw pointer for you.
 ///
 /// # Examples
 ///
