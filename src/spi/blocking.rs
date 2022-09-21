@@ -132,7 +132,7 @@
 //! # For HAL authors
 //!
 //! HALs **must** implement [`SpiBus`], [`SpiBusRead`] and [`SpiBusWrite`]. Users can combine the bus together with the CS pin (which should
-//! implement [`OutputPin`]) using HAL-independent [`SpiDevice`] implementations such as [`ExclusiveDevice`].
+//! implement [`OutputPin`](crate::digital::blocking::OutputPin)) using HAL-independent [`SpiDevice`] implementations such as the ones in [`embedded-hal-bus`](https://crates.io/crates/embedded-hal-bus).
 //!
 //! HALs may additionally implement [`SpiDevice`] to **take advantage of hardware CS management**, which may provide some performance
 //! benefits. (There's no point in a HAL implementing [`SpiDevice`] if the CS management is software-only, this task is better left to
