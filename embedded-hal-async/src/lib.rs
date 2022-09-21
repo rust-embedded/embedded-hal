@@ -9,7 +9,6 @@
 
 #![warn(missing_docs)]
 #![no_std]
-#![feature(generic_associated_types)]
 #![feature(type_alias_impl_trait)]
 
 pub mod delay;
