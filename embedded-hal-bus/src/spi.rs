@@ -35,7 +35,7 @@ pub mod blocking {
 
     /// [`SpiDevice`] implementation with exclusive access to the bus (not shared).
     ///
-    /// This is the most straightforward way of obtaining an [`SpiDevice`] from an [`SpiBus`],
+    /// This is the most straightforward way of obtaining an [`SpiDevice`] from an [`SpiBus`](embedded_hal::spi::blocking::SpiBus),
     /// ideal for when no sharing is required (only one SPI device is present on the bus).
     pub struct ExclusiveDevice<BUS, CS> {
         bus: BUS,
