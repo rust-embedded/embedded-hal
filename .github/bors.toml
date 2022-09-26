@@ -11,6 +11,5 @@ status = [
   "test (nightly, x86_64-unknown-linux-gnu)",
   "test (nightly, thumbv6m-none-eabi)",
   "test (nightly, thumbv7m-none-eabi)",
-  "clippy",
   "fmt",
 ]
