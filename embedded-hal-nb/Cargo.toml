@@ -16,5 +16,5 @@ embedded-hal = { version = "=1.0.0-alpha.8", path = "../embedded-hal" }
 nb = "1"
 
 [dev-dependencies.stm32f1]
-version = "0.14"
+version = "0.15"
 features = ["stm32f103", "rt"]
