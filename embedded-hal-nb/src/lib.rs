@@ -1,69 +1,6 @@
-//! A Hardware Abstraction Layer (HAL) for embedded systems
+//! Non-blocking Hardware Abstraction Layer (HAL) traits for embedded systems, using the `nb` crate.
 //!
-//! **NOTE** This HAL is still is active development. Expect the traits presented here to be
-//! tweaked, split or be replaced wholesale before being stabilized, i.e. before hitting the 1.0.0
-//! release.
-//!
-//! **NOTE** If you want to use an alpha release of the 1.0.0 version, use an exact version
-//! specifier in your `Cargo.toml` like: `embedded-hal = "=1.0.0-alpha.2"`.
-//!
-//! # Design goals
-//!
-//! The HAL
-//!
-//! - Must *erase* device specific details. Neither register, register blocks or magic values should
-//! appear in the API.
-//!
-//! - Must be generic *within* a device and *across* devices. The API to use a serial interface must
-//! be the same regardless of whether the implementation uses the USART1 or UART4 peripheral of a
-//! device or the UART0 peripheral of another device.
-//!
-//! - Where possible must *not* be tied to a specific asynchronous model. The API should be usable
-//! in blocking mode, with the `futures` model, with an async/await model or with a callback model.
-//! (cf. the [`nb`] crate)
-//!
-//! - Must be minimal, and thus easy to implement and zero cost, yet highly composable. People that
-//! want higher level abstraction should *prefer to use this HAL* rather than *re-implement*
-//! register manipulation code.
-//!
-//! - Serve as a foundation for building an ecosystem of platform agnostic drivers. Here driver
-//! means a library crate that lets a target platform interface an external device like a digital
-//! sensor or a wireless transceiver. The advantage of this system is that by writing the driver as
-//! a generic library on top of `embedded-hal` driver authors can support any number of target
-//! platforms (e.g. Cortex-M microcontrollers, AVR microcontrollers, embedded Linux, etc.). The
-//! advantage for application developers is that by adopting `embedded-hal` they can unlock all
-//! these drivers for their platform.
-//!
-//! - Trait methods must be fallible so that they can be used in any possible situation.
-//! Nevertheless, HAL implementations can additionally provide infallible versions of the same methods
-//! if they can never fail in their platform. This way, generic code can use the fallible abstractions
-//! provided here but platform-specific code can avoid fallibility-related boilerplate if possible.
-//!
-//! # Out of scope
-//!
-//! - Initialization and configuration stuff like "ensure this serial interface and that SPI
-//! interface are not using the same pins". The HAL will focus on *doing I/O*.
-//!
-//! # Reference implementation
-//!
-//! The [`stm32f1xx-hal`] crate contains a reference implementation of this HAL.
-//!
-//! [`stm32f1xx-hal`]: https://crates.io/crates/stm32f1xx-hal
-//!
-//! # Platform agnostic drivers
-//!
-//! You can find platform agnostic drivers built on top of `embedded-hal` on crates.io by [searching
-//! for the *embedded-hal* keyword](https://crates.io/keywords/embedded-hal).
-//!
-//! If you are writing a platform agnostic driver yourself you are highly encouraged to [add the
-//! embedded-hal keyword](https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata)
-//! to your crate before publishing it!
-//!
-//! # Detailed design
-//!
-//! ## Traits
-//!
-//! The HAL is specified as traits to allow generic programming. These traits make use of the
+//! The `embedded-hal-nb` traits make use of the
 //! [`nb`][] crate (*please go read that crate documentation before continuing*) to abstract over
 //! the asynchronous model and to also provide a blocking operation mode.
 //!
@@ -72,7 +9,7 @@
 //! Here's how a HAL trait may look like:
 //!
 //! ```
-//! use embedded_hal::nb;
+//! use embedded_hal_nb;
 //!
 //! /// A serial interface
 //! pub trait Serial {
@@ -98,8 +35,6 @@
 //! those cases `nb::Result<_, Infallible>` is used.
 //!
 //! ```
-//! use embedded_hal::nb;
-//!
 //! # use std as core;
 //! use ::core::convert::Infallible;
 //!
@@ -130,8 +65,8 @@
 //! // crate: stm32f1xx-hal
 //! // An implementation of the `embedded-hal` traits for STM32F1xx microcontrollers
 //!
-//! use embedded_hal as hal;
-//! use hal::nb;
+//! use embedded_hal_nb::serial;
+//! use nb;
 //!
 //! // device crate
 //! use stm32f1::stm32f103::USART1;
@@ -143,11 +78,11 @@
 //! // convenience type alias
 //! pub type Serial1 = Serial<USART1>;
 //!
-//! impl hal::serial::ErrorType for Serial<USART1> {
-//!     type Error = hal::serial::ErrorKind;
+//! impl serial::ErrorType for Serial<USART1> {
+//!     type Error = serial::ErrorKind;
 //! }
 //!
-//! impl hal::serial::nb::Read<u8> for Serial<USART1> {
+//! impl embedded_hal_nb::serial::Read<u8> for Serial<USART1> {
 //!     fn read(&mut self) -> nb::Result<u8, Self::Error> {
 //!         // read the status register
 //!         let isr = self.usart.sr.read();
@@ -167,7 +102,7 @@
 //!     }
 //! }
 //!
-//! impl hal::serial::nb::Write<u8> for Serial<USART1> {
+//! impl embedded_hal_nb::serial::Write<u8> for Serial<USART1> {
 //!     fn write(&mut self, byte: u8) -> nb::Result<(), Self::Error> {
 //!         // Similar to the `read` implementation
 //!         # Ok(())
@@ -195,9 +130,9 @@
 //! fashion:
 //!
 //! ```
-//! use crate::stm32f1xx_hal::Serial1;
-//! use embedded_hal::serial::nb::Write;
-//! use embedded_hal::nb::block;
+//! use stm32f1xx_hal::Serial1;
+//! use embedded_hal_nb::serial::Write;
+//! use nb::block;
 //!
 //! # fn main() {
 //! let mut serial: Serial1 = {
@@ -213,7 +148,7 @@
 //! # }
 //!
 //! # mod stm32f1xx_hal {
-//! #     use embedded_hal::nb;
+//! #     use embedded_hal_nb;
 //! #     use core::convert::Infallible;
 //! #     pub struct Serial1;
 //! #     impl Serial1 {
@@ -240,13 +175,12 @@
 //! - Write a whole buffer to a serial device in blocking a fashion.
 //!
 //! ```
-//! use embedded_hal as hal;
-//! use hal::nb::block;
-//! use hal::serial::nb::Write;
+//! use embedded_hal_nb::serial::Write;
+//! use nb::block;
 //!
 //! fn write_all<S>(serial: &mut S, buffer: &[u8]) -> Result<(), S::Error>
 //! where
-//!     S: hal::serial::nb::Write<u8>
+//!     S: Write<u8>
 //! {
 //!     for &byte in buffer {
 //!         block!(serial.write(byte))?;
@@ -262,14 +196,12 @@
 //!
 //! ```
 //! # use std as core;
-//! use embedded_hal as hal;
-//! use hal::nb;
-//!
-//! use hal::serial::{ErrorKind, nb::Write};
+//! use embedded_hal_nb::serial::{ErrorKind, Write};
+//! use nb::block;
 //!
 //! fn flush<S>(serial: &mut S, cb: &mut CircularBuffer)
 //! where
-//!     S: hal::serial::nb::Write<u8, Error = ErrorKind>,
+//!     S: Write<u8, Error = ErrorKind>,
 //! {
 //!     loop {
 //!         if let Some(byte) = cb.peek() {
@@ -333,12 +265,12 @@
 //! #     fn deref_mut(&mut self) -> &mut T { self.0 }
 //! # }
 //! # struct Serial1;
-//! # impl hal::serial::ErrorType for Serial1 {
+//! # impl embedded_hal_nb::serial::ErrorType for Serial1 {
 //! #   type Error = ErrorKind;
 //! # }
-//! # impl hal::serial::nb::Write<u8> for Serial1 {
-//! #   fn write(&mut self, _: u8) -> nb::Result<(), Self::Error> { Err(::nb::Error::WouldBlock) }
-//! #   fn flush(&mut self) -> nb::Result<(), Self::Error> { Err(::nb::Error::WouldBlock) }
+//! # impl embedded_hal_nb::serial::Write<u8> for Serial1 {
+//! #   fn write(&mut self, _: u8) -> nb::Result<(), Self::Error> { Err(nb::Error::WouldBlock) }
+//! #   fn flush(&mut self) -> nb::Result<(), Self::Error> { Err(nb::Error::WouldBlock) }
 //! # }
 //! # struct CircularBuffer;
 //! # impl CircularBuffer {
@@ -353,19 +285,7 @@
 #![warn(missing_docs)]
 #![no_std]
 
-pub mod fmt;
 pub use nb;
-pub mod can;
-pub mod delay;
-pub mod digital;
-pub mod i2c;
+
 pub mod serial;
 pub mod spi;
-
-mod private {
-    use crate::i2c::{SevenBitAddress, TenBitAddress};
-    pub trait Sealed {}
-
-    impl Sealed for SevenBitAddress {}
-    impl Sealed for TenBitAddress {}
-}

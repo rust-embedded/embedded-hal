@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- The `embedded-hal` crate now contains blocking traits only. Import paths no longer contain `::blocking`. `nb` traits are now available in a separate `embedded-hal-nb` crate.
+- Moved CAN traits to a separate `embedded-can` crate.
+
 ### Added
 - Implement `PartialOrd`, `Ord`, `Hash` for `can::StandardId`, `can::ExtendedId` and `can::Id` according to CAN bus arbitration rules
 

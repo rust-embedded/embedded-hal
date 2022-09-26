@@ -1,23 +1,10 @@
-[package]
-authors = [
-  "The Embedded HAL Team <embedded-hal@teams.rust-embedded.org>",
-  "Jorge Aparicio <jorge@japaric.io>",
-  "Jonathan 'theJPster' Pallant <github@thejpster.org.uk>"
+[workspace]
+
+# CI removes lines containing 'nightly-only' when not building with nightly.
+members = [
+    "embedded-hal",
+    "embedded-hal-async",  # nightly-only
+    "embedded-hal-nb",
+    "embedded-hal-bus",
+    "embedded-can",
 ]
-categories = ["asynchronous", "embedded", "hardware-support", "no-std"]
-description = " A Hardware Abstraction Layer (HAL) for embedded systems "
-documentation = "https://docs.rs/embedded-hal"
-edition = "2018"
-keywords = ["hal", "IO"]
-license = "MIT OR Apache-2.0"
-name = "embedded-hal"
-readme = "README.md"
-repository = "https://github.com/rust-embedded/embedded-hal"
-version = "1.0.0-alpha.8"
-
-[dependencies]
-nb = "1"
-
-[dev-dependencies.stm32f1]
-version = "0.14"
-features = ["stm32f103", "rt"]

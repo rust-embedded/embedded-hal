@@ -1,17 +1,8 @@
-[![crates.io](https://img.shields.io/crates/d/embedded-hal.svg)](https://crates.io/crates/embedded-hal)
-[![crates.io](https://img.shields.io/crates/v/embedded-hal.svg)](https://crates.io/crates/embedded-hal)
-[![Documentation](https://docs.rs/embedded-hal/badge.svg)](https://docs.rs/embedded-hal)
-![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.54+-blue.svg)
-
 # `embedded-hal`
 
 >  A Hardware Abstraction Layer (HAL) for embedded systems
 
-This project is developed and maintained by the [HAL team][team].
-
-## [API reference]
-
-[API reference]: https://docs.rs/embedded-hal
+This project is developed and maintained by the [HAL team][https://github.com/rust-embedded/wg#the-hal-team].
 
 ## Scope
 
@@ -26,13 +17,23 @@ platforms (e.g. Cortex-M microcontrollers, AVR microcontrollers, embedded Linux,
 The advantage for application developers is that by adopting `embedded-hal` they can unlock all
 these drivers for their platform.
 
-`embedded-hal` is not tied to a specific execution model like blocking or non-blocking.
-
 For functionality that goes beyond what is provided by `embedded-hal`, users are encouraged
 to use the target platform directly. Abstractions of common functionality can be proposed to be
 included into `embedded-hal` as described [in this guide](docs/how-to-add-a-new-trait.md), though.
 
 See more about the design goals in [this documentation section](https://docs.rs/embedded-hal/latest/embedded_hal/#design-goals).
+
+## Crates
+
+The main  `embedded-hal` project is not tied to a specific execution model like blocking or non-blocking.
+
+| Crate | crates.io | Docs | |
+|-|-|-|-|
+| [embedded-hal](./embedded-hal)       | [![crates.io](https://img.shields.io/crates/v/embedded-hal.svg)](https://crates.io/crates/embedded-hal) | [![Documentation](https://docs.rs/embedded-hal/badge.svg)](https://docs.rs/embedded-hal) | Core traits, blocking version |
+| [embedded-hal-async](./embedded-hal-async) | [![crates.io](https://img.shields.io/crates/v/embedded-hal-async.svg)](https://crates.io/crates/embedded-hal-async) | [![Documentation](https://docs.rs/embedded-hal-async/badge.svg)](https://docs.rs/embedded-hal-async) | Core traits, async version |
+| [embedded-hal-nb](./embedded-hal-nb)    | [![crates.io](https://img.shields.io/crates/v/embedded-hal-nb.svg)](https://crates.io/crates/embedded-hal-nb) | [![Documentation](https://docs.rs/embedded-hal-nb/badge.svg)](https://docs.rs/embedded-hal-nb) | Core traits, polling version using the `nb` crate |
+| [embedded-hal-bus](./embedded-hal-bus)   | [![crates.io](https://img.shields.io/crates/v/embedded-hal-bus.svg)](https://crates.io/crates/embedded-hal-bus) | [![Documentation](https://docs.rs/embedded-hal-bus/badge.svg)](https://docs.rs/embedded-hal-bus) | Utilities for sharing SPI and I2C buses |
+| [embedded-can](./embedded-can)       | [![crates.io](https://img.shields.io/crates/v/embedded-can.svg)](https://crates.io/crates/embedded-can) | [![Documentation](https://docs.rs/embedded-can/badge.svg)](https://docs.rs/embedded-can) | Controller Area Network (CAN) traits |
 
 ## Releases
 
@@ -94,9 +95,6 @@ dual licensed as above, without any additional terms or conditions.
 
 ## Code of Conduct
 
-Contribution to this crate is organized under the terms of the [Rust Code of
-Conduct][CoC], the maintainer of this crate, the [HAL team][team], promises
+Contribution to this repository is organized under the terms of the [Rust Code of
+Conduct](CODE_OF_CONDUCT.md), the maintainers of this repository, the [HAL team](https://github.com/rust-embedded/wg#the-hal-team), promise
 to intervene to uphold that code of conduct.
-
-[CoC]: CODE_OF_CONDUCT.md
-[team]: https://github.com/rust-embedded/wg#the-hal-team

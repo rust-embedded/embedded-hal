@@ -2,11 +2,14 @@ block_labels = ["needs-decision"]
 delete_merged_branches = true
 required_approvals = 1
 status = [
-  "ci-linux (stable, x86_64-unknown-linux-gnu)",
-  "ci-linux (stable, thumbv6m-none-eabi)",
-  "ci-linux (stable, thumbv7m-none-eabi)",
-  "ci-linux (1.54.0, x86_64-unknown-linux-gnu)",
-  "ci-linux-test (stable)",
-  "ci-linux-test (1.54.0, x86_64-unknown-linux-gnu)",
+  "test (stable, x86_64-unknown-linux-gnu)",
+  "test (stable, thumbv6m-none-eabi)",
+  "test (stable, thumbv7m-none-eabi)",
+  "test (1.54.0, x86_64-unknown-linux-gnu)",
+  "test (1.54.0, thumbv6m-none-eabi)",
+  "test (1.54.0, thumbv7m-none-eabi)",
+  "test (nightly, x86_64-unknown-linux-gnu)",
+  "test (nightly, thumbv6m-none-eabi)",
+  "test (nightly, thumbv7m-none-eabi)",
   "fmt",
 ]
