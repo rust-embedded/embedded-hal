@@ -29,7 +29,7 @@
 //! when paired with the macros in the `nb` crate, can operate in a blocking manner, or be adapted
 //! to other asynchronous execution schemes.
 //!
-//! [`WouldBlock`]: https://docs.rs/nb/0.1.0/nb/enum.Error.html
+//! [`WouldBlock`]: https://docs.rs/nb/1.0.0/nb/enum.Error.html
 //!
 //! Some traits, like the one shown below, may expose possibly blocking APIs that can't fail. In
 //! those cases `nb::Result<_, Infallible>` is used.
