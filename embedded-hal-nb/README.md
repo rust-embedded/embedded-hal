@@ -7,9 +7,9 @@
 
 A non-blocking Hardware Abstraction Layer (HAL) for embedded systems, using the `nb` crate.
 
-This crate contains versions of some [`embedded-hal`](https://crates.io/crates/embedded-hal) traits using `nb`, and shares its scope and [design goals].
+This crate contains versions of some [`embedded-hal`](https://crates.io/crates/embedded-hal) traits using `nb`, and shares its scope and [design goals](https://docs.rs/embedded-hal/latest/embedded_hal/#design-goals).
 
-This project is developed and maintained by the [HAL team][https://github.com/rust-embedded/wg#the-hal-team].
+This project is developed and maintained by the [HAL team](https://github.com/rust-embedded/wg#the-hal-team).
 
 ## [API reference]
 
@@ -20,7 +20,7 @@ This project is developed and maintained by the [HAL team][https://github.com/ru
 This crate is guaranteed to compile on stable Rust 1.54 and up. It *might*
 compile with older versions but that may change in any new patch release.
 
-See [here](docs/msrv.md) for details on how the MSRV may be upgraded.
+See [here](../docs/msrv.md) for details on how the MSRV may be upgraded.
 
 ## License
 
