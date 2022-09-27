@@ -1,6 +1,6 @@
 [package]
 name = "embedded-hal-nb"
-version = "1.0.0-alpha.1"
+version = "1.0.0-alpha.0"
 edition = "2018"
 
 categories = ["embedded", "hardware-support", "no-std"]
