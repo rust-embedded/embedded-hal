@@ -14,9 +14,7 @@ jobs:
           profile: minimal
           # embedded-hal-async needs nightly.
           # Use a pinned version to avoid spontaneous breakages (new clippy lints are added often)
-          toolchain: nightly-2022-09-05  
+          toolchain: nightly-2022-09-25
           override: true
           components: clippy
-      - uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+      - run: cargo clippy -- --deny=warnings
