@@ -18,7 +18,7 @@ This crate provides mechanisms to connect a `...Bus` and a `...Device`.
 
 For further details on these traits, please consult the [`embedded-hal` documentation](https://docs.rs/embedded-hal).
 
-This project is developed and maintained by the [HAL team][https://github.com/rust-embedded/wg#the-hal-team].
+This project is developed and maintained by the [HAL team](https://github.com/rust-embedded/wg#the-hal-team).
 
 ## [API reference]
 

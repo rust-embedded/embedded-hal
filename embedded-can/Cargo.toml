@@ -1,6 +1,6 @@
 [package]
 name = "embedded-can"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2018"
 
 description = "HAL traits for Controller Area Network (CAN) devices."
@@ -12,5 +12,4 @@ readme = "README.md"
 repository = "https://github.com/rust-embedded/embedded-hal"
 
 [dependencies]
-embedded-hal = { version = "=1.0.0-alpha.9", path = "../embedded-hal" }
 nb = "1"
