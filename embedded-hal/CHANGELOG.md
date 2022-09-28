@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - Implement `PartialOrd`, `Ord`, `Hash` for `can::StandardId`, `can::ExtendedId` and `can::Id` according to CAN bus arbitration rules
-- Implement `Eq` for `i2c::Operaiton`
+- Implement `Eq` for `i2c::Operation`
 - Implement `PartialOrd`, `Ord`, `Hash` for `can::StandardId`, `can::ExtendedId` and `can::Id` according to CAN bus arbitration rules.
 
 ### Fixed
