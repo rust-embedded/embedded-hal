@@ -12,5 +12,4 @@ readme = "README.md"
 repository = "https://github.com/rust-embedded/embedded-hal"
 
 [dependencies]
-embedded-hal = { version = "=1.0.0-alpha.9", path = "../embedded-hal" }
 nb = "1"

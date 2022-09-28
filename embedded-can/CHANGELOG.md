@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ...
 
+
+### Removed
+- Unnecessary `embedded-hal` dependency.
+
 ## [v0.4.0] - 2022-09-28
 
 Release of version of the traits extracted from embedded-hal.
