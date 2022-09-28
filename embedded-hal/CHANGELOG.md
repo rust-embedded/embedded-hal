@@ -7,21 +7,33 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-### Changed
 
-- The `embedded-hal` crate now contains blocking traits only. Import paths no longer contain `::blocking`. `nb` traits are now available in a separate `embedded-hal-nb` crate.
-- Moved CAN traits to a separate `embedded-can` crate.
+## [v1.0.0-alpha.9] - 2022-09-28
+
+*** This is (also) an alpha release with breaking changes (sorry) ***
+
+### Changed
+- The `embedded-hal` crate now contains blocking traits only. Import paths no longer contain `::blocking`.
 
 ### Added
 - Implement `PartialOrd`, `Ord`, `Hash` for `can::StandardId`, `can::ExtendedId` and `can::Id` according to CAN bus arbitration rules
 - Implement `Eq` for `i2c::Operaiton`
+- Implement `PartialOrd`, `Ord`, `Hash` for `can::StandardId`, `can::ExtendedId` and `can::Id` according to CAN bus arbitration rules.
 
 ### Fixed
 - Fixed documentation for `wait_for_rising_edge`.
 
 ### Removed
-- `digital::blocking::IoPin` traits.
-- `spi::blocking::ExclusiveDevice` and `spi::blocking::ExclusiveDeviceError`. These have been moved to a separate crate.
+- `digital::blocking::IoPin` traits. See: [#340], [#397].
+- `nb` traits are now available in a separate [`embedded-hal-nb`] crate.
+- `spi::blocking::ExclusiveDevice` and `spi::blocking::ExclusiveDeviceError`. These have been moved to a separate [`embedded-hal-bus`] crate.
+- Moved CAN traits to a separate [`embedded-can`] crate.
+
+[`embedded-can`]: https://crates.io/crates/embedded-can
+[`embedded-hal-nb`]: https://crates.io/crates/embedded-hal-nb
+[`embedded-hal-bus`]: https://crates.io/crates/embedded-hal-bus
+[#340]: https://github.com/rust-embedded/embedded-hal/issues/340
+[#397]: https://github.com/rust-embedded/embedded-hal/issues/397
 
 ## [v1.0.0-alpha.8] - 2022-04-15
 
@@ -254,7 +266,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.8...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.9...HEAD
+[v1.0.0-alpha.9]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.8...v1.0.0-alpha.9
 [v1.0.0-alpha.8]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.7...v1.0.0-alpha.8
 [v1.0.0-alpha.7]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.6...v1.0.0-alpha.7
 [v1.0.0-alpha.6]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.5...v1.0.0-alpha.6
