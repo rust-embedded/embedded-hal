@@ -7,7 +7,7 @@
 
 An embedded Controller Area Network (CAN) abstraction layer. This crate defines generic traits to be implemented by CAN driver and MCU HAL crates.
 
-This project is developed and maintained by the [HAL team][https://github.com/rust-embedded/wg#the-hal-team].
+This project is developed and maintained by the [HAL team](https://github.com/rust-embedded/wg#the-hal-team).
 
 ## [API reference]
 
