@@ -18,7 +18,7 @@ This project is developed and maintained by the [HAL team][https://github.com/ru
 This crate is guaranteed to compile on stable Rust 1.54 and up. It *might*
 compile with older versions but that may change in any new patch release.
 
-See [here](docs/msrv.md) for details on how the MSRV may be upgraded.
+See [here](../docs/msrv.md) for details on how the MSRV may be upgraded.
 
 ## License
 
