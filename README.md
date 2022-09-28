@@ -2,7 +2,7 @@
 
 >  A Hardware Abstraction Layer (HAL) for embedded systems
 
-This project is developed and maintained by the [HAL team][https://github.com/rust-embedded/wg#the-hal-team].
+This project is developed and maintained by the [HAL team](https://github.com/rust-embedded/wg#the-hal-team).
 
 ## Scope
 
