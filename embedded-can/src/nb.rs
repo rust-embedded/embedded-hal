@@ -17,7 +17,7 @@ pub trait Can {
     ///
     /// # Notes for implementers
     ///
-    /// * Frames of equal identifier shall be transmited in FIFO fashion when more
+    /// * Frames of equal identifier shall be transmitted in FIFO fashion when more
     ///   than one transmit buffer is available.
     /// * When replacing pending frames make sure the frame is not in the process of
     ///   being send to the bus.

@@ -12,6 +12,6 @@ pub trait Can {
     /// the transmit buffer.
     fn transmit(&mut self, frame: &Self::Frame) -> Result<(), Self::Error>;
 
-    /// Blocks until a frame was received or an error occured.
+    /// Blocks until a frame was received or an error occurred.
     fn receive(&mut self) -> Result<Self::Frame, Self::Error>;
 }
