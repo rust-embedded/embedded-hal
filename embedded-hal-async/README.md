@@ -9,7 +9,7 @@
 
 An asynchronous Hardware Abstraction Layer (HAL) for embedded systems.
 
-This crate contains asynchronous versions of the [`embedded-hal`](https://crates.io/crates/embedded-hal) traits and shares its scope and [design goals].
+This crate contains asynchronous versions of the [`embedded-hal`](https://crates.io/crates/embedded-hal) traits and shares its scope and [design goals](https://docs.rs/embedded-hal/latest/embedded_hal/#design-goals).
 The purpose of this crate is to iterate over these trait versions before integrating them into [`embedded-hal`](https://crates.io/crates/embedded-hal).
 
 **NOTE** These traits are still experimental. At least one breaking change to this crate is expected in the future (changing from GATs to `async fn`), but there might be more.
