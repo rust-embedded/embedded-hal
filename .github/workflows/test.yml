@@ -34,9 +34,6 @@ jobs:
           target: ${{ matrix.target }}
           override: true
 
-      - run: sed -i '/nightly-only/d' Cargo.toml 
-        if: matrix.toolchain != 'nightly'
-
       - run: cargo check --target=${{ matrix.target }}
 
       - run: cargo test --target=${{ matrix.target }}
