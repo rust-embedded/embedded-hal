@@ -13,28 +13,28 @@ where
     T: SpiDevice + ?Sized + 'a,
     T::Bus: SpiBusRead<Word>,
     Word: Copy + 'static,
-= impl Future<Output = Result<(), T::Error>>;
+= impl Future<Output = Result<(), T::Error>> + 'a;
 
 type WriteFuture<'a, T, Word>
 where
     T: SpiDevice + ?Sized + 'a,
     T::Bus: SpiBusWrite<Word>,
     Word: Copy + 'static,
-= impl Future<Output = Result<(), T::Error>>;
+= impl Future<Output = Result<(), T::Error>> + 'a;
 
 type TransferFuture<'a, T, Word>
 where
     T: SpiDevice + ?Sized + 'a,
     T::Bus: SpiBus<Word>,
     Word: Copy + 'static,
-= impl Future<Output = Result<(), T::Error>>;
+= impl Future<Output = Result<(), T::Error>> + 'a;
 
 type TransferInPlaceFuture<'a, T, Word>
 where
     T: SpiDevice + ?Sized + 'a,
     T::Bus: SpiBus<Word>,
     Word: Copy + 'static,
-= impl Future<Output = Result<(), T::Error>>;
+= impl Future<Output = Result<(), T::Error>> + 'a;
 
 #[macro_export]
 /// Do an SPI transaction on a bus.
@@ -488,7 +488,7 @@ where
 {
     type Bus = BUS;
 
-    type TransactionFuture<'a, R, F, Fut> = impl Future<Output = Result<R, Self::Error>>
+    type TransactionFuture<'a, R, F, Fut> = impl Future<Output = Result<R, Self::Error>> + 'a
     where
         Self: 'a, R: 'a, F: FnOnce(*mut Self::Bus) -> Fut + 'a,
         Fut: Future<Output =  Result<R, <Self::Bus as ErrorType>::Error>> + 'a;
