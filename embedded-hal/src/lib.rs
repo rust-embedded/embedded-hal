@@ -80,13 +80,18 @@
 pub mod delay;
 pub mod digital;
 pub mod i2c;
+pub mod sai;
 pub mod serial;
 pub mod spi;
 
 mod private {
     use crate::i2c::{SevenBitAddress, TenBitAddress};
+    use crate::sai::{I2sMode, I2sLeftMode, TdmMode};
     pub trait Sealed {}
 
     impl Sealed for SevenBitAddress {}
     impl Sealed for TenBitAddress {}
+    impl Sealed for I2sMode {}
+    impl Sealed for I2sLeftMode {}
+    impl Sealed for TdmMode {}
 }
