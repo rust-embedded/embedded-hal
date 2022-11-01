@@ -35,7 +35,7 @@ jobs:
           override: true
 
       - run: sed -i '/nightly-only/d' Cargo.toml 
-        if: matrix.toolchain != 'nightly'
+        if: matrix.rust != 'nightly'
 
       - run: cargo check --target=${{ matrix.target }}
 
