@@ -86,7 +86,7 @@ pub mod spi;
 
 mod private {
     use crate::i2c::{SevenBitAddress, TenBitAddress};
-    use crate::sai::{I2sMode, I2sLeftMode, TdmMode};
+    use crate::sai::{I2sLeftMode, I2sMode, TdmMode};
     pub trait Sealed {}
 
     impl Sealed for SevenBitAddress {}

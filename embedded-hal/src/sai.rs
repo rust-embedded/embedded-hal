@@ -5,7 +5,7 @@ use crate::private;
 /// SAI mode
 ///
 /// Note: This trait is sealed and should not be implemented outside of this crate.
-pub trait SaiMode: private::Sealed + 'static {}
+pub trait SaiCommMode: private::Sealed + 'static {}
 
 /// Standard I2S mode
 pub struct I2sMode;
@@ -16,95 +16,95 @@ pub struct I2sLeftMode;
 /// TDM mode
 pub struct TdmMode;
 
-impl SaiMode for I2sMode {}
-impl SaiMode for I2sLeftMode {}
-impl SaiMode for TdmMode {}
+impl SaiCommMode for I2sMode {}
+impl SaiCommMode for I2sLeftMode {}
+impl SaiCommMode for TdmMode {}
 
 /// I2S trait
-pub trait I2s<W>: 
-    I2sRx<W> +
-    I2sTx<W> {}
+pub trait I2s<W>: I2sRx<W> + I2sTx<W> {}
 
 /// I2S receiver-only trait
-pub trait I2sRx<W>: 
-    SaiRx<I2sMode, W, 2> +
-    SaiRxInterlaced<I2sMode, W, 2> {}
+pub trait I2sRx<W>: SaiRx<I2sMode, W, 2> + SaiRxInterlaced<I2sMode, W, 2> {}
 
 /// I2S transmitter-only trait
-pub trait I2sTx<W>: 
-    SaiTx<I2sMode, W, 2> +
-    SaiTxInterlaced<I2sMode, W, 2> {}
-
+pub trait I2sTx<W>: SaiTx<I2sMode, W, 2> + SaiTxInterlaced<I2sMode, W, 2> {}
 
 /// I2S left/MSB aligned trait
-pub trait I2sLeft<W>:
-    I2sLeftRx<W> +
-    I2sLeftTx<W> {}
+pub trait I2sLeft<W>: I2sLeftRx<W> + I2sLeftTx<W> {}
 
-/// I2S left/MSB aligned  receiver-only trait
-pub trait I2sLeftRx<W>: 
-    SaiRx<I2sLeftMode, W, 2> +
-    SaiRxInterlaced<I2sLeftMode, W, 2> {}
+/// I2S left/MSB aligned receiver-only trait
+pub trait I2sLeftRx<W>: SaiRx<I2sLeftMode, W, 2> + SaiRxInterlaced<I2sLeftMode, W, 2> {}
 
-/// I2S left/MSB aligned  transmitter-only trait
-pub trait I2sLeftTx<W>: 
-    SaiTx<I2sLeftMode, W, 2> +
-    SaiTxInterlaced<I2sLeftMode, W, 2> {}
+/// I2S left/MSB aligned transmitter-only trait
+pub trait I2sLeftTx<W>: SaiTx<I2sLeftMode, W, 2> + SaiTxInterlaced<I2sLeftMode, W, 2> {}
 
-    
+/// TDM trait
+pub trait Tdm<W, const CHANNELS: usize>: TdmRx<W, CHANNELS> + TdmTx<W, CHANNELS> {}
+
 /// TDM receiver trait
 pub trait TdmRx<W, const CHANNELS: usize>:
-    SaiRx<TdmMode, W, CHANNELS> +
-    SaiRxInterlaced<TdmMode, W, CHANNELS> {}
+    SaiRx<TdmMode, W, CHANNELS> + SaiRxInterlaced<TdmMode, W, CHANNELS>
+{
+}
 
 /// TDM transmitter trait
 pub trait TdmTx<W, const CHANNELS: usize>:
-    SaiTx<TdmMode, W, CHANNELS> +
-    SaiTxInterlaced<TdmMode, W, CHANNELS> {}
-
+    SaiTx<TdmMode, W, CHANNELS> + SaiTxInterlaced<TdmMode, W, CHANNELS>
+{
+}
 
 /// SAI RX trait
-pub trait SaiRx<M: SaiMode, W, const CHANNELS: usize> {
+pub trait SaiRx<M: SaiCommMode, W: Sized, const CHANNELS: usize> {
     /// Error type
     type Error: core::fmt::Debug;
+    /// Sample type
+    type Sample: Sized;
 
     /// Reads enough bytes to fill all `CHANNELS` with `samples`.
     fn read<'w>(&mut self, samples: [&'w mut [W]; CHANNELS]) -> Result<(), Self::Error>;
 }
 
 /// SAI RX interlaced trait
-pub trait SaiRxInterlaced<M: SaiMode, W, const CHANNELS: usize> {
+pub trait SaiRxInterlaced<M: SaiCommMode, W: Sized, const CHANNELS: usize> {
     /// Error type
     type Error: core::fmt::Debug;
-    
+    /// Sample type
+    type Sample: Sized;
+
     /// Reads enough bytes to fill the interlaced `samples` buffer.
     fn read_interlaced<'w>(&mut self, samples: &'w mut [W]) -> Result<(), Self::Error>;
 }
 
 /// SAI TX trait
-pub trait SaiTx<M: SaiMode, W, const CHANNELS: usize> {
+pub trait SaiTx<M: SaiCommMode, W: Sized, const CHANNELS: usize> {
     /// Error type
     type Error: core::fmt::Debug;
+    /// Sample type
+    type Sample: Sized;
 
     /// Sends `samples` to the `CHANNELS`.
     fn write<'w>(&mut self, samples: [&'w [W]; CHANNELS]) -> Result<(), Self::Error>;
 
     /// Sends `samples` to the `CHANNELS`.
     fn write_iter<WI>(&mut self, samples: [WI; CHANNELS]) -> Result<(), Self::Error>
-    where WI: core::iter::IntoIterator<Item = W>;
+    where
+        WI: core::iter::IntoIterator<Item = W>;
 }
 
 /// SAI TX interlaced trait
-pub trait SaiTxInterlaced<M: SaiMode, W, const CHANNELS: usize> {
+pub trait SaiTxInterlaced<M: SaiCommMode, W: Sized, const CHANNELS: usize> {
     /// Error type
     type Error: core::fmt::Debug;
+    /// Sample type
+    type Sample: Sized;
 
     /// Sends `samples` from an interlaced buffer.
-    fn write_interlaced<'w>(&mut self, samples: &'w mut [W]) -> Result<(), Self::Error>;
+    fn write_interlaced<'w>(&mut self, samples: &'w [W]) -> Result<(), Self::Error>;
 
     /// Sends `samples` to the `CHANNELS`.
     fn write_interlaced_iter<WI>(&mut self, samples: WI) -> Result<(), Self::Error>
-    where WI: core::iter::IntoIterator<Item = W>;
+    where
+        WI: core::iter::IntoIterator<Item = W>;
 }
 
 /// SAI error
