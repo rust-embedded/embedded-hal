@@ -8,34 +8,6 @@ pub use embedded_hal::spi::{
     Error, ErrorKind, ErrorType, Mode, Phase, Polarity, MODE_0, MODE_1, MODE_2, MODE_3,
 };
 
-type ReadFuture<'a, T, Word>
-where
-    T: SpiDevice + ?Sized + 'a,
-    T::Bus: SpiBusRead<Word>,
-    Word: Copy + 'static,
-= impl Future<Output = Result<(), T::Error>> + 'a;
-
-type WriteFuture<'a, T, Word>
-where
-    T: SpiDevice + ?Sized + 'a,
-    T::Bus: SpiBusWrite<Word>,
-    Word: Copy + 'static,
-= impl Future<Output = Result<(), T::Error>> + 'a;
-
-type TransferFuture<'a, T, Word>
-where
-    T: SpiDevice + ?Sized + 'a,
-    T::Bus: SpiBus<Word>,
-    Word: Copy + 'static,
-= impl Future<Output = Result<(), T::Error>> + 'a;
-
-type TransferInPlaceFuture<'a, T, Word>
-where
-    T: SpiDevice + ?Sized + 'a,
-    T::Bus: SpiBus<Word>,
-    Word: Copy + 'static,
-= impl Future<Output = Result<(), T::Error>> + 'a;
-
 #[macro_export]
 /// Do an SPI transaction on a bus.
 /// This is a safe wrapper for [SpiDevice::transaction], which handles dereferencing the raw pointer for you.
@@ -151,14 +123,6 @@ pub unsafe trait SpiDevice: ErrorType {
     /// SPI Bus type for this device.
     type Bus: ErrorType;
 
-    /// Future returned by the `transaction` method.
-    type TransactionFuture<'a, R, F, Fut>: Future<Output = Result<R, Self::Error>>
-    where
-        Self: 'a,
-        R: 'a,
-        F: FnOnce(*mut Self::Bus) -> Fut + 'a,
-        Fut: Future<Output = Result<R, <Self::Bus as ErrorType>::Error>> + 'a;
-
     /// Perform a transaction against the device.
     ///
     /// **NOTE:**
@@ -186,22 +150,22 @@ pub unsafe trait SpiDevice: ErrorType {
     ///
     /// Implementers of the `SpiDevice` trait must guarantee that the pointer is valid and dereferencable
     /// for the entire duration of the closure.
-    fn transaction<'a, R, F, Fut>(&'a mut self, f: F) -> Self::TransactionFuture<'a, R, F, Fut>
+    async fn transaction<R, F, Fut>(&mut self, f: F) -> Result<R, Self::Error>
     where
-        F: FnOnce(*mut Self::Bus) -> Fut + 'a,
-        Fut: Future<Output = Result<R, <Self::Bus as ErrorType>::Error>> + 'a;
+        F: FnOnce(*mut Self::Bus) -> Fut,
+        Fut: Future<Output = Result<R, <Self::Bus as ErrorType>::Error>>;
 
     /// Do a read within a transaction.
     ///
     /// This is a convenience method equivalent to `device.transaction(|bus| bus.read(buf))`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBusRead::read`]
-    fn read<'a, Word>(&'a mut self, buf: &'a mut [Word]) -> ReadFuture<'a, Self, Word>
+    async fn read<'a, Word>(&'a mut self, buf: &'a mut [Word]) -> Result<(), Self::Error>
     where
         Self::Bus: SpiBusRead<Word>,
         Word: Copy + 'static,
     {
-        transaction!(self, move |bus| async move { bus.read(buf).await })
+        transaction!(self, move |bus| async move { bus.read(buf).await }).await
     }
 
     /// Do a write within a transaction.
@@ -209,12 +173,12 @@ pub unsafe trait SpiDevice: ErrorType {
     /// This is a convenience method equivalent to `device.transaction(|bus| bus.write(buf))`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBusWrite::write`]
-    fn write<'a, Word>(&'a mut self, buf: &'a [Word]) -> WriteFuture<'a, Self, Word>
+    async fn write<'a, Word>(&'a mut self, buf: &'a [Word]) -> Result<(), Self::Error>
     where
         Self::Bus: SpiBusWrite<Word>,
         Word: Copy + 'static,
     {
-        transaction!(self, move |bus| async move { bus.write(buf).await })
+        transaction!(self, move |bus| async move { bus.write(buf).await }).await
     }
 
     /// Do a transfer within a transaction.
@@ -222,11 +186,11 @@ pub unsafe trait SpiDevice: ErrorType {
     /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer(read, write))`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer`]
-    fn transfer<'a, Word>(
+    async fn transfer<'a, Word>(
         &'a mut self,
         read: &'a mut [Word],
         write: &'a [Word],
-    ) -> TransferFuture<'a, Self, Word>
+    ) -> Result<(), Self::Error>
     where
         Self::Bus: SpiBus<Word>,
         Word: Copy + 'static,
@@ -235,6 +199,7 @@ pub unsafe trait SpiDevice: ErrorType {
             self,
             move |bus| async move { bus.transfer(read, write).await }
         )
+        .await
     }
 
     /// Do an in-place transfer within a transaction.
@@ -242,10 +207,10 @@ pub unsafe trait SpiDevice: ErrorType {
     /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer_in_place(buf))`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer_in_place`]
-    fn transfer_in_place<'a, Word>(
+    async fn transfer_in_place<'a, Word>(
         &'a mut self,
         buf: &'a mut [Word],
-    ) -> TransferInPlaceFuture<'a, Self, Word>
+    ) -> Result<(), Self::Error>
     where
         Self::Bus: SpiBus<Word>,
         Word: Copy + 'static,
@@ -254,54 +219,38 @@ pub unsafe trait SpiDevice: ErrorType {
             self,
             move |bus| async move { bus.transfer_in_place(buf).await }
         )
+        .await
     }
 }
 
 unsafe impl<T: SpiDevice> SpiDevice for &mut T {
     type Bus = T::Bus;
 
-    type TransactionFuture<'a, R, F, Fut> = T::TransactionFuture<'a, R, F, Fut>
+    async fn transaction<R, F, Fut>(&mut self, f: F) -> Result<R, Self::Error>
     where
-        Self: 'a, R: 'a, F: FnOnce(*mut Self::Bus) -> Fut + 'a,
-        Fut: Future<Output = Result<R, <Self::Bus as ErrorType>::Error>> + 'a;
-
-    fn transaction<'a, R, F, Fut>(&'a mut self, f: F) -> Self::TransactionFuture<'a, R, F, Fut>
-    where
-        F: FnOnce(*mut Self::Bus) -> Fut + 'a,
-        Fut: Future<Output = Result<R, <Self::Bus as ErrorType>::Error>> + 'a,
+        F: FnOnce(*mut Self::Bus) -> Fut,
+        Fut: Future<Output = Result<R, <Self::Bus as ErrorType>::Error>>,
     {
-        T::transaction(self, f)
+        T::transaction(self, f).await
     }
 }
 
 /// Flush support for SPI bus
 pub trait SpiBusFlush: ErrorType {
-    /// Future returned by the `flush` method.
-    type FlushFuture<'a>: Future<Output = Result<(), Self::Error>>
-    where
-        Self: 'a;
-
     /// Wait until all operations have completed and the bus is idle.
     ///
     /// See (the docs on embedded-hal)[embedded_hal::spi::blocking] for information on flushing.
-    fn flush(&mut self) -> Self::FlushFuture<'_>;
+    async fn flush(&mut self) -> Result<(), Self::Error>;
 }
 
 impl<T: SpiBusFlush> SpiBusFlush for &mut T {
-    type FlushFuture<'a> = T::FlushFuture<'a> where Self: 'a;
-
-    fn flush(&mut self) -> Self::FlushFuture<'_> {
-        T::flush(self)
+    async fn flush(&mut self) -> Result<(), Self::Error> {
+        T::flush(self).await
     }
 }
 
 /// Read-only SPI bus
 pub trait SpiBusRead<Word: 'static + Copy = u8>: SpiBusFlush {
-    /// Future returned by the `read` method.
-    type ReadFuture<'a>: Future<Output = Result<(), Self::Error>>
-    where
-        Self: 'a;
-
     /// Read `words` from the slave.
     ///
     /// The word value sent on MOSI during reading is implementation-defined,
@@ -309,36 +258,27 @@ pub trait SpiBusRead<Word: 'static + Copy = u8>: SpiBusFlush {
     ///
     /// Implementations are allowed to return before the operation is
     /// complete. See (the docs on embedded-hal)[embedded_hal::spi::blocking] for details on flushing.
-    fn read<'a>(&'a mut self, words: &'a mut [Word]) -> Self::ReadFuture<'a>;
+    async fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
 }
 
 impl<T: SpiBusRead<Word>, Word: 'static + Copy> SpiBusRead<Word> for &mut T {
-    type ReadFuture<'a> = T::ReadFuture<'a> where Self: 'a;
-
-    fn read<'a>(&'a mut self, words: &'a mut [Word]) -> Self::ReadFuture<'a> {
-        T::read(self, words)
+    async fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
+        T::read(self, words).await
     }
 }
 
 /// Write-only SPI
 pub trait SpiBusWrite<Word: 'static + Copy = u8>: SpiBusFlush {
-    /// Future returned by the `write` method.
-    type WriteFuture<'a>: Future<Output = Result<(), Self::Error>>
-    where
-        Self: 'a;
-
     /// Write `words` to the slave, ignoring all the incoming words
     ///
     /// Implementations are allowed to return before the operation is
     /// complete. See (the docs on embedded-hal)[embedded_hal::spi::blocking] for details on flushing.
-    fn write<'a>(&'a mut self, words: &'a [Word]) -> Self::WriteFuture<'a>;
+    async fn write(&mut self, words: &[Word]) -> Result<(), Self::Error>;
 }
 
 impl<T: SpiBusWrite<Word>, Word: 'static + Copy> SpiBusWrite<Word> for &mut T {
-    type WriteFuture<'a> = T::WriteFuture<'a> where Self: 'a;
-
-    fn write<'a>(&'a mut self, words: &'a [Word]) -> Self::WriteFuture<'a> {
-        T::write(self, words)
+    async fn write(&mut self, words: &[Word]) -> Result<(), Self::Error> {
+        T::write(self, words).await
     }
 }
 
@@ -348,11 +288,6 @@ impl<T: SpiBusWrite<Word>, Word: 'static + Copy> SpiBusWrite<Word> for &mut T {
 ///
 /// See (the docs on embedded-hal)[embedded_hal::spi::blocking] for important information on SPI Bus vs Device traits.
 pub trait SpiBus<Word: 'static + Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
-    /// Future returned by the `transfer` method.
-    type TransferFuture<'a>: Future<Output = Result<(), Self::Error>>
-    where
-        Self: 'a;
-
     /// Write and read simultaneously. `write` is written to the slave on MOSI and
     /// words received on MISO are stored in `read`.
     ///
@@ -364,16 +299,11 @@ pub trait SpiBus<Word: 'static + Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word
     ///
     /// Implementations are allowed to return before the operation is
     /// complete. See (the docs on embedded-hal)[embedded_hal::spi::blocking] for details on flushing.
-    fn transfer<'a>(
+    async fn transfer<'a>(
         &'a mut self,
         read: &'a mut [Word],
         write: &'a [Word],
-    ) -> Self::TransferFuture<'a>;
-
-    /// Future returned by the `transfer_in_place` method.
-    type TransferInPlaceFuture<'a>: Future<Output = Result<(), Self::Error>>
-    where
-        Self: 'a;
+    ) -> Result<(), Self::Error>;
 
     /// Write and read simultaneously. The contents of `words` are
     /// written to the slave, and the received words are stored into the same
@@ -381,30 +311,20 @@ pub trait SpiBus<Word: 'static + Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word
     ///
     /// Implementations are allowed to return before the operation is
     /// complete. See (the docs on embedded-hal)[embedded_hal::spi::blocking] for details on flushing.
-    fn transfer_in_place<'a>(
-        &'a mut self,
-        words: &'a mut [Word],
-    ) -> Self::TransferInPlaceFuture<'a>;
+    async fn transfer_in_place<'a>(&'a mut self, words: &'a mut [Word]) -> Result<(), Self::Error>;
 }
 
 impl<T: SpiBus<Word>, Word: 'static + Copy> SpiBus<Word> for &mut T {
-    type TransferFuture<'a> = T::TransferFuture<'a> where Self: 'a;
-
-    fn transfer<'a>(
+    async fn transfer<'a>(
         &'a mut self,
         read: &'a mut [Word],
         write: &'a [Word],
-    ) -> Self::TransferFuture<'a> {
-        T::transfer(self, read, write)
+    ) -> Result<(), Self::Error> {
+        T::transfer(self, read, write).await
     }
 
-    type TransferInPlaceFuture<'a> = T::TransferInPlaceFuture<'a> where Self: 'a;
-
-    fn transfer_in_place<'a>(
-        &'a mut self,
-        words: &'a mut [Word],
-    ) -> Self::TransferInPlaceFuture<'a> {
-        T::transfer_in_place(self, words)
+    async fn transfer_in_place<'a>(&'a mut self, words: &'a mut [Word]) -> Result<(), Self::Error> {
+        T::transfer_in_place(self, words).await
     }
 }
 
@@ -488,31 +408,23 @@ where
 {
     type Bus = BUS;
 
-    type TransactionFuture<'a, R, F, Fut> = impl Future<Output = Result<R, Self::Error>> + 'a
+    async fn transaction<R, F, Fut>(&mut self, f: F) -> Result<R, Self::Error>
     where
-        Self: 'a, R: 'a, F: FnOnce(*mut Self::Bus) -> Fut + 'a,
-        Fut: Future<Output =  Result<R, <Self::Bus as ErrorType>::Error>> + 'a;
-
-    fn transaction<'a, R, F, Fut>(&'a mut self, f: F) -> Self::TransactionFuture<'a, R, F, Fut>
-    where
-        R: 'a,
-        F: FnOnce(*mut Self::Bus) -> Fut + 'a,
-        Fut: Future<Output = Result<R, <Self::Bus as ErrorType>::Error>> + 'a,
+        F: FnOnce(*mut Self::Bus) -> Fut,
+        Fut: Future<Output = Result<R, <Self::Bus as ErrorType>::Error>>,
     {
-        async move {
-            self.cs.set_low().map_err(ExclusiveDeviceError::Cs)?;
+        self.cs.set_low().map_err(ExclusiveDeviceError::Cs)?;
 
-            let f_res = f(&mut self.bus).await;
+        let f_res = f(&mut self.bus).await;
 
-            // On failure, it's important to still flush and deassert CS.
-            let flush_res = self.bus.flush().await;
-            let cs_res = self.cs.set_high();
+        // On failure, it's important to still flush and deassert CS.
+        let flush_res = self.bus.flush().await;
+        let cs_res = self.cs.set_high();
 
-            let f_res = f_res.map_err(ExclusiveDeviceError::Spi)?;
-            flush_res.map_err(ExclusiveDeviceError::Spi)?;
-            cs_res.map_err(ExclusiveDeviceError::Cs)?;
+        let f_res = f_res.map_err(ExclusiveDeviceError::Spi)?;
+        flush_res.map_err(ExclusiveDeviceError::Spi)?;
+        cs_res.map_err(ExclusiveDeviceError::Cs)?;
 
-            Ok(f_res)
-        }
+        Ok(f_res)
     }
 }
