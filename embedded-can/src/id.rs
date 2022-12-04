@@ -9,14 +9,17 @@ impl StandardId {
     pub const ZERO: Self = Self(0);
 
     /// CAN ID `0x7FF`, the lowest priority.
-    pub const MAX: Self = Self(0x7FF);
+    pub const MAX: Self = Self(Self::MAX_RAW);
+
+    /// Raw CAN ID `0x7FF`, the lowest priority.
+    pub const MAX_RAW: u16 = 0x7FF;
 
     /// Tries to create a `StandardId` from a raw 16-bit integer.
     ///
     /// This will return `None` if `raw` is out of range of an 11-bit integer (`> 0x7FF`).
     #[inline]
     pub const fn new(raw: u16) -> Option<Self> {
-        if raw <= 0x7FF {
+        if raw <= Self::MAX_RAW {
             Some(Self(raw))
         } else {
             None
@@ -48,14 +51,17 @@ impl ExtendedId {
     pub const ZERO: Self = Self(0);
 
     /// CAN ID `0x1FFFFFFF`, the lowest priority.
-    pub const MAX: Self = Self(0x1FFF_FFFF);
+    pub const MAX: Self = Self(Self::MAX_RAW);
+
+    /// Raw CAN ID `0x1FFFFFFF`, the lowest priority.
+    pub const MAX_RAW: u32 = 0x1FFF_FFFF;
 
     /// Tries to create a `ExtendedId` from a raw 32-bit integer.
     ///
     /// This will return `None` if `raw` is out of range of an 29-bit integer (`> 0x1FFF_FFFF`).
     #[inline]
     pub const fn new(raw: u32) -> Option<Self> {
-        if raw <= 0x1FFF_FFFF {
+        if raw <= Self::MAX_RAW {
             Some(Self(raw))
         } else {
             None
@@ -92,6 +98,37 @@ pub enum Id {
 
     /// Extended 29-bit Identifier (`0..=0x1FFF_FFFF`).
     Extended(ExtendedId),
+}
+
+impl Id {
+    /// Creates a CAN identifier as a standard ID.
+    pub fn new_standard_id(raw: u16) -> Option<Self> {
+        let id = StandardId::new(raw)?;
+        Some(Id::Standard(id))
+    }
+
+    /// Creates a CAN identifier as an extended ID.
+    pub fn new_extended_id(raw: u32) -> Option<Self> {
+        let id = ExtendedId::new(raw)?;
+        Some(Id::Extended(id))
+    }
+
+    /// Returns this CAN Identifier as a raw 32-bit integer, regardless of whether it's
+    /// a standard or extended identifier.
+    pub fn as_raw(&self) -> u32 {
+        match self {
+            Id::Standard(id) => id.as_raw() as u32,
+            Id::Extended(id) => id.as_raw(),
+        }
+    }
+
+    /// Determines if the value is an extended identifier.
+    pub fn is_extended(&self) -> bool {
+        match self {
+            Id::Extended(_) => true,
+            _ => false
+        }
+    }
 }
 
 /// Implement `Ord` according to the CAN arbitration rules
@@ -153,19 +190,19 @@ mod tests {
     #[test]
     fn standard_id_new() {
         assert_eq!(
-            StandardId::new(StandardId::MAX.as_raw()),
+            StandardId::new(StandardId::MAX_RAW),
             Some(StandardId::MAX)
         );
     }
 
     #[test]
     fn standard_id_new_out_of_range() {
-        assert_eq!(StandardId::new(StandardId::MAX.as_raw() + 1), None);
+        assert_eq!(StandardId::new(StandardId::MAX_RAW + 1), None);
     }
 
     #[test]
     fn standard_id_new_unchecked_out_of_range() {
-        let id = StandardId::MAX.as_raw() + 1;
+        let id = StandardId::MAX_RAW + 1;
         assert_eq!(unsafe { StandardId::new_unchecked(id) }, StandardId(id));
     }
 
@@ -179,12 +216,12 @@ mod tests {
 
     #[test]
     fn extended_id_new_out_of_range() {
-        assert_eq!(ExtendedId::new(ExtendedId::MAX.as_raw() + 1), None);
+        assert_eq!(ExtendedId::new(ExtendedId::MAX_RAW + 1), None);
     }
 
     #[test]
     fn extended_id_new_unchecked_out_of_range() {
-        let id = ExtendedId::MAX.as_raw() + 1;
+        let id = ExtendedId::MAX_RAW + 1;
         assert_eq!(unsafe { ExtendedId::new_unchecked(id) }, ExtendedId(id));
     }
 
@@ -205,5 +242,39 @@ mod tests {
         assert!(Id::Extended(ExtendedId::ZERO) < Id::Extended(ExtendedId::MAX));
         assert!(Id::Extended(ExtendedId((1 << 11) - 1)) < Id::Standard(StandardId(1)));
         assert!(Id::Standard(StandardId(1)) < Id::Extended(ExtendedId::MAX));
+    }
+
+    #[test]
+    fn id_new() {
+        let id = Id::new_standard_id(StandardId::MAX_RAW);
+        match id {
+            Some(Id::Standard(id)) => assert_eq!(StandardId::MAX, id),
+            _ => assert!(false),
+        }
+
+        let id = Id::new_extended_id(ExtendedId::MAX_RAW);
+        match id {
+            Some(Id::Extended(id)) => assert_eq!(ExtendedId::MAX, id),
+            _ => assert!(false),
+        }
+    }
+
+    #[test]
+    fn id_raw() {
+        const RAW_ID: u32 = StandardId::MAX_RAW as u32;
+
+        let id = StandardId::new(RAW_ID as u16).unwrap();
+        assert_eq!(RAW_ID as u16, id.as_raw());
+
+        let id = Id::from(id);
+        assert!(!id.is_extended());
+        assert_eq!(RAW_ID, id.as_raw());
+
+        let id = ExtendedId::new(RAW_ID).unwrap();
+        assert_eq!(RAW_ID, id.as_raw());
+
+        let id = Id::from(id);
+        assert!(id.is_extended());
+        assert_eq!(RAW_ID, id.as_raw());
     }
 }
