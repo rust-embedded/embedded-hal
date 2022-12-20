@@ -80,6 +80,7 @@
 pub mod delay;
 pub mod digital;
 pub mod i2c;
+pub mod pwm;
 pub mod serial;
 pub mod spi;
 
