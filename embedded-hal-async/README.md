@@ -1,9 +1,6 @@
 [![crates.io](https://img.shields.io/crates/d/embedded-hal-async.svg)](https://crates.io/crates/embedded-hal-async)
 [![crates.io](https://img.shields.io/crates/v/embedded-hal-async.svg)](https://crates.io/crates/embedded-hal-async)
 [![Documentation](https://docs.rs/embedded-hal-async/badge.svg)](https://docs.rs/embedded-hal-async)
-<!--
-![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.46+-blue.svg)
--->
 
 # `embedded-hal-async`
 
@@ -20,12 +17,13 @@ This project is developed and maintained by the [HAL team](https://github.com/ru
 
 [API reference]: https://docs.rs/embedded-hal-async
 
-<!--
 ## Minimum Supported Rust Version (MSRV)
 
-This crate is guaranteed to compile on stable Rust 1.46 and up. It *might*
-compile with older versions but that may change in any new patch release.
--->
+This crate requires Rust nightly newer than `nightly-2022-11-22`, due to requiring support for
+`async fn` in traits (AFIT), which is not stable yet. 
+
+Keep in mind Rust nightlies can make backwards-incompatible changes to unstable features
+at any time.
 
 ## License
 
