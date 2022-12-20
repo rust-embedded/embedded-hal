@@ -55,6 +55,15 @@ impl Not for PinState {
     }
 }
 
+impl From<PinState> for bool {
+    fn from(value: PinState) -> bool {
+        match value {
+            PinState::Low => false,
+            PinState::High => true,
+        }
+    }
+}
+
 /// Single digital push-pull output pin
 pub trait OutputPin: ErrorType {
     /// Drives the pin low
