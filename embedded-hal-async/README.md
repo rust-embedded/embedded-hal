@@ -17,13 +17,13 @@ This project is developed and maintained by the [HAL team](https://github.com/ru
 
 [API reference]: https://docs.rs/embedded-hal-async
 
-<!--
 ## Minimum Supported Rust Version (MSRV)
 
+This crate requires Rust nightly newer than `nightly-2022-11-22`, due to requiring support for
+`async fn` in traits (AFIT), which is not stable yet. 
 
-This crate requires nightly newer than 2022-09-13, but keep in mind nightly can
-break at any time.
--->
+Keep in mind Rust nightlies can make backwards-incompatible changes to unstable features
+at any time.
 
 ## License
 
