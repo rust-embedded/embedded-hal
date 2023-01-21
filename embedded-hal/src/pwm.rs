@@ -71,11 +71,13 @@ pub trait SetDuty: ErrorType {
     fn set_duty(&mut self, duty: u16) -> Result<(), Self::Error>;
 
     /// Set the duty cycle to 0%, or always inactive.
+    #[inline]
     fn set_off(&mut self) -> Result<(), Self::Error> {
         self.set_duty(0)
     }
 
     /// Set the duty cycle to 100%, or always active.
+    #[inline]
     fn set_on(&mut self) -> Result<(), Self::Error> {
         self.set_duty(self.get_max_duty())
     }
@@ -84,6 +86,7 @@ pub trait SetDuty: ErrorType {
     ///
     /// The caller is responsible for ensuring that `num` is less than or equal to `denom`,
     /// and that `denom` is not zero.
+    #[inline]
     fn set_fraction(&mut self, num: u16, denom: u16) -> Result<(), Self::Error> {
         let duty = num as u32 * self.get_max_duty() as u32 / denom as u32;
         self.set_duty(duty as u16)
@@ -92,6 +95,7 @@ pub trait SetDuty: ErrorType {
     /// Set the duty cycle to `percent / 100`
     ///
     /// The caller is responsible for ensuring that `percent` is less than or equal to 100.
+    #[inline]
     fn set_percent(&mut self, percent: u8) -> Result<(), Self::Error> {
         self.set_fraction(percent as u16, 100)
     }
