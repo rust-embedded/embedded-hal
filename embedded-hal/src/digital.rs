@@ -157,3 +157,30 @@ impl<T: InputPin> InputPin for &T {
         T::is_low(self)
     }
 }
+
+/// A digital output "port"
+///
+/// `N` is number of pins in "port"
+///
+/// **NOTE** The "port" doesn't necessarily has to match a hardware GPIO port;
+/// it could for instance be a 4-bit ports made up of non contiguous pins, say
+/// `PA0`, `PA3`, `PA10` and `PA13`.
+pub trait OutputPort<const N: usize>: ErrorType {
+    /// Outputs `N` least significant bits of `word` on the port pins
+    ///
+    /// # Contract
+    ///
+    /// The state of all the port pins will change atomically ("at the same time"). This usually
+    /// means that state of all the pins will be changed in a single register operation.
+    fn write(&mut self, word: u16) -> Result<(), Self::Error>;
+
+    /// Set all pins to `PinState::High`
+    fn all_high(&mut self) -> Result<(), Self::Error> {
+        self.write(!0)
+    }
+
+    /// Reset all pins to `PinState::Low`
+    fn all_low(&mut self) -> Result<(), Self::Error> {
+        self.write(0)
+    }
+}
