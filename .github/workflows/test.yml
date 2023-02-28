@@ -16,7 +16,7 @@ jobs:
         # All generated code should be running on stable now
         rust:
           - stable
-          - 1.54.0  # MSRV
+          - 1.59.0  # MSRV
           - nightly
 
         # The default target we're compiling on and for

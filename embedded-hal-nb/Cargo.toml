@@ -1,7 +1,7 @@
 [package]
 name = "embedded-hal-nb"
 version = "1.0.0-alpha.1"
-edition = "2018"
+edition = "2021"
 
 categories = ["embedded", "hardware-support", "no-std"]
 description = "Non-blocking Hardware Abstraction Layer (HAL) for embedded systems using the `nb` crate."
@@ -16,5 +16,5 @@ embedded-hal = { version = "=1.0.0-alpha.9", path = "../embedded-hal" }
 nb = "1"
 
 [dev-dependencies]
-cortex-m-rt = "=0.7.1"  # 0.7.2 bumped its MSRV higher than embedded-hal's
+cortex-m-rt = "0.7"
 stm32f1 = { version = "0.15", features = ["stm32f103", "rt"] }
