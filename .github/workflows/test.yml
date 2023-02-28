@@ -26,13 +26,11 @@ jobs:
           - thumbv7m-none-eabi
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: ${{ matrix.rust }}
           target: ${{ matrix.target }}
-          override: true
 
       - run: sed -i '/nightly-only/d' Cargo.toml 
         if: matrix.rust != 'nightly'
