@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Added `pwm::SetDutyCycle` trait.
+
 ### Changed
 - gpio: add `ErrorKind` enum for consistency with other traits and for future extensibility. No kinds are defined for now.
 - delay: make infallible.
