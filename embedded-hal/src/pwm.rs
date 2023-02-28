@@ -58,28 +58,28 @@ impl<T: ErrorType> ErrorType for &mut T {
 }
 
 /// Single PWM channel / pin
-pub trait SetDuty: ErrorType {
+pub trait SetDutyCycle: ErrorType {
     /// Get the maximum duty cycle value.
     ///
     /// This value corresponds to a 100% duty cycle.
-    fn get_max_duty(&self) -> u16;
+    fn get_max_duty_cycle(&self) -> u16;
 
     /// Set the duty cycle to `duty / max_duty`.
     ///
     /// The caller is responsible for ensuring that the duty cycle value is less than or equal to the maximum duty cycle value,
     /// as reported by `get_max_duty`.
-    fn set_duty(&mut self, duty: u16) -> Result<(), Self::Error>;
+    fn set_duty_cycle(&mut self, duty: u16) -> Result<(), Self::Error>;
 
     /// Set the duty cycle to 0%, or always inactive.
     #[inline]
-    fn set_off(&mut self) -> Result<(), Self::Error> {
-        self.set_duty(0)
+    fn set_duty_cycle_fully_off(&mut self) -> Result<(), Self::Error> {
+        self.set_duty_cycle(0)
     }
 
     /// Set the duty cycle to 100%, or always active.
     #[inline]
-    fn set_on(&mut self) -> Result<(), Self::Error> {
-        self.set_duty(self.get_max_duty())
+    fn set_duty_cycle_fully_on(&mut self) -> Result<(), Self::Error> {
+        self.set_duty_cycle(self.get_max_duty_cycle())
     }
 
     /// Set the duty cycle to `num / denom`.
@@ -87,38 +87,42 @@ pub trait SetDuty: ErrorType {
     /// The caller is responsible for ensuring that `num` is less than or equal to `denom`,
     /// and that `denom` is not zero.
     #[inline]
-    fn set_fraction(&mut self, num: u16, denom: u16) -> Result<(), Self::Error> {
-        let duty = num as u32 * self.get_max_duty() as u32 / denom as u32;
-        self.set_duty(duty as u16)
+    fn set_duty_cycle_fraction(&mut self, num: u16, denom: u16) -> Result<(), Self::Error> {
+        let duty = num as u32 * self.get_max_duty_cycle() as u32 / denom as u32;
+        self.set_duty_cycle(duty as u16)
     }
 
     /// Set the duty cycle to `percent / 100`
     ///
     /// The caller is responsible for ensuring that `percent` is less than or equal to 100.
     #[inline]
-    fn set_percent(&mut self, percent: u8) -> Result<(), Self::Error> {
-        self.set_fraction(percent as u16, 100)
+    fn set_duty_cycle_percent(&mut self, percent: u8) -> Result<(), Self::Error> {
+        self.set_duty_cycle_fraction(percent as u16, 100)
     }
 }
 
-impl<T: SetDuty> SetDuty for &mut T {
-    fn get_max_duty(&self) -> u16 {
-        T::get_max_duty(self)
-    }
-    fn set_duty(&mut self, duty: u16) -> Result<(), Self::Error> {
-        T::set_duty(self, duty)
+impl<T: SetDutyCycle> SetDutyCycle for &mut T {
+    fn get_max_duty_cycle(&self) -> u16 {
+        T::get_max_duty_cycle(self)
     }
 
-    fn set_off(&mut self) -> Result<(), Self::Error> {
-        T::set_off(self)
+    fn set_duty_cycle(&mut self, duty: u16) -> Result<(), Self::Error> {
+        T::set_duty_cycle(self, duty)
     }
-    fn set_on(&mut self) -> Result<(), Self::Error> {
-        T::set_on(self)
+
+    fn set_duty_cycle_fully_off(&mut self) -> Result<(), Self::Error> {
+        T::set_duty_cycle_fully_off(self)
     }
-    fn set_fraction(&mut self, num: u16, denom: u16) -> Result<(), Self::Error> {
-        T::set_fraction(self, num, denom)
+
+    fn set_duty_cycle_fully_on(&mut self) -> Result<(), Self::Error> {
+        T::set_duty_cycle_fully_on(self)
     }
-    fn set_percent(&mut self, percent: u8) -> Result<(), Self::Error> {
-        T::set_percent(self, percent)
+
+    fn set_duty_cycle_fraction(&mut self, num: u16, denom: u16) -> Result<(), Self::Error> {
+        T::set_duty_cycle_fraction(self, num, denom)
+    }
+
+    fn set_duty_cycle_percent(&mut self, percent: u8) -> Result<(), Self::Error> {
+        T::set_duty_cycle_percent(self, percent)
     }
 }
