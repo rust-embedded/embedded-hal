@@ -37,23 +37,11 @@
 //!         // ...
 //! #       Ok(())
 //!     }
-//!     fn write_iter<B: IntoIterator<Item = u8>>(&mut self, addr: u8, bytes: B) -> Result<(), Self::Error> {
-//!         // ...
-//! #       Ok(())
-//!     }
 //!     fn write_read(&mut self, addr: u8, bytes: &[u8], buffer: &mut [u8]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
-//!     fn write_iter_read<B: IntoIterator<Item = u8>>(&mut self, addr: u8, bytes: B, buffer: &mut [u8]) -> Result<(), Self::Error> {
-//!         // ...
-//! #       Ok(())
-//!     }
 //!     fn transaction<'a>(&mut self, address: u8, operations: &mut [Operation<'a>]) -> Result<(), Self::Error> {
-//!         // ...
-//! #       Ok(())
-//!     }
-//!     fn transaction_iter<'a, O: IntoIterator<Item = Operation<'a>>>(&mut self, address: u8, operations: O) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
@@ -69,23 +57,11 @@
 //!         // ...
 //! #       Ok(())
 //!     }
-//!     fn write_iter<B: IntoIterator<Item = u8>>(&mut self, addr: u16, bytes: B) -> Result<(), Self::Error> {
-//!         // ...
-//! #       Ok(())
-//!     }
 //!     fn write_read(&mut self, addr: u16, bytes: &[u8], buffer: &mut [u8]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
-//!     fn write_iter_read<B: IntoIterator<Item = u8>>(&mut self, addr: u16, bytes: B, buffer: &mut [u8]) -> Result<(), Self::Error> {
-//!         // ...
-//! #       Ok(())
-//!     }
 //!     fn transaction<'a>(&mut self, address: u16, operations: &mut [Operation<'a>]) -> Result<(), Self::Error> {
-//!         // ...
-//! #       Ok(())
-//!     }
-//!     fn transaction_iter<'a, O: IntoIterator<Item = Operation<'a>>>(&mut self, address: u16, operations: O) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
@@ -307,15 +283,6 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `SP` = stop condition
     fn write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error>;
 
-    /// Writes bytes to slave with address `address`
-    ///
-    /// # I2C Events (contract)
-    ///
-    /// Same as the `write` method
-    fn write_iter<B>(&mut self, address: A, bytes: B) -> Result<(), Self::Error>
-    where
-        B: IntoIterator<Item = u8>;
-
     /// Writes bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
     /// single transaction*
     ///
@@ -345,21 +312,6 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
         buffer: &mut [u8],
     ) -> Result<(), Self::Error>;
 
-    /// Writes bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
-    /// single transaction*
-    ///
-    /// # I2C Events (contract)
-    ///
-    /// Same as the `write_read` method
-    fn write_iter_read<B>(
-        &mut self,
-        address: A,
-        bytes: B,
-        buffer: &mut [u8],
-    ) -> Result<(), Self::Error>
-    where
-        B: IntoIterator<Item = u8>;
-
     /// Execute the provided operations on the I2C bus.
     ///
     /// Transaction contract:
@@ -378,23 +330,6 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
         address: A,
         operations: &mut [Operation<'a>],
     ) -> Result<(), Self::Error>;
-
-    /// Execute the provided operations on the I2C bus (iterator version).
-    ///
-    /// Transaction contract:
-    /// - Before executing the first operation an ST is sent automatically. This is followed by SAD+R/W as appropriate.
-    /// - Data from adjacent operations of the same type are sent after each other without an SP or SR.
-    /// - Between adjacent operations of a different type an SR and SAD+R/W is sent.
-    /// - After executing the last operation an SP is sent automatically.
-    /// - If the last operation is a `Read` the master does not send an acknowledge for the last byte.
-    ///
-    /// - `ST` = start condition
-    /// - `SAD+R/W` = slave address followed by bit 1 to indicate reading or 0 to indicate writing
-    /// - `SR` = repeated start condition
-    /// - `SP` = stop condition
-    fn transaction_iter<'a, O>(&mut self, address: A, operations: O) -> Result<(), Self::Error>
-    where
-        O: IntoIterator<Item = Operation<'a>>;
 }
 
 impl<A: AddressMode, T: I2c<A>> I2c<A> for &mut T {
@@ -406,13 +341,6 @@ impl<A: AddressMode, T: I2c<A>> I2c<A> for &mut T {
         T::write(self, address, bytes)
     }
 
-    fn write_iter<B>(&mut self, address: A, bytes: B) -> Result<(), Self::Error>
-    where
-        B: IntoIterator<Item = u8>,
-    {
-        T::write_iter(self, address, bytes)
-    }
-
     fn write_read(
         &mut self,
         address: A,
@@ -422,30 +350,11 @@ impl<A: AddressMode, T: I2c<A>> I2c<A> for &mut T {
         T::write_read(self, address, bytes, buffer)
     }
 
-    fn write_iter_read<B>(
-        &mut self,
-        address: A,
-        bytes: B,
-        buffer: &mut [u8],
-    ) -> Result<(), Self::Error>
-    where
-        B: IntoIterator<Item = u8>,
-    {
-        T::write_iter_read(self, address, bytes, buffer)
-    }
-
     fn transaction<'a>(
         &mut self,
         address: A,
         operations: &mut [Operation<'a>],
     ) -> Result<(), Self::Error> {
         T::transaction(self, address, operations)
-    }
-
-    fn transaction_iter<'a, O>(&mut self, address: A, operations: O) -> Result<(), Self::Error>
-    where
-        O: IntoIterator<Item = Operation<'a>>,
-    {
-        T::transaction_iter(self, address, operations)
     }
 }
