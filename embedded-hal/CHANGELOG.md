@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - gpio: add `ErrorKind` enum for consistency with other traits and for future extensibility. No kinds are defined for now.
+- delay: make infallible.
 
 ## [v1.0.0-alpha.9] - 2022-09-28
 
