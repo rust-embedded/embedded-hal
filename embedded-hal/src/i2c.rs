@@ -1,8 +1,8 @@
 //! Blocking I2C API
 //!
-//! This API supports 7-bit and 10-bit addresses. Traits feature an `AddressMode`
-//! marker type parameter. Two implementation of the `AddressMode` exist:
-//! `SevenBitAddress` and `TenBitAddress`.
+//! This API supports 7-bit and 10-bit addresses. Traits feature an [`AddressMode`]
+//! marker type parameter. Two implementation of the [`AddressMode`] exist:
+//! [`SevenBitAddress`] and [`TenBitAddress`].
 //!
 //! Through this marker types it is possible to implement each address mode for
 //! the traits independently in `embedded-hal` implementations and device drivers
@@ -14,80 +14,140 @@
 //! is not supported by the hardware.
 //!
 //! Since 7-bit addressing is the mode of the majority of I2C devices,
-//! `SevenBitAddress` has been set as default mode and thus can be omitted if desired.
+//! [`SevenBitAddress`] has been set as default mode and thus can be omitted if desired.
 //!
-//! ## Examples
+//! # Bus sharing
 //!
-//! ### `embedded-hal` implementation for an MCU
-//! Here is an example of an embedded-hal implementation of the `Write` trait
-//! for both modes:
+//! I2C allows sharing a single bus between many I2C devices. The SDA and SCL lines are
+//! wired in parallel to all devices. When starting a transfer an "address" is sent
+//! so that the addressed device can respond and all the others can ignore the transfer.
+//!
+#![doc = include_str!("i2c-shared-bus.svg")]
+//!
+//! This bus sharing is common when having multiple I2C devices in the same board, since it uses fewer MCU
+//! pins (`2` instead of `2*n`), and fewer MCU I2C peripherals (`1` instead of `n`).
+//!
+//! This API supports bus sharing natively. Types implementing [`I2c`] are allowed
+//! to represent either exclusive or shared access to an I2C bus. HALs typically
+//! provide exclusive access implementations. Drivers shouldn't care which
+//! kind they receive, they just do transactions on it and let the
+//! underlying implementation share or not.
+//!
+//! The [`embedded-hal-bus`](https://docs.rs/embedded-hal-bus) crate provides several
+//! implementations for sharing I2C buses. You can use them to take an exclusive instance
+//! you've received from a HAL and "split" it into mulitple shared ones, to instantiate
+//! several drivers on the same bus.
+//!
+//! # For driver authors
+//!
+//! Drivers can select the adequate address length with `I2c<SevenBitAddress>` or `I2c<TenBitAddress>` depending
+//! on the target device. If it can use either, the driver can
+//! be generic over the address kind as well, though this is rare.
+//!
+//! Drivers should take the `I2c` instance as an argument to `new()`, and store it in their
+//! struct. They **should not** take `&mut I2c`, the trait has a blanket impl for all `&mut T`
+//! so taking just `I2c` ensures the user can still pass a `&mut`, but is not forced to.
+//!
+//! Drivers **should not** try to enable bus sharing by taking `&mut I2c` at every method.
+//! This is much less ergonomic than owning the `I2c`, which still allows the user to pass an
+//! implementation that does sharing behind the scenes
+//! (from [`embedded-hal-bus`](https://docs.rs/embedded-hal-bus), or others).
+//!
+//! ## Device driver compatible only with 7-bit addresses
+//!
+//! For demonstration purposes the address mode parameter has been omitted in this example.
+//!
 //! ```
-//! # use embedded_hal::i2c::{ErrorKind, ErrorType, SevenBitAddress, TenBitAddress, I2c, Operation};
+//! use embedded_hal::i2c::{I2c, Error};
+//!
+//! const ADDR: u8 = 0x15;
+//! # const TEMP_REGISTER: u8 = 0x1;
+//! pub struct TemperatureSensorDriver<I2C> {
+//!     i2c: I2C,
+//! }
+//!
+//! impl<I2C: I2c> TemperatureSensorDriver<I2C> {
+//!     pub fn new(i2c: I2C) -> Self {
+//!         Self { i2c }
+//!     }
+//!
+//!     pub fn read_temperature(&mut self) -> Result<u8, I2C::Error> {
+//!         let mut temp = [0];
+//!         self.i2c.write_read(ADDR, &[TEMP_REGISTER], &mut temp)?;
+//!         Ok(temp[0])
+//!     }
+//! }
+//! ```
+//!
+//! ## Device driver compatible only with 10-bit addresses
+//!
+//! ```
+//! use embedded_hal::i2c::{Error, TenBitAddress, I2c};
+//!
+//! const ADDR: u16 = 0x158;
+//! # const TEMP_REGISTER: u8 = 0x1;
+//! pub struct TemperatureSensorDriver<I2C> {
+//!     i2c: I2C,
+//! }
+//!
+//! impl<I2C: I2c<TenBitAddress>> TemperatureSensorDriver<I2C> {
+//!     pub fn new(i2c: I2C) -> Self {
+//!         Self { i2c }
+//!     }
+//!
+//!     pub fn read_temperature(&mut self) -> Result<u8, I2C::Error> {
+//!         let mut temp = [0];
+//!         self.i2c.write_read(ADDR, &[TEMP_REGISTER], &mut temp)?;
+//!         Ok(temp[0])
+//!     }
+//! }
+//! ```
+//!
+//! # For HAL authors
+//!
+//! HALs **should not** include bus sharing mechanisms. They should expose a single type representing
+//! exclusive ownership over the bus, and let the user use [`embedded-hal-bus`](https://docs.rs/embedded-hal-bus)
+//! if they want to share it. (One exception is if the underlying platform already
+//! supports sharing, such as Linux or some RTOSs.)
+//!
+//! Here is an example of an embedded-hal implementation of the `I2C` trait
+//! for both addressing modes. All trait methods have have default implementations in terms of `transaction`.
+//! As such, that is the only method that requires implementation in the HAL.
+//!
+//! ```
+//! use embedded_hal::i2c::{self, SevenBitAddress, TenBitAddress, I2c, Operation};
+//!
 //! /// I2C0 hardware peripheral which supports both 7-bit and 10-bit addressing.
 //! pub struct I2c0;
 //!
-//! # impl ErrorType for I2c0 { type Error = ErrorKind; }
-//! impl I2c<SevenBitAddress> for I2c0
-//! {
+//! #[derive(Debug, Copy, Clone, Eq, PartialEq)]
+//! pub enum Error {
+//!     // ...
+//! }
+//!
+//! impl i2c::Error for Error {
+//!     fn kind(&self) -> i2c::ErrorKind {
+//!         match *self {
+//!             // ...
+//!         }
+//!     }
+//! }
+//!
+//! impl i2c::ErrorType for I2c0 {
+//!     type Error = Error;
+//! }
+//!
+//! impl I2c<SevenBitAddress> for I2c0 {
 //!     fn transaction(&mut self, address: u8, operations: &mut [Operation<'_>]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
 //! }
 //!
-//! impl I2c<TenBitAddress> for I2c0
-//! {
+//! impl I2c<TenBitAddress> for I2c0 {
 //!     fn transaction(&mut self, address: u16, operations: &mut [Operation<'_>]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
-//!     }
-//! }
-//! ```
-//!
-//! ### Device driver compatible only with 7-bit addresses
-//!
-//! For demonstration purposes the address mode parameter has been omitted in this example.
-//!
-//! ```
-//! # use embedded_hal::i2c::{I2c, Error};
-//! const ADDR: u8  = 0x15;
-//! # const TEMP_REGISTER: u8 = 0x1;
-//! pub struct TemperatureSensorDriver<I2C> {
-//!     i2c: I2C,
-//! }
-//!
-//! impl<I2C, E: Error> TemperatureSensorDriver<I2C>
-//! where
-//!     I2C: I2c<Error = E>,
-//! {
-//!     pub fn read_temperature(&mut self) -> Result<u8, E> {
-//!         let mut temp = [0];
-//!         self.i2c
-//!             .write_read(ADDR, &[TEMP_REGISTER], &mut temp)
-//!             .and(Ok(temp[0]))
-//!     }
-//! }
-//! ```
-//!
-//! ### Device driver compatible only with 10-bit addresses
-//!
-//! ```
-//! # use embedded_hal::i2c::{Error, TenBitAddress, I2c};
-//! const ADDR: u16  = 0x158;
-//! # const TEMP_REGISTER: u8 = 0x1;
-//! pub struct TemperatureSensorDriver<I2C> {
-//!     i2c: I2C,
-//! }
-//!
-//! impl<I2C, E: Error> TemperatureSensorDriver<I2C>
-//! where
-//!     I2C: I2c<TenBitAddress, Error = E>,
-//! {
-//!     pub fn read_temperature(&mut self) -> Result<u8, E> {
-//!         let mut temp = [0];
-//!         self.i2c
-//!             .write_read(ADDR, &[TEMP_REGISTER], &mut temp)
-//!             .and(Ok(temp[0]))
 //!     }
 //! }
 //! ```
