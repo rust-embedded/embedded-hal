@@ -1,8 +1,10 @@
 //! Serial interface
+//!
+//! See the documentation on [`embedded_hal::serial`] for details.
 
 pub use embedded_hal::serial::{Error, ErrorKind, ErrorType};
 
-/// Read an exact amount of words from a serial interface
+/// Read an exact amount of words from an *unbuffered* serial interface
 ///
 /// Some serial interfaces support different data sizes (8 bits, 9 bits, etc.);
 /// This can be encoded in this trait via the `Word` type parameter.
@@ -19,7 +21,7 @@ impl<T: ReadExact<Word>, Word: 'static + Copy> ReadExact<Word> for &mut T {
     }
 }
 
-/// Read words from a serial interface, until the line becomes idle.
+/// Read words from an *unbuffered* serial interface, until the line becomes idle.
 ///
 /// Some serial interfaces support different data sizes (8 bits, 9 bits, etc.);
 /// This can be encoded in this trait via the `Word` type parameter.

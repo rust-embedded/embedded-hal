@@ -1,4 +1,40 @@
 //! Serial traits
+//!
+//! # Buffered vs Unbuffered
+//!
+//! There is two main ways a serial receiver can operate: buffered and unbuffered.
+//!
+//! - **Buffered**: The serial driver has a reasonably-sized buffer in RAM. Incoming bytes
+//!   are placed into the buffer automatically without user code having to actively do
+//!   anything (using either DMA, or a high-priority interrupt). User code reads bytes
+//!   out of the buffer. Bytes are only lost if received while buffer is full.
+//! - **Unbuffered**: The serial driver has no buffer (or a buffer so small that it's negligible,
+//!   for example nRF chips have a 4-byte buffer in hardware, and some STM32 chips have a 1-byte
+//!   buffer). User code does "read" operations that pop bytes directly from the hardware
+//!   into the user's buffer. Bytes received while the user code is not actively doing a read
+//!   *at that very instant* are lost.
+//!
+//! For example:
+//! - Linux's /dev/ttyX is buffered.
+//! - Most Rust HALs offer unbuffered serial drivers at the time of writing.
+//! - Some HALs (such as `embassy`) offer both buffered and unbuffered.
+//!
+//! There are tradeoffs when deciding which one to use. Unbuffered is the simplest, and allows for
+//! the lowest memory usage since data can be transferred directly from hardware to the user's buffer, avoiding
+//! the need for intermediary drivers. However, with unbuffered it's very easy to **lose data** if the code
+//! spends too much time between read calls. This can be solved either by using buffered serial at the cost of
+//! more RAM usage, or using hardware flow control (RTS/CTS) at the cost of using more MCU pins.
+//!
+//! The read traits in this API ([`ReadExact`] and [`ReadUntilIdle`]) are intended to **model unbuffered serial interfaces**.
+//! Data that arrives when your code is not running a `read_*()` call **is lost**.
+//!
+//! Drivers should only use these traits when the use case allows for it. For example, `ReadUntilIdle` can be used
+//! for packet-wise communications, but you have to ensure the protocol guarantees enough idle time between
+//! packets so that you won't lose data for the next packet while processing the previous one.
+//!
+//! Drivers that require **buffered** serial ports should use [`embedded-io`](https://docs.rs/embedded-io) instead. These
+//! traits allow for a much more `std::io`-like usage, and implementations guarantee data is not lost until the
+//! (much bigger) buffer overflows.
 
 /// Serial error
 pub trait Error: core::fmt::Debug {
@@ -73,7 +109,7 @@ impl<T: ErrorType> ErrorType for &mut T {
     type Error = T::Error;
 }
 
-/// Read an exact amount of words from a serial interface
+/// Read an exact amount of words from an *unbuffered* serial interface
 ///
 /// Some serial interfaces support different data sizes (8 bits, 9 bits, etc.);
 /// This can be encoded in this trait via the `Word` type parameter.
@@ -90,7 +126,7 @@ impl<T: ReadExact<Word>, Word: 'static + Copy> ReadExact<Word> for &mut T {
     }
 }
 
-/// Read words from a serial interface, until the line becomes idle.
+/// Read words from an *unbuffered* serial interface, until the line becomes idle.
 ///
 /// Some serial interfaces support different data sizes (8 bits, 9 bits, etc.);
 /// This can be encoded in this trait via the `Word` type parameter.
