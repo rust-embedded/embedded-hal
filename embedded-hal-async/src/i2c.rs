@@ -111,21 +111,21 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
 }
 
 impl<A: AddressMode, T: I2c<A>> I2c<A> for &mut T {
-    async fn read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error> {
-        T::read(self, address, buffer).await
+    async fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error> {
+        T::read(self, address, read).await
     }
 
-    async fn write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error> {
-        T::write(self, address, bytes).await
+    async fn write(&mut self, address: A, write: &[u8]) -> Result<(), Self::Error> {
+        T::write(self, address, write).await
     }
 
     async fn write_read(
         &mut self,
         address: A,
-        bytes: &[u8],
-        buffer: &mut [u8],
+        write: &[u8],
+        read: &mut [u8],
     ) -> Result<(), Self::Error> {
-        T::write_read(self, address, bytes, buffer).await
+        T::write_read(self, address, write, read).await
     }
 
     async fn transaction(

@@ -29,15 +29,15 @@
 //! # impl ErrorType for I2c0 { type Error = ErrorKind; }
 //! impl I2c<SevenBitAddress> for I2c0
 //! {
-//!     fn read(&mut self, addr: u8, buffer: &mut [u8]) -> Result<(), Self::Error> {
+//!     fn read(&mut self, addr: u8, read: &mut [u8]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
-//!     fn write(&mut self, addr: u8, bytes: &[u8]) -> Result<(), Self::Error> {
+//!     fn write(&mut self, addr: u8, write: &[u8]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
-//!     fn write_read(&mut self, addr: u8, bytes: &[u8], buffer: &mut [u8]) -> Result<(), Self::Error> {
+//!     fn write_read(&mut self, addr: u8, write: &[u8], read: &mut [u8]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
@@ -49,15 +49,15 @@
 //!
 //! impl I2c<TenBitAddress> for I2c0
 //! {
-//!     fn read(&mut self, addr: u16, buffer: &mut [u8]) -> Result<(), Self::Error> {
+//!     fn read(&mut self, addr: u16, write: &mut [u8]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
-//!     fn write(&mut self, addr: u16, bytes: &[u8]) -> Result<(), Self::Error> {
+//!     fn write(&mut self, addr: u16, read: &[u8]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
-//!     fn write_read(&mut self, addr: u16, bytes: &[u8], buffer: &mut [u8]) -> Result<(), Self::Error> {
+//!     fn write_read(&mut self, addr: u16, write: &[u8], read: &mut [u8]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
@@ -245,7 +245,7 @@ pub enum Operation<'a> {
 
 /// Blocking I2C
 pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
-    /// Reads enough bytes from slave with `address` to fill `buffer`
+    /// Reads enough bytes from slave with `address` to fill `read`
     ///
     /// # I2C Events (contract)
     ///
@@ -263,7 +263,7 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
-    fn read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error>;
+    fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error>;
 
     /// Writes bytes to slave with address `address`
     ///
@@ -281,9 +281,9 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `SAK` = slave acknowledge
     /// - `Bi` = ith byte of data
     /// - `SP` = stop condition
-    fn write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error>;
+    fn write(&mut self, address: A, write: &[u8]) -> Result<(), Self::Error>;
 
-    /// Writes bytes to slave with address `address` and then reads enough bytes to fill `buffer` *in a
+    /// Writes bytes to slave with address `address` and then reads enough bytes to fill `read` *in a
     /// single transaction*
     ///
     /// # I2C Events (contract)
@@ -305,12 +305,7 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
-    fn write_read(
-        &mut self,
-        address: A,
-        bytes: &[u8],
-        buffer: &mut [u8],
-    ) -> Result<(), Self::Error>;
+    fn write_read(&mut self, address: A, write: &[u8], read: &mut [u8]) -> Result<(), Self::Error>;
 
     /// Execute the provided operations on the I2C bus.
     ///
@@ -333,21 +328,16 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
 }
 
 impl<A: AddressMode, T: I2c<A>> I2c<A> for &mut T {
-    fn read(&mut self, address: A, buffer: &mut [u8]) -> Result<(), Self::Error> {
-        T::read(self, address, buffer)
+    fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error> {
+        T::read(self, address, read)
     }
 
-    fn write(&mut self, address: A, bytes: &[u8]) -> Result<(), Self::Error> {
-        T::write(self, address, bytes)
+    fn write(&mut self, address: A, write: &[u8]) -> Result<(), Self::Error> {
+        T::write(self, address, write)
     }
 
-    fn write_read(
-        &mut self,
-        address: A,
-        bytes: &[u8],
-        buffer: &mut [u8],
-    ) -> Result<(), Self::Error> {
-        T::write_read(self, address, bytes, buffer)
+    fn write_read(&mut self, address: A, write: &[u8], read: &mut [u8]) -> Result<(), Self::Error> {
+        T::write_read(self, address, write, read)
     }
 
     fn transaction(
