@@ -41,7 +41,10 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
-    async fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error>;
+    async fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error> {
+        self.transaction(address, &mut [Operation::Read(read)])
+            .await
+    }
 
     /// Writes bytes to slave with address `address`
     ///
@@ -59,7 +62,10 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `SAK` = slave acknowledge
     /// - `Bi` = ith byte of data
     /// - `SP` = stop condition
-    async fn write(&mut self, address: A, write: &[u8]) -> Result<(), Self::Error>;
+    async fn write(&mut self, address: A, write: &[u8]) -> Result<(), Self::Error> {
+        self.transaction(address, &mut [Operation::Write(write)])
+            .await
+    }
 
     /// Writes bytes to slave with address `address` and then reads enough bytes to fill `read` *in a
     /// single transaction*.
@@ -88,7 +94,13 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
         address: A,
         write: &[u8],
         read: &mut [u8],
-    ) -> Result<(), Self::Error>;
+    ) -> Result<(), Self::Error> {
+        self.transaction(
+            address,
+            &mut [Operation::Write(write), Operation::Read(read)],
+        )
+        .await
+    }
 
     /// Execute the provided operations on the I2C bus as a single transaction.
     ///

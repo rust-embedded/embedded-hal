@@ -29,18 +29,6 @@
 //! # impl ErrorType for I2c0 { type Error = ErrorKind; }
 //! impl I2c<SevenBitAddress> for I2c0
 //! {
-//!     fn read(&mut self, addr: u8, read: &mut [u8]) -> Result<(), Self::Error> {
-//!         // ...
-//! #       Ok(())
-//!     }
-//!     fn write(&mut self, addr: u8, write: &[u8]) -> Result<(), Self::Error> {
-//!         // ...
-//! #       Ok(())
-//!     }
-//!     fn write_read(&mut self, addr: u8, write: &[u8], read: &mut [u8]) -> Result<(), Self::Error> {
-//!         // ...
-//! #       Ok(())
-//!     }
 //!     fn transaction(&mut self, address: u8, operations: &mut [Operation<'_>]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
@@ -49,18 +37,6 @@
 //!
 //! impl I2c<TenBitAddress> for I2c0
 //! {
-//!     fn read(&mut self, addr: u16, write: &mut [u8]) -> Result<(), Self::Error> {
-//!         // ...
-//! #       Ok(())
-//!     }
-//!     fn write(&mut self, addr: u16, read: &[u8]) -> Result<(), Self::Error> {
-//!         // ...
-//! #       Ok(())
-//!     }
-//!     fn write_read(&mut self, addr: u16, write: &[u8], read: &mut [u8]) -> Result<(), Self::Error> {
-//!         // ...
-//! #       Ok(())
-//!     }
 //!     fn transaction(&mut self, address: u16, operations: &mut [Operation<'_>]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
@@ -232,7 +208,7 @@ impl AddressMode for SevenBitAddress {}
 
 impl AddressMode for TenBitAddress {}
 
-/// Transactional I2C operation.
+/// I2C operation.
 ///
 /// Several operations can be combined as part of a transaction.
 #[derive(Debug, PartialEq, Eq)]
@@ -263,7 +239,9 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
-    fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error>;
+    fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error> {
+        self.transaction(address, &mut [Operation::Read(read)])
+    }
 
     /// Writes bytes to slave with address `address`
     ///
@@ -281,7 +259,9 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `SAK` = slave acknowledge
     /// - `Bi` = ith byte of data
     /// - `SP` = stop condition
-    fn write(&mut self, address: A, write: &[u8]) -> Result<(), Self::Error>;
+    fn write(&mut self, address: A, write: &[u8]) -> Result<(), Self::Error> {
+        self.transaction(address, &mut [Operation::Write(write)])
+    }
 
     /// Writes bytes to slave with address `address` and then reads enough bytes to fill `read` *in a
     /// single transaction*
@@ -305,7 +285,12 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
-    fn write_read(&mut self, address: A, write: &[u8], read: &mut [u8]) -> Result<(), Self::Error>;
+    fn write_read(&mut self, address: A, write: &[u8], read: &mut [u8]) -> Result<(), Self::Error> {
+        self.transaction(
+            address,
+            &mut [Operation::Write(write), Operation::Read(read)],
+        )
+    }
 
     /// Execute the provided operations on the I2C bus.
     ///
