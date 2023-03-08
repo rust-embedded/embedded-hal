@@ -41,7 +41,7 @@
 //!         // ...
 //! #       Ok(())
 //!     }
-//!     fn transaction<'a>(&mut self, address: u8, operations: &mut [Operation<'a>]) -> Result<(), Self::Error> {
+//!     fn transaction(&mut self, address: u8, operations: &mut [Operation<'_>]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
@@ -61,7 +61,7 @@
 //!         // ...
 //! #       Ok(())
 //!     }
-//!     fn transaction<'a>(&mut self, address: u16, operations: &mut [Operation<'a>]) -> Result<(), Self::Error> {
+//!     fn transaction(&mut self, address: u16, operations: &mut [Operation<'_>]) -> Result<(), Self::Error> {
 //!         // ...
 //! #       Ok(())
 //!     }
@@ -325,10 +325,10 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `SAD+R/W` = slave address followed by bit 1 to indicate reading or 0 to indicate writing
     /// - `SR` = repeated start condition
     /// - `SP` = stop condition
-    fn transaction<'a>(
+    fn transaction(
         &mut self,
         address: A,
-        operations: &mut [Operation<'a>],
+        operations: &mut [Operation<'_>],
     ) -> Result<(), Self::Error>;
 }
 
@@ -350,10 +350,10 @@ impl<A: AddressMode, T: I2c<A>> I2c<A> for &mut T {
         T::write_read(self, address, bytes, buffer)
     }
 
-    fn transaction<'a>(
+    fn transaction(
         &mut self,
         address: A,
-        operations: &mut [Operation<'a>],
+        operations: &mut [Operation<'_>],
     ) -> Result<(), Self::Error> {
         T::transaction(self, address, operations)
     }
