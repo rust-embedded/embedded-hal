@@ -12,6 +12,7 @@
 //! For further details on these traits, please consult the [`embedded-hal` documentation](https://docs.rs/embedded-hal).
 
 #![warn(missing_docs)]
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
 
+pub mod i2c;
 pub mod spi;

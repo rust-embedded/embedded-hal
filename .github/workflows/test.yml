@@ -13,17 +13,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # All generated code should be running on stable now
         rust:
           - stable
           - 1.59.0  # MSRV
           - nightly
-
-        # The default target we're compiling on and for
         target:
           - x86_64-unknown-linux-gnu
           - thumbv6m-none-eabi
           - thumbv7m-none-eabi
+        include:
+          - target: x86_64-unknown-linux-gnu
+            features: embedded-hal-bus/std
 
     steps:
       - uses: actions/checkout@v3
@@ -35,7 +35,7 @@ jobs:
       - run: sed -i '/nightly-only/d' Cargo.toml 
         if: matrix.rust != 'nightly'
 
-      - run: cargo check --target=${{ matrix.target }}
+      - run: cargo check --target=${{ matrix.target }} --features=${{ matrix.features }}
 
-      - run: cargo test --target=${{ matrix.target }}
+      - run: cargo test --target=${{ matrix.target }} --features=${{ matrix.features }}
         if: contains(matrix.target, 'linux')
