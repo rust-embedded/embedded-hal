@@ -80,9 +80,7 @@ pub trait Write<Word: Copy = u8>: ErrorType {
     /// An implementation can choose to buffer the write, returning `Ok(())`
     /// after the complete slice has been written to a buffer, but before all
     /// words have been sent via the serial interface. To make sure that
-    /// everything has been sent, call [`flush`] after this function returns.
-    ///
-    /// [`flush`]: #tymethod.flush
+    /// everything has been sent, call [`flush`](Write::flush) after this function returns.
     fn write(&mut self, buffer: &[Word]) -> Result<(), Self::Error>;
 
     /// Block until the serial interface has sent all buffered words
