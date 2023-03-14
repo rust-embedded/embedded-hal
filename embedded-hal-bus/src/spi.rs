@@ -2,7 +2,10 @@
 
 use core::fmt::Debug;
 use embedded_hal::digital::OutputPin;
-use embedded_hal::spi::{Error, ErrorKind, ErrorType, SpiBusFlush, SpiDevice};
+use embedded_hal::spi::{
+    Error, ErrorKind, ErrorType, Operation, SpiBus, SpiBusRead, SpiBusWrite, SpiDevice,
+    SpiDeviceRead, SpiDeviceWrite,
+};
 
 /// Error type for [`ExclusiveDevice`] operations.
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
@@ -50,29 +53,111 @@ where
     type Error = ExclusiveDeviceError<BUS::Error, CS::Error>;
 }
 
-impl<BUS, CS> SpiDevice for ExclusiveDevice<BUS, CS>
+impl<Word: Copy + 'static, BUS, CS> SpiDeviceRead<Word> for ExclusiveDevice<BUS, CS>
 where
-    BUS: SpiBusFlush,
+    BUS: SpiBusRead<Word>,
     CS: OutputPin,
 {
-    type Bus = BUS;
-
-    fn transaction<R>(
-        &mut self,
-        f: impl FnOnce(&mut Self::Bus) -> Result<R, <Self::Bus as ErrorType>::Error>,
-    ) -> Result<R, Self::Error> {
+    fn read_transaction(&mut self, operations: &mut [&mut [Word]]) -> Result<(), Self::Error> {
         self.cs.set_low().map_err(ExclusiveDeviceError::Cs)?;
 
-        let f_res = f(&mut self.bus);
+        let mut op_res = Ok(());
+
+        for buf in operations {
+            if let Err(e) = self.bus.read(buf) {
+                op_res = Err(e);
+                break;
+            }
+        }
 
         // On failure, it's important to still flush and deassert CS.
         let flush_res = self.bus.flush();
         let cs_res = self.cs.set_high();
 
-        let f_res = f_res.map_err(ExclusiveDeviceError::Spi)?;
+        op_res.map_err(ExclusiveDeviceError::Spi)?;
         flush_res.map_err(ExclusiveDeviceError::Spi)?;
         cs_res.map_err(ExclusiveDeviceError::Cs)?;
 
-        Ok(f_res)
+        Ok(())
+    }
+}
+
+impl<Word: Copy + 'static, BUS, CS> SpiDeviceWrite<Word> for ExclusiveDevice<BUS, CS>
+where
+    BUS: SpiBusWrite<Word>,
+    CS: OutputPin,
+{
+    fn write_transaction(&mut self, operations: &[&[Word]]) -> Result<(), Self::Error> {
+        self.cs.set_low().map_err(ExclusiveDeviceError::Cs)?;
+
+        let mut op_res = Ok(());
+
+        for buf in operations {
+            if let Err(e) = self.bus.write(buf) {
+                op_res = Err(e);
+                break;
+            }
+        }
+
+        // On failure, it's important to still flush and deassert CS.
+        let flush_res = self.bus.flush();
+        let cs_res = self.cs.set_high();
+
+        op_res.map_err(ExclusiveDeviceError::Spi)?;
+        flush_res.map_err(ExclusiveDeviceError::Spi)?;
+        cs_res.map_err(ExclusiveDeviceError::Cs)?;
+
+        Ok(())
+    }
+}
+
+impl<Word: Copy + 'static, BUS, CS> SpiDevice<Word> for ExclusiveDevice<BUS, CS>
+where
+    BUS: SpiBus<Word>,
+    CS: OutputPin,
+{
+    fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {
+        self.cs.set_low().map_err(ExclusiveDeviceError::Cs)?;
+
+        let mut op_res = Ok(());
+
+        for op in operations {
+            match op {
+                Operation::Read(buf) => {
+                    if let Err(e) = self.bus.read(buf) {
+                        op_res = Err(e);
+                        break;
+                    }
+                }
+                Operation::Write(buf) => {
+                    if let Err(e) = self.bus.write(buf) {
+                        op_res = Err(e);
+                        break;
+                    }
+                }
+                Operation::Transfer(read, write) => {
+                    if let Err(e) = self.bus.transfer(read, write) {
+                        op_res = Err(e);
+                        break;
+                    }
+                }
+                Operation::TransferInPlace(buf) => {
+                    if let Err(e) = self.bus.transfer_in_place(buf) {
+                        op_res = Err(e);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // On failure, it's important to still flush and deassert CS.
+        let flush_res = self.bus.flush();
+        let cs_res = self.cs.set_high();
+
+        op_res.map_err(ExclusiveDeviceError::Spi)?;
+        flush_res.map_err(ExclusiveDeviceError::Spi)?;
+        cs_res.map_err(ExclusiveDeviceError::Cs)?;
+
+        Ok(())
     }
 }

@@ -46,20 +46,19 @@
 //! consists of asserting CS, then doing one or more transfers, then deasserting CS. For the entire duration of the transaction, the [`SpiDevice`]
 //! implementation will ensure no other transaction can be opened on the same bus. This is the key that allows correct sharing of the bus.
 //!
-//! The capabilities of the bus (read-write, read-only or write-only) are determined by which of the [`SpiBus`], [`SpiBusRead`] [`SpiBusWrite`] traits
-//! are implemented for the [`Bus`](SpiDevice::Bus) associated type.
+//! For read-only or write-only SPI devices, the [`SpiDeviceRead`] and [`SpiDeviceWrite`] are available.
 //!
 //! # For driver authors
 //!
 //! When implementing a driver, it's crucial to pick the right trait, to ensure correct operation
 //! with maximum interoperability. Here are some guidelines depending on the device you're implementing a driver for:
 //!
-//! If your device **has a CS pin**, use [`SpiDevice`]. Do not manually manage the CS pin, the [`SpiDevice`] implementation will do it for you.
-//! Add bounds like `where T::Bus: SpiBus`, `where T::Bus: SpiBusRead`, `where T::Bus: SpiBusWrite` to specify the kind of access you need.
+//! If your device **has a CS pin**, use [`SpiDevice`] (or [`SpiDeviceRead`]/[`SpiDeviceWrite`]). Do not manually
+//! manage the CS pin, the [`SpiDevice`] implementation will do it for you.
 //! By using [`SpiDevice`], your driver will cooperate nicely with other drivers for other devices in the same shared SPI bus.
 //!
 //! ```
-//! # use embedded_hal::spi::{SpiBus, SpiBusRead, SpiBusWrite, SpiDevice};
+//! # use embedded_hal::spi::{SpiBus, SpiBusRead, SpiBusWrite, SpiDevice, Operation};
 //! pub struct MyDriver<SPI> {
 //!     spi: SPI,
 //! }
@@ -67,7 +66,6 @@
 //! impl<SPI> MyDriver<SPI>
 //! where
 //!     SPI: SpiDevice,
-//!     SPI::Bus: SpiBus, // or SpiBusRead/SpiBusWrite if you only need to read or only write.
 //! {
 //!     pub fn new(spi: SPI) -> Self {
 //!         Self { spi }
@@ -77,10 +75,10 @@
 //!         let mut buf = [0; 2];
 //!
 //!         // `transaction` asserts and deasserts CS for us. No need to do it manually!
-//!         self.spi.transaction(|bus| {
-//!             bus.write(&[0x90])?;
-//!             bus.read(&mut buf)
-//!         }).map_err(MyError::Spi)?;
+//!         self.spi.transaction(&mut [
+//!             Operation::Write(&[0x90]),
+//!             Operation::Read(&mut buf),
+//!         ]).map_err(MyError::Spi)?;
 //!
 //!         Ok(buf)
 //!     }
@@ -298,21 +296,41 @@ impl<T: ErrorType> ErrorType for &mut T {
     type Error = T::Error;
 }
 
-/// SPI device trait
+/// SPI transaction operation.
 ///
-/// `SpiDevice` represents ownership over a single SPI device on a (possibly shared) bus, selected
+/// This allows composition of SPI operations into a single bus transaction
+#[derive(Debug, PartialEq)]
+pub enum Operation<'a, Word: 'static> {
+    /// Read data into the provided buffer.
+    ///
+    /// Equivalent to [`SpiBusRead::read`].
+    Read(&'a mut [Word]),
+    /// Write data from the provided buffer, discarding read data
+    ///
+    /// Equivalent to [`SpiBusWrite::write`].
+    Write(&'a [Word]),
+    /// Read data into the first buffer, while writing data from the second buffer.
+    ///
+    /// Equivalent to [`SpiBus::transfer`].
+    Transfer(&'a mut [Word], &'a [Word]),
+    /// Write data out while reading data into the provided buffer
+    ///
+    /// Equivalent to [`SpiBus::transfer_in_place`].
+    TransferInPlace(&'a mut [Word]),
+}
+
+/// SPI read-only device trait
+///
+/// `SpiDeviceRead` represents ownership over a single SPI device on a (possibly shared) bus, selected
 /// with a CS (Chip Select) pin.
 ///
 /// See the [module-level documentation](self) for important usage information.
-pub trait SpiDevice: ErrorType {
-    /// SPI Bus type for this device.
-    type Bus: ErrorType;
-
-    /// Perform a transaction against the device.
+pub trait SpiDeviceRead<Word: Copy + 'static = u8>: ErrorType {
+    /// Perform a read transaction against the device.
     ///
     /// - Locks the bus
     /// - Asserts the CS (Chip Select) pin.
-    /// - Calls `f` with an exclusive reference to the bus, which can then be used to do transfers against the device.
+    /// - Performs all the operations.
     /// - [Flushes](SpiBusFlush::flush) the bus.
     /// - Deasserts the CS pin.
     /// - Unlocks the bus.
@@ -323,71 +341,128 @@ pub trait SpiDevice: ErrorType {
     ///
     /// On bus errors the implementation should try to deassert CS.
     /// If an error occurs while deasserting CS the bus error should take priority as the return value.
-    fn transaction<R>(
-        &mut self,
-        f: impl FnOnce(&mut Self::Bus) -> Result<R, <Self::Bus as ErrorType>::Error>,
-    ) -> Result<R, Self::Error>;
-
-    /// Do a write within a transaction.
-    ///
-    /// This is a convenience method equivalent to `device.transaction(|bus| bus.write(buf))`.
-    ///
-    /// See also: [`SpiDevice::transaction`], [`SpiBusWrite::write`]
-    fn write<Word>(&mut self, buf: &[Word]) -> Result<(), Self::Error>
-    where
-        Self::Bus: SpiBusWrite<Word>,
-        Word: Copy,
-    {
-        self.transaction(|bus| bus.write(buf))
-    }
+    fn read_transaction(&mut self, operations: &mut [&mut [Word]]) -> Result<(), Self::Error>;
 
     /// Do a read within a transaction.
     ///
-    /// This is a convenience method equivalent to `device.transaction(|bus| bus.read(buf))`.
+    /// This is a convenience method equivalent to `device.read_transaction(&mut [buf])`.
     ///
-    /// See also: [`SpiDevice::transaction`], [`SpiBusRead::read`]
-    fn read<Word>(&mut self, buf: &mut [Word]) -> Result<(), Self::Error>
-    where
-        Self::Bus: SpiBusRead<Word>,
-        Word: Copy,
-    {
-        self.transaction(|bus| bus.read(buf))
+    /// See also: [`SpiDeviceRead::read_transaction`], [`SpiBusRead::read`]
+    fn read(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
+        self.read_transaction(&mut [buf])
     }
+}
+
+/// SPI write-only device trait
+///
+/// `SpiDeviceWrite` represents ownership over a single SPI device on a (possibly shared) bus, selected
+/// with a CS (Chip Select) pin.
+///
+/// See the [module-level documentation](self) for important usage information.
+pub trait SpiDeviceWrite<Word: Copy + 'static = u8>: ErrorType {
+    /// Perform a write transaction against the device.
+    ///
+    /// - Locks the bus
+    /// - Asserts the CS (Chip Select) pin.
+    /// - Performs all the operations.
+    /// - [Flushes](SpiBusFlush::flush) the bus.
+    /// - Deasserts the CS pin.
+    /// - Unlocks the bus.
+    ///
+    /// The locking mechanism is implementation-defined. The only requirement is it must prevent two
+    /// transactions from executing concurrently against the same bus. Examples of implementations are:
+    /// critical sections, blocking mutexes, returning an error or panicking if the bus is already busy.
+    ///
+    /// On bus errors the implementation should try to deassert CS.
+    /// If an error occurs while deasserting CS the bus error should take priority as the return value.
+    fn write_transaction(&mut self, operations: &[&[Word]]) -> Result<(), Self::Error>;
+
+    /// Do a write within a transaction.
+    ///
+    /// This is a convenience method equivalent to `device.write_transaction(&mut [buf])`.
+    ///
+    /// See also: [`SpiDeviceWrite::write_transaction`], [`SpiBusWrite::write`]
+    fn write(&mut self, buf: &[Word]) -> Result<(), Self::Error> {
+        self.write_transaction(&[buf])
+    }
+}
+
+/// SPI device trait
+///
+/// `SpiDevice` represents ownership over a single SPI device on a (possibly shared) bus, selected
+/// with a CS (Chip Select) pin.
+///
+/// See the [module-level documentation](self) for important usage information.
+pub trait SpiDevice<Word: Copy + 'static = u8>:
+    SpiDeviceRead<Word> + SpiDeviceWrite<Word> + ErrorType
+{
+    /// Perform a transaction against the device.
+    ///
+    /// - Locks the bus
+    /// - Asserts the CS (Chip Select) pin.
+    /// - Performs all the operations.
+    /// - [Flushes](SpiBusFlush::flush) the bus.
+    /// - Deasserts the CS pin.
+    /// - Unlocks the bus.
+    ///
+    /// The locking mechanism is implementation-defined. The only requirement is it must prevent two
+    /// transactions from executing concurrently against the same bus. Examples of implementations are:
+    /// critical sections, blocking mutexes, returning an error or panicking if the bus is already busy.
+    ///
+    /// On bus errors the implementation should try to deassert CS.
+    /// If an error occurs while deasserting CS the bus error should take priority as the return value.
+    fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error>;
 
     /// Do a transfer within a transaction.
     ///
-    /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer(read, write))`.
+    /// This is a convenience method equivalent to `device.transaction(&mut [Operation::Transfer(read, write)]`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer`]
-    fn transfer<Word>(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error>
-    where
-        Self::Bus: SpiBus<Word>,
-        Word: Copy,
-    {
-        self.transaction(|bus| bus.transfer(read, write))
+    fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
+        self.transaction(&mut [Operation::Transfer(read, write)])
     }
 
     /// Do an in-place transfer within a transaction.
     ///
-    /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer_in_place(buf))`.
+    /// This is a convenience method equivalent to `device.transaction([Operation::TransferInPlace(buf)]`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer_in_place`]
-    fn transfer_in_place<Word>(&mut self, buf: &mut [Word]) -> Result<(), Self::Error>
-    where
-        Self::Bus: SpiBus<Word>,
-        Word: Copy,
-    {
-        self.transaction(|bus| bus.transfer_in_place(buf))
+    fn transfer_in_place(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
+        self.transaction(&mut [Operation::TransferInPlace(buf)])
     }
 }
 
-impl<T: SpiDevice> SpiDevice for &mut T {
-    type Bus = T::Bus;
-    fn transaction<R>(
-        &mut self,
-        f: impl FnOnce(&mut Self::Bus) -> Result<R, <Self::Bus as ErrorType>::Error>,
-    ) -> Result<R, Self::Error> {
-        T::transaction(self, f)
+impl<Word: Copy + 'static, T: SpiDeviceRead<Word>> SpiDeviceRead<Word> for &mut T {
+    fn read_transaction(&mut self, operations: &mut [&mut [Word]]) -> Result<(), Self::Error> {
+        T::read_transaction(self, operations)
+    }
+
+    fn read(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
+        T::read(self, buf)
+    }
+}
+
+impl<Word: Copy + 'static, T: SpiDeviceWrite<Word>> SpiDeviceWrite<Word> for &mut T {
+    fn write_transaction(&mut self, operations: &[&[Word]]) -> Result<(), Self::Error> {
+        T::write_transaction(self, operations)
+    }
+
+    fn write(&mut self, buf: &[Word]) -> Result<(), Self::Error> {
+        T::write(self, buf)
+    }
+}
+
+impl<Word: Copy + 'static, T: SpiDevice<Word>> SpiDevice<Word> for &mut T {
+    fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {
+        T::transaction(self, operations)
+    }
+
+    fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
+        T::transfer(self, read, write)
+    }
+
+    fn transfer_in_place(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
+        T::transfer_in_place(self, buf)
     }
 }
 
@@ -406,7 +481,7 @@ impl<T: SpiBusFlush> SpiBusFlush for &mut T {
 }
 
 /// Read-only SPI bus
-pub trait SpiBusRead<Word: Copy = u8>: SpiBusFlush {
+pub trait SpiBusRead<Word: Copy + 'static = u8>: SpiBusFlush {
     /// Read `words` from the slave.
     ///
     /// The word value sent on MOSI during reading is implementation-defined,
@@ -417,14 +492,14 @@ pub trait SpiBusRead<Word: Copy = u8>: SpiBusFlush {
     fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
 }
 
-impl<T: SpiBusRead<Word>, Word: Copy> SpiBusRead<Word> for &mut T {
+impl<T: SpiBusRead<Word>, Word: Copy + 'static> SpiBusRead<Word> for &mut T {
     fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
         T::read(self, words)
     }
 }
 
 /// Write-only SPI bus
-pub trait SpiBusWrite<Word: Copy = u8>: SpiBusFlush {
+pub trait SpiBusWrite<Word: Copy + 'static = u8>: SpiBusFlush {
     /// Write `words` to the slave, ignoring all the incoming words
     ///
     /// Implementations are allowed to return before the operation is
@@ -432,7 +507,7 @@ pub trait SpiBusWrite<Word: Copy = u8>: SpiBusFlush {
     fn write(&mut self, words: &[Word]) -> Result<(), Self::Error>;
 }
 
-impl<T: SpiBusWrite<Word>, Word: Copy> SpiBusWrite<Word> for &mut T {
+impl<T: SpiBusWrite<Word>, Word: Copy + 'static> SpiBusWrite<Word> for &mut T {
     fn write(&mut self, words: &[Word]) -> Result<(), Self::Error> {
         T::write(self, words)
     }
@@ -443,7 +518,7 @@ impl<T: SpiBusWrite<Word>, Word: Copy> SpiBusWrite<Word> for &mut T {
 /// `SpiBus` represents **exclusive ownership** over the whole SPI bus, with SCK, MOSI and MISO pins.
 ///
 /// See the [module-level documentation](self) for important information on SPI Bus vs Device traits.
-pub trait SpiBus<Word: Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
+pub trait SpiBus<Word: Copy + 'static = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
     /// Write and read simultaneously. `write` is written to the slave on MOSI and
     /// words received on MISO are stored in `read`.
     ///
@@ -466,7 +541,7 @@ pub trait SpiBus<Word: Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
     fn transfer_in_place(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
 }
 
-impl<T: SpiBus<Word>, Word: Copy> SpiBus<Word> for &mut T {
+impl<T: SpiBus<Word>, Word: Copy + 'static> SpiBus<Word> for &mut T {
     fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
         T::transfer(self, read, write)
     }

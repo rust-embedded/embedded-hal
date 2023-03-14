@@ -1,113 +1,85 @@
 //! SPI master mode traits.
 
-use core::{fmt::Debug, future::Future};
+use core::fmt::Debug;
 
 use embedded_hal::digital::OutputPin;
 use embedded_hal::spi as blocking;
 pub use embedded_hal::spi::{
-    Error, ErrorKind, ErrorType, Mode, Phase, Polarity, MODE_0, MODE_1, MODE_2, MODE_3,
+    Error, ErrorKind, ErrorType, Mode, Operation, Phase, Polarity, MODE_0, MODE_1, MODE_2, MODE_3,
 };
 
-#[macro_export]
-/// Do an SPI transaction on a bus.
-/// This is a safe wrapper for [SpiDevice::transaction], which handles dereferencing the raw pointer for you.
+/// SPI read-only device trait
 ///
-/// # Examples
+/// `SpiDeviceRead` represents ownership over a single SPI device on a (possibly shared) bus, selected
+/// with a CS (Chip Select) pin.
 ///
-/// ```
-/// use embedded_hal_async::spi::{transaction, SpiBus, SpiBusRead, SpiBusWrite, SpiDevice};
+/// See (the docs on embedded-hal)[embedded_hal::spi] for important information on SPI Bus vs Device traits.
 ///
-/// pub async fn transaction_example<SPI>(mut device: SPI) -> Result<u32, SPI::Error>
-/// where
-///     SPI: SpiDevice,
-///     SPI::Bus: SpiBus,
-/// {
-///     transaction!(&mut device, move |bus| async move {
-///         // Unlike `SpiDevice::transaction`, we don't need to
-///         // manually dereference a pointer in order to use the bus.
-///         bus.write(&[42]).await?;
-///         let mut data = [0; 4];
-///         bus.read(&mut data).await?;
-///         Ok(u32::from_be_bytes(data))
-///     })
-///     .await
-/// }
-/// ```
-///
-/// Note that the compiler will prevent you from moving the bus reference outside of the closure
-/// ```compile_fail
-/// # use embedded_hal_async::spi::{transaction, SpiBus, SpiBusRead, SpiBusWrite, SpiDevice};
-/// #
-/// # pub async fn smuggle_test<SPI>(mut device: SPI) -> Result<(), SPI::Error>
-/// # where
-/// #     SPI: SpiDevice,
-/// #     SPI::Bus: SpiBus,
-/// # {
-///     let mut bus_smuggler: Option<&mut SPI::Bus> = None;
-///     transaction!(&mut device, move |bus| async move {
-///         bus_smuggler = Some(bus);
-///         Ok(())
-///     })
-///     .await
-/// # }
-/// ```
-macro_rules! spi_transaction {
-    ($device:expr, move |$bus:ident| async move $closure_body:expr) => {
-        $crate::spi::SpiDevice::transaction($device, move |$bus| {
-            // Safety: Implementers of the `SpiDevice` trait guarantee that the pointer is
-            // valid and dereferencable for the entire duration of the closure.
-            let $bus = unsafe { &mut *$bus };
-            async move {
-                let result = $closure_body;
-                let $bus = $bus; // Ensure that the bus reference was not moved out of the closure
-                let _ = $bus; // Silence the "unused variable" warning from prevous line
-                result
-            }
-        })
-    };
-    ($device:expr, move |$bus:ident| async $closure_body:expr) => {
-        $crate::spi::SpiDevice::transaction($device, move |$bus| {
-            // Safety: Implementers of the `SpiDevice` trait guarantee that the pointer is
-            // valid and dereferencable for the entire duration of the closure.
-            let $bus = unsafe { &mut *$bus };
-            async {
-                let result = $closure_body;
-                let $bus = $bus; // Ensure that the bus reference was not moved out of the closure
-                let _ = $bus; // Silence the "unused variable" warning from prevous line
-                result
-            }
-        })
-    };
-    ($device:expr, |$bus:ident| async move $closure_body:expr) => {
-        $crate::spi::SpiDevice::transaction($device, |$bus| {
-            // Safety: Implementers of the `SpiDevice` trait guarantee that the pointer is
-            // valid and dereferencable for the entire duration of the closure.
-            let $bus = unsafe { &mut *$bus };
-            async move {
-                let result = $closure_body;
-                let $bus = $bus; // Ensure that the bus reference was not moved out of the closure
-                let _ = $bus; // Silence the "unused variable" warning from prevous line
-                result
-            }
-        })
-    };
-    ($device:expr, |$bus:ident| async $closure_body:expr) => {
-        $crate::spi::SpiDevice::transaction($device, |$bus| {
-            // Safety: Implementers of the `SpiDevice` trait guarantee that the pointer is
-            // valid and dereferencable for the entire duration of the closure.
-            let $bus = unsafe { &mut *$bus };
-            async {
-                let result = $closure_body;
-                let $bus = $bus; // Ensure that the bus reference was not moved out of the closure
-                let _ = $bus; // Silence the "unused variable" warning from prevous line
-                result
-            }
-        })
-    };
+/// See the [module-level documentation](self) for important usage information.
+pub trait SpiDeviceRead<Word: Copy + 'static = u8>: ErrorType {
+    /// Perform a read transaction against the device.
+    ///
+    /// - Locks the bus
+    /// - Asserts the CS (Chip Select) pin.
+    /// - Performs all the operations.
+    /// - [Flushes](SpiBusFlush::flush) the bus.
+    /// - Deasserts the CS pin.
+    /// - Unlocks the bus.
+    ///
+    /// The locking mechanism is implementation-defined. The only requirement is it must prevent two
+    /// transactions from executing concurrently against the same bus. Examples of implementations are:
+    /// critical sections, blocking mutexes, returning an error or panicking if the bus is already busy.
+    ///
+    /// On bus errors the implementation should try to deassert CS.
+    /// If an error occurs while deasserting CS the bus error should take priority as the return value.
+    async fn read_transaction(&mut self, operations: &mut [&mut [Word]])
+        -> Result<(), Self::Error>;
+
+    /// Do a read within a transaction.
+    ///
+    /// This is a convenience method equivalent to `device.read_transaction(&mut [buf])`.
+    ///
+    /// See also: [`SpiDeviceRead::read_transaction`], [`SpiBusRead::read`]
+    async fn read(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
+        self.read_transaction(&mut [buf]).await
+    }
 }
 
-#[doc(inline)]
-pub use spi_transaction as transaction;
+/// SPI write-only device trait
+///
+/// `SpiDeviceWrite` represents ownership over a single SPI device on a (possibly shared) bus, selected
+/// with a CS (Chip Select) pin.
+///
+/// See (the docs on embedded-hal)[embedded_hal::spi] for important information on SPI Bus vs Device traits.
+///
+/// See the [module-level documentation](self) for important usage information.
+pub trait SpiDeviceWrite<Word: Copy + 'static = u8>: ErrorType {
+    /// Perform a write transaction against the device.
+    ///
+    /// - Locks the bus
+    /// - Asserts the CS (Chip Select) pin.
+    /// - Performs all the operations.
+    /// - [Flushes](SpiBusFlush::flush) the bus.
+    /// - Deasserts the CS pin.
+    /// - Unlocks the bus.
+    ///
+    /// The locking mechanism is implementation-defined. The only requirement is it must prevent two
+    /// transactions from executing concurrently against the same bus. Examples of implementations are:
+    /// critical sections, blocking mutexes, returning an error or panicking if the bus is already busy.
+    ///
+    /// On bus errors the implementation should try to deassert CS.
+    /// If an error occurs while deasserting CS the bus error should take priority as the return value.
+    async fn write_transaction(&mut self, operations: &[&[Word]]) -> Result<(), Self::Error>;
+
+    /// Do a write within a transaction.
+    ///
+    /// This is a convenience method equivalent to `device.write_transaction(&mut [buf])`.
+    ///
+    /// See also: [`SpiDeviceWrite::write_transaction`], [`SpiBusWrite::write`]
+    async fn write(&mut self, buf: &[Word]) -> Result<(), Self::Error> {
+        self.write_transaction(&[buf]).await
+    }
+}
 
 /// SPI device trait
 ///
@@ -116,90 +88,38 @@ pub use spi_transaction as transaction;
 ///
 /// See (the docs on embedded-hal)[embedded_hal::spi] for important information on SPI Bus vs Device traits.
 ///
-/// # Safety
-///
-/// See [`SpiDevice::transaction`] for details.
-pub unsafe trait SpiDevice: ErrorType {
-    /// SPI Bus type for this device.
-    type Bus: ErrorType;
-
+/// See the [module-level documentation](self) for important usage information.
+pub trait SpiDevice<Word: Copy + 'static = u8>:
+    SpiDeviceRead<Word> + SpiDeviceWrite<Word> + ErrorType
+{
     /// Perform a transaction against the device.
-    ///
-    /// **NOTE:**
-    /// It is not recommended to use this method directly, because it requires `unsafe` code to dereference the raw pointer.
-    /// Instead, the [`transaction!`] macro should be used, which handles this safely inside the macro.
     ///
     /// - Locks the bus
     /// - Asserts the CS (Chip Select) pin.
-    /// - Calls `f` with an exclusive reference to the bus, which can then be used to do transfers against the device.
+    /// - Performs all the operations.
     /// - [Flushes](SpiBusFlush::flush) the bus.
     /// - Deasserts the CS pin.
     /// - Unlocks the bus.
     ///
     /// The locking mechanism is implementation-defined. The only requirement is it must prevent two
     /// transactions from executing concurrently against the same bus. Examples of implementations are:
-    /// critical sections, blocking mutexes, async mutexes, returning an error or panicking if the bus is already busy.
+    /// critical sections, blocking mutexes, returning an error or panicking if the bus is already busy.
     ///
     /// On bus errors the implementation should try to deassert CS.
     /// If an error occurs while deasserting CS the bus error should take priority as the return value.
-    ///
-    /// # Safety
-    ///
-    /// The current state of the Rust typechecker doesn't allow expressing the necessary lifetime constraints, so
-    /// the `f` closure receives a lifetime-less `*mut Bus` raw pointer instead.
-    ///
-    /// Implementers of the `SpiDevice` trait must guarantee that the pointer is valid and dereferencable
-    /// for the entire duration of the closure.
-    async fn transaction<R, F, Fut>(&mut self, f: F) -> Result<R, Self::Error>
-    where
-        F: FnOnce(*mut Self::Bus) -> Fut,
-        Fut: Future<Output = Result<R, <Self::Bus as ErrorType>::Error>>;
-
-    /// Do a read within a transaction.
-    ///
-    /// This is a convenience method equivalent to `device.transaction(|bus| bus.read(buf))`.
-    ///
-    /// See also: [`SpiDevice::transaction`], [`SpiBusRead::read`]
-    async fn read<'a, Word>(&'a mut self, buf: &'a mut [Word]) -> Result<(), Self::Error>
-    where
-        Self::Bus: SpiBusRead<Word>,
-        Word: Copy + 'static,
-    {
-        transaction!(self, move |bus| async move { bus.read(buf).await }).await
-    }
-
-    /// Do a write within a transaction.
-    ///
-    /// This is a convenience method equivalent to `device.transaction(|bus| bus.write(buf))`.
-    ///
-    /// See also: [`SpiDevice::transaction`], [`SpiBusWrite::write`]
-    async fn write<'a, Word>(&'a mut self, buf: &'a [Word]) -> Result<(), Self::Error>
-    where
-        Self::Bus: SpiBusWrite<Word>,
-        Word: Copy + 'static,
-    {
-        transaction!(self, move |bus| async move { bus.write(buf).await }).await
-    }
+    async fn transaction(
+        &mut self,
+        operations: &mut [Operation<'_, Word>],
+    ) -> Result<(), Self::Error>;
 
     /// Do a transfer within a transaction.
     ///
     /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer(read, write))`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer`]
-    async fn transfer<'a, Word>(
-        &'a mut self,
-        read: &'a mut [Word],
-        write: &'a [Word],
-    ) -> Result<(), Self::Error>
-    where
-        Self::Bus: SpiBus<Word>,
-        Word: Copy + 'static,
-    {
-        transaction!(
-            self,
-            move |bus| async move { bus.transfer(read, write).await }
-        )
-        .await
+    async fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
+        self.transaction(&mut [Operation::Transfer(read, write)])
+            .await
     }
 
     /// Do an in-place transfer within a transaction.
@@ -207,31 +127,49 @@ pub unsafe trait SpiDevice: ErrorType {
     /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer_in_place(buf))`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer_in_place`]
-    async fn transfer_in_place<'a, Word>(
-        &'a mut self,
-        buf: &'a mut [Word],
-    ) -> Result<(), Self::Error>
-    where
-        Self::Bus: SpiBus<Word>,
-        Word: Copy + 'static,
-    {
-        transaction!(
-            self,
-            move |bus| async move { bus.transfer_in_place(buf).await }
-        )
-        .await
+    async fn transfer_in_place(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
+        self.transaction(&mut [Operation::TransferInPlace(buf)])
+            .await
     }
 }
 
-unsafe impl<T: SpiDevice> SpiDevice for &mut T {
-    type Bus = T::Bus;
+impl<Word: Copy + 'static, T: SpiDeviceRead<Word>> SpiDeviceRead<Word> for &mut T {
+    async fn read_transaction(
+        &mut self,
+        operations: &mut [&mut [Word]],
+    ) -> Result<(), Self::Error> {
+        T::read_transaction(self, operations).await
+    }
 
-    async fn transaction<R, F, Fut>(&mut self, f: F) -> Result<R, Self::Error>
-    where
-        F: FnOnce(*mut Self::Bus) -> Fut,
-        Fut: Future<Output = Result<R, <Self::Bus as ErrorType>::Error>>,
-    {
-        T::transaction(self, f).await
+    async fn read(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
+        T::read(self, buf).await
+    }
+}
+
+impl<Word: Copy + 'static, T: SpiDeviceWrite<Word>> SpiDeviceWrite<Word> for &mut T {
+    async fn write_transaction(&mut self, operations: &[&[Word]]) -> Result<(), Self::Error> {
+        T::write_transaction(self, operations).await
+    }
+
+    async fn write(&mut self, buf: &[Word]) -> Result<(), Self::Error> {
+        T::write(self, buf).await
+    }
+}
+
+impl<Word: Copy + 'static, T: SpiDevice<Word>> SpiDevice<Word> for &mut T {
+    async fn transaction(
+        &mut self,
+        operations: &mut [Operation<'_, Word>],
+    ) -> Result<(), Self::Error> {
+        T::transaction(self, operations).await
+    }
+
+    async fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
+        T::transfer(self, read, write).await
+    }
+
+    async fn transfer_in_place(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
+        T::transfer_in_place(self, buf).await
     }
 }
 
@@ -374,57 +312,194 @@ where
     type Error = ExclusiveDeviceError<BUS::Error, CS::Error>;
 }
 
-impl<BUS, CS> blocking::SpiDevice for ExclusiveDevice<BUS, CS>
+impl<Word: Copy + 'static, BUS, CS> blocking::SpiDeviceRead<Word> for ExclusiveDevice<BUS, CS>
 where
-    BUS: blocking::SpiBusFlush,
+    BUS: blocking::SpiBusRead<Word>,
     CS: OutputPin,
 {
-    type Bus = BUS;
-
-    fn transaction<R>(
-        &mut self,
-        f: impl FnOnce(&mut Self::Bus) -> Result<R, <Self::Bus as ErrorType>::Error>,
-    ) -> Result<R, Self::Error> {
+    fn read_transaction(&mut self, operations: &mut [&mut [Word]]) -> Result<(), Self::Error> {
         self.cs.set_low().map_err(ExclusiveDeviceError::Cs)?;
 
-        let f_res = f(&mut self.bus);
+        let mut op_res = Ok(());
+
+        for buf in operations {
+            if let Err(e) = self.bus.read(buf) {
+                op_res = Err(e);
+                break;
+            }
+        }
 
         // On failure, it's important to still flush and deassert CS.
         let flush_res = self.bus.flush();
         let cs_res = self.cs.set_high();
 
-        let f_res = f_res.map_err(ExclusiveDeviceError::Spi)?;
+        op_res.map_err(ExclusiveDeviceError::Spi)?;
         flush_res.map_err(ExclusiveDeviceError::Spi)?;
         cs_res.map_err(ExclusiveDeviceError::Cs)?;
 
-        Ok(f_res)
+        Ok(())
     }
 }
 
-unsafe impl<BUS, CS> SpiDevice for ExclusiveDevice<BUS, CS>
+impl<Word: Copy + 'static, BUS, CS> blocking::SpiDeviceWrite<Word> for ExclusiveDevice<BUS, CS>
 where
-    BUS: SpiBusFlush,
+    BUS: blocking::SpiBusWrite<Word>,
     CS: OutputPin,
 {
-    type Bus = BUS;
-
-    async fn transaction<R, F, Fut>(&mut self, f: F) -> Result<R, Self::Error>
-    where
-        F: FnOnce(*mut Self::Bus) -> Fut,
-        Fut: Future<Output = Result<R, <Self::Bus as ErrorType>::Error>>,
-    {
+    fn write_transaction(&mut self, operations: &[&[Word]]) -> Result<(), Self::Error> {
         self.cs.set_low().map_err(ExclusiveDeviceError::Cs)?;
 
-        let f_res = f(&mut self.bus).await;
+        let mut op_res = Ok(());
+
+        for buf in operations {
+            if let Err(e) = self.bus.write(buf) {
+                op_res = Err(e);
+                break;
+            }
+        }
+
+        // On failure, it's important to still flush and deassert CS.
+        let flush_res = self.bus.flush();
+        let cs_res = self.cs.set_high();
+
+        op_res.map_err(ExclusiveDeviceError::Spi)?;
+        flush_res.map_err(ExclusiveDeviceError::Spi)?;
+        cs_res.map_err(ExclusiveDeviceError::Cs)?;
+
+        Ok(())
+    }
+}
+
+impl<Word: Copy + 'static, BUS, CS> blocking::SpiDevice<Word> for ExclusiveDevice<BUS, CS>
+where
+    BUS: blocking::SpiBus<Word>,
+    CS: OutputPin,
+{
+    fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {
+        self.cs.set_low().map_err(ExclusiveDeviceError::Cs)?;
+
+        let op_res = 'ops: {
+            for op in operations {
+                let res = match op {
+                    Operation::Read(buf) => self.bus.read(buf),
+                    Operation::Write(buf) => self.bus.write(buf),
+                    Operation::Transfer(read, write) => self.bus.transfer(read, write),
+                    Operation::TransferInPlace(buf) => self.bus.transfer_in_place(buf),
+                };
+                if let Err(e) = res {
+                    break 'ops Err(e);
+                }
+            }
+            Ok(())
+        };
+
+        // On failure, it's important to still flush and deassert CS.
+        let flush_res = self.bus.flush();
+        let cs_res = self.cs.set_high();
+
+        op_res.map_err(ExclusiveDeviceError::Spi)?;
+        flush_res.map_err(ExclusiveDeviceError::Spi)?;
+        cs_res.map_err(ExclusiveDeviceError::Cs)?;
+
+        Ok(())
+    }
+}
+
+impl<Word: Copy + 'static, BUS, CS> SpiDeviceRead<Word> for ExclusiveDevice<BUS, CS>
+where
+    BUS: SpiBusRead<Word>,
+    CS: OutputPin,
+{
+    async fn read_transaction(
+        &mut self,
+        operations: &mut [&mut [Word]],
+    ) -> Result<(), Self::Error> {
+        self.cs.set_low().map_err(ExclusiveDeviceError::Cs)?;
+
+        let mut op_res = Ok(());
+
+        for buf in operations {
+            if let Err(e) = self.bus.read(buf).await {
+                op_res = Err(e);
+                break;
+            }
+        }
 
         // On failure, it's important to still flush and deassert CS.
         let flush_res = self.bus.flush().await;
         let cs_res = self.cs.set_high();
 
-        let f_res = f_res.map_err(ExclusiveDeviceError::Spi)?;
+        op_res.map_err(ExclusiveDeviceError::Spi)?;
         flush_res.map_err(ExclusiveDeviceError::Spi)?;
         cs_res.map_err(ExclusiveDeviceError::Cs)?;
 
-        Ok(f_res)
+        Ok(())
+    }
+}
+
+impl<Word: Copy + 'static, BUS, CS> SpiDeviceWrite<Word> for ExclusiveDevice<BUS, CS>
+where
+    BUS: SpiBusWrite<Word>,
+    CS: OutputPin,
+{
+    async fn write_transaction(&mut self, operations: &[&[Word]]) -> Result<(), Self::Error> {
+        self.cs.set_low().map_err(ExclusiveDeviceError::Cs)?;
+
+        let mut op_res = Ok(());
+
+        for buf in operations {
+            if let Err(e) = self.bus.write(buf).await {
+                op_res = Err(e);
+                break;
+            }
+        }
+
+        // On failure, it's important to still flush and deassert CS.
+        let flush_res = self.bus.flush().await;
+        let cs_res = self.cs.set_high();
+
+        op_res.map_err(ExclusiveDeviceError::Spi)?;
+        flush_res.map_err(ExclusiveDeviceError::Spi)?;
+        cs_res.map_err(ExclusiveDeviceError::Cs)?;
+
+        Ok(())
+    }
+}
+
+impl<Word: Copy + 'static, BUS, CS> SpiDevice<Word> for ExclusiveDevice<BUS, CS>
+where
+    BUS: SpiBus<Word>,
+    CS: OutputPin,
+{
+    async fn transaction(
+        &mut self,
+        operations: &mut [Operation<'_, Word>],
+    ) -> Result<(), Self::Error> {
+        self.cs.set_low().map_err(ExclusiveDeviceError::Cs)?;
+
+        let op_res = 'ops: {
+            for op in operations {
+                let res = match op {
+                    Operation::Read(buf) => self.bus.read(buf).await,
+                    Operation::Write(buf) => self.bus.write(buf).await,
+                    Operation::Transfer(read, write) => self.bus.transfer(read, write).await,
+                    Operation::TransferInPlace(buf) => self.bus.transfer_in_place(buf).await,
+                };
+                if let Err(e) = res {
+                    break 'ops Err(e);
+                }
+            }
+            Ok(())
+        };
+
+        // On failure, it's important to still flush and deassert CS.
+        let flush_res = self.bus.flush().await;
+        let cs_res = self.cs.set_high();
+
+        op_res.map_err(ExclusiveDeviceError::Spi)?;
+        flush_res.map_err(ExclusiveDeviceError::Spi)?;
+        cs_res.map_err(ExclusiveDeviceError::Cs)?;
+
+        Ok(())
     }
 }
