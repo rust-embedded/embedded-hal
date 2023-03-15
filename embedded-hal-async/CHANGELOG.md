@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- Added a `serial::Write` trait.
+
 ### Changed
 - delay: make infallible.
 
