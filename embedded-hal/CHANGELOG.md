@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - gpio: add `ErrorKind` enum for consistency with other traits and for future extensibility. No kinds are defined for now.
 - delay: make infallible.
+- i2c: remove `_iter()` methods.
+- i2c: add default implementations for all methods based on `transaction()`.
+- i2c: document guidelines for shared bus usage.
 
 ## [v1.0.0-alpha.9] - 2022-09-28
 

@@ -41,7 +41,10 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
-    async fn read<'a>(&'a mut self, address: A, read: &'a mut [u8]) -> Result<(), Self::Error>;
+    async fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error> {
+        self.transaction(address, &mut [Operation::Read(read)])
+            .await
+    }
 
     /// Writes bytes to slave with address `address`
     ///
@@ -59,7 +62,10 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `SAK` = slave acknowledge
     /// - `Bi` = ith byte of data
     /// - `SP` = stop condition
-    async fn write<'a>(&'a mut self, address: A, write: &'a [u8]) -> Result<(), Self::Error>;
+    async fn write(&mut self, address: A, write: &[u8]) -> Result<(), Self::Error> {
+        self.transaction(address, &mut [Operation::Write(write)])
+            .await
+    }
 
     /// Writes bytes to slave with address `address` and then reads enough bytes to fill `read` *in a
     /// single transaction*.
@@ -83,12 +89,18 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
-    async fn write_read<'a>(
-        &'a mut self,
+    async fn write_read(
+        &mut self,
         address: A,
-        write: &'a [u8],
-        read: &'a mut [u8],
-    ) -> Result<(), Self::Error>;
+        write: &[u8],
+        read: &mut [u8],
+    ) -> Result<(), Self::Error> {
+        self.transaction(
+            address,
+            &mut [Operation::Write(write), Operation::Read(read)],
+        )
+        .await
+    }
 
     /// Execute the provided operations on the I2C bus as a single transaction.
     ///
@@ -103,35 +115,35 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `SAD+R/W` = slave address followed by bit 1 to indicate reading or 0 to indicate writing
     /// - `SR` = repeated start condition
     /// - `SP` = stop condition
-    async fn transaction<'a, 'b>(
-        &'a mut self,
+    async fn transaction(
+        &mut self,
         address: A,
-        operations: &'a mut [Operation<'b>],
+        operations: &mut [Operation<'_>],
     ) -> Result<(), Self::Error>;
 }
 
 impl<A: AddressMode, T: I2c<A>> I2c<A> for &mut T {
-    async fn read<'a>(&'a mut self, address: A, buffer: &'a mut [u8]) -> Result<(), Self::Error> {
-        T::read(self, address, buffer).await
+    async fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error> {
+        T::read(self, address, read).await
     }
 
-    async fn write<'a>(&'a mut self, address: A, bytes: &'a [u8]) -> Result<(), Self::Error> {
-        T::write(self, address, bytes).await
+    async fn write(&mut self, address: A, write: &[u8]) -> Result<(), Self::Error> {
+        T::write(self, address, write).await
     }
 
-    async fn write_read<'a>(
-        &'a mut self,
+    async fn write_read(
+        &mut self,
         address: A,
-        bytes: &'a [u8],
-        buffer: &'a mut [u8],
+        write: &[u8],
+        read: &mut [u8],
     ) -> Result<(), Self::Error> {
-        T::write_read(self, address, bytes, buffer).await
+        T::write_read(self, address, write, read).await
     }
 
-    async fn transaction<'a, 'b>(
-        &'a mut self,
+    async fn transaction(
+        &mut self,
         address: A,
-        operations: &'a mut [Operation<'b>],
+        operations: &mut [Operation<'_>],
     ) -> Result<(), Self::Error> {
         T::transaction(self, address, operations).await
     }

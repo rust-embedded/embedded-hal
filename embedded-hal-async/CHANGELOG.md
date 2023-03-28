@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - delay: make infallible.
+- i2c: remove `_iter()` methods.
+- i2c: add default implementations for all methods based on `transaction()`.
 
 ## [v0.2.0-alpha.0] - 2022-11-23
 
