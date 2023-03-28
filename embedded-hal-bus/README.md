@@ -5,41 +5,47 @@
 
 # `embedded-hal-bus`
 
-Bus/Device connection mechanisms for [`embedded-hal`](https://crates.io/crates/embedded-hal), a Hardware Abstraction Layer (HAL) for embedded systems.
+Bus sharing utilities for [`embedded-hal`](https://crates.io/crates/embedded-hal), a Hardware Abstraction Layer (HAL) for embedded systems.
 
-It is possible to connect several peripherals to a bus like SPI or I2C.
-To support this, `embedded-hal` provides the `SpiBus` and `SpiDevice` traits in the case of SPI, for example.
-
-`embedded-hal` trait implementations for microcontrollers should implement the `...Bus` traits.
-However, device drivers should use the `...Device` traits, _not the `...Bus` traits_ if at all possible
-in order to allow for sharing of the bus they are connected to.
-
-This crate provides mechanisms to connect a `...Bus` and a `...Device`.
-
-For further details on these traits, please consult the [`embedded-hal` documentation](https://docs.rs/embedded-hal).
+`embedded-hal` provides traits for SPI and I2C buses and devices. This crate provides hardware-independent adapters for sharing a single bus between multiple devices, compatible with the traits.
 
 This project is developed and maintained by the [HAL team](https://github.com/rust-embedded/wg#the-hal-team).
 
-## [API reference]
+## SPI
 
-[API reference]: https://docs.rs/embedded-hal-bus
+To support bus sharing, `embedded-hal` provides the `SpiBus` and `SpiDevice` traits. `SpiBus` represents an entire bus,
+while `SpiDevice` represents a device on that bus. For further details on these traits, please consult the
+[`embedded-hal` documentation](https://docs.rs/embedded-hal/1.0.0-alpha.9/embedded_hal/spi/index.html).
+
+`embedded-hal` trait implementations for microcontrollers should implement the `SpiBus` trait.
+However, device drivers should use the `SpiDevice` traits, _not the `SpiBus` traits_ if at all possible
+in order to allow for sharing of the bus they are connected to.
+
+This crate provides mechanisms to connect a `SpiBus` and a `SpiDevice`.
+
+## I2C
+
+In the case of I2C, the same `I2c` `embedded-hal` trait represents either an entire bus, or a device on a bus. This crate
+provides mechanisms to obtain multiple `I2c` instances out of a single `I2c` instance, sharing the bus.
+
+## Features
+
+- `std`: enable shared bus implementations using `std::sync::Mutex`.
 
 ## Minimum Supported Rust Version (MSRV)
-
 
 This crate is guaranteed to compile on stable Rust 1.59 and up. It *might*
 compile with older versions but that may change in any new patch release.
 
 See [here](../docs/msrv.md) for details on how the MSRV may be upgraded.
 
-
 ## License
 
 Licensed under either of
 
 - Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or
-  http://www.apache.org/licenses/LICENSE-2.0)
-- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+  <http://www.apache.org/licenses/LICENSE-2.0>)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or <http://opensource.org/licenses/MIT>)
 
 at your option.
 
