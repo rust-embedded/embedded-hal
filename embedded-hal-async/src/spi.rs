@@ -114,7 +114,7 @@ pub use spi_transaction as transaction;
 /// `SpiDevice` represents ownership over a single SPI device on a (possibly shared) bus, selected
 /// with a CS (Chip Select) pin.
 ///
-/// See (the docs on embedded-hal)[embedded_hal::spi::blocking] for important information on SPI Bus vs Device traits.
+/// See (the docs on embedded-hal)[embedded_hal::spi] for important information on SPI Bus vs Device traits.
 ///
 /// # Safety
 ///
@@ -239,7 +239,7 @@ unsafe impl<T: SpiDevice> SpiDevice for &mut T {
 pub trait SpiBusFlush: ErrorType {
     /// Wait until all operations have completed and the bus is idle.
     ///
-    /// See (the docs on embedded-hal)[embedded_hal::spi::blocking] for information on flushing.
+    /// See (the docs on embedded-hal)[embedded_hal::spi] for information on flushing.
     async fn flush(&mut self) -> Result<(), Self::Error>;
 }
 
@@ -257,7 +257,7 @@ pub trait SpiBusRead<Word: 'static + Copy = u8>: SpiBusFlush {
     /// typically `0x00`, `0xFF`, or configurable.
     ///
     /// Implementations are allowed to return before the operation is
-    /// complete. See (the docs on embedded-hal)[embedded_hal::spi::blocking] for details on flushing.
+    /// complete. See (the docs on embedded-hal)[embedded_hal::spi] for details on flushing.
     async fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
 }
 
@@ -272,7 +272,7 @@ pub trait SpiBusWrite<Word: 'static + Copy = u8>: SpiBusFlush {
     /// Write `words` to the slave, ignoring all the incoming words
     ///
     /// Implementations are allowed to return before the operation is
-    /// complete. See (the docs on embedded-hal)[embedded_hal::spi::blocking] for details on flushing.
+    /// complete. See (the docs on embedded-hal)[embedded_hal::spi] for details on flushing.
     async fn write(&mut self, words: &[Word]) -> Result<(), Self::Error>;
 }
 
@@ -286,7 +286,7 @@ impl<T: SpiBusWrite<Word>, Word: 'static + Copy> SpiBusWrite<Word> for &mut T {
 ///
 /// `SpiBus` represents **exclusive ownership** over the whole SPI bus, with SCK, MOSI and MISO pins.
 ///
-/// See (the docs on embedded-hal)[embedded_hal::spi::blocking] for important information on SPI Bus vs Device traits.
+/// See (the docs on embedded-hal)[embedded_hal::spi] for important information on SPI Bus vs Device traits.
 pub trait SpiBus<Word: 'static + Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word> {
     /// Write and read simultaneously. `write` is written to the slave on MOSI and
     /// words received on MISO are stored in `read`.
@@ -298,7 +298,7 @@ pub trait SpiBus<Word: 'static + Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word
     /// typically `0x00`, `0xFF`, or configurable.
     ///
     /// Implementations are allowed to return before the operation is
-    /// complete. See (the docs on embedded-hal)[embedded_hal::spi::blocking] for details on flushing.
+    /// complete. See (the docs on embedded-hal)[embedded_hal::spi] for details on flushing.
     async fn transfer<'a>(
         &'a mut self,
         read: &'a mut [Word],
@@ -310,7 +310,7 @@ pub trait SpiBus<Word: 'static + Copy = u8>: SpiBusRead<Word> + SpiBusWrite<Word
     /// `words` buffer, overwriting it.
     ///
     /// Implementations are allowed to return before the operation is
-    /// complete. See (the docs on embedded-hal)[embedded_hal::spi::blocking] for details on flushing.
+    /// complete. See (the docs on embedded-hal)[embedded_hal::spi] for details on flushing.
     async fn transfer_in_place<'a>(&'a mut self, words: &'a mut [Word]) -> Result<(), Self::Error>;
 }
 

@@ -35,7 +35,7 @@
 //!
 //! - Where possible must *not* be tied to a specific asynchronous model. The API should be usable
 //! in blocking mode, with the `futures` model, with an async/await model or with a callback model.
-//! (cf. the [`nb`] crate)
+//! (cf. the [`nb`](https://docs.rs/nb) crate)
 //!
 //! - Must be minimal, and thus easy to implement and zero cost, yet highly composable. People that
 //! want higher level abstraction should *prefer to use this HAL* rather than *re-implement*
