@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 - i2c: add bus sharing implementations.
+- spi: add bus sharing implementations.
 
 ## [v0.1.0-alpha.1] - 2022-09-28
 
