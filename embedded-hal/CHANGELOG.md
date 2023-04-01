@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - i2c: remove `_iter()` methods.
 - i2c: add default implementations for all methods based on `transaction()`.
 - i2c: document guidelines for shared bus usage.
+- spi: SpiDevice transaction now takes an operation slice instead of a closure
 
 ## [v1.0.0-alpha.9] - 2022-09-28
 

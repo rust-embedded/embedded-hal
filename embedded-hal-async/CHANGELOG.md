@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - delay: make infallible.
 - i2c: remove `_iter()` methods.
 - i2c: add default implementations for all methods based on `transaction()`.
+- spi: SpiDevice transaction now takes an operation slice instead of a closure
 
 ## [v0.2.0-alpha.0] - 2022-11-23
 
