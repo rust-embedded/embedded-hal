@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ...
 
+## [v1.0.0-alpha.2] - 2023-04-04
+
+### Changed
+- Updated `embedded-hal` to version `1.0.0-alpha.10`.
+
 ## [v1.0.0-alpha.1] - 2022-09-28
 
 ### Changed
@@ -18,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 First release to crates.io
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-nb-v1.0.0-alpha.1...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-nb-v1.0.0-alpha.2...HEAD
+[v1.0.0-alpha.2]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-nb-v1.0.0-alpha.1...embedded-hal-nb-v1.0.0-alpha.2which
 [v1.0.0-alpha.1]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-nb-v1.0.0-alpha.0...embedded-hal-nb-v1.0.0-alpha.1
 [v1.0.0-alpha.0]: https://github.com/rust-embedded/embedded-hal/tree/embedded-hal-nb-v1.0.0-alpha.0

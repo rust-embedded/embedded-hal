@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v1.0.0-alpha.10] - 2023-04-04
+
+*** This is (also) an alpha release with breaking changes (sorry) ***
+
 ### Added
 - Added `pwm::SetDutyCycle` trait.
 
