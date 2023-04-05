@@ -7,10 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v0.2.0-alpha.1] - 2023-04-04
+
 ### Added
 - Added a `serial::Write` trait.
 
 ### Changed
+- Updated `embedded-hal` to version `1.0.0-alpha.10`.
 - delay: make infallible.
 - i2c: remove `_iter()` methods.
 - i2c: add default implementations for all methods based on `transaction()`.
@@ -46,7 +49,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 First release to crates.io
 
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.2.0-alpha.0...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.2.0-alpha.1...HEAD
+[v0.2.0-alpha.1]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.2.0-alpha.0...embedded-hal-async-v0.2.0-alpha.1
 [v0.2.0-alpha.0]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.1.0-alpha.3...embedded-hal-async-v0.2.0-alpha.0
 [v0.1.0-alpha.3]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.1.0-alpha.2...embedded-hal-async-v0.1.0-alpha.3
 [v0.1.0-alpha.2]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.1.0-alpha.1...embedded-hal-async-v0.1.0-alpha.2
