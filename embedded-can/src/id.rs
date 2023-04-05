@@ -103,31 +103,17 @@ pub enum Id {
 impl Id {
     /// Creates a CAN identifier as a standard ID.
     pub fn new_standard_id(raw: u16) -> Option<Self> {
-        let id = StandardId::new(raw)?;
-        Some(Id::Standard(id))
+        Some(Id::from(StandardId::new(raw)?))
     }
 
     /// Creates a CAN identifier as an extended ID.
     pub fn new_extended_id(raw: u32) -> Option<Self> {
-        let id = ExtendedId::new(raw)?;
-        Some(Id::Extended(id))
-    }
-
-    /// Returns this CAN Identifier as a raw 32-bit integer, regardless of whether it's
-    /// a standard or extended identifier.
-    pub fn as_raw(&self) -> u32 {
-        match self {
-            Id::Standard(id) => id.as_raw() as u32,
-            Id::Extended(id) => id.as_raw(),
-        }
+        Some(Id::from(ExtendedId::new(raw)?))
     }
 
     /// Determines if the value is an extended identifier.
     pub fn is_extended(&self) -> bool {
-        match self {
-            Id::Extended(_) => true,
-            _ => false
-        }
+        matches!(self, Id::Extended(_))
     }
 }
 
@@ -261,20 +247,10 @@ mod tests {
 
     #[test]
     fn id_raw() {
-        const RAW_ID: u32 = StandardId::MAX_RAW as u32;
+        let id = StandardId::new(StandardId::MAX_RAW).unwrap();
+        assert_eq!(StandardId::MAX_RAW, id.as_raw());
 
-        let id = StandardId::new(RAW_ID as u16).unwrap();
-        assert_eq!(RAW_ID as u16, id.as_raw());
-
-        let id = Id::from(id);
-        assert!(!id.is_extended());
-        assert_eq!(RAW_ID, id.as_raw());
-
-        let id = ExtendedId::new(RAW_ID).unwrap();
-        assert_eq!(RAW_ID, id.as_raw());
-
-        let id = Id::from(id);
-        assert!(id.is_extended());
-        assert_eq!(RAW_ID, id.as_raw());
+        let id = ExtendedId::new(ExtendedId::MAX_RAW).unwrap();
+        assert_eq!(ExtendedId::MAX_RAW, id.as_raw());
     }
 }
