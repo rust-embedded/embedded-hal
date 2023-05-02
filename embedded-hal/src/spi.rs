@@ -142,7 +142,11 @@
 //! # Flushing
 //!
 //! To improve performance, [`SpiBus`] implementations are allowed to return before the operation is finished, i.e. when the bus is still not
-//! idle.
+//! idle. This allows pipelining SPI transfers with CPU work.
+//!
+//! When calling another method when a previous operation is still in progress, implementations can either wait for the previous operation
+//! to finish, or enqueue the new one, but they must not return a "busy" error. Users must be able to do multiple method calls in a row
+//! and have them executed "as if" they were done sequentially, without having to check for "busy" errors.
 //!
 //! When using a [`SpiBus`], call [`flush`](SpiBusFlush::flush) to wait for operations to actually finish. Examples of situations
 //! where this is needed are:
