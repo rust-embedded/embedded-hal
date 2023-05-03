@@ -12,6 +12,63 @@ pub struct RefCellDevice<'a, T> {
 
 impl<'a, T> RefCellDevice<'a, T> {
     /// Create a new `RefCellDevice`
+    ///
+    /// # Examples
+    ///
+    /// Assuming there is a pressure sensor with address `0x42` on the same bus as a temperature sensor
+    /// with address `0x20`; [`RefCellDevice`] can be used to give access to both of these sensors
+    /// from a single `i2c` instance.
+    ///
+    /// ```
+    /// use embedded_hal_bus::i2c;
+    /// use core::cell::RefCell;
+    /// # use embedded_hal::i2c::{self as hali2c, SevenBitAddress, TenBitAddress, I2c, Operation, ErrorKind};
+    /// # pub struct Sensor<I2C> {
+    /// #     i2c: I2C,
+    /// #     address: u8,
+    /// # }
+    /// # impl<I2C: I2c> Sensor<I2C> {
+    /// #     pub const fn new(i2c: I2C, address: u8) -> Self {
+    /// #         Self { i2c, address }
+    /// #     }
+    /// # }
+    /// # type PressureSensor = Sensor;
+    /// # type TemperatureSensor = Sensor;
+    /// # pub struct I2c0;
+    /// # #[derive(Debug, Copy, Clone, Eq, PartialEq)]
+    /// # pub enum Error { }
+    /// # impl hali2c::Error for Error {
+    /// #     fn kind(&self) -> hali2c::ErrorKind {
+    /// #         ErrorKind::Other
+    /// #     }
+    /// # }
+    /// # impl hali2c::ErrorType for I2c0 {
+    /// #     type Error = Error;
+    /// # }
+    /// # impl I2c<SevenBitAddress> for I2c0 {
+    /// #     fn transaction(&mut self, address: u8, operations: &mut [Operation<'_>]) -> Result<(), Self::Error> {
+    /// #       Ok(())
+    /// #     }
+    /// # }
+    /// # struct Hal;
+    /// # impl Hal {
+    /// #   fn i2c(&self) -> I2c0 {
+    /// #     I2c0
+    /// #   }
+    /// # }
+    /// # let hal = Hal;
+    ///
+    /// let i2c = hal.i2c();
+    /// let i2c_ref_cell = RefCell::new(i2c);
+    /// let mut temperature_sensor = TemperatureSensor::new(
+    ///   i2c::RefCellDevice::new(&i2c_ref_cell),
+    ///   0x20,
+    /// );
+    /// let mut pressure_sensor = PressureSensor::new(
+    ///   i2c::RefCellDevice::new(&i2c_ref_cell),
+    ///   0x42,
+    /// );
+    /// ```
     pub fn new(bus: &'a RefCell<T>) -> Self {
         Self { bus }
     }
