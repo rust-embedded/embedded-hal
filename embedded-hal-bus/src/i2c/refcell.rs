@@ -22,12 +22,12 @@ use embedded_hal::i2c::{ErrorType, I2c};
 /// #     address: u8,
 /// # }
 /// # impl<I2C: I2c> Sensor<I2C> {
-/// #     pub const fn new(i2c: I2C, address: u8) -> Self {
+/// #     pub fn new(i2c: I2C, address: u8) -> Self {
 /// #         Self { i2c, address }
 /// #     }
 /// # }
-/// # type PressureSensor = Sensor;
-/// # type TemperatureSensor = Sensor;
+/// # type PressureSensor<I2C> = Sensor<I2C>;
+/// # type TemperatureSensor<I2C> = Sensor<I2C>;
 /// # pub struct I2c0;
 /// # #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 /// # pub enum Error { }
