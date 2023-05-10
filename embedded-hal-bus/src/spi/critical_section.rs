@@ -1,9 +1,7 @@
 use core::cell::RefCell;
 use critical_section::Mutex;
 use embedded_hal::digital::OutputPin;
-use embedded_hal::spi::{
-    ErrorType, Operation, SpiBus, SpiBusRead, SpiBusWrite, SpiDevice, SpiDeviceRead, SpiDeviceWrite,
-};
+use embedded_hal::spi::{ErrorType, Operation, SpiBus, SpiDevice};
 
 use super::DeviceError;
 
@@ -35,70 +33,6 @@ where
     CS: OutputPin,
 {
     type Error = DeviceError<BUS::Error, CS::Error>;
-}
-
-impl<'a, Word: Copy + 'static, BUS, CS> SpiDeviceRead<Word> for CriticalSectionDevice<'a, BUS, CS>
-where
-    BUS: SpiBusRead<Word>,
-    CS: OutputPin,
-{
-    fn read_transaction(&mut self, operations: &mut [&mut [Word]]) -> Result<(), Self::Error> {
-        critical_section::with(|cs| {
-            let bus = &mut *self.bus.borrow_ref_mut(cs);
-
-            self.cs.set_low().map_err(DeviceError::Cs)?;
-
-            let mut op_res = Ok(());
-            for buf in operations {
-                if let Err(e) = bus.read(buf) {
-                    op_res = Err(e);
-                    break;
-                }
-            }
-
-            // On failure, it's important to still flush and deassert CS.
-            let flush_res = bus.flush();
-            let cs_res = self.cs.set_high();
-
-            op_res.map_err(DeviceError::Spi)?;
-            flush_res.map_err(DeviceError::Spi)?;
-            cs_res.map_err(DeviceError::Cs)?;
-
-            Ok(())
-        })
-    }
-}
-
-impl<'a, Word: Copy + 'static, BUS, CS> SpiDeviceWrite<Word> for CriticalSectionDevice<'a, BUS, CS>
-where
-    BUS: SpiBusWrite<Word>,
-    CS: OutputPin,
-{
-    fn write_transaction(&mut self, operations: &[&[Word]]) -> Result<(), Self::Error> {
-        critical_section::with(|cs| {
-            let bus = &mut *self.bus.borrow_ref_mut(cs);
-
-            self.cs.set_low().map_err(DeviceError::Cs)?;
-
-            let mut op_res = Ok(());
-            for buf in operations {
-                if let Err(e) = bus.write(buf) {
-                    op_res = Err(e);
-                    break;
-                }
-            }
-
-            // On failure, it's important to still flush and deassert CS.
-            let flush_res = bus.flush();
-            let cs_res = self.cs.set_high();
-
-            op_res.map_err(DeviceError::Spi)?;
-            flush_res.map_err(DeviceError::Spi)?;
-            cs_res.map_err(DeviceError::Cs)?;
-
-            Ok(())
-        })
-    }
 }
 
 impl<'a, Word: Copy + 'static, BUS, CS> SpiDevice<Word> for CriticalSectionDevice<'a, BUS, CS>

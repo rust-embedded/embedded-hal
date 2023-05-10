@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Removed
+- spi: removed read-only and write-only traits.
+
 ## [v0.2.0-alpha.1] - 2023-04-04
 
 ### Added
