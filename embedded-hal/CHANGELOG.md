@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- spi: added `Operation::DelayUs(u32)`.
+
 ### Removed
 - spi: removed read-only and write-only traits.
 

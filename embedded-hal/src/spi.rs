@@ -313,6 +313,8 @@ pub enum Operation<'a, Word: 'static> {
     ///
     /// Equivalent to [`SpiBus::transfer_in_place`].
     TransferInPlace(&'a mut [Word]),
+    /// Delay for at least the specified number of microseconds
+    DelayUs(u32),
 }
 
 /// SPI device trait

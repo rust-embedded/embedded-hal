@@ -8,6 +8,8 @@ pub use embedded_hal::spi::{
     Error, ErrorKind, ErrorType, Mode, Operation, Phase, Polarity, MODE_0, MODE_1, MODE_2, MODE_3,
 };
 
+use crate::delay::DelayUs;
+
 /// SPI device trait
 ///
 /// `SpiDevice` represents ownership over a single SPI device on a (possibly shared) bus, selected
@@ -195,19 +197,20 @@ where
 ///
 /// This is the most straightforward way of obtaining an [`SpiDevice`] from an [`SpiBus`],
 /// ideal for when no sharing is required (only one SPI device is present on the bus).
-pub struct ExclusiveDevice<BUS, CS> {
+pub struct ExclusiveDevice<BUS, CS, D> {
     bus: BUS,
     cs: CS,
+    delay: D,
 }
 
-impl<BUS, CS> ExclusiveDevice<BUS, CS> {
+impl<BUS, CS, D> ExclusiveDevice<BUS, CS, D> {
     /// Create a new ExclusiveDevice
-    pub fn new(bus: BUS, cs: CS) -> Self {
-        Self { bus, cs }
+    pub fn new(bus: BUS, cs: CS, delay: D) -> Self {
+        Self { bus, cs, delay }
     }
 }
 
-impl<BUS, CS> ErrorType for ExclusiveDevice<BUS, CS>
+impl<BUS, CS, D> ErrorType for ExclusiveDevice<BUS, CS, D>
 where
     BUS: ErrorType,
     CS: OutputPin,
@@ -215,10 +218,11 @@ where
     type Error = ExclusiveDeviceError<BUS::Error, CS::Error>;
 }
 
-impl<Word: Copy + 'static, BUS, CS> blocking::SpiDevice<Word> for ExclusiveDevice<BUS, CS>
+impl<Word: Copy + 'static, BUS, CS, D> blocking::SpiDevice<Word> for ExclusiveDevice<BUS, CS, D>
 where
     BUS: blocking::SpiBus<Word>,
     CS: OutputPin,
+    D: embedded_hal::delay::DelayUs,
 {
     fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {
         self.cs.set_low().map_err(ExclusiveDeviceError::Cs)?;
@@ -230,6 +234,13 @@ where
                     Operation::Write(buf) => self.bus.write(buf),
                     Operation::Transfer(read, write) => self.bus.transfer(read, write),
                     Operation::TransferInPlace(buf) => self.bus.transfer_in_place(buf),
+                    Operation::DelayUs(us) => match self.bus.flush() {
+                        Err(e) => Err(e),
+                        Ok(()) => {
+                            self.delay.delay_us(*us);
+                            Ok(())
+                        }
+                    },
                 };
                 if let Err(e) = res {
                     break 'ops Err(e);
@@ -250,10 +261,11 @@ where
     }
 }
 
-impl<Word: Copy + 'static, BUS, CS> SpiDevice<Word> for ExclusiveDevice<BUS, CS>
+impl<Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for ExclusiveDevice<BUS, CS, D>
 where
     BUS: SpiBus<Word>,
     CS: OutputPin,
+    D: DelayUs,
 {
     async fn transaction(
         &mut self,
@@ -268,6 +280,13 @@ where
                     Operation::Write(buf) => self.bus.write(buf).await,
                     Operation::Transfer(read, write) => self.bus.transfer(read, write).await,
                     Operation::TransferInPlace(buf) => self.bus.transfer_in_place(buf).await,
+                    Operation::DelayUs(us) => match self.bus.flush().await {
+                        Err(e) => Err(e),
+                        Ok(()) => {
+                            self.delay.delay_us(*us).await;
+                            Ok(())
+                        }
+                    },
                 };
                 if let Err(e) = res {
                     break 'ops Err(e);
