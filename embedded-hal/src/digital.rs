@@ -82,6 +82,7 @@ pub enum PinState {
 }
 
 impl From<bool> for PinState {
+    #[inline]
     fn from(value: bool) -> Self {
         match value {
             false => PinState::Low,
@@ -93,6 +94,7 @@ impl From<bool> for PinState {
 impl Not for PinState {
     type Output = PinState;
 
+    #[inline]
     fn not(self) -> Self::Output {
         match self {
             PinState::High => PinState::Low,
@@ -102,6 +104,7 @@ impl Not for PinState {
 }
 
 impl From<PinState> for bool {
+    #[inline]
     fn from(value: PinState) -> bool {
         match value {
             PinState::Low => false,
