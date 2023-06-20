@@ -1,5 +1,6 @@
 //! SPI bus sharing mechanisms.
 
+use embedded_hal::delay::DelayUs;
 use embedded_hal::digital::OutputPin;
 use embedded_hal::spi::{ErrorType, Operation, SpiBus, SpiDevice};
 
@@ -9,19 +10,36 @@ use super::DeviceError;
 ///
 /// This is the most straightforward way of obtaining an [`SpiDevice`] from an [`SpiBus`](embedded_hal::spi::SpiBus),
 /// ideal for when no sharing is required (only one SPI device is present on the bus).
-pub struct ExclusiveDevice<BUS, CS> {
+pub struct ExclusiveDevice<BUS, CS, D> {
     bus: BUS,
     cs: CS,
+    delay: D,
 }
 
-impl<BUS, CS> ExclusiveDevice<BUS, CS> {
+impl<BUS, CS, D> ExclusiveDevice<BUS, CS, D> {
     /// Create a new ExclusiveDevice
-    pub fn new(bus: BUS, cs: CS) -> Self {
-        Self { bus, cs }
+    pub fn new(bus: BUS, cs: CS, delay: D) -> Self {
+        Self { bus, cs, delay }
     }
 }
 
-impl<BUS, CS> ErrorType for ExclusiveDevice<BUS, CS>
+impl<BUS, CS> ExclusiveDevice<BUS, CS, super::NoDelay> {
+    /// Create a new ExclusiveDevice without support for in-transaction delays.
+    ///
+    /// # Panics
+    ///
+    /// The returned device will panic if you try to execute a transaction
+    /// that contains any operations of type `Operation::DelayUs`.
+    pub fn new_no_delay(bus: BUS, cs: CS) -> Self {
+        Self {
+            bus,
+            cs,
+            delay: super::NoDelay,
+        }
+    }
+}
+
+impl<BUS, CS, D> ErrorType for ExclusiveDevice<BUS, CS, D>
 where
     BUS: ErrorType,
     CS: OutputPin,
@@ -29,10 +47,11 @@ where
     type Error = DeviceError<BUS::Error, CS::Error>;
 }
 
-impl<Word: Copy + 'static, BUS, CS> SpiDevice<Word> for ExclusiveDevice<BUS, CS>
+impl<Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for ExclusiveDevice<BUS, CS, D>
 where
     BUS: SpiBus<Word>,
     CS: OutputPin,
+    D: DelayUs,
 {
     fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {
         self.cs.set_low().map_err(DeviceError::Cs)?;
@@ -42,6 +61,11 @@ where
             Operation::Write(buf) => self.bus.write(buf),
             Operation::Transfer(read, write) => self.bus.transfer(read, write),
             Operation::TransferInPlace(buf) => self.bus.transfer_in_place(buf),
+            Operation::DelayUs(us) => {
+                self.bus.flush()?;
+                self.delay.delay_us(*us);
+                Ok(())
+            }
         });
 
         // On failure, it's important to still flush and deassert CS.

@@ -35,3 +35,12 @@ where
         }
     }
 }
+
+/// Dummy `DelayUs` implementation that panics on use.
+pub struct NoDelay;
+
+impl embedded_hal::delay::DelayUs for NoDelay {
+    fn delay_us(&mut self, _us: u32) {
+        panic!("You've tried to execute a SPI transaction containing a `Operation::Delay` in a `SpiDevice` created with `new_no_delay()`. Create it with `new()` instead, passing a `DelayUs` implementation.")
+    }
+}
