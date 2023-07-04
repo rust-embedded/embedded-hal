@@ -11,8 +11,8 @@ license = "MIT OR Apache-2.0"
 name = "embedded-hal-async"
 readme = "README.md"
 repository = "https://github.com/rust-embedded/embedded-hal"
-version = "0.2.0-alpha.1"
+version = "0.2.0-alpha.2"
 rust-version = "1.65.0"
 
 [dependencies]
-embedded-hal = { version = "=1.0.0-alpha.10", path = "../embedded-hal" }
+embedded-hal = { version = "=1.0.0-alpha.11", path = "../embedded-hal" }

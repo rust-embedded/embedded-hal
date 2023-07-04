@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+## [v1.0.0-alpha.11] - 2023-07-04
+
+*** This is (also) an alpha release with breaking changes (sorry) ***
+
 ### Added
 - spi: added `Operation::DelayUs(u32)`.
 
@@ -286,7 +291,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.9...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.11...HEAD
+[v1.0.0-alpha.11]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.10...v1.0.0-alpha.11
+[v1.0.0-alpha.10]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.9...v1.0.0-alpha.10
 [v1.0.0-alpha.9]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.8...v1.0.0-alpha.9
 [v1.0.0-alpha.8]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.7...v1.0.0-alpha.8
 [v1.0.0-alpha.7]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.6...v1.0.0-alpha.7
