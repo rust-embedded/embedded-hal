@@ -7,5 +7,4 @@
 pub mod delay;
 pub mod digital;
 pub mod i2c;
-pub mod serial;
 pub mod spi;
