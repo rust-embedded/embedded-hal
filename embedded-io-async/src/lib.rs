@@ -1,8 +1,11 @@
-#![no_std]
 #![feature(async_fn_in_trait, impl_trait_projections)]
+#![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![warn(missing_docs)]
 #![doc = include_str!("../README.md")]
+
+#[cfg(feature = "alloc")]
+extern crate alloc;
 
 mod impls;
 

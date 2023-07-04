@@ -11,5 +11,13 @@ categories = [
     "no-std",
 ]
 
+[features]
+std = ["alloc", "embedded-io/std"]
+alloc = ["embedded-io/alloc"]
+
 [dependencies]
 embedded-io = { version = "0.5", path = "../embedded-io" }
+
+[package.metadata.docs.rs]
+features = ["std"]
+rustdoc-args = ["--cfg", "docsrs"]
