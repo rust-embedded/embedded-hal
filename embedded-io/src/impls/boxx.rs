@@ -1,4 +1,4 @@
-use crate::{BufRead, Io, Read, Seek, Write};
+use crate::{BufRead, Io, Read, ReadReady, Seek, Write, WriteReady};
 use alloc::boxed::Box;
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
@@ -43,5 +43,21 @@ impl<T: ?Sized + Seek> Seek for Box<T> {
     #[inline]
     fn seek(&mut self, pos: crate::SeekFrom) -> Result<u64, Self::Error> {
         T::seek(self, pos)
+    }
+}
+
+#[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
+impl<T: ?Sized + ReadReady> ReadReady for Box<T> {
+    #[inline]
+    fn read_ready(&mut self) -> Result<bool, Self::Error> {
+        T::read_ready(self)
+    }
+}
+
+#[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
+impl<T: ?Sized + WriteReady> WriteReady for Box<T> {
+    #[inline]
+    fn write_ready(&mut self) -> Result<bool, Self::Error> {
+        T::write_ready(self)
     }
 }

@@ -262,6 +262,33 @@ pub trait Seek: crate::Io {
     }
 }
 
+/// Get whether a reader is ready.
+///
+/// This allows using a [`Read`] or [`BufRead`] in a nonblocking fashion, i.e. trying to read
+/// only when it is ready.
+pub trait ReadReady: crate::Io {
+    /// Get whether the reader is ready for immediately reading.
+    ///
+    /// This usually means that there is either some bytes have been received and are buffered and ready to be read,
+    /// or that the reader is at EOF.
+    ///
+    /// If this returns `true`, it's guaranteed that the next call to [`Read::read`] or [`BufRead::fill_buf`] will not block.
+    fn read_ready(&mut self) -> Result<bool, Self::Error>;
+}
+
+/// Get whether a writer is ready.
+///
+/// This allows using a [`Write`] in a nonblocking fashion, i.e. trying to write
+/// only when it is ready.
+pub trait WriteReady: crate::Io {
+    /// Get whether the writer is ready for immediately writeing.
+    ///
+    /// This usually means that there is free space in the internal transmit buffer.
+    ///
+    /// If this returns `true`, it's guaranteed that the next call to [`Write::write`] will not block.
+    fn write_ready(&mut self) -> Result<bool, Self::Error>;
+}
+
 impl<T: ?Sized + Read> Read for &mut T {
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
@@ -295,5 +322,19 @@ impl<T: ?Sized + Seek> Seek for &mut T {
     #[inline]
     fn seek(&mut self, pos: crate::SeekFrom) -> Result<u64, Self::Error> {
         T::seek(self, pos)
+    }
+}
+
+impl<T: ?Sized + ReadReady> ReadReady for &mut T {
+    #[inline]
+    fn read_ready(&mut self) -> Result<bool, Self::Error> {
+        T::read_ready(self)
+    }
+}
+
+impl<T: ?Sized + WriteReady> WriteReady for &mut T {
+    #[inline]
+    fn write_ready(&mut self) -> Result<bool, Self::Error> {
+        T::write_ready(self)
     }
 }

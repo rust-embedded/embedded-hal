@@ -9,7 +9,9 @@ extern crate alloc;
 
 mod impls;
 
-pub use embedded_io::{Error, ErrorKind, Io, ReadExactError, SeekFrom, WriteAllError};
+pub use embedded_io::{
+    Error, ErrorKind, Io, ReadExactError, ReadReady, SeekFrom, WriteAllError, WriteReady,
+};
 
 /// Async reader.
 ///

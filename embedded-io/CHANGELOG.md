@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+- Added `ReadReady`, `WriteReady` traits. They allow peeking whether the i/o handle is ready to read/write, so they allow using the traits in a non-blocking way.
 - Moved `embedded_io::blocking` to the crate root.
 - Split async traits to the `embedded-io-async` crate.
 - Split async trait adapters to separate crates.
