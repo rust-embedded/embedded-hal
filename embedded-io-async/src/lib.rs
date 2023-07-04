@@ -4,6 +4,8 @@
 #![warn(missing_docs)]
 #![doc = include_str!("../README.md")]
 
+mod impls;
+
 pub use embedded_io::{Error, ErrorKind, Io, ReadExactError, SeekFrom, WriteAllError};
 
 /// Async reader.
