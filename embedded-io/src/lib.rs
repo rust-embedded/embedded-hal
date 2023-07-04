@@ -8,6 +8,9 @@ use core::fmt;
 #[cfg(feature = "alloc")]
 extern crate alloc;
 
+#[cfg(feature = "std")]
+pub mod adapters;
+
 mod impls;
 
 /// Enumeration of possible methods to seek within an I/O object.
