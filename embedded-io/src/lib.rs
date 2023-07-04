@@ -4,6 +4,8 @@
 
 use core::fmt;
 
+mod impls;
+
 /// Enumeration of possible methods to seek within an I/O object.
 ///
 /// Semantics are the same as [`std::io::SeekFrom`], check its documentation for details.
