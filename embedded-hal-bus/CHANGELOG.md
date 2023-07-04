@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v0.1.0-alpha.3] - 2023-07-04
+
+### Changed
+- Updated `embedded-hal` to version `1.0.0-alpha.11`.
+
+
 ## [v0.1.0-alpha.2] - 2023-04-04
 
 ### Changed
@@ -25,7 +31,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 First release to crates.io
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-alpha.2...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-alpha.3...HEAD
+[v0.1.0-alpha.3]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-alpha.2...embedded-hal-bus-v0.1.0-alpha.3
 [v0.1.0-alpha.2]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-alpha.1...embedded-hal-bus-v0.1.0-alpha.2
 [v0.1.0-alpha.1]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-alpha.0...embedded-hal-bus-v0.1.0-alpha.1
 [v0.1.0-alpha.0]: https://github.com/rust-embedded/embedded-hal/tree/embedded-hal-bus-v0.1.0-alpha.0

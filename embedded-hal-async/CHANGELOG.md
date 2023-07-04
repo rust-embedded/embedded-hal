@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v0.2.0-alpha.2] - 2023-07-04
+
+### Added
+- spi: added `Operation::DelayUs(u32)`.
+
+### Changed
+- Updated `embedded-hal` to version `1.0.0-alpha.11`.
+- spi: removed redundant lifetime annotations. Note that recent nightlies care about them and require impls to match, so you might have to adjust them.
+
 ### Removed
 - spi: removed read-only and write-only traits.
 
@@ -52,7 +61,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 First release to crates.io
 
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.2.0-alpha.1...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.2.0-alpha.2...HEAD
+[v0.2.0-alpha.2]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.2.0-alpha.1...embedded-hal-async-v0.2.0-alpha.2
 [v0.2.0-alpha.1]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.2.0-alpha.0...embedded-hal-async-v0.2.0-alpha.1
 [v0.2.0-alpha.0]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.1.0-alpha.3...embedded-hal-async-v0.2.0-alpha.0
 [v0.1.0-alpha.3]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.1.0-alpha.2...embedded-hal-async-v0.1.0-alpha.3
