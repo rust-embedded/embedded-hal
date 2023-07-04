@@ -10,3 +10,11 @@ categories = [
     "embedded",
     "no-std",
 ]
+
+[features]
+std = ["alloc"]
+alloc = []
+
+[package.metadata.docs.rs]
+features = ["std"]
+rustdoc-args = ["--cfg", "docsrs"]

@@ -1,8 +1,12 @@
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 #![warn(missing_docs)]
 #![doc = include_str!("../README.md")]
 
 use core::fmt;
+
+#[cfg(feature = "alloc")]
+extern crate alloc;
 
 mod impls;
 
@@ -87,6 +91,9 @@ impl<E: fmt::Debug> fmt::Display for ReadExactError<E> {
     }
 }
 
+#[cfg(feature = "std")]
+impl<E: fmt::Debug> std::error::Error for ReadExactError<E> {}
+
 /// Error returned by [`Write::write_fmt`]
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum WriteFmtError<E> {
@@ -110,6 +117,9 @@ impl<E: fmt::Debug> fmt::Display for WriteFmtError<E> {
     }
 }
 
+#[cfg(feature = "std")]
+impl<E: fmt::Debug> std::error::Error for WriteFmtError<E> {}
+
 /// Error returned by [`Write::write_all`]
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum WriteAllError<E> {
@@ -130,6 +140,9 @@ impl<E: fmt::Debug> fmt::Display for WriteAllError<E> {
         write!(f, "{:?}", self)
     }
 }
+
+#[cfg(feature = "std")]
+impl<E: fmt::Debug> std::error::Error for WriteAllError<E> {}
 
 /// Blocking reader.
 ///
