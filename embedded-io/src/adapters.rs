@@ -126,15 +126,51 @@ impl<T: crate::Seek + ?Sized> std::io::Seek for ToStd<T> {
     }
 }
 
-fn to_std_error<T: core::fmt::Debug>(err: T) -> std::io::Error {
-    let kind = std::io::ErrorKind::Other;
+fn to_std_error<T: crate::Error>(err: T) -> std::io::Error {
+    let kind = match err.kind() {
+        crate::ErrorKind::NotFound => std::io::ErrorKind::NotFound,
+        crate::ErrorKind::PermissionDenied => std::io::ErrorKind::PermissionDenied,
+        crate::ErrorKind::ConnectionRefused => std::io::ErrorKind::ConnectionRefused,
+        crate::ErrorKind::ConnectionReset => std::io::ErrorKind::ConnectionReset,
+        crate::ErrorKind::ConnectionAborted => std::io::ErrorKind::ConnectionAborted,
+        crate::ErrorKind::NotConnected => std::io::ErrorKind::NotConnected,
+        crate::ErrorKind::AddrInUse => std::io::ErrorKind::AddrInUse,
+        crate::ErrorKind::AddrNotAvailable => std::io::ErrorKind::AddrNotAvailable,
+        crate::ErrorKind::BrokenPipe => std::io::ErrorKind::BrokenPipe,
+        crate::ErrorKind::AlreadyExists => std::io::ErrorKind::AlreadyExists,
+        crate::ErrorKind::InvalidInput => std::io::ErrorKind::InvalidInput,
+        crate::ErrorKind::InvalidData => std::io::ErrorKind::InvalidData,
+        crate::ErrorKind::TimedOut => std::io::ErrorKind::TimedOut,
+        crate::ErrorKind::Interrupted => std::io::ErrorKind::Interrupted,
+        crate::ErrorKind::Unsupported => std::io::ErrorKind::Unsupported,
+        crate::ErrorKind::OutOfMemory => std::io::ErrorKind::OutOfMemory,
+        _ => std::io::ErrorKind::Other,
+    };
     std::io::Error::new(kind, format!("{:?}", err))
 }
 
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl crate::Error for std::io::Error {
     fn kind(&self) -> crate::ErrorKind {
-        crate::ErrorKind::Other
+        match self.kind() {
+            std::io::ErrorKind::NotFound => crate::ErrorKind::NotFound,
+            std::io::ErrorKind::PermissionDenied => crate::ErrorKind::PermissionDenied,
+            std::io::ErrorKind::ConnectionRefused => crate::ErrorKind::ConnectionRefused,
+            std::io::ErrorKind::ConnectionReset => crate::ErrorKind::ConnectionReset,
+            std::io::ErrorKind::ConnectionAborted => crate::ErrorKind::ConnectionAborted,
+            std::io::ErrorKind::NotConnected => crate::ErrorKind::NotConnected,
+            std::io::ErrorKind::AddrInUse => crate::ErrorKind::AddrInUse,
+            std::io::ErrorKind::AddrNotAvailable => crate::ErrorKind::AddrNotAvailable,
+            std::io::ErrorKind::BrokenPipe => crate::ErrorKind::BrokenPipe,
+            std::io::ErrorKind::AlreadyExists => crate::ErrorKind::AlreadyExists,
+            std::io::ErrorKind::InvalidInput => crate::ErrorKind::InvalidInput,
+            std::io::ErrorKind::InvalidData => crate::ErrorKind::InvalidData,
+            std::io::ErrorKind::TimedOut => crate::ErrorKind::TimedOut,
+            std::io::ErrorKind::Interrupted => crate::ErrorKind::Interrupted,
+            std::io::ErrorKind::Unsupported => crate::ErrorKind::Unsupported,
+            std::io::ErrorKind::OutOfMemory => crate::ErrorKind::OutOfMemory,
+            _ => crate::ErrorKind::Other,
+        }
     }
 }
 
