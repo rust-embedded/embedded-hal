@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `From` impls to convert between `ErrorKind` and `std::io::ErrorKind`.
 - Moved `embedded_io::blocking` to the crate root.
 - Split async traits to the `embedded-io-async` crate.
-- Split async trait adapters to separate crates.
+- Split trait adapters to the `embedded-io-adapters` crate.
 - Rename trait `Io` to `ErrorKind`, for consistency with `embedded-hal`.
 
 ## 0.4.0 - 2022-11-25
