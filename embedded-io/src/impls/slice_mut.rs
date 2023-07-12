@@ -1,7 +1,7 @@
-use crate::{Io, Write};
+use crate::{ErrorType, Write};
 use core::mem;
 
-impl Io for &mut [u8] {
+impl ErrorType for &mut [u8] {
     type Error = core::convert::Infallible;
 }
 

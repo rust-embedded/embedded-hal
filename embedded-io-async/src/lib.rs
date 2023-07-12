@@ -10,13 +10,13 @@ extern crate alloc;
 mod impls;
 
 pub use embedded_io::{
-    Error, ErrorKind, Io, ReadExactError, ReadReady, SeekFrom, WriteAllError, WriteReady,
+    Error, ErrorKind, ErrorType, ReadExactError, ReadReady, SeekFrom, WriteAllError, WriteReady,
 };
 
 /// Async reader.
 ///
 /// Semantics are the same as [`std::io::Read`], check its documentation for details.
-pub trait Read: Io {
+pub trait Read: ErrorType {
     /// Pull some bytes from this source into the specified buffer, returning how many bytes were read.
     async fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error>;
 
@@ -40,7 +40,7 @@ pub trait Read: Io {
 /// Async buffered reader.
 ///
 /// Semantics are the same as [`std::io::BufRead`], check its documentation for details.
-pub trait BufRead: Io {
+pub trait BufRead: ErrorType {
     /// Return the contents of the internal buffer, filling it with more data from the inner reader if it is empty.
     async fn fill_buf(&mut self) -> Result<&[u8], Self::Error>;
 
@@ -51,7 +51,7 @@ pub trait BufRead: Io {
 /// Async writer.
 ///
 /// Semantics are the same as [`std::io::Write`], check its documentation for details.
-pub trait Write: Io {
+pub trait Write: ErrorType {
     /// Write a buffer into this writer, returning how many bytes were written.
     async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error>;
 
@@ -77,7 +77,7 @@ pub trait Write: Io {
 /// Async seek within streams.
 ///
 /// Semantics are the same as [`std::io::Seek`], check its documentation for details.
-pub trait Seek: Io {
+pub trait Seek: ErrorType {
     /// Seek to an offset, in bytes, in a stream.
     async fn seek(&mut self, pos: SeekFrom) -> Result<u64, Self::Error>;
 

@@ -40,7 +40,7 @@ impl<T: ?Sized> FromStd<T> {
     }
 }
 
-impl<T: ?Sized> crate::Io for FromStd<T> {
+impl<T: ?Sized> crate::ErrorType for FromStd<T> {
     type Error = std::io::Error;
 }
 

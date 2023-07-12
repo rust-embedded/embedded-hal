@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved `embedded_io::blocking` to the crate root.
 - Split async traits to the `embedded-io-async` crate.
 - Split async trait adapters to separate crates.
+- Rename trait `Io` to `ErrorKind`, for consistency with `embedded-hal`.
 
 ## 0.4.0 - 2022-11-25
 

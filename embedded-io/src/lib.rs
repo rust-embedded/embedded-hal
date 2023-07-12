@@ -55,7 +55,7 @@ impl Error for ErrorKind {
     }
 }
 
-/// Base trait for all IO traits.
+/// Base trait for all IO traits, defining the error type.
 ///
 /// All IO operations of all traits return the error defined in this trait.
 ///
@@ -64,12 +64,12 @@ impl Error for ErrorKind {
 /// This is very convenient when writing generic code, it means you have to
 /// handle a single error type `T::Error`, instead of `<T as Read>::Error` and `<T as Write>::Error`
 /// which might be different types.
-pub trait Io {
+pub trait ErrorType {
     /// Error type of all the IO operations on this type.
     type Error: Error;
 }
 
-impl<T: ?Sized + crate::Io> crate::Io for &mut T {
+impl<T: ?Sized + crate::ErrorType> crate::ErrorType for &mut T {
     type Error = T::Error;
 }
 
@@ -150,7 +150,7 @@ impl<E: fmt::Debug> std::error::Error for WriteAllError<E> {}
 /// Blocking reader.
 ///
 /// Semantics are the same as [`std::io::Read`], check its documentation for details.
-pub trait Read: crate::Io {
+pub trait Read: crate::ErrorType {
     /// Pull some bytes from this source into the specified buffer, returning how many bytes were read.
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error>;
 
@@ -174,7 +174,7 @@ pub trait Read: crate::Io {
 /// Blocking buffered reader.
 ///
 /// Semantics are the same as [`std::io::BufRead`], check its documentation for details.
-pub trait BufRead: crate::Io {
+pub trait BufRead: crate::ErrorType {
     /// Return the contents of the internal buffer, filling it with more data from the inner reader if it is empty.
     fn fill_buf(&mut self) -> Result<&[u8], Self::Error>;
 
@@ -185,7 +185,7 @@ pub trait BufRead: crate::Io {
 /// Blocking writer.
 ///
 /// Semantics are the same as [`std::io::Write`], check its documentation for details.
-pub trait Write: crate::Io {
+pub trait Write: crate::ErrorType {
     /// Write a buffer into this writer, returning how many bytes were written.
     fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error>;
 
@@ -246,7 +246,7 @@ pub trait Write: crate::Io {
 /// Blocking seek within streams.
 ///
 /// Semantics are the same as [`std::io::Seek`], check its documentation for details.
-pub trait Seek: crate::Io {
+pub trait Seek: crate::ErrorType {
     /// Seek to an offset, in bytes, in a stream.
     fn seek(&mut self, pos: crate::SeekFrom) -> Result<u64, Self::Error>;
 
@@ -266,7 +266,7 @@ pub trait Seek: crate::Io {
 ///
 /// This allows using a [`Read`] or [`BufRead`] in a nonblocking fashion, i.e. trying to read
 /// only when it is ready.
-pub trait ReadReady: crate::Io {
+pub trait ReadReady: crate::ErrorType {
     /// Get whether the reader is ready for immediately reading.
     ///
     /// This usually means that there is either some bytes have been received and are buffered and ready to be read,
@@ -280,7 +280,7 @@ pub trait ReadReady: crate::Io {
 ///
 /// This allows using a [`Write`] in a nonblocking fashion, i.e. trying to write
 /// only when it is ready.
-pub trait WriteReady: crate::Io {
+pub trait WriteReady: crate::ErrorType {
     /// Get whether the writer is ready for immediately writing.
     ///
     /// This usually means that there is free space in the internal transmit buffer.

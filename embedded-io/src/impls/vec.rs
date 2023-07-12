@@ -1,8 +1,8 @@
-use crate::{Io, Write};
+use crate::{ErrorType, Write};
 use alloc::vec::Vec;
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
-impl Io for Vec<u8> {
+impl ErrorType for Vec<u8> {
     type Error = core::convert::Infallible;
 }
 

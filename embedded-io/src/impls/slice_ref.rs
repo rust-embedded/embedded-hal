@@ -1,6 +1,6 @@
-use crate::{BufRead, Io, Read};
+use crate::{BufRead, ErrorType, Read};
 
-impl Io for &[u8] {
+impl ErrorType for &[u8] {
     type Error = core::convert::Infallible;
 }
 
