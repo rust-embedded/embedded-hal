@@ -31,7 +31,7 @@ pub trait FullDuplex<Word: Copy = u8>: ErrorType {
     fn write(&mut self, word: Word) -> nb::Result<(), Self::Error>;
 }
 
-impl<T: FullDuplex<Word>, Word: Copy> FullDuplex<Word> for &mut T {
+impl<T: FullDuplex<Word> + ?Sized, Word: Copy> FullDuplex<Word> for &mut T {
     fn read(&mut self) -> nb::Result<Word, Self::Error> {
         T::read(self)
     }

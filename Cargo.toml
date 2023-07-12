@@ -1,4 +1,5 @@
 [workspace]
+resolver = "2"
 
 # CI removes lines containing 'nightly-only' when not building with nightly.
 members = [

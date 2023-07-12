@@ -122,7 +122,7 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     ) -> Result<(), Self::Error>;
 }
 
-impl<A: AddressMode, T: I2c<A>> I2c<A> for &mut T {
+impl<A: AddressMode, T: I2c<A> + ?Sized> I2c<A> for &mut T {
     async fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error> {
         T::read(self, address, read).await
     }

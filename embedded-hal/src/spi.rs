@@ -288,7 +288,7 @@ pub trait ErrorType {
     type Error: Error;
 }
 
-impl<T: ErrorType> ErrorType for &mut T {
+impl<T: ErrorType + ?Sized> ErrorType for &mut T {
     type Error = T::Error;
 }
 
@@ -378,7 +378,7 @@ pub trait SpiDevice<Word: Copy + 'static = u8>: ErrorType {
     }
 }
 
-impl<Word: Copy + 'static, T: SpiDevice<Word>> SpiDevice<Word> for &mut T {
+impl<Word: Copy + 'static, T: SpiDevice<Word> + ?Sized> SpiDevice<Word> for &mut T {
     fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {
         T::transaction(self, operations)
     }
@@ -448,7 +448,7 @@ pub trait SpiBus<Word: Copy + 'static = u8>: ErrorType {
     fn flush(&mut self) -> Result<(), Self::Error>;
 }
 
-impl<T: SpiBus<Word>, Word: Copy + 'static> SpiBus<Word> for &mut T {
+impl<T: SpiBus<Word> + ?Sized, Word: Copy + 'static> SpiBus<Word> for &mut T {
     fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
         T::read(self, words)
     }

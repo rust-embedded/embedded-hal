@@ -48,7 +48,7 @@ pub trait Wait: embedded_hal::digital::ErrorType {
     async fn wait_for_any_edge(&mut self) -> Result<(), Self::Error>;
 }
 
-impl<T: Wait> Wait for &mut T {
+impl<T: Wait + ?Sized> Wait for &mut T {
     async fn wait_for_high(&mut self) -> Result<(), Self::Error> {
         T::wait_for_high(self).await
     }

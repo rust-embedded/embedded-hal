@@ -69,7 +69,7 @@ pub trait ErrorType {
     type Error: Error;
 }
 
-impl<T: ErrorType> ErrorType for &mut T {
+impl<T: ErrorType + ?Sized> ErrorType for &mut T {
     type Error = T::Error;
 }
 
@@ -82,7 +82,7 @@ pub trait Read<Word: Copy = u8>: ErrorType {
     fn read(&mut self) -> nb::Result<Word, Self::Error>;
 }
 
-impl<T: Read<Word>, Word: Copy> Read<Word> for &mut T {
+impl<T: Read<Word> + ?Sized, Word: Copy> Read<Word> for &mut T {
     fn read(&mut self) -> nb::Result<Word, Self::Error> {
         T::read(self)
     }
@@ -97,7 +97,7 @@ pub trait Write<Word: Copy = u8>: ErrorType {
     fn flush(&mut self) -> nb::Result<(), Self::Error>;
 }
 
-impl<T: Write<Word>, Word: Copy> Write<Word> for &mut T {
+impl<T: Write<Word> + ?Sized, Word: Copy> Write<Word> for &mut T {
     fn write(&mut self, word: Word) -> nb::Result<(), Self::Error> {
         T::write(self, word)
     }
