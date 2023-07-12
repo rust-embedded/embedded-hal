@@ -10,4 +10,5 @@ members = [
     "embedded-can",
     "embedded-io",
     "embedded-io-async",  # nightly-only
+    "embedded-io-adapters",  # nightly-only
 ]

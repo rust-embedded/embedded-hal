@@ -1,0 +1,28 @@
+[package]
+name = "embedded-io-adapters"
+version = "0.1.0"
+edition = "2021"
+description = "Adapters between the `embedded-io` traits and other I/O traits"
+repository = "https://github.com/rust-embedded/embedded-hal"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+categories = [
+    "embedded",
+    "no-std",
+]
+
+[features]
+std = []
+tokio-1 = ["std", "dep:tokio", "dep:embedded-io-async"]
+futures-03 = ["std", "dep:futures", "dep:embedded-io-async"]
+
+[dependencies]
+embedded-io = { version = "0.5", path = "../embedded-io" }
+embedded-io-async = { version = "0.5", path = "../embedded-io-async", optional = true }
+
+futures = { version = "0.3.21", features = ["std"], default-features = false, optional = true }
+tokio = { version = "1", default-features = false, optional = true }
+
+[package.metadata.docs.rs]
+features = ["std"]
+rustdoc-args = ["--cfg", "docsrs"]

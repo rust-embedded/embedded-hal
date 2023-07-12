@@ -28,6 +28,8 @@ jobs:
             features: std
           - target: x86_64-unknown-linux-gnu
             features: alloc
+          - target: x86_64-unknown-linux-gnu
+            features: std,tokio-1,futures-03
 
     steps:
       - uses: actions/checkout@v3
