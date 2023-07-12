@@ -208,6 +208,16 @@ impl<BUS, CS, D> ExclusiveDevice<BUS, CS, D> {
     pub fn new(bus: BUS, cs: CS, delay: D) -> Self {
         Self { bus, cs, delay }
     }
+
+    /// Returns a reference to the underlying bus object.
+    pub fn bus(&self) -> &BUS {
+        &self.bus
+    }
+
+    /// Returns a mutable reference to the underlying bus object.
+    pub fn bus_mut(&mut self) -> &mut BUS {
+        &mut self.bus
+    }
 }
 
 impl<BUS, CS, D> ErrorType for ExclusiveDevice<BUS, CS, D>
