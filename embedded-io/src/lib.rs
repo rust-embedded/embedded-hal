@@ -15,7 +15,7 @@ mod impls;
 
 /// Enumeration of possible methods to seek within an I/O object.
 ///
-/// Semantics are the same as [`std::io::SeekFrom`], check its documentation for details.
+/// This is the `embedded-io` equivalent of [`std::io::SeekFrom`].
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum SeekFrom {
     /// Sets the offset to the provided number of bytes.
@@ -207,12 +207,33 @@ impl<E: fmt::Debug> std::error::Error for WriteAllError<E> {}
 
 /// Blocking reader.
 ///
-/// Semantics are the same as [`std::io::Read`], check its documentation for details.
+/// This trait is the `embedded-io` equivalent of [`std::io::Read`].
 pub trait Read: crate::ErrorType {
-    /// Pull some bytes from this source into the specified buffer, returning how many bytes were read.
+    /// Read some bytes from this source into the specified buffer, returning how many bytes were read.
+    ///
+    /// If no bytes are currently available to read, this function blocks until at least one byte is available.
+    ///
+    /// If bytes are available, a non-zero amount of bytes is read to the beginning of `buf`, and the amount
+    /// is returned. It is not guaranteed that *all* available bytes are returned, it is possible for the
+    /// implementation to read an amount of bytes less than `buf.len()` while there are more bytes immediately
+    /// available.
+    ///
+    /// If the reader is at end-of-file (EOF), `Ok(0)` is returned. There is no guarantee that a reader at EOF
+    /// will always be so in the future, for example a reader can stop being at EOF if another process appends
+    /// more bytes to the underlying file.
+    ///
+    /// If `buf.len() == 0`, `read` returns without blocking, with either `Ok(0)` or an error.
+    /// The `Ok(0)` doesn't indicate EOF, unlike when called with a non-empty buffer.
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error>;
 
     /// Read the exact number of bytes required to fill `buf`.
+    ///
+    /// This function calls `read()` in a loop until exactly `buf.len()` bytes have
+    /// been read, blocking if needed.
+    ///
+    /// If you are using [`ReadReady`] to avoid blocking, you should not use this function.
+    /// `ReadReady::read_ready()` returning true only guarantees the first call to `read()` will
+    /// not block, so this function may still block in subsequent calls.
     fn read_exact(&mut self, mut buf: &mut [u8]) -> Result<(), ReadExactError<Self::Error>> {
         while !buf.is_empty() {
             match self.read(buf) {
@@ -231,9 +252,15 @@ pub trait Read: crate::ErrorType {
 
 /// Blocking buffered reader.
 ///
-/// Semantics are the same as [`std::io::BufRead`], check its documentation for details.
+/// This trait is the `embedded-io` equivalent of [`std::io::BufRead`].
 pub trait BufRead: crate::ErrorType {
     /// Return the contents of the internal buffer, filling it with more data from the inner reader if it is empty.
+    ///
+    /// If no bytes are currently available to read, this function blocks until at least one byte is available.
+    ///
+    /// If the reader is at end-of-file (EOF), an empty slice is returned. There is no guarantee that a reader at EOF
+    /// will always be so in the future, for example a reader can stop being at EOF if another process appends
+    /// more bytes to the underlying file.
     fn fill_buf(&mut self) -> Result<&[u8], Self::Error>;
 
     /// Tell this buffer that `amt` bytes have been consumed from the buffer, so they should no longer be returned in calls to `fill_buf`.
@@ -242,15 +269,36 @@ pub trait BufRead: crate::ErrorType {
 
 /// Blocking writer.
 ///
-/// Semantics are the same as [`std::io::Write`], check its documentation for details.
+/// This trait is the `embedded-io` equivalent of [`std::io::Write`].
 pub trait Write: crate::ErrorType {
     /// Write a buffer into this writer, returning how many bytes were written.
+    ///
+    /// If the writer is not currently ready to accept more bytes (for example, its buffer is full),
+    /// this function blocks until it is ready to accept least one byte.
+    ///
+    /// If it's ready to accept bytes, a non-zero amount of bytes is written from the beginning of `buf`, and the amount
+    /// is returned. It is not guaranteed that *all* available buffer space is filled, i.e. it is possible for the
+    /// implementation to write an amount of bytes less than `buf.len()` while the writer continues to be
+    /// ready to accept more bytes immediately.
+    ///
+    /// Implementations should never return `Ok(0)` when `buf.len() != 0`. Situations where the writer is not
+    /// able to accept more bytes and likely never will are better indicated with errors.
+    ///
+    /// If `buf.len() == 0`, `write` returns without blocking, with either `Ok(0)` or an error.
+    /// The `Ok(0)` doesn't indicate an error.
     fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error>;
 
-    /// Flush this output stream, ensuring that all intermediately buffered contents reach their destination.
+    /// Flush this output stream, blocking until all intermediately buffered contents reach their destination.
     fn flush(&mut self) -> Result<(), Self::Error>;
 
     /// Write an entire buffer into this writer.
+    ///
+    /// This function calls `write()` in a loop until exactly `buf.len()` bytes have
+    /// been written, blocking if needed.
+    ///
+    /// If you are using [`WriteReady`] to avoid blocking, you should not use this function.
+    /// `WriteReady::write_ready()` returning true only guarantees the first call to `write()` will
+    /// not block, so this function may still block in subsequent calls.
     fn write_all(&mut self, mut buf: &[u8]) -> Result<(), WriteAllError<Self::Error>> {
         while !buf.is_empty() {
             match self.write(buf) {
@@ -263,6 +311,13 @@ pub trait Write: crate::ErrorType {
     }
 
     /// Write a formatted string into this writer, returning any error encountered.
+    ///
+    /// This function calls `write()` in a loop until the entire formatted string has
+    /// been written, blocking if needed.
+    ///
+    /// If you are using [`WriteReady`] to avoid blocking, you should not use this function.
+    /// `WriteReady::write_ready()` returning true only guarantees the first call to `write()` will
+    /// not block, so this function may still block in subsequent calls.
     fn write_fmt(&mut self, fmt: fmt::Arguments<'_>) -> Result<(), WriteFmtError<Self::Error>> {
         // Create a shim which translates a Write to a fmt::Write and saves
         // off I/O errors. instead of discarding them
@@ -303,7 +358,7 @@ pub trait Write: crate::ErrorType {
 
 /// Blocking seek within streams.
 ///
-/// Semantics are the same as [`std::io::Seek`], check its documentation for details.
+/// This trait is the `embedded-io` equivalent of [`std::io::Seek`].
 pub trait Seek: crate::ErrorType {
     /// Seek to an offset, in bytes, in a stream.
     fn seek(&mut self, pos: crate::SeekFrom) -> Result<u64, Self::Error>;

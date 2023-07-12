@@ -12,8 +12,12 @@ Rust's `std::io` traits are not available in `no_std` targets, mainly because `s
 requires allocation. This crate contains replacement equivalent traits, usable in `no_std`
 targets.
 
-The only difference with `std::io` is `Error` is an associated type. This allows each implementor 
-to return its own error type, while avoiding `dyn` or `Box`. This is how errors are handled in [`embedded-hal`](https://github.com/rust-embedded/embedded-hal/).
+## Differences with `std::io`
+
+- `Error` is an associated type. This allows each implementor to return its own error type,
+while avoiding `dyn` or `Box`. This is consistent with how errors are handled in [`embedded-hal`](https://github.com/rust-embedded/embedded-hal/).
+- In `std::io`, the `Read`/`Write` traits might be blocking or non-blocking (i.e. returning `WouldBlock` errors) depending on the file descriptor's mode, which is only known at run-time. This allows passing a non-blocking stream to code that expects a blocking
+stream, causing unexpected errors. To solve this, `embedded-io` specifies `Read`/`Write` are always blocking, and adds new `ReadReady`/`WriteReady` traits to allow using streams in a non-blocking way.
 
 ## Minimum Supported Rust Version (MSRV)
 
