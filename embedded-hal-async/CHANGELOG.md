@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+- spi: added `ExclusiveDevice::{bus, bus_mut}`.
+
 ## [v0.2.0-alpha.2] - 2023-07-04
 
 ### Added
