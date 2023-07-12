@@ -28,7 +28,9 @@ jobs:
             features: std
           - target: x86_64-unknown-linux-gnu
             features: alloc
-
+          - target: x86_64-unknown-linux-gnu
+            features: std,tokio-1,futures-03
+            rust: nightly
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@master
