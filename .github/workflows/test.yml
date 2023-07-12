@@ -25,7 +25,9 @@ jobs:
           - thumbv7m-none-eabi
         include:
           - target: x86_64-unknown-linux-gnu
-            features: embedded-hal-bus/std
+            features: std
+          - target: x86_64-unknown-linux-gnu
+            features: alloc
 
     steps:
       - uses: actions/checkout@v3

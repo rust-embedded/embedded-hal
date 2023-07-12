@@ -1,0 +1,20 @@
+[package]
+name = "embedded-io"
+version = "0.5.0"
+edition = "2021"
+description = "Embedded IO traits"
+repository = "https://github.com/rust-embedded/embedded-hal"
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+categories = [
+    "embedded",
+    "no-std",
+]
+
+[features]
+std = ["alloc"]
+alloc = []
+
+[package.metadata.docs.rs]
+features = ["std"]
+rustdoc-args = ["--cfg", "docsrs"]

@@ -7,4 +7,6 @@ members = [
     "embedded-hal-nb",
     "embedded-hal-bus",
     "embedded-can",
+    "embedded-io",
+    "embedded-io-async",  # nightly-only
 ]
