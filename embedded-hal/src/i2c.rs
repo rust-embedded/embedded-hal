@@ -249,7 +249,7 @@ pub trait ErrorType {
     type Error: Error;
 }
 
-impl<T: ErrorType> ErrorType for &mut T {
+impl<T: ErrorType + ?Sized> ErrorType for &mut T {
     type Error = T::Error;
 }
 
@@ -372,7 +372,7 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     ) -> Result<(), Self::Error>;
 }
 
-impl<A: AddressMode, T: I2c<A>> I2c<A> for &mut T {
+impl<A: AddressMode, T: I2c<A> + ?Sized> I2c<A> for &mut T {
     fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error> {
         T::read(self, address, read)
     }

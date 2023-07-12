@@ -53,7 +53,7 @@ pub trait ErrorType {
     type Error: Error;
 }
 
-impl<T: ErrorType> ErrorType for &mut T {
+impl<T: ErrorType + ?Sized> ErrorType for &mut T {
     type Error = T::Error;
 }
 
@@ -101,7 +101,7 @@ pub trait SetDutyCycle: ErrorType {
     }
 }
 
-impl<T: SetDutyCycle> SetDutyCycle for &mut T {
+impl<T: SetDutyCycle + ?Sized> SetDutyCycle for &mut T {
     fn get_max_duty_cycle(&self) -> u16 {
         T::get_max_duty_cycle(self)
     }

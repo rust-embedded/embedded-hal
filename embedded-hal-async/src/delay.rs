@@ -13,7 +13,7 @@ pub trait DelayUs {
 
 impl<T> DelayUs for &mut T
 where
-    T: DelayUs,
+    T: DelayUs + ?Sized,
 {
     async fn delay_us(&mut self, us: u32) {
         T::delay_us(self, us).await

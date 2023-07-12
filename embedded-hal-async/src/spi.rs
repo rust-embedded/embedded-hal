@@ -76,7 +76,7 @@ pub trait SpiDevice<Word: Copy + 'static = u8>: ErrorType {
     }
 }
 
-impl<Word: Copy + 'static, T: SpiDevice<Word>> SpiDevice<Word> for &mut T {
+impl<Word: Copy + 'static, T: SpiDevice<Word> + ?Sized> SpiDevice<Word> for &mut T {
     async fn transaction(
         &mut self,
         operations: &mut [Operation<'_, Word>],
@@ -149,7 +149,7 @@ pub trait SpiBus<Word: 'static + Copy = u8>: ErrorType {
     async fn flush(&mut self) -> Result<(), Self::Error>;
 }
 
-impl<T: SpiBus<Word>, Word: 'static + Copy> SpiBus<Word> for &mut T {
+impl<T: SpiBus<Word> + ?Sized, Word: 'static + Copy> SpiBus<Word> for &mut T {
     async fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
         T::read(self, words).await
     }

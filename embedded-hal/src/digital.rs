@@ -55,11 +55,11 @@ pub trait ErrorType {
     type Error: Error;
 }
 
-impl<T: ErrorType> ErrorType for &T {
+impl<T: ErrorType + ?Sized> ErrorType for &T {
     type Error = T::Error;
 }
 
-impl<T: ErrorType> ErrorType for &mut T {
+impl<T: ErrorType + ?Sized> ErrorType for &mut T {
     type Error = T::Error;
 }
 
@@ -139,7 +139,7 @@ pub trait OutputPin: ErrorType {
     }
 }
 
-impl<T: OutputPin> OutputPin for &mut T {
+impl<T: OutputPin + ?Sized> OutputPin for &mut T {
     fn set_low(&mut self) -> Result<(), Self::Error> {
         T::set_low(self)
     }
@@ -166,7 +166,7 @@ pub trait StatefulOutputPin: OutputPin {
     fn is_set_low(&self) -> Result<bool, Self::Error>;
 }
 
-impl<T: StatefulOutputPin> StatefulOutputPin for &mut T {
+impl<T: StatefulOutputPin + ?Sized> StatefulOutputPin for &mut T {
     fn is_set_high(&self) -> Result<bool, Self::Error> {
         T::is_set_high(self)
     }
@@ -182,7 +182,7 @@ pub trait ToggleableOutputPin: ErrorType {
     fn toggle(&mut self) -> Result<(), Self::Error>;
 }
 
-impl<T: ToggleableOutputPin> ToggleableOutputPin for &mut T {
+impl<T: ToggleableOutputPin + ?Sized> ToggleableOutputPin for &mut T {
     fn toggle(&mut self) -> Result<(), Self::Error> {
         T::toggle(self)
     }
@@ -197,7 +197,7 @@ pub trait InputPin: ErrorType {
     fn is_low(&self) -> Result<bool, Self::Error>;
 }
 
-impl<T: InputPin> InputPin for &T {
+impl<T: InputPin + ?Sized> InputPin for &T {
     fn is_high(&self) -> Result<bool, Self::Error> {
         T::is_high(self)
     }
