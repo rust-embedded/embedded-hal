@@ -281,7 +281,7 @@ pub trait ReadReady: crate::Io {
 /// This allows using a [`Write`] in a nonblocking fashion, i.e. trying to write
 /// only when it is ready.
 pub trait WriteReady: crate::Io {
-    /// Get whether the writer is ready for immediately writeing.
+    /// Get whether the writer is ready for immediately writing.
     ///
     /// This usually means that there is free space in the internal transmit buffer.
     ///

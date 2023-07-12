@@ -3,9 +3,9 @@
 //! To interoperate with `std::io`, wrap a type in one of these
 //! adapters.
 //!
-//! There's no separate adapters for Read/ReadBuf/Write traits. Instead, a single
+//! There are no separate adapters for `Read`/`ReadBuf`/`Write` traits. Instead, a single
 //! adapter implements the right traits based on what the inner type implements.
-//! This allows adapting a `Read+Write`, for example.
+//! This allows using these adapters when using `Read+Write`, for example.
 
 use crate::SeekFrom;
 
@@ -107,26 +107,26 @@ impl<T: ?Sized> ToStd<T> {
 
 impl<T: crate::Read + ?Sized> std::io::Read for ToStd<T> {
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, std::io::Error> {
-        self.inner.read(buf).map_err(to_io_error)
+        self.inner.read(buf).map_err(to_std_error)
     }
 }
 
 impl<T: crate::Write + ?Sized> std::io::Write for ToStd<T> {
     fn write(&mut self, buf: &[u8]) -> Result<usize, std::io::Error> {
-        self.inner.write(buf).map_err(to_io_error)
+        self.inner.write(buf).map_err(to_std_error)
     }
     fn flush(&mut self) -> Result<(), std::io::Error> {
-        self.inner.flush().map_err(to_io_error)
+        self.inner.flush().map_err(to_std_error)
     }
 }
 
 impl<T: crate::Seek + ?Sized> std::io::Seek for ToStd<T> {
     fn seek(&mut self, pos: std::io::SeekFrom) -> Result<u64, std::io::Error> {
-        self.inner.seek(pos.into()).map_err(to_io_error)
+        self.inner.seek(pos.into()).map_err(to_std_error)
     }
 }
 
-fn to_io_error<T: core::fmt::Debug>(err: T) -> std::io::Error {
+fn to_std_error<T: core::fmt::Debug>(err: T) -> std::io::Error {
     let kind = std::io::ErrorKind::Other;
     std::io::Error::new(kind, format!("{:?}", err))
 }

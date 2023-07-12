@@ -6,7 +6,7 @@
 
 This project is developed and maintained by the [HAL team](https://github.com/rust-embedded/wg#the-hal-team).
 
-IO traits for embedded systems.
+Input/Output traits for embedded systems.
 
 Rust's `std::io` traits are not available in `no_std` targets, mainly because `std::io::Error`
 requires allocation. This crate contains replacement equivalent traits, usable in `no_std`
