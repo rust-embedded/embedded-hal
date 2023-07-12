@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-- Added `ReadReady`, `WriteReady` traits. They allow peeking whether the I/O handle is ready to read/write, so they allow using the traits in a non-blocking way.
+- Add `ReadReady`, `WriteReady` traits. They allow peeking whether the I/O handle is ready to read/write, so they allow using the traits in a non-blocking way.
+- Add variants to `ErrorKind` mirroring `std::io::ErrorKind`.
+- Add `From` impls to convert between `ErrorKind` and `std::io::ErrorKind`.
 - Moved `embedded_io::blocking` to the crate root.
 - Split async traits to the `embedded-io-async` crate.
 - Split async trait adapters to separate crates.
