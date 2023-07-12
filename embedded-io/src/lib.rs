@@ -127,7 +127,7 @@ pub trait ErrorType {
     type Error: Error;
 }
 
-impl<T: ?Sized + crate::ErrorType> crate::ErrorType for &mut T {
+impl<T: ?Sized + ErrorType> ErrorType for &mut T {
     type Error = T::Error;
 }
 
@@ -208,7 +208,7 @@ impl<E: fmt::Debug> std::error::Error for WriteAllError<E> {}
 /// Blocking reader.
 ///
 /// This trait is the `embedded-io` equivalent of [`std::io::Read`].
-pub trait Read: crate::ErrorType {
+pub trait Read: ErrorType {
     /// Read some bytes from this source into the specified buffer, returning how many bytes were read.
     ///
     /// If no bytes are currently available to read, this function blocks until at least one byte is available.
@@ -253,7 +253,7 @@ pub trait Read: crate::ErrorType {
 /// Blocking buffered reader.
 ///
 /// This trait is the `embedded-io` equivalent of [`std::io::BufRead`].
-pub trait BufRead: crate::ErrorType {
+pub trait BufRead: ErrorType {
     /// Return the contents of the internal buffer, filling it with more data from the inner reader if it is empty.
     ///
     /// If no bytes are currently available to read, this function blocks until at least one byte is available.
@@ -270,7 +270,7 @@ pub trait BufRead: crate::ErrorType {
 /// Blocking writer.
 ///
 /// This trait is the `embedded-io` equivalent of [`std::io::Write`].
-pub trait Write: crate::ErrorType {
+pub trait Write: ErrorType {
     /// Write a buffer into this writer, returning how many bytes were written.
     ///
     /// If the writer is not currently ready to accept more bytes (for example, its buffer is full),
@@ -359,19 +359,19 @@ pub trait Write: crate::ErrorType {
 /// Blocking seek within streams.
 ///
 /// This trait is the `embedded-io` equivalent of [`std::io::Seek`].
-pub trait Seek: crate::ErrorType {
+pub trait Seek: ErrorType {
     /// Seek to an offset, in bytes, in a stream.
-    fn seek(&mut self, pos: crate::SeekFrom) -> Result<u64, Self::Error>;
+    fn seek(&mut self, pos: SeekFrom) -> Result<u64, Self::Error>;
 
     /// Rewind to the beginning of a stream.
     fn rewind(&mut self) -> Result<(), Self::Error> {
-        self.seek(crate::SeekFrom::Start(0))?;
+        self.seek(SeekFrom::Start(0))?;
         Ok(())
     }
 
     /// Returns the current seek position from the start of the stream.
     fn stream_position(&mut self) -> Result<u64, Self::Error> {
-        self.seek(crate::SeekFrom::Current(0))
+        self.seek(SeekFrom::Current(0))
     }
 }
 
@@ -379,7 +379,7 @@ pub trait Seek: crate::ErrorType {
 ///
 /// This allows using a [`Read`] or [`BufRead`] in a nonblocking fashion, i.e. trying to read
 /// only when it is ready.
-pub trait ReadReady: crate::ErrorType {
+pub trait ReadReady: ErrorType {
     /// Get whether the reader is ready for immediately reading.
     ///
     /// This usually means that there is either some bytes have been received and are buffered and ready to be read,
@@ -393,7 +393,7 @@ pub trait ReadReady: crate::ErrorType {
 ///
 /// This allows using a [`Write`] in a nonblocking fashion, i.e. trying to write
 /// only when it is ready.
-pub trait WriteReady: crate::ErrorType {
+pub trait WriteReady: ErrorType {
     /// Get whether the writer is ready for immediately writing.
     ///
     /// This usually means that there is free space in the internal transmit buffer.
@@ -433,7 +433,7 @@ impl<T: ?Sized + Write> Write for &mut T {
 
 impl<T: ?Sized + Seek> Seek for &mut T {
     #[inline]
-    fn seek(&mut self, pos: crate::SeekFrom) -> Result<u64, Self::Error> {
+    fn seek(&mut self, pos: SeekFrom) -> Result<u64, Self::Error> {
         T::seek(self, pos)
     }
 }
