@@ -65,7 +65,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 *** This is (also) an alpha release with breaking changes (sorry) ***
 
 ### Changed
-- The Minimum Supported Rust Version (MSRV) is now 1.59.0
+- The Minimum Supported Rust Version (MSRV) is now 1.60.0
 - `spi`: unify all traits into `SpiReadBus`, `SpiWriteBus` and `SpiBus` (read-write).
 - `spi`: Add `SpiDevice` trait to represent a single device in a (possibly shared) bus, with managed chip-select (CS) pin.
 - `spi`: Clarify that implementations are allowed to return before operations are finished, add `flush` to wait until finished.

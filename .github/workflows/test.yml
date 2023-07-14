@@ -17,7 +17,7 @@ jobs:
       matrix:
         rust:
           - stable
-          - 1.59.0  # MSRV
+          - 1.60.0  # MSRV
           - nightly
         target:
           - x86_64-unknown-linux-gnu
