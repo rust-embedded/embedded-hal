@@ -115,25 +115,7 @@ impl<T: embedded_io::Seek + ?Sized> std::io::Seek for ToStd<T> {
     }
 }
 
-fn to_std_error<T: embedded_io::Error>(err: T) -> std::io::Error {
-    let kind = match err.kind() {
-        embedded_io::ErrorKind::NotFound => std::io::ErrorKind::NotFound,
-        embedded_io::ErrorKind::PermissionDenied => std::io::ErrorKind::PermissionDenied,
-        embedded_io::ErrorKind::ConnectionRefused => std::io::ErrorKind::ConnectionRefused,
-        embedded_io::ErrorKind::ConnectionReset => std::io::ErrorKind::ConnectionReset,
-        embedded_io::ErrorKind::ConnectionAborted => std::io::ErrorKind::ConnectionAborted,
-        embedded_io::ErrorKind::NotConnected => std::io::ErrorKind::NotConnected,
-        embedded_io::ErrorKind::AddrInUse => std::io::ErrorKind::AddrInUse,
-        embedded_io::ErrorKind::AddrNotAvailable => std::io::ErrorKind::AddrNotAvailable,
-        embedded_io::ErrorKind::BrokenPipe => std::io::ErrorKind::BrokenPipe,
-        embedded_io::ErrorKind::AlreadyExists => std::io::ErrorKind::AlreadyExists,
-        embedded_io::ErrorKind::InvalidInput => std::io::ErrorKind::InvalidInput,
-        embedded_io::ErrorKind::InvalidData => std::io::ErrorKind::InvalidData,
-        embedded_io::ErrorKind::TimedOut => std::io::ErrorKind::TimedOut,
-        embedded_io::ErrorKind::Interrupted => std::io::ErrorKind::Interrupted,
-        embedded_io::ErrorKind::Unsupported => std::io::ErrorKind::Unsupported,
-        embedded_io::ErrorKind::OutOfMemory => std::io::ErrorKind::OutOfMemory,
-        _ => std::io::ErrorKind::Other,
-    };
-    std::io::Error::new(kind, format!("{:?}", err))
+/// Convert a embedded-io error to a std::io::Error
+pub fn to_std_error<T: embedded_io::Error>(err: T) -> std::io::Error {
+    std::io::Error::new(err.kind().into(), format!("{:?}", err))
 }
