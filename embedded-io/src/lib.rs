@@ -227,6 +227,33 @@ impl<E> From<E> for ReadExactError<E> {
     }
 }
 
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+impl From<ReadExactError<std::io::Error>> for std::io::Error {
+    fn from(err: ReadExactError<std::io::Error>) -> Self {
+        match err {
+            ReadExactError::UnexpectedEof => std::io::Error::new(
+                std::io::ErrorKind::UnexpectedEof,
+                "UnexpectedEof".to_owned(),
+            ),
+            ReadExactError::Other(e) => std::io::Error::new(e.kind(), format!("{:?}", e)),
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+impl From<WriteAllError<std::io::Error>> for std::io::Error {
+    fn from(err: WriteAllError<std::io::Error>) -> Self {
+        match err {
+            WriteAllError::WriteZero => {
+                std::io::Error::new(std::io::ErrorKind::WriteZero, "WriteZero".to_owned())
+            }
+            WriteAllError::Other(e) => std::io::Error::new(e.kind(), format!("{:?}", e)),
+        }
+    }
+}
+
 impl<E: fmt::Debug> fmt::Display for ReadExactError<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:?}", self)
@@ -234,6 +261,7 @@ impl<E: fmt::Debug> fmt::Display for ReadExactError<E> {
 }
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<E: fmt::Debug> std::error::Error for ReadExactError<E> {}
 
 /// Error returned by [`Write::write_fmt`]
@@ -260,6 +288,7 @@ impl<E: fmt::Debug> fmt::Display for WriteFmtError<E> {
 }
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<E: fmt::Debug> std::error::Error for WriteFmtError<E> {}
 
 /// Error returned by [`Write::write_all`]
@@ -284,6 +313,7 @@ impl<E: fmt::Debug> fmt::Display for WriteAllError<E> {
 }
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<E: fmt::Debug> std::error::Error for WriteAllError<E> {}
 
 /// Blocking reader.
