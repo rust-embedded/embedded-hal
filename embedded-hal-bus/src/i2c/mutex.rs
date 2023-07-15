@@ -6,6 +6,7 @@ use std::sync::Mutex;
 /// Sharing is implemented with an `std` [`Mutex`](std::sync::Mutex). It allows a single bus across multiple threads,
 /// with finer-grained locking than [`CriticalSectionDevice`](super::CriticalSectionDevice). The downside is that
 /// it is only available in `std` targets.
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 pub struct MutexDevice<'a, T> {
     bus: &'a Mutex<T>,
 }
