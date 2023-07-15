@@ -68,12 +68,6 @@ provided here but platform-specific code can avoid fallibility-related boilerpla
 - Initialization and configuration stuff like "ensure this serial interface and that SPI
 interface are not using the same pins". The HAL will focus on *doing I/O*.
 
-## Reference implementation
-
-The [`stm32f1xx-hal`] crate contains a reference implementation of this HAL.
-
-[`stm32f1xx-hal`]: https://crates.io/crates/stm32f1xx-hal
-
 ## Platform agnostic drivers
 
 You can find platform agnostic drivers built on top of `embedded-hal` on crates.io by [searching
