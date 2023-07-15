@@ -78,6 +78,13 @@ embedded-hal keyword](https://doc.rust-lang.org/cargo/reference/manifest.html#pa
 to your crate before publishing it!
 //
 
+## Serial/UART traits
+
+There is no serial traits in `embedded-hal`. Instead, use [`embedded-io`](https://crates.io/crates/embedded-io).
+A serial port is essentially a byte-oriented stream, and that's what `embedded-io` models. Sharing the traits
+with all byte streams has some advantages. For example, it allows generic code providing a command-line interface
+or a console to operate either on hardware serial ports or on virtual ones like Telnet or USB CDC-ACM.
+
 ## Minimum Supported Rust Version (MSRV)
 
 This crate is guaranteed to compile on stable Rust 1.60 and up. It *might*

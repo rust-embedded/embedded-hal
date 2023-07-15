@@ -10,6 +10,13 @@ This crate contains asynchronous versions of the [`embedded-hal`](https://crates
 
 This project is developed and maintained by the [HAL team](https://github.com/rust-embedded/wg#the-hal-team).
 
+## Serial/UART traits
+
+There is no serial traits in `embedded-hal-async`. Instead, use [`embedded-io-async`](https://crates.io/crates/embedded-io).
+A serial port is essentially a byte-oriented stream, and that's what `embedded-io-async` models. Sharing the traits
+with all byte streams has some advantages. For example, it allows generic code providing a command-line interface
+or a console to operate either on hardware serial ports or on virtual ones like Telnet or USB CDC-ACM.
+
 ## Minimum Supported Rust Version (MSRV)
 
 This crate requires Rust nightly newer than `nightly-2022-11-22`, due to requiring support for
