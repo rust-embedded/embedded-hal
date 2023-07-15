@@ -1,0 +1,17 @@
+on:
+  push: # Run CI for all branches except GitHub merge queue tmp branches
+    branches-ignore:
+    - "gh-readonly-queue/**"
+  pull_request: # Run CI for PRs on any branch
+  merge_group: # Run CI for the GitHub merge queue
+
+name: Rustdoc check
+jobs:
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: nightly-2023-07-03
+      - run: RUSTDOCFLAGS="--deny=warnings --cfg=docsrs" cargo doc --all-features
