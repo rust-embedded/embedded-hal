@@ -38,7 +38,7 @@ jobs:
           toolchain: ${{ matrix.rust }}
           target: ${{ matrix.target }}
 
-      - run: sed -i '/nightly-only/d' Cargo.toml
+      - run: mv Cargo.stable.toml Cargo.toml
         if: matrix.rust != 'nightly'
 
       - run: cargo check --target=${{ matrix.target }} --features=${{ matrix.features }}
