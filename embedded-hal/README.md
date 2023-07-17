@@ -1,7 +1,7 @@
 [![crates.io](https://img.shields.io/crates/d/embedded-hal.svg)](https://crates.io/crates/embedded-hal)
 [![crates.io](https://img.shields.io/crates/v/embedded-hal.svg)](https://crates.io/crates/embedded-hal)
 [![Documentation](https://docs.rs/embedded-hal/badge.svg)](https://docs.rs/embedded-hal)
-![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.59+-blue.svg)
+![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.60+-blue.svg)
 
 # `embedded-hal`
 
@@ -15,7 +15,7 @@ This project is developed and maintained by the [HAL team](https://github.com/ru
 
 ## Minimum Supported Rust Version (MSRV)
 
-This crate is guaranteed to compile on stable Rust 1.59 and up. It *might*
+This crate is guaranteed to compile on stable Rust 1.60 and up. It *might*
 compile with older versions but that may change in any new patch release.
 
 See [here](../docs/msrv.md) for details on how the MSRV may be upgraded.

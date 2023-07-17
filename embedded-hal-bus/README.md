@@ -1,7 +1,7 @@
 [![crates.io](https://img.shields.io/crates/d/embedded-hal-bus.svg)](https://crates.io/crates/embedded-hal-bus)
 [![crates.io](https://img.shields.io/crates/v/embedded-hal-bus.svg)](https://crates.io/crates/embedded-hal-bus)
 [![Documentation](https://docs.rs/embedded-hal-bus/badge.svg)](https://docs.rs/embedded-hal-bus)
-![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.59+-blue.svg)
+![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.60+-blue.svg)
 
 # `embedded-hal-bus`
 
@@ -34,7 +34,7 @@ provides mechanisms to obtain multiple `I2c` instances out of a single `I2c` ins
 
 ## Minimum Supported Rust Version (MSRV)
 
-This crate is guaranteed to compile on stable Rust 1.59 and up. It *might*
+This crate is guaranteed to compile on stable Rust 1.60 and up. It *might*
 compile with older versions but that may change in any new patch release.
 
 See [here](../docs/msrv.md) for details on how the MSRV may be upgraded.

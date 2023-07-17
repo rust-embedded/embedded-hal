@@ -17,7 +17,7 @@ jobs:
       matrix:
         rust:
           - stable
-          - 1.59.0  # MSRV
+          - 1.60.0  # MSRV
           - nightly
         target:
           - x86_64-unknown-linux-gnu
@@ -28,7 +28,9 @@ jobs:
             features: std
           - target: x86_64-unknown-linux-gnu
             features: alloc
-
+          - target: x86_64-unknown-linux-gnu
+            features: std,tokio-1,futures-03
+            rust: nightly
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@master
@@ -36,7 +38,7 @@ jobs:
           toolchain: ${{ matrix.rust }}
           target: ${{ matrix.target }}
 
-      - run: sed -i '/nightly-only/d' Cargo.toml
+      - run: mv Cargo.stable.toml Cargo.toml
         if: matrix.rust != 'nightly'
 
       - run: cargo check --target=${{ matrix.target }} --features=${{ matrix.features }}

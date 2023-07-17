@@ -1,13 +1,13 @@
 [workspace]
 resolver = "2"
 
-# CI removes lines containing 'nightly-only' when not building with nightly.
 members = [
     "embedded-hal",
-    "embedded-hal-async",  # nightly-only
+    "embedded-hal-async",
     "embedded-hal-nb",
     "embedded-hal-bus",
     "embedded-can",
     "embedded-io",
-    "embedded-io-async",  # nightly-only
+    "embedded-io-async",
+    "embedded-io-adapters",
 ]

@@ -8,9 +8,6 @@ use core::fmt;
 #[cfg(feature = "alloc")]
 extern crate alloc;
 
-#[cfg(feature = "std")]
-pub mod adapters;
-
 mod impls;
 
 /// Enumeration of possible methods to seek within an I/O object.
@@ -24,6 +21,30 @@ pub enum SeekFrom {
     End(i64),
     /// Sets the offset to the current position plus the specified number of bytes.
     Current(i64),
+}
+
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+impl From<SeekFrom> for std::io::SeekFrom {
+    fn from(pos: SeekFrom) -> Self {
+        match pos {
+            SeekFrom::Start(n) => std::io::SeekFrom::Start(n),
+            SeekFrom::End(n) => std::io::SeekFrom::End(n),
+            SeekFrom::Current(n) => std::io::SeekFrom::Current(n),
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+impl From<std::io::SeekFrom> for SeekFrom {
+    fn from(pos: std::io::SeekFrom) -> SeekFrom {
+        match pos {
+            std::io::SeekFrom::Start(n) => SeekFrom::Start(n),
+            std::io::SeekFrom::End(n) => SeekFrom::End(n),
+            std::io::SeekFrom::Current(n) => SeekFrom::Current(n),
+        }
+    }
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -92,6 +113,58 @@ pub enum ErrorKind {
     OutOfMemory,
 }
 
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+impl From<ErrorKind> for std::io::ErrorKind {
+    fn from(value: ErrorKind) -> Self {
+        match value {
+            ErrorKind::NotFound => std::io::ErrorKind::NotFound,
+            ErrorKind::PermissionDenied => std::io::ErrorKind::PermissionDenied,
+            ErrorKind::ConnectionRefused => std::io::ErrorKind::ConnectionRefused,
+            ErrorKind::ConnectionReset => std::io::ErrorKind::ConnectionReset,
+            ErrorKind::ConnectionAborted => std::io::ErrorKind::ConnectionAborted,
+            ErrorKind::NotConnected => std::io::ErrorKind::NotConnected,
+            ErrorKind::AddrInUse => std::io::ErrorKind::AddrInUse,
+            ErrorKind::AddrNotAvailable => std::io::ErrorKind::AddrNotAvailable,
+            ErrorKind::BrokenPipe => std::io::ErrorKind::BrokenPipe,
+            ErrorKind::AlreadyExists => std::io::ErrorKind::AlreadyExists,
+            ErrorKind::InvalidInput => std::io::ErrorKind::InvalidInput,
+            ErrorKind::InvalidData => std::io::ErrorKind::InvalidData,
+            ErrorKind::TimedOut => std::io::ErrorKind::TimedOut,
+            ErrorKind::Interrupted => std::io::ErrorKind::Interrupted,
+            ErrorKind::Unsupported => std::io::ErrorKind::Unsupported,
+            ErrorKind::OutOfMemory => std::io::ErrorKind::OutOfMemory,
+            _ => std::io::ErrorKind::Other,
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+impl From<std::io::ErrorKind> for ErrorKind {
+    fn from(value: std::io::ErrorKind) -> Self {
+        match value {
+            std::io::ErrorKind::NotFound => ErrorKind::NotFound,
+            std::io::ErrorKind::PermissionDenied => ErrorKind::PermissionDenied,
+            std::io::ErrorKind::ConnectionRefused => ErrorKind::ConnectionRefused,
+            std::io::ErrorKind::ConnectionReset => ErrorKind::ConnectionReset,
+            std::io::ErrorKind::ConnectionAborted => ErrorKind::ConnectionAborted,
+            std::io::ErrorKind::NotConnected => ErrorKind::NotConnected,
+            std::io::ErrorKind::AddrInUse => ErrorKind::AddrInUse,
+            std::io::ErrorKind::AddrNotAvailable => ErrorKind::AddrNotAvailable,
+            std::io::ErrorKind::BrokenPipe => ErrorKind::BrokenPipe,
+            std::io::ErrorKind::AlreadyExists => ErrorKind::AlreadyExists,
+            std::io::ErrorKind::InvalidInput => ErrorKind::InvalidInput,
+            std::io::ErrorKind::InvalidData => ErrorKind::InvalidData,
+            std::io::ErrorKind::TimedOut => ErrorKind::TimedOut,
+            std::io::ErrorKind::Interrupted => ErrorKind::Interrupted,
+            std::io::ErrorKind::Unsupported => ErrorKind::Unsupported,
+            std::io::ErrorKind::OutOfMemory => ErrorKind::OutOfMemory,
+            _ => ErrorKind::Other,
+        }
+    }
+}
+
 /// Error trait.
 ///
 /// This trait allows generic code to do limited inspecting of errors,
@@ -113,6 +186,14 @@ impl Error for ErrorKind {
     }
 }
 
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+impl crate::Error for std::io::Error {
+    fn kind(&self) -> crate::ErrorKind {
+        self.kind().into()
+    }
+}
+
 /// Base trait for all IO traits, defining the error type.
 ///
 /// All IO operations of all traits return the error defined in this trait.
@@ -127,7 +208,7 @@ pub trait ErrorType {
     type Error: Error;
 }
 
-impl<T: ?Sized + crate::ErrorType> crate::ErrorType for &mut T {
+impl<T: ?Sized + ErrorType> ErrorType for &mut T {
     type Error = T::Error;
 }
 
@@ -146,6 +227,33 @@ impl<E> From<E> for ReadExactError<E> {
     }
 }
 
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+impl From<ReadExactError<std::io::Error>> for std::io::Error {
+    fn from(err: ReadExactError<std::io::Error>) -> Self {
+        match err {
+            ReadExactError::UnexpectedEof => std::io::Error::new(
+                std::io::ErrorKind::UnexpectedEof,
+                "UnexpectedEof".to_owned(),
+            ),
+            ReadExactError::Other(e) => std::io::Error::new(e.kind(), format!("{:?}", e)),
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+impl From<WriteAllError<std::io::Error>> for std::io::Error {
+    fn from(err: WriteAllError<std::io::Error>) -> Self {
+        match err {
+            WriteAllError::WriteZero => {
+                std::io::Error::new(std::io::ErrorKind::WriteZero, "WriteZero".to_owned())
+            }
+            WriteAllError::Other(e) => std::io::Error::new(e.kind(), format!("{:?}", e)),
+        }
+    }
+}
+
 impl<E: fmt::Debug> fmt::Display for ReadExactError<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:?}", self)
@@ -153,6 +261,7 @@ impl<E: fmt::Debug> fmt::Display for ReadExactError<E> {
 }
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<E: fmt::Debug> std::error::Error for ReadExactError<E> {}
 
 /// Error returned by [`Write::write_fmt`]
@@ -179,6 +288,7 @@ impl<E: fmt::Debug> fmt::Display for WriteFmtError<E> {
 }
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<E: fmt::Debug> std::error::Error for WriteFmtError<E> {}
 
 /// Error returned by [`Write::write_all`]
@@ -203,12 +313,13 @@ impl<E: fmt::Debug> fmt::Display for WriteAllError<E> {
 }
 
 #[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<E: fmt::Debug> std::error::Error for WriteAllError<E> {}
 
 /// Blocking reader.
 ///
 /// This trait is the `embedded-io` equivalent of [`std::io::Read`].
-pub trait Read: crate::ErrorType {
+pub trait Read: ErrorType {
     /// Read some bytes from this source into the specified buffer, returning how many bytes were read.
     ///
     /// If no bytes are currently available to read, this function blocks until at least one byte is available.
@@ -253,7 +364,7 @@ pub trait Read: crate::ErrorType {
 /// Blocking buffered reader.
 ///
 /// This trait is the `embedded-io` equivalent of [`std::io::BufRead`].
-pub trait BufRead: crate::ErrorType {
+pub trait BufRead: ErrorType {
     /// Return the contents of the internal buffer, filling it with more data from the inner reader if it is empty.
     ///
     /// If no bytes are currently available to read, this function blocks until at least one byte is available.
@@ -270,7 +381,7 @@ pub trait BufRead: crate::ErrorType {
 /// Blocking writer.
 ///
 /// This trait is the `embedded-io` equivalent of [`std::io::Write`].
-pub trait Write: crate::ErrorType {
+pub trait Write: ErrorType {
     /// Write a buffer into this writer, returning how many bytes were written.
     ///
     /// If the writer is not currently ready to accept more bytes (for example, its buffer is full),
@@ -359,19 +470,19 @@ pub trait Write: crate::ErrorType {
 /// Blocking seek within streams.
 ///
 /// This trait is the `embedded-io` equivalent of [`std::io::Seek`].
-pub trait Seek: crate::ErrorType {
+pub trait Seek: ErrorType {
     /// Seek to an offset, in bytes, in a stream.
-    fn seek(&mut self, pos: crate::SeekFrom) -> Result<u64, Self::Error>;
+    fn seek(&mut self, pos: SeekFrom) -> Result<u64, Self::Error>;
 
     /// Rewind to the beginning of a stream.
     fn rewind(&mut self) -> Result<(), Self::Error> {
-        self.seek(crate::SeekFrom::Start(0))?;
+        self.seek(SeekFrom::Start(0))?;
         Ok(())
     }
 
     /// Returns the current seek position from the start of the stream.
     fn stream_position(&mut self) -> Result<u64, Self::Error> {
-        self.seek(crate::SeekFrom::Current(0))
+        self.seek(SeekFrom::Current(0))
     }
 }
 
@@ -379,7 +490,7 @@ pub trait Seek: crate::ErrorType {
 ///
 /// This allows using a [`Read`] or [`BufRead`] in a nonblocking fashion, i.e. trying to read
 /// only when it is ready.
-pub trait ReadReady: crate::ErrorType {
+pub trait ReadReady: ErrorType {
     /// Get whether the reader is ready for immediately reading.
     ///
     /// This usually means that there is either some bytes have been received and are buffered and ready to be read,
@@ -393,7 +504,7 @@ pub trait ReadReady: crate::ErrorType {
 ///
 /// This allows using a [`Write`] in a nonblocking fashion, i.e. trying to write
 /// only when it is ready.
-pub trait WriteReady: crate::ErrorType {
+pub trait WriteReady: ErrorType {
     /// Get whether the writer is ready for immediately writing.
     ///
     /// This usually means that there is free space in the internal transmit buffer.
@@ -433,7 +544,7 @@ impl<T: ?Sized + Write> Write for &mut T {
 
 impl<T: ?Sized + Seek> Seek for &mut T {
     #[inline]
-    fn seek(&mut self, pos: crate::SeekFrom) -> Result<u64, Self::Error> {
+    fn seek(&mut self, pos: SeekFrom) -> Result<u64, Self::Error> {
         T::seek(self, pos)
     }
 }
