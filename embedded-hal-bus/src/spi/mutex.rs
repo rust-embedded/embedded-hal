@@ -13,6 +13,7 @@ use super::DeviceError;
 /// Sharing is implemented with a `std` [`Mutex`](std::sync::Mutex). It allows a single bus across multiple threads,
 /// with finer-grained locking than [`CriticalSectionDevice`](super::CriticalSectionDevice). The downside is
 /// it is only available in `std` targets.
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 pub struct MutexDevice<'a, BUS, CS, D> {
     bus: &'a Mutex<BUS>,
     cs: CS,
