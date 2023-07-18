@@ -6,7 +6,3 @@
 
 pub mod i2c;
 pub mod spi;
-
-#[cfg(feature = "async")]
-#[cfg_attr(docsrs, doc(cfg(feature = "async")))]
-pub mod asynch;
