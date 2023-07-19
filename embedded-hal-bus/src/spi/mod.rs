@@ -39,8 +39,25 @@ where
 /// Dummy `DelayUs` implementation that panics on use.
 pub struct NoDelay;
 
+#[cold]
+fn no_delay_panic() {
+    panic!("You've tried to execute a SPI transaction containing a `Operation::Delay` in a `SpiDevice` created with `new_no_delay()`. Create it with `new()` instead, passing a `DelayUs` implementation.");
+}
+
 impl embedded_hal::delay::DelayUs for NoDelay {
     fn delay_us(&mut self, _us: u32) {
-        panic!("You've tried to execute a SPI transaction containing a `Operation::Delay` in a `SpiDevice` created with `new_no_delay()`. Create it with `new()` instead, passing a `DelayUs` implementation.")
+        no_delay_panic();
+    }
+}
+
+#[cfg(feature = "async")]
+#[cfg_attr(docsrs, doc(cfg(feature = "async")))]
+impl embedded_hal_async::delay::DelayUs for NoDelay {
+    async fn delay_us(&mut self, _us: u32) {
+        no_delay_panic();
+    }
+
+    async fn delay_ms(&mut self, _us: u32) {
+        no_delay_panic();
     }
 }
