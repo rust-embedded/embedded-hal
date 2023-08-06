@@ -163,8 +163,12 @@
 
 use core::fmt::Debug;
 
+#[cfg(feature = "defmt-03")]
+use crate::defmt;
+
 /// Clock polarity
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum Polarity {
     /// Clock signal low when idle
     IdleLow,
@@ -174,6 +178,7 @@ pub enum Polarity {
 
 /// Clock phase
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum Phase {
     /// Data in "captured" on the first clock transition
     CaptureOnFirstTransition,
@@ -183,6 +188,7 @@ pub enum Phase {
 
 /// SPI mode
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub struct Mode {
     /// Clock polarity
     pub polarity: Polarity,
@@ -236,6 +242,7 @@ impl Error for core::convert::Infallible {
 /// free to define more specific or additional error types. However, by providing
 /// a mapping to these common SPI errors, generic code can still react to them.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 #[non_exhaustive]
 pub enum ErrorKind {
     /// The peripheral receive buffer was overrun
@@ -295,7 +302,8 @@ impl<T: ErrorType + ?Sized> ErrorType for &mut T {
 /// SPI transaction operation.
 ///
 /// This allows composition of SPI operations into a single bus transaction
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum Operation<'a, Word: 'static> {
     /// Read data into the provided buffer.
     ///
