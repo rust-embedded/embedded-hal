@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 0.5.0 - 2023-08-06
 
 - Add `ReadReady`, `WriteReady` traits. They allow peeking whether the I/O handle is ready to read/write, so they allow using the traits in a non-blocking way.
 - Add variants to `ErrorKind` mirroring `std::io::ErrorKind`.
@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved `embedded_io::blocking` to the crate root.
 - Split async traits to the `embedded-io-async` crate.
 - Split trait adapters to the `embedded-io-adapters` crate.
-- Add `std::io` impls for `ReadExactError` & `WriteAllError`.
+- Add `std::error` impls for `ReadExactError` & `WriteAllError`.
 - Rename trait `Io` to `ErrorKind`, for consistency with `embedded-hal`.
 
 ## 0.4.0 - 2022-11-25

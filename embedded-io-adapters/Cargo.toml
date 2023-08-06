@@ -1,6 +1,6 @@
 [package]
 name = "embedded-io-adapters"
-version = "0.1.0"
+version = "0.5.0"
 edition = "2021"
 description = "Adapters between the `embedded-io` traits and other I/O traits"
 repository = "https://github.com/rust-embedded/embedded-hal"
