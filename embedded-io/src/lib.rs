@@ -5,6 +5,10 @@
 
 use core::fmt;
 
+// needed to prevent defmt macros from breaking, since they emit code that does `defmt::blahblah`.
+#[cfg(feature = "defmt-03")]
+use defmt_03 as defmt;
+
 #[cfg(feature = "alloc")]
 extern crate alloc;
 
@@ -14,6 +18,7 @@ mod impls;
 ///
 /// This is the `embedded-io` equivalent of [`std::io::SeekFrom`].
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum SeekFrom {
     /// Sets the offset to the provided number of bytes.
     Start(u64),
@@ -47,8 +52,6 @@ impl From<std::io::SeekFrom> for SeekFrom {
     }
 }
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-#[non_exhaustive]
 /// Possible kinds of errors.
 ///
 /// This list is intended to grow over time and it is not recommended to
@@ -59,6 +62,9 @@ impl From<std::io::SeekFrom> for SeekFrom {
 ///
 /// - `WouldBlock` is removed, since `embedded-io` traits are always blocking. See the [crate-level documentation](crate) for details.
 /// - `WriteZero` is removed, since it is a separate variant in [`WriteAllError`] and [`WriteFmtError`].
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
+#[non_exhaustive]
 pub enum ErrorKind {
     /// Unspecified error kind.
     Other,
@@ -214,6 +220,7 @@ impl<T: ?Sized + ErrorType> ErrorType for &mut T {
 
 /// Error returned by [`Read::read_exact`]
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum ReadExactError<E> {
     /// An EOF error was encountered before reading the exact amount of requested bytes.
     UnexpectedEof,
@@ -266,6 +273,7 @@ impl<E: fmt::Debug> std::error::Error for ReadExactError<E> {}
 
 /// Error returned by [`Write::write_fmt`]
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum WriteFmtError<E> {
     /// [`Write::write`] wrote zero bytes
     WriteZero,
@@ -293,6 +301,7 @@ impl<E: fmt::Debug> std::error::Error for WriteFmtError<E> {}
 
 /// Error returned by [`Write::write_all`]
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum WriteAllError<E> {
     /// [`Write::write`] wrote zero bytes
     WriteZero,

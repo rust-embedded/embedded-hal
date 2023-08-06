@@ -14,9 +14,11 @@ categories = [
 [features]
 std = ["alloc", "embedded-io/std"]
 alloc = ["embedded-io/alloc"]
+defmt-03 = ["dep:defmt-03", "embedded-io/defmt-03"]
 
 [dependencies]
 embedded-io = { version = "0.5", path = "../embedded-io" }
+defmt-03 = { package = "defmt", version = "0.3", optional = true }
 
 [package.metadata.docs.rs]
 features = ["std"]
