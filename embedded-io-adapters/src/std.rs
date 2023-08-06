@@ -66,6 +66,7 @@ impl<T: std::io::Seek + ?Sized> embedded_io::Seek for FromStd<T> {
 }
 
 /// Adapter to `std::io` traits.
+#[derive(Clone)]
 pub struct ToStd<T: ?Sized> {
     inner: T,
 }
