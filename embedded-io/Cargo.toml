@@ -15,6 +15,9 @@ categories = [
 std = ["alloc"]
 alloc = []
 
+[dependencies]
+defmt-03 = { package = "defmt", version = "0.3", optional = true }
+
 [package.metadata.docs.rs]
 features = ["std"]
 rustdoc-args = ["--cfg", "docsrs"]
