@@ -21,16 +21,19 @@ jobs:
           - nightly
         target:
           - x86_64-unknown-linux-gnu
-          - thumbv6m-none-eabi
           - thumbv7m-none-eabi
+        features:
+          - ''
         include:
-          - target: x86_64-unknown-linux-gnu
+          - rust: stable
+            target: x86_64-unknown-linux-gnu
             features: std
-          - target: x86_64-unknown-linux-gnu
+          - rust: stable
+            target: x86_64-unknown-linux-gnu
             features: alloc
-          - target: x86_64-unknown-linux-gnu
-            features: std,tokio-1,futures-03
-            rust: nightly
+          - rust: nightly
+            target: x86_64-unknown-linux-gnu
+            features: std,tokio-1,futures-03,defmt-03
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@master

@@ -15,3 +15,7 @@ mod private {
     impl Sealed for SevenBitAddress {}
     impl Sealed for TenBitAddress {}
 }
+
+// needed to prevent defmt macros from breaking, since they emit code that does `defmt::blahblah`.
+#[cfg(feature = "defmt-03")]
+use defmt_03 as defmt;
