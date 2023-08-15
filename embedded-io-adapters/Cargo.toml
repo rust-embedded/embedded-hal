@@ -24,5 +24,5 @@ futures = { version = "0.3.21", features = ["std"], default-features = false, op
 tokio = { version = "1", default-features = false, optional = true }
 
 [package.metadata.docs.rs]
-features = ["std"]
+features = ["std", "tokio-1", "futures-03"]
 rustdoc-args = ["--cfg", "docsrs"]

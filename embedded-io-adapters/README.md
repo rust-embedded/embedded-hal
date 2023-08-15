@@ -1,6 +1,6 @@
-[![crates.io](https://img.shields.io/crates/d/embedded-io.svg)](https://crates.io/crates/embedded-io)
-[![crates.io](https://img.shields.io/crates/v/embedded-io.svg)](https://crates.io/crates/embedded-io)
-[![Documentation](https://docs.rs/embedded-io/badge.svg)](https://docs.rs/embedded-io)
+[![crates.io](https://img.shields.io/crates/d/embedded-io-adapters.svg)](https://crates.io/crates/embedded-io-adapters)
+[![crates.io](https://img.shields.io/crates/v/embedded-io-adapters.svg)](https://crates.io/crates/embedded-io-adapters)
+[![Documentation](https://docs.rs/embedded-io-adapters/badge.svg)](https://docs.rs/embedded-io-adapters)
 
 # `embedded-io-adapters`
 
