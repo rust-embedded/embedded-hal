@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Split trait adapters to the `embedded-io-adapters` crate.
 - Add `std::error` impls for `ReadExactError` & `WriteAllError`.
 - Rename trait `Io` to `ErrorKind`, for consistency with `embedded-hal`.
+- Added optional `defmt` 0.3 support.
 
 ## 0.4.0 - 2022-11-25
 

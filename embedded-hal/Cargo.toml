@@ -13,7 +13,7 @@ license = "MIT OR Apache-2.0"
 name = "embedded-hal"
 readme = "README.md"
 repository = "https://github.com/rust-embedded/embedded-hal"
-version = "1.0.0-alpha.11"
+version = "1.0.0-rc.1"
 
 [dependencies]
 defmt-03 = { package = "defmt", version = "0.3", optional = true }

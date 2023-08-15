@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v1.0.0-rc.1] - 2023-08-15
+
+- The Minimum Supported Rust Version (MSRV) is now 1.60.0
+- Add optional `defmt` 0.3 support.
+- Remove serial traits, the replacement is the `embedded-io` crate.
+- Added `+ ?Sized` to all blanket impls.
 
 ## [v1.0.0-alpha.11] - 2023-07-04
 
@@ -65,7 +71,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 *** This is (also) an alpha release with breaking changes (sorry) ***
 
 ### Changed
-- The Minimum Supported Rust Version (MSRV) is now 1.60.0
+- The Minimum Supported Rust Version (MSRV) is now 1.59.0
 - `spi`: unify all traits into `SpiReadBus`, `SpiWriteBus` and `SpiBus` (read-write).
 - `spi`: Add `SpiDevice` trait to represent a single device in a (possibly shared) bus, with managed chip-select (CS) pin.
 - `spi`: Clarify that implementations are allowed to return before operations are finished, add `flush` to wait until finished.
@@ -291,7 +297,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.11...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-rc.1...HEAD
+[v1.0.0-rc.1]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.11...v1.0.0-rc.1
 [v1.0.0-alpha.11]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.10...v1.0.0-alpha.11
 [v1.0.0-alpha.10]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.9...v1.0.0-alpha.10
 [v1.0.0-alpha.9]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.8...v1.0.0-alpha.9

@@ -19,6 +19,12 @@ while avoiding `dyn` or `Box`. This is consistent with how errors are handled in
 - In `std::io`, the `Read`/`Write` traits might be blocking or non-blocking (i.e. returning `WouldBlock` errors) depending on the file descriptor's mode, which is only known at run-time. This allows passing a non-blocking stream to code that expects a blocking
 stream, causing unexpected errors. To solve this, `embedded-io` specifies `Read`/`Write` are always blocking, and adds new `ReadReady`/`WriteReady` traits to allow using streams in a non-blocking way.
 
+## Optional Cargo features
+
+- **`std`**: Adds `From` impls to convert to/from `std::io` structs, adds `std::error::Error` impls.
+- **`alloc`**: Adds blanket impls for `Box`, adds `Write` impl to `Vec`.
+- **`defmt-03`**: Derive `defmt::Format` from `defmt` 0.3 for enums and structs.
+
 ## Minimum Supported Rust Version (MSRV)
 
 This crate is guaranteed to compile on stable Rust 1.60 and up. It *might*
