@@ -17,13 +17,21 @@ A serial port is essentially a byte-oriented stream, and that's what `embedded-i
 with all byte streams has some advantages. For example, it allows generic code providing a command-line interface
 or a console to operate either on hardware serial ports or on virtual ones like Telnet or USB CDC-ACM.
 
+## Optional Cargo features
+
+- **`defmt-03`**: Derive `defmt::Format` from `defmt` 0.3 for enums and structs.
+
 ## Minimum Supported Rust Version (MSRV)
 
 This crate requires Rust nightly newer than `nightly-2022-11-22`, due to requiring support for
-`async fn` in traits (AFIT), which is not stable yet. 
+`async fn` in traits (AFIT), which is not stable yet.
 
 Keep in mind Rust nightlies can make backwards-incompatible changes to unstable features
-at any time.
+at any time. If this happens, we might do changes that increase the minimum required nightly
+version in any patch release.
+
+When AFIT becomes stable, MSRV will be bumped to the Rust version that stabilizes it, after which
+point the [standard MSRV bump policy](../docs/msrv.md) will apply.
 
 ## License
 

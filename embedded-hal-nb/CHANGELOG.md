@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ...
 
+## [v1.0.0-rc.1] - 2023-08-15
+
+- Updated `embedded-hal` to version `1.0.0-rc.1`.
+- Added `+ ?Sized` to all blanket impls.
+
 ## [v1.0.0-alpha.3] - 2023-07-04
 
 ### Changed

@@ -10,6 +10,12 @@ This crate contains asynchronous versions of the [`embedded-io`](https://crates.
 
 This project is developed and maintained by the [HAL team](https://github.com/rust-embedded/wg#the-hal-team).
 
+## Optional Cargo features
+
+- **`std`**: Adds `From` impls to convert to/from `std::io` structs, adds `std::error::Error` impls.
+- **`alloc`**: Adds blanket impls for `Box`, adds `Write` impl to `Vec`.
+- **`defmt-03`**: Derive `defmt::Format` from `defmt` 0.3 for enums and structs.
+
 ## Minimum Supported Rust Version (MSRV)
 
 This crate requires Rust nightly newer than `nightly-2022-11-22`, due to requiring support for

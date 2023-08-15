@@ -28,9 +28,11 @@ This crate provides mechanisms to connect a `SpiBus` and a `SpiDevice`.
 In the case of I2C, the same `I2c` `embedded-hal` trait represents either an entire bus, or a device on a bus. This crate
 provides mechanisms to obtain multiple `I2c` instances out of a single `I2c` instance, sharing the bus.
 
-## Features
+## Optional Cargo features
 
-- `std`: enable shared bus implementations using `std::sync::Mutex`.
+- **`std`**: enable shared bus implementations using `std::sync::Mutex`.
+- **`async`**: enable `embedded-hal-async` support.
+- **`defmt-03`**: Derive `defmt::Format` from `defmt` 0.3 for enums and structs.
 
 ## Minimum Supported Rust Version (MSRV)
 

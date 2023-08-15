@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [v0.1.0-rc.1] - 2023-08-15
+
+- Updated `embedded-hal`, `embedded-hal-async` to version `1.0.0-rc.1`.
+- The Minimum Supported Rust Version (MSRV) is now 1.60.0
+- Added `embedded-hal-async` support to SPI `ExclusiveDevice`.
+- Added methods to access the inner bus to SPI `ExclusiveDevice`.
+- Add optional `defmt` 0.3 support.
+
 ## [v0.1.0-alpha.3] - 2023-07-04
 
 ### Changed
@@ -31,7 +39,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 First release to crates.io
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-alpha.3...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-rc.1...HEAD
+[v0.1.0-rc.1]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-alpha.3...embedded-hal-bus-v0.1.0-rc.1
 [v0.1.0-alpha.3]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-alpha.2...embedded-hal-bus-v0.1.0-alpha.3
 [v0.1.0-alpha.2]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-alpha.1...embedded-hal-bus-v0.1.0-alpha.2
 [v0.1.0-alpha.1]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-alpha.0...embedded-hal-bus-v0.1.0-alpha.1

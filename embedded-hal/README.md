@@ -84,6 +84,10 @@ A serial port is essentially a byte-oriented stream, and that's what `embedded-i
 with all byte streams has some advantages. For example, it allows generic code providing a command-line interface
 or a console to operate either on hardware serial ports or on virtual ones like Telnet or USB CDC-ACM.
 
+## Optional Cargo features
+
+- **`defmt-03`**: Derive `defmt::Format` from `defmt` 0.3 for enums and structs.
+
 ## Minimum Supported Rust Version (MSRV)
 
 This crate is guaranteed to compile on stable Rust 1.60 and up. It *might*

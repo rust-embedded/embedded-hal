@@ -7,8 +7,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-### Added
-- spi: added `ExclusiveDevice::{bus, bus_mut}`.
+## [v1.0.0-rc.1] - 2023-08-15
+
+- Updated `embedded-hal` to version `1.0.0-rc.1`.
+- Add optional `defmt` 0.3 support.
+- Remove serial traits, the replacement is the `embedded-io` crate.
+- Added `+ ?Sized` to all blanket impls.
+- Moved `ExclusiveDevice` to `embedded-hal-bus`.
 
 ## [v0.2.0-alpha.2] - 2023-07-04
 
@@ -64,7 +69,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 First release to crates.io
 
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.2.0-alpha.2...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v1.0.0-rc.1...HEAD
+[v1.0.0-rc.1]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.2.0-alpha.2...embedded-hal-async-v1.0.0-rc.1
 [v0.2.0-alpha.2]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.2.0-alpha.1...embedded-hal-async-v0.2.0-alpha.2
 [v0.2.0-alpha.1]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.2.0-alpha.0...embedded-hal-async-v0.2.0-alpha.1
 [v0.2.0-alpha.0]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.1.0-alpha.3...embedded-hal-async-v0.2.0-alpha.0
