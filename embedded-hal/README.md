@@ -9,7 +9,7 @@
 
 This project is developed and maintained by the [HAL team](https://github.com/rust-embedded/wg#the-hal-team).
 
-**NOTE** This HAL is still is active development. Expect the traits presented here to be
+**NOTE** This HAL is still in active development. Expect the traits presented here to be
 tweaked, split or be replaced wholesale before being stabilized, i.e. before hitting the 1.0.0
 release.
 
