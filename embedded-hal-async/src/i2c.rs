@@ -1,4 +1,4 @@
-//! Async I2C API
+//! Async I2C API.
 //!
 //! This API supports 7-bit and 10-bit addresses. Traits feature an `AddressMode`
 //! marker type parameter. Two implementation of the `AddressMode` exist:
@@ -21,9 +21,9 @@ pub use embedded_hal::i2c::{
     AddressMode, Error, ErrorKind, ErrorType, NoAcknowledgeSource, SevenBitAddress, TenBitAddress,
 };
 
-/// Async i2c
+/// Async I2c.
 pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
-    /// Reads enough bytes from slave with `address` to fill `buffer`
+    /// Reads enough bytes from slave with `address` to fill `buffer`.
     ///
     /// # I2C Events (contract)
     ///
@@ -41,12 +41,13 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
+    #[inline]
     async fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error> {
         self.transaction(address, &mut [Operation::Read(read)])
             .await
     }
 
-    /// Writes bytes to slave with address `address`
+    /// Writes bytes to slave with address `address`.
     ///
     /// # I2C Events (contract)
     ///
@@ -62,6 +63,7 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `SAK` = slave acknowledge
     /// - `Bi` = ith byte of data
     /// - `SP` = stop condition
+    #[inline]
     async fn write(&mut self, address: A, write: &[u8]) -> Result<(), Self::Error> {
         self.transaction(address, &mut [Operation::Write(write)])
             .await
@@ -89,6 +91,7 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
+    #[inline]
     async fn write_read(
         &mut self,
         address: A,
@@ -123,14 +126,17 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
 }
 
 impl<A: AddressMode, T: I2c<A> + ?Sized> I2c<A> for &mut T {
+    #[inline]
     async fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error> {
         T::read(self, address, read).await
     }
 
+    #[inline]
     async fn write(&mut self, address: A, write: &[u8]) -> Result<(), Self::Error> {
         T::write(self, address, write).await
     }
 
+    #[inline]
     async fn write_read(
         &mut self,
         address: A,
@@ -140,6 +146,7 @@ impl<A: AddressMode, T: I2c<A> + ?Sized> I2c<A> for &mut T {
         T::write_read(self, address, write, read).await
     }
 
+    #[inline]
     async fn transaction(
         &mut self,
         address: A,

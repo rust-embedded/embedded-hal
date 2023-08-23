@@ -1,6 +1,6 @@
-//! Serial interface
+//! Serial interface.
 
-/// Serial error
+/// Serial error.
 pub trait Error: core::fmt::Debug {
     /// Convert error to a generic serial error kind
     ///
@@ -11,12 +11,13 @@ pub trait Error: core::fmt::Debug {
 }
 
 impl Error for core::convert::Infallible {
+    #[inline]
     fn kind(&self) -> ErrorKind {
         match *self {}
     }
 }
 
-/// Serial error kind
+/// Serial error kind.
 ///
 /// This represents a common set of serial operation errors. HAL implementations are
 /// free to define more specific or additional error types. However, by providing
@@ -38,12 +39,14 @@ pub enum ErrorKind {
 }
 
 impl Error for ErrorKind {
+    #[inline]
     fn kind(&self) -> ErrorKind {
         *self
     }
 }
 
 impl core::fmt::Display for ErrorKind {
+    #[inline]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Overrun => write!(f, "The peripheral receive buffer was overrun"),
@@ -61,7 +64,7 @@ impl core::fmt::Display for ErrorKind {
     }
 }
 
-/// Serial error type trait
+/// Serial error type trait.
 ///
 /// This just defines the error type, to be used by the other traits.
 pub trait ErrorType {
@@ -73,7 +76,7 @@ impl<T: ErrorType + ?Sized> ErrorType for &mut T {
     type Error = T::Error;
 }
 
-/// Read half of a serial interface
+/// Read half of a serial interface.
 ///
 /// Some serial interfaces support different data sizes (8 bits, 9 bits, etc.);
 /// This can be encoded in this trait via the `Word` type parameter.
@@ -83,25 +86,28 @@ pub trait Read<Word: Copy = u8>: ErrorType {
 }
 
 impl<T: Read<Word> + ?Sized, Word: Copy> Read<Word> for &mut T {
+    #[inline]
     fn read(&mut self) -> nb::Result<Word, Self::Error> {
         T::read(self)
     }
 }
 
-/// Write half of a serial interface
+/// Write half of a serial interface.
 pub trait Write<Word: Copy = u8>: ErrorType {
-    /// Writes a single word to the serial interface
+    /// Writes a single word to the serial interface.
     fn write(&mut self, word: Word) -> nb::Result<(), Self::Error>;
 
-    /// Ensures that none of the previously written words are still buffered
+    /// Ensures that none of the previously written words are still buffered.
     fn flush(&mut self) -> nb::Result<(), Self::Error>;
 }
 
 impl<T: Write<Word> + ?Sized, Word: Copy> Write<Word> for &mut T {
+    #[inline]
     fn write(&mut self, word: Word) -> nb::Result<(), Self::Error> {
         T::write(self, word)
     }
 
+    #[inline]
     fn flush(&mut self) -> nb::Result<(), Self::Error> {
         T::flush(self)
     }
@@ -115,6 +121,7 @@ impl<Word, Error: self::Error> core::fmt::Write for dyn Write<Word, Error = Erro
 where
     Word: Copy + From<u8>,
 {
+    #[inline]
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
         let _ = s
             .bytes()

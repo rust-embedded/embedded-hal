@@ -20,7 +20,8 @@ pub struct RefCellDevice<'a, BUS, CS, D> {
 }
 
 impl<'a, BUS, CS, D> RefCellDevice<'a, BUS, CS, D> {
-    /// Create a new ExclusiveDevice
+    /// Create a new RefCellDevice.
+    #[inline]
     pub fn new(bus: &'a RefCell<BUS>, cs: CS, delay: D) -> Self {
         Self { bus, cs, delay }
     }
@@ -33,6 +34,7 @@ impl<'a, BUS, CS> RefCellDevice<'a, BUS, CS, super::NoDelay> {
     ///
     /// The returned device will panic if you try to execute a transaction
     /// that contains any operations of type `Operation::DelayUs`.
+    #[inline]
     pub fn new_no_delay(bus: &'a RefCell<BUS>, cs: CS) -> Self {
         Self {
             bus,
@@ -56,6 +58,7 @@ where
     CS: OutputPin,
     D: DelayUs,
 {
+    #[inline]
     fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {
         let bus = &mut *self.bus.borrow_mut();
 

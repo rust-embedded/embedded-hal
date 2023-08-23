@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-...
+- Minor document fixes.
+- Add #[inline] hints to most of `embedded-hal-nb` functions.
 
 ## [v1.0.0-rc.1] - 2023-08-15
 

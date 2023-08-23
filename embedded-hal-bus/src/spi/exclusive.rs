@@ -22,17 +22,20 @@ pub struct ExclusiveDevice<BUS, CS, D> {
 }
 
 impl<BUS, CS, D> ExclusiveDevice<BUS, CS, D> {
-    /// Create a new ExclusiveDevice
+    /// Create a new ExclusiveDevice.
+    #[inline]
     pub fn new(bus: BUS, cs: CS, delay: D) -> Self {
         Self { bus, cs, delay }
     }
 
     /// Returns a reference to the underlying bus object.
+    #[inline]
     pub fn bus(&self) -> &BUS {
         &self.bus
     }
 
     /// Returns a mutable reference to the underlying bus object.
+    #[inline]
     pub fn bus_mut(&mut self) -> &mut BUS {
         &mut self.bus
     }
@@ -45,6 +48,7 @@ impl<BUS, CS> ExclusiveDevice<BUS, CS, super::NoDelay> {
     ///
     /// The returned device will panic if you try to execute a transaction
     /// that contains any operations of type `Operation::DelayUs`.
+    #[inline]
     pub fn new_no_delay(bus: BUS, cs: CS) -> Self {
         Self {
             bus,
@@ -68,6 +72,7 @@ where
     CS: OutputPin,
     D: DelayUs,
 {
+    #[inline]
     fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {
         self.cs.set_low().map_err(DeviceError::Cs)?;
 
@@ -103,6 +108,7 @@ where
     CS: OutputPin,
     D: AsyncDelayUs,
 {
+    #[inline]
     async fn transaction(
         &mut self,
         operations: &mut [Operation<'_, Word>],

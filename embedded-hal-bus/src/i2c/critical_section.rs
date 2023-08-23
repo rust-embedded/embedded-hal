@@ -14,7 +14,8 @@ pub struct CriticalSectionDevice<'a, T> {
 }
 
 impl<'a, T> CriticalSectionDevice<'a, T> {
-    /// Create a new `CriticalSectionDevice`
+    /// Create a new `CriticalSectionDevice`.
+    #[inline]
     pub fn new(bus: &'a Mutex<RefCell<T>>) -> Self {
         Self { bus }
     }
@@ -31,6 +32,7 @@ impl<'a, T> I2c for CriticalSectionDevice<'a, T>
 where
     T: I2c,
 {
+    #[inline]
     fn read(&mut self, address: u8, read: &mut [u8]) -> Result<(), Self::Error> {
         critical_section::with(|cs| {
             let bus = &mut *self.bus.borrow_ref_mut(cs);
@@ -38,6 +40,7 @@ where
         })
     }
 
+    #[inline]
     fn write(&mut self, address: u8, write: &[u8]) -> Result<(), Self::Error> {
         critical_section::with(|cs| {
             let bus = &mut *self.bus.borrow_ref_mut(cs);
@@ -45,6 +48,7 @@ where
         })
     }
 
+    #[inline]
     fn write_read(
         &mut self,
         address: u8,
@@ -57,6 +61,7 @@ where
         })
     }
 
+    #[inline]
     fn transaction(
         &mut self,
         address: u8,

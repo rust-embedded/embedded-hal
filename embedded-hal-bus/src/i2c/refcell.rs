@@ -68,7 +68,8 @@ pub struct RefCellDevice<'a, T> {
 }
 
 impl<'a, T> RefCellDevice<'a, T> {
-    /// Create a new `RefCellDevice`
+    /// Create a new `RefCellDevice`.
+    #[inline]
     pub fn new(bus: &'a RefCell<T>) -> Self {
         Self { bus }
     }
@@ -85,16 +86,19 @@ impl<'a, T> I2c for RefCellDevice<'a, T>
 where
     T: I2c,
 {
+    #[inline]
     fn read(&mut self, address: u8, read: &mut [u8]) -> Result<(), Self::Error> {
         let bus = &mut *self.bus.borrow_mut();
         bus.read(address, read)
     }
 
+    #[inline]
     fn write(&mut self, address: u8, write: &[u8]) -> Result<(), Self::Error> {
         let bus = &mut *self.bus.borrow_mut();
         bus.write(address, write)
     }
 
+    #[inline]
     fn write_read(
         &mut self,
         address: u8,
@@ -105,6 +109,7 @@ where
         bus.write_read(address, write, read)
     }
 
+    #[inline]
     fn transaction(
         &mut self,
         address: u8,

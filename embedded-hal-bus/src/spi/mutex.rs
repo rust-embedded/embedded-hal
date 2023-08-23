@@ -21,7 +21,8 @@ pub struct MutexDevice<'a, BUS, CS, D> {
 }
 
 impl<'a, BUS, CS, D> MutexDevice<'a, BUS, CS, D> {
-    /// Create a new ExclusiveDevice
+    /// Create a new MutexDevice.
+    #[inline]
     pub fn new(bus: &'a Mutex<BUS>, cs: CS, delay: D) -> Self {
         Self { bus, cs, delay }
     }
@@ -34,6 +35,7 @@ impl<'a, BUS, CS> MutexDevice<'a, BUS, CS, super::NoDelay> {
     ///
     /// The returned device will panic if you try to execute a transaction
     /// that contains any operations of type `Operation::DelayUs`.
+    #[inline]
     pub fn new_no_delay(bus: &'a Mutex<BUS>, cs: CS) -> Self {
         Self {
             bus,
@@ -57,6 +59,7 @@ where
     CS: OutputPin,
     D: DelayUs,
 {
+    #[inline]
     fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {
         let bus = &mut *self.bus.lock().unwrap();
 

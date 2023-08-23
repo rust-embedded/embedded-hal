@@ -23,7 +23,8 @@ pub struct CriticalSectionDevice<'a, BUS, CS, D> {
 }
 
 impl<'a, BUS, CS, D> CriticalSectionDevice<'a, BUS, CS, D> {
-    /// Create a new ExclusiveDevice
+    /// Create a new ExclusiveDevice.
+    #[inline]
     pub fn new(bus: &'a Mutex<RefCell<BUS>>, cs: CS, delay: D) -> Self {
         Self { bus, cs, delay }
     }
@@ -36,6 +37,7 @@ impl<'a, BUS, CS> CriticalSectionDevice<'a, BUS, CS, super::NoDelay> {
     ///
     /// The returned device will panic if you try to execute a transaction
     /// that contains any operations of type `Operation::DelayUs`.
+    #[inline]
     pub fn new_no_delay(bus: &'a Mutex<RefCell<BUS>>, cs: CS) -> Self {
         Self {
             bus,
@@ -59,6 +61,7 @@ where
     CS: OutputPin,
     D: DelayUs,
 {
+    #[inline]
     fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {
         critical_section::with(|cs| {
             let bus = &mut *self.bus.borrow_ref_mut(cs);

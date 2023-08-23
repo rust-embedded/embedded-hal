@@ -21,9 +21,9 @@ use crate::defmt;
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum DeviceError<BUS, CS> {
-    /// An inner SPI bus operation failed
+    /// An inner SPI bus operation failed.
     Spi(BUS),
-    /// Asserting or deasserting CS failed
+    /// Asserting or deasserting CS failed.
     Cs(CS),
 }
 
@@ -32,6 +32,7 @@ where
     BUS: Error + Debug,
     CS: Debug,
 {
+    #[inline]
     fn kind(&self) -> ErrorKind {
         match self {
             Self::Spi(e) => e.kind(),
@@ -51,6 +52,7 @@ fn no_delay_panic() {
 }
 
 impl embedded_hal::delay::DelayUs for NoDelay {
+    #[inline]
     fn delay_us(&mut self, _us: u32) {
         no_delay_panic();
     }
@@ -59,11 +61,13 @@ impl embedded_hal::delay::DelayUs for NoDelay {
 #[cfg(feature = "async")]
 #[cfg_attr(docsrs, doc(cfg(feature = "async")))]
 impl embedded_hal_async::delay::DelayUs for NoDelay {
+    #[inline]
     async fn delay_us(&mut self, _us: u32) {
         no_delay_panic();
     }
 
-    async fn delay_ms(&mut self, _us: u32) {
+    #[inline]
+    async fn delay_ms(&mut self, _ms: u32) {
         no_delay_panic();
     }
 }

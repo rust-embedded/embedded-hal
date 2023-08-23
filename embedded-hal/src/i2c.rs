@@ -1,4 +1,4 @@
-//! Blocking I2C API
+//! Blocking I2C API.
 //!
 //! This API supports 7-bit and 10-bit addresses. Traits feature an [`AddressMode`]
 //! marker type parameter. Two implementation of the [`AddressMode`] exist:
@@ -157,9 +157,9 @@ use crate::private;
 #[cfg(feature = "defmt-03")]
 use crate::defmt;
 
-/// I2C error
+/// I2C error.
 pub trait Error: core::fmt::Debug {
-    /// Convert error to a generic I2C error kind
+    /// Convert error to a generic I2C error kind.
     ///
     /// By using this method, I2C errors freely defined by HAL implementations
     /// can be converted to a set of generic I2C errors upon which generic
@@ -168,12 +168,13 @@ pub trait Error: core::fmt::Debug {
 }
 
 impl Error for core::convert::Infallible {
+    #[inline]
     fn kind(&self) -> ErrorKind {
         match *self {}
     }
 }
 
-/// I2C error kind
+/// I2C error kind.
 ///
 /// This represents a common set of I2C operation errors. HAL implementations are
 /// free to define more specific or additional error types. However, by providing
@@ -185,19 +186,19 @@ pub enum ErrorKind {
     /// Bus error occurred. e.g. A START or a STOP condition is detected and is not
     /// located after a multiple of 9 SCL clock pulses.
     Bus,
-    /// The arbitration was lost, e.g. electrical problems with the clock signal
+    /// The arbitration was lost, e.g. electrical problems with the clock signal.
     ArbitrationLoss,
     /// A bus operation was not acknowledged, e.g. due to the addressed device not
     /// being available on the bus or the device not being ready to process requests
-    /// at the moment
+    /// at the moment.
     NoAcknowledge(NoAcknowledgeSource),
-    /// The peripheral receive buffer was overrun
+    /// The peripheral receive buffer was overrun.
     Overrun,
     /// A different error occurred. The original error may contain more information.
     Other,
 }
 
-/// I2C no acknowledge error source
+/// I2C no acknowledge error source.
 ///
 /// In cases where it is possible, a device should indicate if a no acknowledge
 /// response was received to an address versus a no acknowledge to a data byte.
@@ -216,12 +217,14 @@ pub enum NoAcknowledgeSource {
 }
 
 impl Error for ErrorKind {
+    #[inline]
     fn kind(&self) -> ErrorKind {
         *self
     }
 }
 
 impl core::fmt::Display for ErrorKind {
+    #[inline]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Bus => write!(f, "Bus error occurred"),
@@ -237,6 +240,7 @@ impl core::fmt::Display for ErrorKind {
 }
 
 impl core::fmt::Display for NoAcknowledgeSource {
+    #[inline]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Address => write!(f, "The device did not acknowledge its address"),
@@ -246,7 +250,7 @@ impl core::fmt::Display for NoAcknowledgeSource {
     }
 }
 
-/// I2C error type trait
+/// I2C error type trait.
 ///
 /// This just defines the error type, to be used by the other traits.
 pub trait ErrorType {
@@ -258,15 +262,15 @@ impl<T: ErrorType + ?Sized> ErrorType for &mut T {
     type Error = T::Error;
 }
 
-/// Address mode (7-bit / 10-bit)
+/// Address mode (7-bit / 10-bit).
 ///
 /// Note: This trait is sealed and should not be implemented outside of this crate.
 pub trait AddressMode: private::Sealed + 'static {}
 
-/// 7-bit address mode type
+/// 7-bit address mode type.
 pub type SevenBitAddress = u8;
 
-/// 10-bit address mode type
+/// 10-bit address mode type.
 pub type TenBitAddress = u16;
 
 impl AddressMode for SevenBitAddress {}
@@ -279,15 +283,15 @@ impl AddressMode for TenBitAddress {}
 #[derive(Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum Operation<'a> {
-    /// Read data into the provided buffer
+    /// Read data into the provided buffer.
     Read(&'a mut [u8]),
-    /// Write data from the provided buffer
+    /// Write data from the provided buffer.
     Write(&'a [u8]),
 }
 
-/// Blocking I2C
+/// Blocking I2C.
 pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
-    /// Reads enough bytes from slave with `address` to fill `read`
+    /// Reads enough bytes from slave with `address` to fill `read`.
     ///
     /// # I2C Events (contract)
     ///
@@ -305,11 +309,12 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
+    #[inline]
     fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error> {
         self.transaction(address, &mut [Operation::Read(read)])
     }
 
-    /// Writes bytes to slave with address `address`
+    /// Writes bytes to slave with address `address`.
     ///
     /// # I2C Events (contract)
     ///
@@ -325,12 +330,13 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `SAK` = slave acknowledge
     /// - `Bi` = ith byte of data
     /// - `SP` = stop condition
+    #[inline]
     fn write(&mut self, address: A, write: &[u8]) -> Result<(), Self::Error> {
         self.transaction(address, &mut [Operation::Write(write)])
     }
 
     /// Writes bytes to slave with address `address` and then reads enough bytes to fill `read` *in a
-    /// single transaction*
+    /// single transaction*.
     ///
     /// # I2C Events (contract)
     ///
@@ -351,6 +357,7 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - `MAK` = master acknowledge
     /// - `NMAK` = master no acknowledge
     /// - `SP` = stop condition
+    #[inline]
     fn write_read(&mut self, address: A, write: &[u8], read: &mut [u8]) -> Result<(), Self::Error> {
         self.transaction(
             address,
@@ -379,18 +386,22 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
 }
 
 impl<A: AddressMode, T: I2c<A> + ?Sized> I2c<A> for &mut T {
+    #[inline]
     fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error> {
         T::read(self, address, read)
     }
 
+    #[inline]
     fn write(&mut self, address: A, write: &[u8]) -> Result<(), Self::Error> {
         T::write(self, address, write)
     }
 
+    #[inline]
     fn write_read(&mut self, address: A, write: &[u8], read: &mut [u8]) -> Result<(), Self::Error> {
         T::write_read(self, address, write, read)
     }
 
+    #[inline]
     fn transaction(
         &mut self,
         address: A,

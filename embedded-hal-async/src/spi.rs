@@ -4,7 +4,7 @@ pub use embedded_hal::spi::{
     Error, ErrorKind, ErrorType, Mode, Operation, Phase, Polarity, MODE_0, MODE_1, MODE_2, MODE_3,
 };
 
-/// SPI device trait
+/// SPI device trait.
 ///
 /// `SpiDevice` represents ownership over a single SPI device on a (possibly shared) bus, selected
 /// with a CS (Chip Select) pin.
@@ -36,6 +36,7 @@ pub trait SpiDevice<Word: Copy + 'static = u8>: ErrorType {
     /// This is a convenience method equivalent to `device.read_transaction(&mut [buf])`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiDevice::read`]
+    #[inline]
     async fn read(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
         self.transaction(&mut [Operation::Read(buf)]).await
     }
@@ -45,6 +46,7 @@ pub trait SpiDevice<Word: Copy + 'static = u8>: ErrorType {
     /// This is a convenience method equivalent to `device.write_transaction(&mut [buf])`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiDevice::write`]
+    #[inline]
     async fn write(&mut self, buf: &[Word]) -> Result<(), Self::Error> {
         self.transaction(&mut [Operation::Write(buf)]).await
     }
@@ -54,6 +56,7 @@ pub trait SpiDevice<Word: Copy + 'static = u8>: ErrorType {
     /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer(read, write))`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer`]
+    #[inline]
     async fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
         self.transaction(&mut [Operation::Transfer(read, write)])
             .await
@@ -64,6 +67,7 @@ pub trait SpiDevice<Word: Copy + 'static = u8>: ErrorType {
     /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer_in_place(buf))`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer_in_place`]
+    #[inline]
     async fn transfer_in_place(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
         self.transaction(&mut [Operation::TransferInPlace(buf)])
             .await
@@ -71,6 +75,7 @@ pub trait SpiDevice<Word: Copy + 'static = u8>: ErrorType {
 }
 
 impl<Word: Copy + 'static, T: SpiDevice<Word> + ?Sized> SpiDevice<Word> for &mut T {
+    #[inline]
     async fn transaction(
         &mut self,
         operations: &mut [Operation<'_, Word>],
@@ -78,24 +83,28 @@ impl<Word: Copy + 'static, T: SpiDevice<Word> + ?Sized> SpiDevice<Word> for &mut
         T::transaction(self, operations).await
     }
 
+    #[inline]
     async fn read(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
         T::read(self, buf).await
     }
 
+    #[inline]
     async fn write(&mut self, buf: &[Word]) -> Result<(), Self::Error> {
         T::write(self, buf).await
     }
 
+    #[inline]
     async fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
         T::transfer(self, read, write).await
     }
 
+    #[inline]
     async fn transfer_in_place(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
         T::transfer_in_place(self, buf).await
     }
 }
 
-/// SPI bus
+/// SPI bus.
 ///
 /// `SpiBus` represents **exclusive ownership** over the whole SPI bus, with SCK, MOSI and MISO pins.
 ///
@@ -110,7 +119,7 @@ pub trait SpiBus<Word: 'static + Copy = u8>: ErrorType {
     /// complete. See (the docs on embedded-hal)[embedded_hal::spi] for details on flushing.
     async fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
 
-    /// Write `words` to the slave, ignoring all the incoming words
+    /// Write `words` to the slave, ignoring all the incoming words.
     ///
     /// Implementations are allowed to return before the operation is
     /// complete. See (the docs on embedded-hal)[embedded_hal::spi] for details on flushing.
@@ -144,22 +153,27 @@ pub trait SpiBus<Word: 'static + Copy = u8>: ErrorType {
 }
 
 impl<T: SpiBus<Word> + ?Sized, Word: 'static + Copy> SpiBus<Word> for &mut T {
+    #[inline]
     async fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
         T::read(self, words).await
     }
 
+    #[inline]
     async fn write(&mut self, words: &[Word]) -> Result<(), Self::Error> {
         T::write(self, words).await
     }
 
+    #[inline]
     async fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
         T::transfer(self, read, write).await
     }
 
+    #[inline]
     async fn transfer_in_place(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
         T::transfer_in_place(self, words).await
     }
 
+    #[inline]
     async fn flush(&mut self) -> Result<(), Self::Error> {
         T::flush(self).await
     }
