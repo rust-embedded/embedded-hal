@@ -4,11 +4,11 @@ pub use embedded_hal::spi::{
     Error, ErrorKind, ErrorType, Mode, Phase, Polarity, MODE_0, MODE_1, MODE_2, MODE_3,
 };
 
-/// Full duplex SPI (master mode)
+/// Full duplex SPI (master mode).
 ///
 /// # Notes
 ///
-/// - It's the task of the user of this interface to manage the slave select lines
+/// - It's the task of the user of this interface to manage the slave select lines.
 ///
 /// - Due to how full duplex SPI works each `read` call must be preceded by a `write` call.
 ///
@@ -32,10 +32,12 @@ pub trait FullDuplex<Word: Copy = u8>: ErrorType {
 }
 
 impl<T: FullDuplex<Word> + ?Sized, Word: Copy> FullDuplex<Word> for &mut T {
+    #[inline]
     fn read(&mut self) -> nb::Result<Word, Self::Error> {
         T::read(self)
     }
 
+    #[inline]
     fn write(&mut self, word: Word) -> nb::Result<(), Self::Error> {
         T::write(self, word)
     }
