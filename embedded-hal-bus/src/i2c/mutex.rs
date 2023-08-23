@@ -12,7 +12,8 @@ pub struct MutexDevice<'a, T> {
 }
 
 impl<'a, T> MutexDevice<'a, T> {
-    /// Create a new `MutexDevice`
+    /// Create a new `MutexDevice`.
+    #[inline]
     pub fn new(bus: &'a Mutex<T>) -> Self {
         Self { bus }
     }
@@ -29,16 +30,19 @@ impl<'a, T> I2c for MutexDevice<'a, T>
 where
     T: I2c,
 {
+    #[inline]
     fn read(&mut self, address: u8, read: &mut [u8]) -> Result<(), Self::Error> {
         let bus = &mut *self.bus.lock().unwrap();
         bus.read(address, read)
     }
 
+    #[inline]
     fn write(&mut self, address: u8, write: &[u8]) -> Result<(), Self::Error> {
         let bus = &mut *self.bus.lock().unwrap();
         bus.write(address, write)
     }
 
+    #[inline]
     fn write_read(
         &mut self,
         address: u8,
@@ -49,6 +53,7 @@ where
         bus.write_read(address, write, read)
     }
 
+    #[inline]
     fn transaction(
         &mut self,
         address: u8,
