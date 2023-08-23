@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+- Minor document fixes.
+- Add #[inline] hints to most of `embedded-hal-async` functions.
+
 ## [v1.0.0-rc.1] - 2023-08-15
 
 - Updated `embedded-hal` to version `1.0.0-rc.1`.
