@@ -1,11 +1,11 @@
-//! Digital I/O
+//! Digital I/O.
 
 use core::{convert::From, ops::Not};
 
 #[cfg(feature = "defmt-03")]
 use crate::defmt;
 
-/// Error
+/// Error.
 pub trait Error: core::fmt::Debug {
     /// Convert error to a generic error kind
     ///
@@ -21,7 +21,7 @@ impl Error for core::convert::Infallible {
     }
 }
 
-/// Error kind
+/// Error kind.
 ///
 /// This represents a common set of operation errors. HAL implementations are
 /// free to define more specific or additional error types. However, by providing
@@ -35,12 +35,14 @@ pub enum ErrorKind {
 }
 
 impl Error for ErrorKind {
+    #[inline]
     fn kind(&self) -> ErrorKind {
         *self
     }
 }
 
 impl core::fmt::Display for ErrorKind {
+    #[inline]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Other => write!(
@@ -51,7 +53,7 @@ impl core::fmt::Display for ErrorKind {
     }
 }
 
-/// Error type trait
+/// Error type trait.
 ///
 /// This just defines the error type, to be used by the other traits.
 pub trait ErrorType {
@@ -67,7 +69,7 @@ impl<T: ErrorType + ?Sized> ErrorType for &mut T {
     type Error = T::Error;
 }
 
-/// Digital output pin state
+/// Digital output pin state.
 ///
 /// Conversion from `bool` and logical negation are also implemented
 /// for this type.
@@ -80,9 +82,9 @@ impl<T: ErrorType + ?Sized> ErrorType for &mut T {
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum PinState {
-    /// Low pin state
+    /// Low pin state.
     Low,
-    /// High pin state
+    /// High pin state.
     High,
 }
 
@@ -118,24 +120,25 @@ impl From<PinState> for bool {
     }
 }
 
-/// Single digital push-pull output pin
+/// Single digital push-pull output pin.
 pub trait OutputPin: ErrorType {
-    /// Drives the pin low
+    /// Drives the pin low.
     ///
     /// *NOTE* the actual electrical state of the pin may not actually be low, e.g. due to external
-    /// electrical sources
+    /// electrical sources.
     fn set_low(&mut self) -> Result<(), Self::Error>;
 
-    /// Drives the pin high
+    /// Drives the pin high.
     ///
     /// *NOTE* the actual electrical state of the pin may not actually be high, e.g. due to external
-    /// electrical sources
+    /// electrical sources.
     fn set_high(&mut self) -> Result<(), Self::Error>;
 
-    /// Drives the pin high or low depending on the provided value
+    /// Drives the pin high or low depending on the provided value.
     ///
     /// *NOTE* the actual electrical state of the pin may not actually be high or low, e.g. due to external
-    /// electrical sources
+    /// electrical sources.
+    #[inline]
     fn set_state(&mut self, state: PinState) -> Result<(), Self::Error> {
         match state {
             PinState::Low => self.set_low(),
@@ -145,55 +148,61 @@ pub trait OutputPin: ErrorType {
 }
 
 impl<T: OutputPin + ?Sized> OutputPin for &mut T {
+    #[inline]
     fn set_low(&mut self) -> Result<(), Self::Error> {
         T::set_low(self)
     }
 
+    #[inline]
     fn set_high(&mut self) -> Result<(), Self::Error> {
         T::set_high(self)
     }
 
+    #[inline]
     fn set_state(&mut self, state: PinState) -> Result<(), Self::Error> {
         T::set_state(self, state)
     }
 }
 
-/// Push-pull output pin that can read its output state
+/// Push-pull output pin that can read its output state.
 pub trait StatefulOutputPin: OutputPin {
     /// Is the pin in drive high mode?
     ///
-    /// *NOTE* this does *not* read the electrical state of the pin
+    /// *NOTE* this does *not* read the electrical state of the pin.
     fn is_set_high(&self) -> Result<bool, Self::Error>;
 
     /// Is the pin in drive low mode?
     ///
-    /// *NOTE* this does *not* read the electrical state of the pin
+    /// *NOTE* this does *not* read the electrical state of the pin.
     fn is_set_low(&self) -> Result<bool, Self::Error>;
 }
 
 impl<T: StatefulOutputPin + ?Sized> StatefulOutputPin for &mut T {
+    #[inline]
     fn is_set_high(&self) -> Result<bool, Self::Error> {
         T::is_set_high(self)
     }
 
+    #[inline]
     fn is_set_low(&self) -> Result<bool, Self::Error> {
         T::is_set_low(self)
     }
 }
 
-/// Output pin that can be toggled
+/// Output pin that can be toggled.
 pub trait ToggleableOutputPin: ErrorType {
     /// Toggle pin output.
     fn toggle(&mut self) -> Result<(), Self::Error>;
 }
 
 impl<T: ToggleableOutputPin + ?Sized> ToggleableOutputPin for &mut T {
+    #[inline]
     fn toggle(&mut self) -> Result<(), Self::Error> {
         T::toggle(self)
     }
 }
 
-/// Single digital input pin
+/// Single digital input pin.
 pub trait InputPin: ErrorType {
     /// Is the input pin high?
     fn is_high(&self) -> Result<bool, Self::Error>;
@@ -203,10 +212,12 @@ pub trait InputPin: ErrorType {
 }
 
 impl<T: InputPin + ?Sized> InputPin for &T {
+    #[inline]
     fn is_high(&self) -> Result<bool, Self::Error> {
         T::is_high(self)
     }
 
+    #[inline]
     fn is_low(&self) -> Result<bool, Self::Error> {
         T::is_low(self)
     }

@@ -166,63 +166,63 @@ use core::fmt::Debug;
 #[cfg(feature = "defmt-03")]
 use crate::defmt;
 
-/// Clock polarity
+/// Clock polarity.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum Polarity {
-    /// Clock signal low when idle
+    /// Clock signal low when idle.
     IdleLow,
-    /// Clock signal high when idle
+    /// Clock signal high when idle.
     IdleHigh,
 }
 
-/// Clock phase
+/// Clock phase.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum Phase {
-    /// Data in "captured" on the first clock transition
+    /// Data in "captured" on the first clock transition.
     CaptureOnFirstTransition,
-    /// Data in "captured" on the second clock transition
+    /// Data in "captured" on the second clock transition.
     CaptureOnSecondTransition,
 }
 
-/// SPI mode
+/// SPI mode.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub struct Mode {
-    /// Clock polarity
+    /// Clock polarity.
     pub polarity: Polarity,
-    /// Clock phase
+    /// Clock phase.
     pub phase: Phase,
 }
 
-/// Helper for CPOL = 0, CPHA = 0
+/// Helper for CPOL = 0, CPHA = 0.
 pub const MODE_0: Mode = Mode {
     polarity: Polarity::IdleLow,
     phase: Phase::CaptureOnFirstTransition,
 };
 
-/// Helper for CPOL = 0, CPHA = 1
+/// Helper for CPOL = 0, CPHA = 1.
 pub const MODE_1: Mode = Mode {
     polarity: Polarity::IdleLow,
     phase: Phase::CaptureOnSecondTransition,
 };
 
-/// Helper for CPOL = 1, CPHA = 0
+/// Helper for CPOL = 1, CPHA = 0.
 pub const MODE_2: Mode = Mode {
     polarity: Polarity::IdleHigh,
     phase: Phase::CaptureOnFirstTransition,
 };
 
-/// Helper for CPOL = 1, CPHA = 1
+/// Helper for CPOL = 1, CPHA = 1.
 pub const MODE_3: Mode = Mode {
     polarity: Polarity::IdleHigh,
     phase: Phase::CaptureOnSecondTransition,
 };
 
-/// SPI error
+/// SPI error.
 pub trait Error: core::fmt::Debug {
-    /// Convert error to a generic SPI error kind
+    /// Convert error to a generic SPI error kind.
     ///
     /// By using this method, SPI errors freely defined by HAL implementations
     /// can be converted to a set of generic SPI errors upon which generic
@@ -231,12 +231,13 @@ pub trait Error: core::fmt::Debug {
 }
 
 impl Error for core::convert::Infallible {
+    #[inline]
     fn kind(&self) -> ErrorKind {
         match *self {}
     }
 }
 
-/// SPI error kind
+/// SPI error kind.
 ///
 /// This represents a common set of SPI operation errors. HAL implementations are
 /// free to define more specific or additional error types. However, by providing
@@ -245,11 +246,11 @@ impl Error for core::convert::Infallible {
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 #[non_exhaustive]
 pub enum ErrorKind {
-    /// The peripheral receive buffer was overrun
+    /// The peripheral receive buffer was overrun.
     Overrun,
-    /// Multiple devices on the SPI bus are trying to drive the slave select pin, e.g. in a multi-master setup
+    /// Multiple devices on the SPI bus are trying to drive the slave select pin, e.g. in a multi-master setup.
     ModeFault,
-    /// Received data does not conform to the peripheral configuration
+    /// Received data does not conform to the peripheral configuration.
     FrameFormat,
     /// An error occurred while asserting or deasserting the Chip Select pin.
     ChipSelectFault,
@@ -258,12 +259,14 @@ pub enum ErrorKind {
 }
 
 impl Error for ErrorKind {
+    #[inline]
     fn kind(&self) -> ErrorKind {
         *self
     }
 }
 
 impl core::fmt::Display for ErrorKind {
+    #[inline]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Overrun => write!(f, "The peripheral receive buffer was overrun"),
@@ -287,11 +290,11 @@ impl core::fmt::Display for ErrorKind {
     }
 }
 
-/// SPI error type trait
+/// SPI error type trait.
 ///
 /// This just defines the error type, to be used by the other SPI traits.
 pub trait ErrorType {
-    /// Error type
+    /// Error type.
     type Error: Error;
 }
 
@@ -301,7 +304,7 @@ impl<T: ErrorType + ?Sized> ErrorType for &mut T {
 
 /// SPI transaction operation.
 ///
-/// This allows composition of SPI operations into a single bus transaction
+/// This allows composition of SPI operations into a single bus transaction.
 #[derive(Debug, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum Operation<'a, Word: 'static> {
@@ -309,7 +312,7 @@ pub enum Operation<'a, Word: 'static> {
     ///
     /// Equivalent to [`SpiBus::read`].
     Read(&'a mut [Word]),
-    /// Write data from the provided buffer, discarding read data
+    /// Write data from the provided buffer, discarding read data.
     ///
     /// Equivalent to [`SpiBus::write`].
     Write(&'a [Word]),
@@ -317,15 +320,15 @@ pub enum Operation<'a, Word: 'static> {
     ///
     /// Equivalent to [`SpiBus::transfer`].
     Transfer(&'a mut [Word], &'a [Word]),
-    /// Write data out while reading data into the provided buffer
+    /// Write data out while reading data into the provided buffer.
     ///
     /// Equivalent to [`SpiBus::transfer_in_place`].
     TransferInPlace(&'a mut [Word]),
-    /// Delay for at least the specified number of microseconds
+    /// Delay for at least the specified number of microseconds.
     DelayUs(u32),
 }
 
-/// SPI device trait
+/// SPI device trait.
 ///
 /// `SpiDevice` represents ownership over a single SPI device on a (possibly shared) bus, selected
 /// with a CS (Chip Select) pin.
@@ -354,6 +357,7 @@ pub trait SpiDevice<Word: Copy + 'static = u8>: ErrorType {
     /// This is a convenience method equivalent to `device.transaction(&mut [Operation::Read(buf)])`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBus::read`]
+    #[inline]
     fn read(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
         self.transaction(&mut [Operation::Read(buf)])
     }
@@ -363,6 +367,7 @@ pub trait SpiDevice<Word: Copy + 'static = u8>: ErrorType {
     /// This is a convenience method equivalent to `device.transaction(&mut [Operation::Write(buf)])`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBus::write`]
+    #[inline]
     fn write(&mut self, buf: &[Word]) -> Result<(), Self::Error> {
         self.transaction(&mut [Operation::Write(buf)])
     }
@@ -372,6 +377,7 @@ pub trait SpiDevice<Word: Copy + 'static = u8>: ErrorType {
     /// This is a convenience method equivalent to `device.transaction(&mut [Operation::Transfer(read, write)]`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer`]
+    #[inline]
     fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
         self.transaction(&mut [Operation::Transfer(read, write)])
     }
@@ -381,34 +387,40 @@ pub trait SpiDevice<Word: Copy + 'static = u8>: ErrorType {
     /// This is a convenience method equivalent to `device.transaction(&mut [Operation::TransferInPlace(buf)]`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer_in_place`]
+    #[inline]
     fn transfer_in_place(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
         self.transaction(&mut [Operation::TransferInPlace(buf)])
     }
 }
 
 impl<Word: Copy + 'static, T: SpiDevice<Word> + ?Sized> SpiDevice<Word> for &mut T {
+    #[inline]
     fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {
         T::transaction(self, operations)
     }
 
+    #[inline]
     fn read(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
         T::read(self, buf)
     }
 
+    #[inline]
     fn write(&mut self, buf: &[Word]) -> Result<(), Self::Error> {
         T::write(self, buf)
     }
 
+    #[inline]
     fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
         T::transfer(self, read, write)
     }
 
+    #[inline]
     fn transfer_in_place(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
         T::transfer_in_place(self, buf)
     }
 }
 
-/// SPI bus
+/// SPI bus.
 ///
 /// `SpiBus` represents **exclusive ownership** over the whole SPI bus, with SCK, MOSI and MISO pins.
 ///
@@ -423,7 +435,7 @@ pub trait SpiBus<Word: Copy + 'static = u8>: ErrorType {
     /// complete. See the [module-level documentation](self) for details.
     fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error>;
 
-    /// Write `words` to the slave, ignoring all the incoming words
+    /// Write `words` to the slave, ignoring all the incoming words.
     ///
     /// Implementations are allowed to return before the operation is
     /// complete. See the [module-level documentation](self) for details.
@@ -457,22 +469,27 @@ pub trait SpiBus<Word: Copy + 'static = u8>: ErrorType {
 }
 
 impl<T: SpiBus<Word> + ?Sized, Word: Copy + 'static> SpiBus<Word> for &mut T {
+    #[inline]
     fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
         T::read(self, words)
     }
 
+    #[inline]
     fn write(&mut self, words: &[Word]) -> Result<(), Self::Error> {
         T::write(self, words)
     }
 
+    #[inline]
     fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
         T::transfer(self, read, write)
     }
 
+    #[inline]
     fn transfer_in_place(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
         T::transfer_in_place(self, words)
     }
 
+    #[inline]
     fn flush(&mut self) -> Result<(), Self::Error> {
         T::flush(self)
     }

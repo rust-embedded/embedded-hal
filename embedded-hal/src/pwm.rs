@@ -1,11 +1,11 @@
-//! Pulse Width Modulation (PWM) traits
+//! Pulse Width Modulation (PWM) traits.
 
 #[cfg(feature = "defmt-03")]
 use crate::defmt;
 
 /// Error
 pub trait Error: core::fmt::Debug {
-    /// Convert error to a generic error kind
+    /// Convert error to a generic error kind.
     ///
     /// By using this method, errors freely defined by HAL implementations
     /// can be converted to a set of generic errors upon which generic
@@ -14,12 +14,13 @@ pub trait Error: core::fmt::Debug {
 }
 
 impl Error for core::convert::Infallible {
+    #[inline]
     fn kind(&self) -> ErrorKind {
         match *self {}
     }
 }
 
-/// Error kind
+/// Error kind.
 ///
 /// This represents a common set of operation errors. HAL implementations are
 /// free to define more specific or additional error types. However, by providing
@@ -33,12 +34,14 @@ pub enum ErrorKind {
 }
 
 impl Error for ErrorKind {
+    #[inline]
     fn kind(&self) -> ErrorKind {
         *self
     }
 }
 
 impl core::fmt::Display for ErrorKind {
+    #[inline]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Other => write!(
@@ -49,7 +52,7 @@ impl core::fmt::Display for ErrorKind {
     }
 }
 
-/// Error type trait
+/// Error type trait.
 ///
 /// This just defines the error type, to be used by the other traits.
 pub trait ErrorType {
@@ -61,7 +64,7 @@ impl<T: ErrorType + ?Sized> ErrorType for &mut T {
     type Error = T::Error;
 }
 
-/// Single PWM channel / pin
+/// Single PWM channel / pin.
 pub trait SetDutyCycle: ErrorType {
     /// Get the maximum duty cycle value.
     ///
@@ -106,26 +109,32 @@ pub trait SetDutyCycle: ErrorType {
 }
 
 impl<T: SetDutyCycle + ?Sized> SetDutyCycle for &mut T {
+    #[inline]
     fn get_max_duty_cycle(&self) -> u16 {
         T::get_max_duty_cycle(self)
     }
 
+    #[inline]
     fn set_duty_cycle(&mut self, duty: u16) -> Result<(), Self::Error> {
         T::set_duty_cycle(self, duty)
     }
 
+    #[inline]
     fn set_duty_cycle_fully_off(&mut self) -> Result<(), Self::Error> {
         T::set_duty_cycle_fully_off(self)
     }
 
+    #[inline]
     fn set_duty_cycle_fully_on(&mut self) -> Result<(), Self::Error> {
         T::set_duty_cycle_fully_on(self)
     }
 
+    #[inline]
     fn set_duty_cycle_fraction(&mut self, num: u16, denom: u16) -> Result<(), Self::Error> {
         T::set_duty_cycle_fraction(self, num, denom)
     }
 
+    #[inline]
     fn set_duty_cycle_percent(&mut self, percent: u8) -> Result<(), Self::Error> {
         T::set_duty_cycle_percent(self, percent)
     }
