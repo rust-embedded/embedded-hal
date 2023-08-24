@@ -4,6 +4,8 @@ use core::future::poll_fn;
 use core::pin::Pin;
 use core::task::Poll;
 
+use tokio::io::AsyncBufReadExt;
+
 /// Adapter from `tokio::io` traits.
 #[derive(Clone)]
 pub struct FromTokio<T: ?Sized> {
@@ -51,6 +53,16 @@ impl<T: tokio::io::AsyncRead + Unpin + ?Sized> embedded_io_async::Read for FromT
             }
         })
         .await
+    }
+}
+
+impl<T: tokio::io::AsyncBufRead + Unpin + ?Sized> embedded_io_async::BufRead for FromTokio<T> {
+    async fn fill_buf(&mut self) -> Result<&[u8], Self::Error> {
+        self.inner.fill_buf().await
+    }
+
+    fn consume(&mut self, amt: usize) {
+        Pin::new(&mut self.inner).consume(amt)
     }
 }
 

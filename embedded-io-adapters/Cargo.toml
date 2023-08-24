@@ -21,7 +21,7 @@ embedded-io = { version = "0.5", path = "../embedded-io" }
 embedded-io-async = { version = "0.5", path = "../embedded-io-async", optional = true }
 
 futures = { version = "0.3.21", features = ["std"], default-features = false, optional = true }
-tokio = { version = "1", default-features = false, optional = true }
+tokio = { version = "1", features = ["io-util"], default-features = false, optional = true }
 
 [package.metadata.docs.rs]
 features = ["std", "tokio-1", "futures-03"]
