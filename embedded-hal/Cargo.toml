@@ -8,6 +8,7 @@ categories = ["asynchronous", "embedded", "hardware-support", "no-std"]
 description = " A Hardware Abstraction Layer (HAL) for embedded systems "
 documentation = "https://docs.rs/embedded-hal"
 edition = "2021"
+rust-version = "1.60"
 keywords = ["hal", "IO"]
 license = "MIT OR Apache-2.0"
 name = "embedded-hal"
