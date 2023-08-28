@@ -3,7 +3,7 @@
 #![warn(missing_docs)]
 #![doc = include_str!("../README.md")]
 
-use core::fmt;
+use core::{convert::Infallible, fmt};
 
 // needed to prevent defmt macros from breaking, since they emit code that does `defmt::blahblah`.
 #[cfg(feature = "defmt-03")]
@@ -289,6 +289,16 @@ impl<E> From<E> for WriteFmtError<E> {
     }
 }
 
+impl From<WriteFmtError<Infallible>> for Infallible {
+    fn from(err: WriteFmtError<Infallible>) -> Self {
+        match err {
+            WriteFmtError::WriteZero => panic!("Infallible zero write"),
+            WriteFmtError::FmtError => panic!("Infallible fmt write"),
+            WriteFmtError::Other(e) => e,
+        }
+    }
+}
+
 impl<E: fmt::Debug> fmt::Display for WriteFmtError<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:?}", self)
@@ -312,6 +322,15 @@ pub enum WriteAllError<E> {
 impl<E> From<E> for WriteAllError<E> {
     fn from(err: E) -> Self {
         Self::Other(err)
+    }
+}
+
+impl From<WriteAllError<Infallible>> for Infallible {
+    fn from(err: WriteAllError<Infallible>) -> Self {
+        match err {
+            WriteAllError::WriteZero => panic!("Infallible zero write"),
+            WriteAllError::Other(e) => e,
+        }
     }
 }
 
