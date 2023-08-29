@@ -3,6 +3,8 @@
 use core::future::poll_fn;
 use core::pin::Pin;
 
+use futures::AsyncBufReadExt;
+
 /// Adapter from `futures::io` traits.
 #[derive(Clone)]
 pub struct FromFutures<T: ?Sized> {
@@ -40,6 +42,16 @@ impl<T: ?Sized> embedded_io::ErrorType for FromFutures<T> {
 impl<T: futures::io::AsyncRead + Unpin + ?Sized> embedded_io_async::Read for FromFutures<T> {
     async fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
         poll_fn(|cx| Pin::new(&mut self.inner).poll_read(cx, buf)).await
+    }
+}
+
+impl<T: futures::io::AsyncBufRead + Unpin + ?Sized> embedded_io_async::BufRead for FromFutures<T> {
+    async fn fill_buf(&mut self) -> Result<&[u8], Self::Error> {
+        self.inner.fill_buf().await
+    }
+
+    fn consume(&mut self, amt: usize) {
+        Pin::new(&mut self.inner).consume(amt)
     }
 }
 
