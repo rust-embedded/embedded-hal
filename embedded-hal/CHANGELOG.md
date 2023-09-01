@@ -93,7 +93,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed blanket impl of `DelayUs` not covering the `delay_ms` method.
 
 ### Changed
-- `spi`: traits now enforce all impls on the same struct (eg `Transfer` and `Write`) have the same `Error` type.
+- `spi`: traits now enforce all impls on the same struct (e.g. `Transfer` and `Write`) have the same `Error` type.
 - `digital`: traits now enforce all impls on the same struct have the same `Error` type.
 - `serial`: traits now enforce all impls on the same struct have the same `Error` type.
 - `i2c`: traits now enforce all impls on the same struct have the same `Error` type.
@@ -150,7 +150,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Swap PWM channel arguments to references
 - All trait methods have been renamed to remove the `try_` prefix (i.e. `try_send` -> `send`) for consistency.
-- Moved all traits into two sub modules for each feature depending on the execution model: `blocking` and `nb` (non-blocking). For example, the spi traits can now be found under `embedded_hal::spi::blocking` or `embedded_hal::spi::nb`.
+- Moved all traits into two submodules for each feature depending on the execution model: `blocking` and `nb` (non-blocking). For example, the spi traits can now be found under `embedded_hal::spi::blocking` or `embedded_hal::spi::nb`.
 - Execution-model-independent definitions have been moved into the feature module. For example, SPI `Phase` is now defined in `embedded_hal::spi::Phase`. For convenience, these definitions are reexported in both of its blocking and non-blocking submodules.
 - Re-export `nb::{block!, Error, Result}` to avoid version mismatches. These should be used instead of
   importing the `nb` crate directly in dependent crates.
@@ -281,7 +281,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- Re-export most / unchanged traits from embedded-hal v0.2.x to allow inter-operation between HAL
+- Re-export most / unchanged traits from embedded-hal v0.2.x to allow interoperation between HAL
   implementations and drivers that are using different minor versions.
 
 ## [v0.1.2] - 2018-02-14

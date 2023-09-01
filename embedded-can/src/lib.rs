@@ -22,7 +22,7 @@ pub trait Frame: Sized {
     /// This will return `None` if the data length code (DLC) is not valid.
     fn new_remote(id: impl Into<Id>, dlc: usize) -> Option<Self>;
 
-    /// Returns true if this frame is a extended frame.
+    /// Returns true if this frame is an extended frame.
     fn is_extended(&self) -> bool;
 
     /// Returns true if this frame is a standard frame.

@@ -6,7 +6,7 @@ This project is developed and maintained by the [HAL team](https://github.com/ru
 
 ## Scope
 
-`embedded-hal` serves as a foundation for building an ecosystem of platform agnostic drivers.
+`embedded-hal` serves as a foundation for building an ecosystem of platform-agnostic drivers.
 (driver meaning library crates that let a target platform interface an external device like a digital
 sensor or a wireless transceiver).
 

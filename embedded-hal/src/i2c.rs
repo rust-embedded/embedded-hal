@@ -35,7 +35,7 @@
 //!
 //! The [`embedded-hal-bus`](https://docs.rs/embedded-hal-bus) crate provides several
 //! implementations for sharing I2C buses. You can use them to take an exclusive instance
-//! you've received from a HAL and "split" it into mulitple shared ones, to instantiate
+//! you've received from a HAL and "split" it into multiple shared ones, to instantiate
 //! several drivers on the same bus.
 //!
 //! # For driver authors
