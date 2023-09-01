@@ -8,10 +8,10 @@ use super::DeviceError;
 
 /// `critical-section`-based shared bus [`SpiDevice`] implementation.
 ///
-/// This allows for sharing an [`SpiBus`](embedded_hal::spi::SpiBus), obtaining multiple [`SpiDevice`] instances,
+/// This allows for sharing an [`SpiBus`], obtaining multiple [`SpiDevice`] instances,
 /// each with its own `CS` pin.
 ///
-/// Sharing is implemented with a `critical-section` [`Mutex`](critical_section::Mutex). A critical section is taken for
+/// Sharing is implemented with a `critical-section` [`Mutex`]. A critical section is taken for
 /// the entire duration of a transaction. This allows sharing a single bus across multiple threads (interrupt priority levels).
 /// The downside is critical sections typically require globally disabling interrupts, so `CriticalSectionDevice` will likely
 /// negatively impact real-time properties, such as interrupt latency. If you can, prefer using
@@ -23,7 +23,7 @@ pub struct CriticalSectionDevice<'a, BUS, CS, D> {
 }
 
 impl<'a, BUS, CS, D> CriticalSectionDevice<'a, BUS, CS, D> {
-    /// Create a new ExclusiveDevice.
+    /// Create a new [`CriticalSectionDevice`].
     #[inline]
     pub fn new(bus: &'a Mutex<RefCell<BUS>>, cs: CS, delay: D) -> Self {
         Self { bus, cs, delay }
@@ -31,12 +31,12 @@ impl<'a, BUS, CS, D> CriticalSectionDevice<'a, BUS, CS, D> {
 }
 
 impl<'a, BUS, CS> CriticalSectionDevice<'a, BUS, CS, super::NoDelay> {
-    /// Create a new CriticalSectionDevice without support for in-transaction delays.
+    /// Create a new [`CriticalSectionDevice`] without support for in-transaction delays.
     ///
     /// # Panics
     ///
     /// The returned device will panic if you try to execute a transaction
-    /// that contains any operations of type `Operation::DelayUs`.
+    /// that contains any operations of type [`Operation::DelayUs`].
     #[inline]
     pub fn new_no_delay(bus: &'a Mutex<RefCell<BUS>>, cs: CS) -> Self {
         Self {

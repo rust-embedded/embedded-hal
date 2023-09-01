@@ -7,7 +7,7 @@ use super::DeviceError;
 
 /// `RefCell`-based shared bus [`SpiDevice`] implementation.
 ///
-/// This allows for sharing an [`SpiBus`](embedded_hal::spi::SpiBus), obtaining multiple [`SpiDevice`] instances,
+/// This allows for sharing an [`SpiBus`], obtaining multiple [`SpiDevice`] instances,
 /// each with its own `CS` pin.
 ///
 /// Sharing is implemented with a `RefCell`. This means it has low overhead, but `RefCellDevice` instances are not `Send`,
@@ -20,7 +20,7 @@ pub struct RefCellDevice<'a, BUS, CS, D> {
 }
 
 impl<'a, BUS, CS, D> RefCellDevice<'a, BUS, CS, D> {
-    /// Create a new RefCellDevice.
+    /// Create a new [`RefCellDevice`].
     #[inline]
     pub fn new(bus: &'a RefCell<BUS>, cs: CS, delay: D) -> Self {
         Self { bus, cs, delay }
@@ -28,7 +28,7 @@ impl<'a, BUS, CS, D> RefCellDevice<'a, BUS, CS, D> {
 }
 
 impl<'a, BUS, CS> RefCellDevice<'a, BUS, CS, super::NoDelay> {
-    /// Create a new RefCellDevice without support for in-transaction delays.
+    /// Create a new [`RefCellDevice`] without support for in-transaction delays.
     ///
     /// # Panics
     ///

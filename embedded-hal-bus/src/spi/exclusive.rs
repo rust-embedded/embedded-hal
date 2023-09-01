@@ -13,7 +13,7 @@ use super::DeviceError;
 
 /// [`SpiDevice`] implementation with exclusive access to the bus (not shared).
 ///
-/// This is the most straightforward way of obtaining an [`SpiDevice`] from an [`SpiBus`](embedded_hal::spi::SpiBus),
+/// This is the most straightforward way of obtaining an [`SpiDevice`] from an [`SpiBus`],
 /// ideal for when no sharing is required (only one SPI device is present on the bus).
 pub struct ExclusiveDevice<BUS, CS, D> {
     bus: BUS,
@@ -22,7 +22,7 @@ pub struct ExclusiveDevice<BUS, CS, D> {
 }
 
 impl<BUS, CS, D> ExclusiveDevice<BUS, CS, D> {
-    /// Create a new ExclusiveDevice.
+    /// Create a new [`ExclusiveDevice`].
     #[inline]
     pub fn new(bus: BUS, cs: CS, delay: D) -> Self {
         Self { bus, cs, delay }
@@ -42,7 +42,7 @@ impl<BUS, CS, D> ExclusiveDevice<BUS, CS, D> {
 }
 
 impl<BUS, CS> ExclusiveDevice<BUS, CS, super::NoDelay> {
-    /// Create a new ExclusiveDevice without support for in-transaction delays.
+    /// Create a new [`ExclusiveDevice`] without support for in-transaction delays.
     ///
     /// # Panics
     ///
