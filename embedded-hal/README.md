@@ -35,7 +35,7 @@ Additionally, more domain-specific traits are available in separate crates:
 
 The HAL
 
-- Must *erase* device specific details. Neither register, register blocks or magic values should
+- Must *erase* device specific details. Neither register, register blocks, nor magic values should
 appear in the API.
 
 - Must be generic *within* a device and *across* devices. The API to use a serial interface must
@@ -50,7 +50,7 @@ in blocking mode, with the `futures` model, with an async/await model or with a 
 want higher level abstraction should *prefer to use this HAL* rather than *re-implement*
 register manipulation code.
 
-- Serve as a foundation for building an ecosystem of platform agnostic drivers. Here driver
+- Serve as a foundation for building an ecosystem of platform-agnostic drivers. Here driver
 means a library crate that lets a target platform interface an external device like a digital
 sensor or a wireless transceiver. The advantage of this system is that by writing the driver as
 a generic library on top of `embedded-hal` driver authors can support any number of target
@@ -70,10 +70,10 @@ interface are not using the same pins". The HAL will focus on *doing I/O*.
 
 ## Platform agnostic drivers
 
-You can find platform agnostic drivers built on top of `embedded-hal` on crates.io by [searching
+You can find platform-agnostic drivers built on top of `embedded-hal` on crates.io by [searching
 for the *embedded-hal* keyword](https://crates.io/keywords/embedded-hal).
 
-If you are writing a platform agnostic driver yourself you are highly encouraged to [add the
+If you are writing a platform-agnostic driver yourself you are highly encouraged to [add the
 embedded-hal keyword](https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata)
 to your crate before publishing it!
 
