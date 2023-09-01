@@ -221,7 +221,7 @@ pub const MODE_3: Mode = Mode {
 };
 
 /// SPI error.
-pub trait Error: core::fmt::Debug {
+pub trait Error: Debug {
     /// Convert error to a generic SPI error kind.
     ///
     /// By using this method, SPI errors freely defined by HAL implementations
