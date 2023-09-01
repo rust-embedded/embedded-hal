@@ -95,7 +95,7 @@ pub trait SetDutyCycle: ErrorType {
     /// and that `denom` is not zero.
     #[inline]
     fn set_duty_cycle_fraction(&mut self, num: u16, denom: u16) -> Result<(), Self::Error> {
-        let duty = num as u32 * self.get_max_duty_cycle() as u32 / denom as u32;
+        let duty = u32::from(num) * u32::from(self.get_max_duty_cycle()) / u32::from(denom);
         self.set_duty_cycle(duty as u16)
     }
 
@@ -104,7 +104,7 @@ pub trait SetDutyCycle: ErrorType {
     /// The caller is responsible for ensuring that `percent` is less than or equal to 100.
     #[inline]
     fn set_duty_cycle_percent(&mut self, percent: u8) -> Result<(), Self::Error> {
-        self.set_duty_cycle_fraction(percent as u16, 100)
+        self.set_duty_cycle_fraction(u16::from(percent), 100)
     }
 }
 
