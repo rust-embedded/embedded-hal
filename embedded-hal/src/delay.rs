@@ -22,11 +22,11 @@ where
 {
     #[inline]
     fn delay_us(&mut self, us: u32) {
-        T::delay_us(self, us)
+        T::delay_us(self, us);
     }
 
     #[inline]
     fn delay_ms(&mut self, ms: u32) {
-        T::delay_ms(self, ms)
+        T::delay_ms(self, ms);
     }
 }

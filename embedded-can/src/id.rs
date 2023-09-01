@@ -15,6 +15,7 @@ impl StandardId {
     ///
     /// This will return `None` if `raw` is out of range of an 11-bit integer (`> 0x7FF`).
     #[inline]
+    #[must_use]
     pub const fn new(raw: u16) -> Option<Self> {
         if raw <= 0x7FF {
             Some(Self(raw))
@@ -28,12 +29,14 @@ impl StandardId {
     /// # Safety
     /// Using this method can create an invalid ID and is thus marked as unsafe.
     #[inline]
+    #[must_use]
     pub const unsafe fn new_unchecked(raw: u16) -> Self {
         Self(raw)
     }
 
     /// Returns this CAN Identifier as a raw 16-bit integer.
     #[inline]
+    #[must_use]
     pub const fn as_raw(&self) -> u16 {
         self.0
     }
@@ -54,6 +57,7 @@ impl ExtendedId {
     ///
     /// This will return `None` if `raw` is out of range of an 29-bit integer (`> 0x1FFF_FFFF`).
     #[inline]
+    #[must_use]
     pub const fn new(raw: u32) -> Option<Self> {
         if raw <= 0x1FFF_FFFF {
             Some(Self(raw))
@@ -67,17 +71,20 @@ impl ExtendedId {
     /// # Safety
     /// Using this method can create an invalid ID and is thus marked as unsafe.
     #[inline]
+    #[must_use]
     pub const unsafe fn new_unchecked(raw: u32) -> Self {
         Self(raw)
     }
 
     /// Returns this CAN Identifier as a raw 32-bit integer.
     #[inline]
+    #[must_use]
     pub const fn as_raw(&self) -> u32 {
         self.0
     }
 
     /// Returns the Base ID part of this extended identifier.
+    #[must_use]
     pub fn standard_id(&self) -> StandardId {
         // ID-28 to ID-18
         StandardId((self.0 >> 18) as u16)

@@ -58,10 +58,10 @@ pub trait Read: ErrorType {
                 Err(e) => return Err(ReadExactError::Other(e)),
             }
         }
-        if !buf.is_empty() {
-            Err(ReadExactError::UnexpectedEof)
-        } else {
+        if buf.is_empty() {
             Ok(())
+        } else {
+            Err(ReadExactError::UnexpectedEof)
         }
     }
 }
@@ -170,7 +170,7 @@ impl<T: ?Sized + BufRead> BufRead for &mut T {
     }
 
     fn consume(&mut self, amt: usize) {
-        T::consume(self, amt)
+        T::consume(self, amt);
     }
 }
 

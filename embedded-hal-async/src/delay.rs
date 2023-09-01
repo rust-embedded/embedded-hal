@@ -17,11 +17,11 @@ where
 {
     #[inline]
     async fn delay_us(&mut self, us: u32) {
-        T::delay_us(self, us).await
+        T::delay_us(self, us).await;
     }
 
     #[inline]
     async fn delay_ms(&mut self, ms: u32) {
-        T::delay_ms(self, ms).await
+        T::delay_ms(self, ms).await;
     }
 }
