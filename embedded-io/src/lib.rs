@@ -175,7 +175,7 @@ impl From<std::io::ErrorKind> for ErrorKind {
 ///
 /// This trait allows generic code to do limited inspecting of errors,
 /// to react differently to different kinds.
-pub trait Error: core::fmt::Debug {
+pub trait Error: fmt::Debug {
     /// Get the kind of this error.
     fn kind(&self) -> ErrorKind;
 }
@@ -194,8 +194,8 @@ impl Error for ErrorKind {
 
 #[cfg(feature = "std")]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
-impl crate::Error for std::io::Error {
-    fn kind(&self) -> crate::ErrorKind {
+impl Error for std::io::Error {
+    fn kind(&self) -> ErrorKind {
         self.kind().into()
     }
 }
