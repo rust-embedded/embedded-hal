@@ -4,7 +4,7 @@ use embedded_hal::i2c::{ErrorType, I2c};
 
 /// `critical-section`-based shared bus [`I2c`] implementation.
 ///
-/// Sharing is implemented with a `critical-section` [`Mutex`](critical_section::Mutex). A critical section is taken for
+/// Sharing is implemented with a `critical-section` [`Mutex`]. A critical section is taken for
 /// the entire duration of a transaction. This allows sharing a single bus across multiple threads (interrupt priority levels).
 /// The downside is critical sections typically require globally disabling interrupts, so `CriticalSectionDevice` will likely
 /// negatively impact real-time properties, such as interrupt latency. If you can, prefer using

@@ -13,7 +13,7 @@ use super::DeviceError;
 
 /// [`SpiDevice`] implementation with exclusive access to the bus (not shared).
 ///
-/// This is the most straightforward way of obtaining an [`SpiDevice`] from an [`SpiBus`](embedded_hal::spi::SpiBus),
+/// This is the most straightforward way of obtaining an [`SpiDevice`] from an [`SpiBus`],
 /// ideal for when no sharing is required (only one SPI device is present on the bus).
 pub struct ExclusiveDevice<BUS, CS, D> {
     bus: BUS,

@@ -7,10 +7,10 @@ use super::DeviceError;
 
 /// `std` `Mutex`-based shared bus [`SpiDevice`] implementation.
 ///
-/// This allows for sharing an [`SpiBus`](embedded_hal::spi::SpiBus), obtaining multiple [`SpiDevice`] instances,
+/// This allows for sharing an [`SpiBus`], obtaining multiple [`SpiDevice`] instances,
 /// each with its own `CS` pin.
 ///
-/// Sharing is implemented with a `std` [`Mutex`](std::sync::Mutex). It allows a single bus across multiple threads,
+/// Sharing is implemented with a `std` [`Mutex`]. It allows a single bus across multiple threads,
 /// with finer-grained locking than [`CriticalSectionDevice`](super::CriticalSectionDevice). The downside is
 /// it is only available in `std` targets.
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]

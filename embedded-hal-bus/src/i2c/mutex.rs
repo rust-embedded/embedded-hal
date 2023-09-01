@@ -3,7 +3,7 @@ use std::sync::Mutex;
 
 /// `std` `Mutex`-based shared bus [`I2c`] implementation.
 ///
-/// Sharing is implemented with an `std` [`Mutex`](std::sync::Mutex). It allows a single bus across multiple threads,
+/// Sharing is implemented with an `std` [`Mutex`]. It allows a single bus across multiple threads,
 /// with finer-grained locking than [`CriticalSectionDevice`](super::CriticalSectionDevice). The downside is that
 /// it is only available in `std` targets.
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]

@@ -8,10 +8,10 @@ use super::DeviceError;
 
 /// `critical-section`-based shared bus [`SpiDevice`] implementation.
 ///
-/// This allows for sharing an [`SpiBus`](embedded_hal::spi::SpiBus), obtaining multiple [`SpiDevice`] instances,
+/// This allows for sharing an [`SpiBus`], obtaining multiple [`SpiDevice`] instances,
 /// each with its own `CS` pin.
 ///
-/// Sharing is implemented with a `critical-section` [`Mutex`](critical_section::Mutex). A critical section is taken for
+/// Sharing is implemented with a `critical-section` [`Mutex`]. A critical section is taken for
 /// the entire duration of a transaction. This allows sharing a single bus across multiple threads (interrupt priority levels).
 /// The downside is critical sections typically require globally disabling interrupts, so `CriticalSectionDevice` will likely
 /// negatively impact real-time properties, such as interrupt latency. If you can, prefer using
