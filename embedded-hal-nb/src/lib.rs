@@ -57,7 +57,7 @@
 //! [`svd2rust`]: https://crates.io/crates/svd2rust
 //!
 //! Shown below is an implementation of some of the HAL traits for the [`stm32f1xx-hal`] crate. This
-//! single implementation will work for *any* microcontroller in the STM32F1xx family.
+//! single implementation will work for *any* microcontroller in the `STM32F1xx` family.
 //!
 //! [`stm32f1`]: https://crates.io/crates/stm32f1
 //!

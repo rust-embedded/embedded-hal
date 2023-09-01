@@ -22,7 +22,7 @@ pub struct ExclusiveDevice<BUS, CS, D> {
 }
 
 impl<BUS, CS, D> ExclusiveDevice<BUS, CS, D> {
-    /// Create a new ExclusiveDevice.
+    /// Create a new [`ExclusiveDevice`].
     #[inline]
     pub fn new(bus: BUS, cs: CS, delay: D) -> Self {
         Self { bus, cs, delay }
@@ -42,7 +42,7 @@ impl<BUS, CS, D> ExclusiveDevice<BUS, CS, D> {
 }
 
 impl<BUS, CS> ExclusiveDevice<BUS, CS, super::NoDelay> {
-    /// Create a new ExclusiveDevice without support for in-transaction delays.
+    /// Create a new [`ExclusiveDevice`] without support for in-transaction delays.
     ///
     /// # Panics
     ///
