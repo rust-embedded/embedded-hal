@@ -118,5 +118,5 @@ impl<T: embedded_io::Seek + ?Sized> std::io::Seek for ToStd<T> {
 
 /// Convert a embedded-io error to a std::io::Error
 pub fn to_std_error<T: embedded_io::Error>(err: T) -> std::io::Error {
-    std::io::Error::new(err.kind().into(), format!("{:?}", err))
+    std::io::Error::new(err.kind().into(), format!("{err:?}"))
 }

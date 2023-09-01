@@ -243,7 +243,7 @@ impl From<ReadExactError<std::io::Error>> for std::io::Error {
                 std::io::ErrorKind::UnexpectedEof,
                 "UnexpectedEof".to_owned(),
             ),
-            ReadExactError::Other(e) => std::io::Error::new(e.kind(), format!("{:?}", e)),
+            ReadExactError::Other(e) => std::io::Error::new(e.kind(), format!("{e:?}")),
         }
     }
 }
@@ -256,14 +256,14 @@ impl From<WriteAllError<std::io::Error>> for std::io::Error {
             WriteAllError::WriteZero => {
                 std::io::Error::new(std::io::ErrorKind::WriteZero, "WriteZero".to_owned())
             }
-            WriteAllError::Other(e) => std::io::Error::new(e.kind(), format!("{:?}", e)),
+            WriteAllError::Other(e) => std::io::Error::new(e.kind(), format!("{e:?}")),
         }
     }
 }
 
 impl<E: fmt::Debug> fmt::Display for ReadExactError<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 
@@ -291,7 +291,7 @@ impl<E> From<E> for WriteFmtError<E> {
 
 impl<E: fmt::Debug> fmt::Display for WriteFmtError<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 
@@ -317,7 +317,7 @@ impl<E> From<E> for WriteAllError<E> {
 
 impl<E: fmt::Debug> fmt::Display for WriteAllError<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self)
+        write!(f, "{self:?}")
     }
 }
 
