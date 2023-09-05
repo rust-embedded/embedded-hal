@@ -1,7 +1,8 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![warn(missing_docs)]
-#![doc = include_str!("../README.md")]
+#![cfg_attr(docsrs, cfg_attr(all(), doc = include_str!("../README.md")))]
+#![cfg_attr(not(docsrs), doc = "build docs with docsrs")]
 
 use core::fmt;
 
@@ -263,7 +264,7 @@ impl From<WriteAllError<std::io::Error>> for std::io::Error {
 
 impl<E: fmt::Debug> fmt::Display for ReadExactError<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{self:?}")
+        write!(f, "{:?}", self)
     }
 }
 
@@ -291,7 +292,7 @@ impl<E> From<E> for WriteFmtError<E> {
 
 impl<E: fmt::Debug> fmt::Display for WriteFmtError<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{self:?}")
+        write!(f, "{:?}", self)
     }
 }
 
@@ -317,7 +318,7 @@ impl<E> From<E> for WriteAllError<E> {
 
 impl<E: fmt::Debug> fmt::Display for WriteAllError<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{self:?}")
+        write!(f, "{:?}", self)
     }
 }
 
