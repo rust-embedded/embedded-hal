@@ -14,6 +14,7 @@ categories = [
 [features]
 std = ["alloc"]
 alloc = []
+defmt-03 = ["dep:defmt-03"]
 
 [dependencies]
 defmt-03 = { package = "defmt", version = "0.3", optional = true }
