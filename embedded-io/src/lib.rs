@@ -419,15 +419,19 @@ pub trait Write: ErrorType {
     /// If you are using [`WriteReady`] to avoid blocking, you should not use this function.
     /// `WriteReady::write_ready()` returning true only guarantees the first call to `write()` will
     /// not block, so this function may still block in subsequent calls.
-    fn write_all(&mut self, mut buf: &[u8]) -> Result<(), WriteAllError<Self::Error>> {
+    fn write_all(&mut self, mut buf: &[u8]) -> Result<usize, WriteAllError<Self::Error>> {
+        let mut len = 0;
         while !buf.is_empty() {
             match self.write(buf) {
                 Ok(0) => return Err(WriteAllError::WriteZero),
-                Ok(n) => buf = &buf[n..],
+                Ok(n) => {
+                    len += n;
+                    buf = &buf[n..]
+                }
                 Err(e) => return Err(WriteAllError::Other(e)),
             }
         }
-        Ok(())
+        Ok(len)
     }
 
     /// Write a formatted string into this writer, returning any error encountered.
@@ -438,18 +442,22 @@ pub trait Write: ErrorType {
     /// If you are using [`WriteReady`] to avoid blocking, you should not use this function.
     /// `WriteReady::write_ready()` returning true only guarantees the first call to `write()` will
     /// not block, so this function may still block in subsequent calls.
-    fn write_fmt(&mut self, fmt: fmt::Arguments<'_>) -> Result<(), WriteFmtError<Self::Error>> {
+    fn write_fmt(&mut self, fmt: fmt::Arguments<'_>) -> Result<usize, WriteFmtError<Self::Error>> {
         // Create a shim which translates a Write to a fmt::Write and saves
         // off I/O errors. instead of discarding them
         struct Adapter<'a, T: Write + ?Sized + 'a> {
             inner: &'a mut T,
+            len: usize,
             error: Result<(), WriteAllError<T::Error>>,
         }
 
         impl<T: Write + ?Sized> fmt::Write for Adapter<'_, T> {
             fn write_str(&mut self, s: &str) -> fmt::Result {
                 match self.inner.write_all(s.as_bytes()) {
-                    Ok(()) => Ok(()),
+                    Ok(len) => {
+                        self.len = len;
+                        Ok(())
+                    }
                     Err(e) => {
                         self.error = Err(e);
                         Err(fmt::Error)
@@ -460,10 +468,11 @@ pub trait Write: ErrorType {
 
         let mut output = Adapter {
             inner: self,
+            len: 0,
             error: Ok(()),
         };
         match fmt::write(&mut output, fmt) {
-            Ok(()) => Ok(()),
+            Ok(()) => Ok(output.len),
             Err(..) => match output.error {
                 // check if the error came from the underlying `Write` or not
                 Err(e) => match e {
