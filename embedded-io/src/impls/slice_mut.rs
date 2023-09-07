@@ -39,6 +39,7 @@ mod test {
         let mut buf = [0u8; 1024];
         let len = write!(&mut buf[..], "Hello!").unwrap();
         assert!(len == "Hello!".as_bytes().len());
+        assert!(core::str::from_utf8(&buf[..len]).unwrap() == "Hello!");
     }
 
     #[test]
@@ -46,5 +47,6 @@ mod test {
         let mut buf = [0u8; 1024];
         let len = write!(&mut buf[..], "Hello, {}!", "World").unwrap();
         assert!(len == "Hello, World!".as_bytes().len());
+        assert!(core::str::from_utf8(&buf[..len]).unwrap() == "Hello, World!");
     }
 }
