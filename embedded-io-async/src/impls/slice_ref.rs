@@ -1,3 +1,5 @@
+use core::convert::Infallible;
+
 use crate::{BufRead, Read};
 
 /// Read is implemented for `&[u8]` by copying from the slice.
@@ -6,7 +8,7 @@ use crate::{BufRead, Read};
 /// The slice will be empty when EOF is reached.
 impl Read for &[u8] {
     #[inline]
-    async fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
+    async fn read(&mut self, buf: &mut [u8]) -> Result<usize, Infallible> {
         let amt = core::cmp::min(buf.len(), self.len());
         let (a, b) = self.split_at(amt);
 
@@ -26,7 +28,7 @@ impl Read for &[u8] {
 
 impl BufRead for &[u8] {
     #[inline]
-    async fn fill_buf(&mut self) -> Result<&[u8], Self::Error> {
+    async fn fill_buf(&mut self) -> Result<&[u8], Infallible> {
         Ok(*self)
     }
 

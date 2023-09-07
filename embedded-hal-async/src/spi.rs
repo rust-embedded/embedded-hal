@@ -79,27 +79,27 @@ impl<Word: Copy + 'static, T: SpiDevice<Word> + ?Sized> SpiDevice<Word> for &mut
     async fn transaction(
         &mut self,
         operations: &mut [Operation<'_, Word>],
-    ) -> Result<(), Self::Error> {
+    ) -> Result<(), T::Error> {
         T::transaction(self, operations).await
     }
 
     #[inline]
-    async fn read(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
+    async fn read(&mut self, buf: &mut [Word]) -> Result<(), T::Error> {
         T::read(self, buf).await
     }
 
     #[inline]
-    async fn write(&mut self, buf: &[Word]) -> Result<(), Self::Error> {
+    async fn write(&mut self, buf: &[Word]) -> Result<(), T::Error> {
         T::write(self, buf).await
     }
 
     #[inline]
-    async fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
+    async fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), T::Error> {
         T::transfer(self, read, write).await
     }
 
     #[inline]
-    async fn transfer_in_place(&mut self, buf: &mut [Word]) -> Result<(), Self::Error> {
+    async fn transfer_in_place(&mut self, buf: &mut [Word]) -> Result<(), T::Error> {
         T::transfer_in_place(self, buf).await
     }
 }
@@ -154,27 +154,27 @@ pub trait SpiBus<Word: 'static + Copy = u8>: ErrorType {
 
 impl<T: SpiBus<Word> + ?Sized, Word: 'static + Copy> SpiBus<Word> for &mut T {
     #[inline]
-    async fn read(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
+    async fn read(&mut self, words: &mut [Word]) -> Result<(), T::Error> {
         T::read(self, words).await
     }
 
     #[inline]
-    async fn write(&mut self, words: &[Word]) -> Result<(), Self::Error> {
+    async fn write(&mut self, words: &[Word]) -> Result<(), T::Error> {
         T::write(self, words).await
     }
 
     #[inline]
-    async fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), Self::Error> {
+    async fn transfer(&mut self, read: &mut [Word], write: &[Word]) -> Result<(), T::Error> {
         T::transfer(self, read, write).await
     }
 
     #[inline]
-    async fn transfer_in_place(&mut self, words: &mut [Word]) -> Result<(), Self::Error> {
+    async fn transfer_in_place(&mut self, words: &mut [Word]) -> Result<(), T::Error> {
         T::transfer_in_place(self, words).await
     }
 
     #[inline]
-    async fn flush(&mut self) -> Result<(), Self::Error> {
+    async fn flush(&mut self) -> Result<(), T::Error> {
         T::flush(self).await
     }
 }

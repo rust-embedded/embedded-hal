@@ -1,4 +1,4 @@
-#![feature(async_fn_in_trait, impl_trait_projections)]
+#![feature(async_fn_in_trait)]
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![warn(missing_docs)]
@@ -159,13 +159,13 @@ pub trait Seek: ErrorType {
 
 impl<T: ?Sized + Read> Read for &mut T {
     #[inline]
-    async fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
+    async fn read(&mut self, buf: &mut [u8]) -> Result<usize, T::Error> {
         T::read(self, buf).await
     }
 }
 
 impl<T: ?Sized + BufRead> BufRead for &mut T {
-    async fn fill_buf(&mut self) -> Result<&[u8], Self::Error> {
+    async fn fill_buf(&mut self) -> Result<&[u8], T::Error> {
         T::fill_buf(self).await
     }
 
@@ -176,19 +176,19 @@ impl<T: ?Sized + BufRead> BufRead for &mut T {
 
 impl<T: ?Sized + Write> Write for &mut T {
     #[inline]
-    async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
+    async fn write(&mut self, buf: &[u8]) -> Result<usize, T::Error> {
         T::write(self, buf).await
     }
 
     #[inline]
-    async fn flush(&mut self) -> Result<(), Self::Error> {
+    async fn flush(&mut self) -> Result<(), T::Error> {
         T::flush(self).await
     }
 }
 
 impl<T: ?Sized + Seek> Seek for &mut T {
     #[inline]
-    async fn seek(&mut self, pos: SeekFrom) -> Result<u64, Self::Error> {
+    async fn seek(&mut self, pos: SeekFrom) -> Result<u64, T::Error> {
         T::seek(self, pos).await
     }
 }

@@ -1,5 +1,5 @@
 use crate::Write;
-use core::mem;
+use core::{convert::Infallible, mem};
 
 /// Write is implemented for `&mut [u8]` by copying into the slice, overwriting
 /// its data.
@@ -12,7 +12,7 @@ use core::mem;
 /// kind `ErrorKind::WriteZero`.
 impl Write for &mut [u8] {
     #[inline]
-    async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
+    async fn write(&mut self, buf: &[u8]) -> Result<usize, Infallible> {
         let amt = core::cmp::min(buf.len(), self.len());
         let (a, b) = mem::take(self).split_at_mut(amt);
         a.copy_from_slice(&buf[..amt]);

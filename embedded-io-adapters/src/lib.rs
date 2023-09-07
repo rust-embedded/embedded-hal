@@ -2,7 +2,7 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![cfg_attr(
     any(feature = "tokio-1", feature = "futures-03"),
-    feature(async_fn_in_trait, impl_trait_projections)
+    feature(async_fn_in_trait)
 )]
 #![warn(missing_docs)]
 #![doc = include_str!("../README.md")]

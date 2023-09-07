@@ -127,12 +127,12 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
 
 impl<A: AddressMode, T: I2c<A> + ?Sized> I2c<A> for &mut T {
     #[inline]
-    async fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error> {
+    async fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), T::Error> {
         T::read(self, address, read).await
     }
 
     #[inline]
-    async fn write(&mut self, address: A, write: &[u8]) -> Result<(), Self::Error> {
+    async fn write(&mut self, address: A, write: &[u8]) -> Result<(), T::Error> {
         T::write(self, address, write).await
     }
 
@@ -142,7 +142,7 @@ impl<A: AddressMode, T: I2c<A> + ?Sized> I2c<A> for &mut T {
         address: A,
         write: &[u8],
         read: &mut [u8],
-    ) -> Result<(), Self::Error> {
+    ) -> Result<(), T::Error> {
         T::write_read(self, address, write, read).await
     }
 
@@ -151,7 +151,7 @@ impl<A: AddressMode, T: I2c<A> + ?Sized> I2c<A> for &mut T {
         &mut self,
         address: A,
         operations: &mut [Operation<'_>],
-    ) -> Result<(), Self::Error> {
+    ) -> Result<(), T::Error> {
         T::transaction(self, address, operations).await
     }
 }

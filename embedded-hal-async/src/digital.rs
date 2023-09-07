@@ -50,27 +50,27 @@ pub trait Wait: embedded_hal::digital::ErrorType {
 
 impl<T: Wait + ?Sized> Wait for &mut T {
     #[inline]
-    async fn wait_for_high(&mut self) -> Result<(), Self::Error> {
+    async fn wait_for_high(&mut self) -> Result<(), T::Error> {
         T::wait_for_high(self).await
     }
 
     #[inline]
-    async fn wait_for_low(&mut self) -> Result<(), Self::Error> {
+    async fn wait_for_low(&mut self) -> Result<(), T::Error> {
         T::wait_for_low(self).await
     }
 
     #[inline]
-    async fn wait_for_rising_edge(&mut self) -> Result<(), Self::Error> {
+    async fn wait_for_rising_edge(&mut self) -> Result<(), T::Error> {
         T::wait_for_rising_edge(self).await
     }
 
     #[inline]
-    async fn wait_for_falling_edge(&mut self) -> Result<(), Self::Error> {
+    async fn wait_for_falling_edge(&mut self) -> Result<(), T::Error> {
         T::wait_for_falling_edge(self).await
     }
 
     #[inline]
-    async fn wait_for_any_edge(&mut self) -> Result<(), Self::Error> {
+    async fn wait_for_any_edge(&mut self) -> Result<(), T::Error> {
         T::wait_for_any_edge(self).await
     }
 }
