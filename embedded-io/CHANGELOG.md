@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-- `write_all` and `write_fmt` now return the number of bytes written to.
+- `write_fmt` now returns the number of bytes written to.
 
 ## 0.5.0 - 2023-08-06
 

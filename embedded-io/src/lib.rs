@@ -420,21 +420,18 @@ pub trait Write: ErrorType {
     /// `WriteReady::write_ready()` returning true only guarantees the first call to `write()` will
     /// not block, so this function may still block in subsequent calls.
     fn write_all(&mut self, mut buf: &[u8]) -> Result<usize, WriteAllError<Self::Error>> {
-        let mut len = 0;
         while !buf.is_empty() {
             match self.write(buf) {
                 Ok(0) => return Err(WriteAllError::WriteZero),
-                Ok(n) => {
-                    len += n;
-                    buf = &buf[n..]
-                }
+                Ok(n) => buf = &buf[n..],
                 Err(e) => return Err(WriteAllError::Other(e)),
             }
         }
-        Ok(len)
+        Ok(())
     }
 
-    /// Write a formatted string into this writer, returning any error encountered.
+    /// Write a formatted string into this writer, returning how many bytes were written or any
+    /// error encountered.
     ///
     /// This function calls `write()` in a loop until the entire formatted string has
     /// been written, blocking if needed.
@@ -453,9 +450,10 @@ pub trait Write: ErrorType {
 
         impl<T: Write + ?Sized> fmt::Write for Adapter<'_, T> {
             fn write_str(&mut self, s: &str) -> fmt::Result {
-                match self.inner.write_all(s.as_bytes()) {
-                    Ok(len) => {
-                        self.len = len;
+                let string_bytes = s.as_bytes();
+                match self.inner.write_all(string_bytes) {
+                    Ok(_) => {
+                        self.len += string_bytes.len();
                         Ok(())
                     }
                     Err(e) => {
