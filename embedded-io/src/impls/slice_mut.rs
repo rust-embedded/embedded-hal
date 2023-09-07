@@ -29,3 +29,22 @@ impl Write for &mut [u8] {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::Write;
+
+    #[test]
+    fn basic_length() {
+        let mut buf = [0u8; 1024];
+        let len = write!(&mut buf[..], "Hello!").unwrap();
+        assert!(len == "Hello!".as_bytes().len());
+    }
+
+    #[test]
+    fn format_length() {
+        let mut buf = [0u8; 1024];
+        let len = write!(&mut buf[..], "Hello, {}!", "World").unwrap();
+        assert!(len == "Hello, World!".as_bytes().len());
+    }
+}

@@ -419,7 +419,7 @@ pub trait Write: ErrorType {
     /// If you are using [`WriteReady`] to avoid blocking, you should not use this function.
     /// `WriteReady::write_ready()` returning true only guarantees the first call to `write()` will
     /// not block, so this function may still block in subsequent calls.
-    fn write_all(&mut self, mut buf: &[u8]) -> Result<usize, WriteAllError<Self::Error>> {
+    fn write_all(&mut self, mut buf: &[u8]) -> Result<(), WriteAllError<Self::Error>> {
         while !buf.is_empty() {
             match self.write(buf) {
                 Ok(0) => return Err(WriteAllError::WriteZero),
