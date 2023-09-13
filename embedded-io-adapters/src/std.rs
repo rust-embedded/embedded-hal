@@ -1,5 +1,7 @@
 //! Adapters to/from `std::io` traits.
 
+use embedded_io::Error;
+
 /// Adapter from `std::io` traits.
 #[derive(Clone)]
 pub struct FromStd<T: ?Sized> {
@@ -52,7 +54,11 @@ impl<T: std::io::BufRead + ?Sized> embedded_io::BufRead for FromStd<T> {
 
 impl<T: std::io::Write + ?Sized> embedded_io::Write for FromStd<T> {
     fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
-        self.inner.write(buf)
+        match self.inner.write(buf) {
+            Ok(0) if !buf.is_empty() => Err(std::io::ErrorKind::WriteZero.into()),
+            Ok(n) => Ok(n),
+            Err(e) => Err(e),
+        }
     }
     fn flush(&mut self) -> Result<(), Self::Error> {
         self.inner.flush()
@@ -103,7 +109,11 @@ impl<T: embedded_io::Read + ?Sized> std::io::Read for ToStd<T> {
 
 impl<T: embedded_io::Write + ?Sized> std::io::Write for ToStd<T> {
     fn write(&mut self, buf: &[u8]) -> Result<usize, std::io::Error> {
-        self.inner.write(buf).map_err(to_std_error)
+        match self.inner.write(buf) {
+            Ok(n) => Ok(n),
+            Err(e) if e.kind() == embedded_io::ErrorKind::WriteZero => Ok(0),
+            Err(e) => Err(to_std_error(e)),
+        }
     }
     fn flush(&mut self) -> Result<(), std::io::Error> {
         self.inner.flush().map_err(to_std_error)
