@@ -10,7 +10,7 @@ extern crate alloc;
 mod impls;
 
 pub use embedded_io::{
-    Error, ErrorKind, ErrorType, ReadExactError, ReadReady, SeekFrom, WriteAllError, WriteReady,
+    Error, ErrorKind, ErrorType, ReadExactError, ReadReady, SeekFrom, WriteReady,
 };
 
 /// Async reader.
@@ -125,13 +125,13 @@ pub trait Write: ErrorType {
     ///
     /// This function is not side-effect-free on cancel (AKA "cancel-safe"), i.e. if you cancel (drop) a returned
     /// future that hasn't completed yet, some bytes might have already been written.
-    async fn write_all(&mut self, buf: &[u8]) -> Result<(), WriteAllError<Self::Error>> {
+    async fn write_all(&mut self, buf: &[u8]) -> Result<(), Self::Error> {
         let mut buf = buf;
         while !buf.is_empty() {
             match self.write(buf).await {
-                Ok(0) => return Err(WriteAllError::WriteZero),
+                Ok(0) => panic!("write() returned Ok(0)"),
                 Ok(n) => buf = &buf[n..],
-                Err(e) => return Err(WriteAllError::Other(e)),
+                Err(e) => return Err(e),
             }
         }
         Ok(())
