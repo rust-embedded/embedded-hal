@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+- Prohibit `Write::write` implementations returning `Ok(0)` unless there is no
+  data to write; consequently remove `WriteAllError` and the `WriteAllError`
+  variant of `WriteFmtError`. Update the `&mut [u8]` impl to possibly return
+  a new `SliceWriteError` if the slice is full instead of `Ok(0)`.
+- Add `WriteZero` variant to `ErrorKind` for implementations that previously
+  may have returned `Ok(0)` to indicate no further data could be written.
+- `Write::write_all` now panics if the `write()` implementation returns `Ok(0)`.
+
 ## 0.5.0 - 2023-08-06
 
 - Add `ReadReady`, `WriteReady` traits. They allow peeking whether the I/O handle is ready to read/write, so they allow using the traits in a non-blocking way.

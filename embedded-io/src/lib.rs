@@ -61,7 +61,6 @@ impl From<std::io::SeekFrom> for SeekFrom {
 /// This is the `embedded-io` equivalent of [`std::io::ErrorKind`], except with the following changes:
 ///
 /// - `WouldBlock` is removed, since `embedded-io` traits are always blocking. See the [crate-level documentation](crate) for details.
-/// - `WriteZero` is removed, since it is a separate variant in [`WriteAllError`] and [`WriteFmtError`].
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 #[non_exhaustive]
@@ -117,6 +116,8 @@ pub enum ErrorKind {
     /// An operation could not be completed, because it failed
     /// to allocate enough memory.
     OutOfMemory,
+    /// An attempted write could not write any data.
+    WriteZero,
 }
 
 #[cfg(feature = "std")]
@@ -248,19 +249,6 @@ impl From<ReadExactError<std::io::Error>> for std::io::Error {
     }
 }
 
-#[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
-impl From<WriteAllError<std::io::Error>> for std::io::Error {
-    fn from(err: WriteAllError<std::io::Error>) -> Self {
-        match err {
-            WriteAllError::WriteZero => {
-                std::io::Error::new(std::io::ErrorKind::WriteZero, "WriteZero".to_owned())
-            }
-            WriteAllError::Other(e) => std::io::Error::new(e.kind(), format!("{e:?}")),
-        }
-    }
-}
-
 impl<E: fmt::Debug> fmt::Display for ReadExactError<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{self:?}")
@@ -275,8 +263,6 @@ impl<E: fmt::Debug> std::error::Error for ReadExactError<E> {}
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub enum WriteFmtError<E> {
-    /// [`Write::write`] wrote zero bytes
-    WriteZero,
     /// An error was encountered while formatting.
     FmtError,
     /// Error returned by the inner Write.
@@ -298,32 +284,6 @@ impl<E: fmt::Debug> fmt::Display for WriteFmtError<E> {
 #[cfg(feature = "std")]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<E: fmt::Debug> std::error::Error for WriteFmtError<E> {}
-
-/// Error returned by [`Write::write_all`]
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
-pub enum WriteAllError<E> {
-    /// [`Write::write`] wrote zero bytes
-    WriteZero,
-    /// Error returned by the inner Write.
-    Other(E),
-}
-
-impl<E> From<E> for WriteAllError<E> {
-    fn from(err: E) -> Self {
-        Self::Other(err)
-    }
-}
-
-impl<E: fmt::Debug> fmt::Display for WriteAllError<E> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{self:?}")
-    }
-}
-
-#[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
-impl<E: fmt::Debug> std::error::Error for WriteAllError<E> {}
 
 /// Blocking reader.
 ///
@@ -401,11 +361,12 @@ pub trait Write: ErrorType {
     /// implementation to write an amount of bytes less than `buf.len()` while the writer continues to be
     /// ready to accept more bytes immediately.
     ///
-    /// Implementations should never return `Ok(0)` when `buf.len() != 0`. Situations where the writer is not
-    /// able to accept more bytes and likely never will are better indicated with errors.
+    /// Implementations must not return `Ok(0)` unless `buf` is empty. Situations where the
+    /// writer is not able to accept more bytes must instead be indicated with an error,
+    /// where the `ErrorKind` is `WriteZero`.
     ///
-    /// If `buf.len() == 0`, `write` returns without blocking, with either `Ok(0)` or an error.
-    /// The `Ok(0)` doesn't indicate an error.
+    /// If `buf` is empty, `write` returns without blocking, with either `Ok(0)` or an error.
+    /// `Ok(0)` doesn't indicate an error.
     fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error>;
 
     /// Flush this output stream, blocking until all intermediately buffered contents reach their destination.
@@ -419,12 +380,14 @@ pub trait Write: ErrorType {
     /// If you are using [`WriteReady`] to avoid blocking, you should not use this function.
     /// `WriteReady::write_ready()` returning true only guarantees the first call to `write()` will
     /// not block, so this function may still block in subsequent calls.
-    fn write_all(&mut self, mut buf: &[u8]) -> Result<(), WriteAllError<Self::Error>> {
+    ///
+    /// This function will panic if `write()` returns `Ok(0)`.
+    fn write_all(&mut self, mut buf: &[u8]) -> Result<(), Self::Error> {
         while !buf.is_empty() {
             match self.write(buf) {
-                Ok(0) => return Err(WriteAllError::WriteZero),
+                Ok(0) => panic!("write() returned Ok(0)"),
                 Ok(n) => buf = &buf[n..],
-                Err(e) => return Err(WriteAllError::Other(e)),
+                Err(e) => return Err(e),
             }
         }
         Ok(())
@@ -443,7 +406,7 @@ pub trait Write: ErrorType {
         // off I/O errors. instead of discarding them
         struct Adapter<'a, T: Write + ?Sized + 'a> {
             inner: &'a mut T,
-            error: Result<(), WriteAllError<T::Error>>,
+            error: Result<(), T::Error>,
         }
 
         impl<T: Write + ?Sized> fmt::Write for Adapter<'_, T> {
@@ -466,10 +429,7 @@ pub trait Write: ErrorType {
             Ok(()) => Ok(()),
             Err(..) => match output.error {
                 // check if the error came from the underlying `Write` or not
-                Err(e) => match e {
-                    WriteAllError::WriteZero => Err(WriteFmtError::WriteZero),
-                    WriteAllError::Other(e) => Err(WriteFmtError::Other(e)),
-                },
+                Err(e) => Err(WriteFmtError::Other(e)),
                 Ok(()) => Err(WriteFmtError::FmtError),
             },
         }
