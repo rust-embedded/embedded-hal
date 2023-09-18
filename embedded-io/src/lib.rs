@@ -401,6 +401,17 @@ pub trait Write: ErrorType {
     /// If you are using [`WriteReady`] to avoid blocking, you should not use this function.
     /// `WriteReady::write_ready()` returning true only guarantees the first call to `write()` will
     /// not block, so this function may still block in subsequent calls.
+    ///
+    /// Unlike [`Write::write`], the number of bytes written is not returned. However, in the case of
+    /// writing to an `&mut [u8]` its possible to calculate the number of bytes written by subtracting
+    /// the length of the slice after the write, from the initial length of the slice.
+    ///
+    /// ```rust
+    /// # use embedded_io::Write;
+    /// let mut buf: &mut [u8] = &mut [0u8; 256];
+    /// let start = buf.len();
+    /// let len = write!(buf, "{}", "Test").and_then(|_| Ok(start - buf.len()));
+    /// ```
     fn write_fmt(&mut self, fmt: fmt::Arguments<'_>) -> Result<(), WriteFmtError<Self::Error>> {
         // Create a shim which translates a Write to a fmt::Write and saves
         // off I/O errors. instead of discarding them
