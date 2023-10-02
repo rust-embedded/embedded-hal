@@ -1,6 +1,6 @@
 [package]
 name = "embedded-io-async"
-version = "0.5.0"
+version = "0.6.0"
 edition = "2021"
 description = "Async embedded IO traits"
 repository = "https://github.com/rust-embedded/embedded-hal"
@@ -17,7 +17,7 @@ alloc = ["embedded-io/alloc"]
 defmt-03 = ["dep:defmt-03", "embedded-io/defmt-03"]
 
 [dependencies]
-embedded-io = { version = "0.5", path = "../embedded-io" }
+embedded-io = { version = "0.6", path = "../embedded-io" }
 defmt-03 = { package = "defmt", version = "0.3", optional = true }
 
 [package.metadata.docs.rs]
