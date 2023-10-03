@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+Add unreleased changes here
+
+## 0.6.0 - 2023-10-02
+
 - Add support for adapting `BufRead` from `futures` and `tokio`.
 - Return an error when a wrapped `std`/`futures`/`tokio` `write()` call returns
   `Ok(0)` to comply with `embedded_io::Write` requirements.
