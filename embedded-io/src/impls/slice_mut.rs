@@ -1,18 +1,5 @@
-use crate::{Error, ErrorKind, ErrorType, Write};
+use crate::{Error, ErrorKind, ErrorType, SliceWriteError, Write};
 use core::mem;
-
-// needed to prevent defmt macros from breaking, since they emit code that does `defmt::blahblah`.
-#[cfg(feature = "defmt-03")]
-use defmt_03 as defmt;
-
-/// Errors that could be returned by `Write` on `&mut [u8]`.
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
-#[non_exhaustive]
-pub enum SliceWriteError {
-    /// The target slice was full and so could not receive any new data.
-    Full,
-}
 
 impl Error for SliceWriteError {
     fn kind(&self) -> ErrorKind {
