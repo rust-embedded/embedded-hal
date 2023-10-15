@@ -58,7 +58,7 @@
 //! For demonstration purposes the address mode parameter has been omitted in this example.
 //!
 //! ```
-//! use embedded_hal::i2c::{I2c, Error};
+//! use embedded_hal::i2c::{self, I2c, Error};
 //!
 //! const ADDR: u8 = 0x15;
 //! # const TEMP_REGISTER: u8 = 0x1;
@@ -72,6 +72,7 @@
 //!     }
 //!
 //!     pub fn read_temperature(&mut self) -> Result<u8, I2C::Error> {
+//!         debug_assert!(i2c::is_seven_bit(&ADDR));
 //!         let mut temp = [0];
 //!         self.i2c.write_read(ADDR, &[TEMP_REGISTER], &mut temp)?;
 //!         Ok(temp[0])
@@ -82,7 +83,7 @@
 //! ## Device driver compatible only with 10-bit addresses
 //!
 //! ```
-//! use embedded_hal::i2c::{Error, TenBitAddress, I2c};
+//! use embedded_hal::i2c::{self, Error, TenBitAddress, I2c};
 //!
 //! const ADDR: u16 = 0x158;
 //! # const TEMP_REGISTER: u8 = 0x1;
@@ -96,6 +97,7 @@
 //!     }
 //!
 //!     pub fn read_temperature(&mut self) -> Result<u8, I2C::Error> {
+//!         debug_assert!(i2c::is_ten_bit(&ADDR));
 //!         let mut temp = [0];
 //!         self.i2c.write_read(ADDR, &[TEMP_REGISTER], &mut temp)?;
 //!         Ok(temp[0])
@@ -151,6 +153,8 @@
 //!     }
 //! }
 //! ```
+
+use core::any::Any;
 
 use crate::private;
 
@@ -409,4 +413,16 @@ impl<A: AddressMode, T: I2c<A> + ?Sized> I2c<A> for &mut T {
     ) -> Result<(), Self::Error> {
         T::transaction(self, address, operations)
     }
+}
+
+/// Convenience function to determine whether the concrete type for an [AddressMode] is
+/// [SevenBitAddress].
+pub fn is_seven_bit(addr: &dyn Any) -> bool {
+    addr.is::<SevenBitAddress>()
+}
+
+/// Convenience function to determine whether the concrete type for an [AddressMode] is
+/// [TenBitAddress].
+pub fn is_ten_bit(addr: &dyn Any) -> bool {
+    addr.is::<TenBitAddress>()
 }
