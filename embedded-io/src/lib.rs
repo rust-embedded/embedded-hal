@@ -259,6 +259,15 @@ impl<E: fmt::Debug> fmt::Display for ReadExactError<E> {
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 impl<E: fmt::Debug> std::error::Error for ReadExactError<E> {}
 
+/// Errors that could be returned by `Write` on `&mut [u8]`.
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
+#[non_exhaustive]
+pub enum SliceWriteError {
+    /// The target slice was full and so could not receive any new data.
+    Full,
+}
+
 /// Error returned by [`Write::write_fmt`]
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
