@@ -1,5 +1,7 @@
-use crate::Write;
 use core::mem;
+use embedded_io::SliceWriteError;
+
+use crate::Write;
 
 /// Write is implemented for `&mut [u8]` by copying into the slice, overwriting
 /// its data.
@@ -14,6 +16,9 @@ impl Write for &mut [u8] {
     #[inline]
     async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
         let amt = core::cmp::min(buf.len(), self.len());
+        if !buf.is_empty() && amt == 0 {
+            return Err(SliceWriteError::Full);
+        }
         let (a, b) = mem::take(self).split_at_mut(amt);
         a.copy_from_slice(&buf[..amt]);
         *self = b;
