@@ -42,6 +42,14 @@ impl<T: ?Sized> embedded_io::ErrorType for FromTokio<T> {
 
 impl<T: tokio::io::AsyncRead + Unpin + ?Sized> embedded_io_async::Read for FromTokio<T> {
     async fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
+        // The current tokio implementation (https://github.com/tokio-rs/tokio/blob/tokio-1.33.0/tokio/src/io/poll_evented.rs#L165)
+        // does not consider the case of buf.is_empty() as a special case,
+        // which can cause Poll::Pending to be returned at the end of the stream when called with an empty buffer.
+        // This poll will, however, never become ready, as no more bytes will be received.
+        if buf.is_empty() {
+            return Ok(0);
+        }
+
         poll_fn(|cx| {
             let mut buf = tokio::io::ReadBuf::new(buf);
             match Pin::new(&mut self.inner).poll_read(cx, &mut buf) {
