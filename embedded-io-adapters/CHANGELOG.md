@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Add unreleased changes here
 
+- Handle reading from `FromTokio` with empty buffer, ensuring `Ok(0)` is always returned.
+
 ## 0.6.0 - 2023-10-02
 
 - Add support for adapting `BufRead` from `futures` and `tokio`.
