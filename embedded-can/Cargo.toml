@@ -13,3 +13,6 @@ repository = "https://github.com/rust-embedded/embedded-hal"
 
 [dependencies]
 nb = "1"
+
+[features]
+async = []

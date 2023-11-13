@@ -3,6 +3,8 @@
 #![warn(missing_docs)]
 #![no_std]
 
+#[cfg(feature = "async")]
+pub mod asynchronous;
 pub mod blocking;
 pub mod nb;
 
