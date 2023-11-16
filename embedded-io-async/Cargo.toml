@@ -10,6 +10,7 @@ categories = [
     "embedded",
     "no-std",
 ]
+rust-version = "1.75.0"
 
 [features]
 std = ["alloc", "embedded-io/std"]

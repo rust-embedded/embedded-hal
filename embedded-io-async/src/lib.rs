@@ -2,14 +2,6 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![warn(missing_docs)]
 #![doc = include_str!("../README.md")]
-// disable warning for already-stabilized features.
-// Needed to pass CI, because we deny warnings.
-// We don't immediately remove them to not immediately break older nightlies.
-// When all features are stable, we'll remove them.
-#![allow(stable_features)]
-#![allow(unknown_lints)]
-#![allow(async_fn_in_trait)]
-#![feature(async_fn_in_trait, impl_trait_projections)]
 
 #[cfg(feature = "alloc")]
 extern crate alloc;
