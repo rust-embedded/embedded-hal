@@ -15,5 +15,8 @@ readme = "README.md"
 repository = "https://github.com/rust-embedded/embedded-hal"
 version = "1.0.0-rc.1"
 
+[features]
+defmt-03 = ["dep:defmt-03"]
+
 [dependencies]
 defmt-03 = { package = "defmt", version = "0.3", optional = true }
