@@ -12,6 +12,8 @@ mod mutex;
 #[cfg(feature = "std")]
 pub use mutex::*;
 mod critical_section;
+mod shared;
+
 pub use self::critical_section::*;
 
 #[cfg(feature = "defmt-03")]
