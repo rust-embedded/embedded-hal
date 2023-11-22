@@ -21,7 +21,7 @@ pub struct MutexDevice<'a, BUS, CS, D> {
 }
 
 impl<'a, BUS, CS, D> MutexDevice<'a, BUS, CS, D> {
-    /// Create a new MutexDevice.
+    /// Create a new [`MutexDevice`].
     #[inline]
     pub fn new(bus: &'a Mutex<BUS>, cs: CS, delay: D) -> Self {
         Self { bus, cs, delay }
@@ -29,7 +29,7 @@ impl<'a, BUS, CS, D> MutexDevice<'a, BUS, CS, D> {
 }
 
 impl<'a, BUS, CS> MutexDevice<'a, BUS, CS, super::NoDelay> {
-    /// Create a new MutexDevice without support for in-transaction delays.
+    /// Create a new [`MutexDevice`] without support for in-transaction delays.
     ///
     /// # Panics
     ///

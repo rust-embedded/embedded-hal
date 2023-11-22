@@ -70,7 +70,7 @@ impl<T: tokio::io::AsyncBufRead + Unpin + ?Sized> embedded_io_async::BufRead for
     }
 
     fn consume(&mut self, amt: usize) {
-        Pin::new(&mut self.inner).consume(amt)
+        Pin::new(&mut self.inner).consume(amt);
     }
 }
 

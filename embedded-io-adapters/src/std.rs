@@ -1,6 +1,6 @@
 //! Adapters to/from `std::io` traits.
 
-use embedded_io::Error;
+use embedded_io::Error as _;
 
 /// Adapter from `std::io` traits.
 #[derive(Clone)]
@@ -48,7 +48,7 @@ impl<T: std::io::BufRead + ?Sized> embedded_io::BufRead for FromStd<T> {
     }
 
     fn consume(&mut self, amt: usize) {
-        self.inner.consume(amt)
+        self.inner.consume(amt);
     }
 }
 
@@ -126,7 +126,7 @@ impl<T: embedded_io::Seek + ?Sized> std::io::Seek for ToStd<T> {
     }
 }
 
-/// Convert a embedded-io error to a std::io::Error
+/// Convert a embedded-io error to a [`std::io::Error`]
 pub fn to_std_error<T: embedded_io::Error>(err: T) -> std::io::Error {
     std::io::Error::new(err.kind().into(), format!("{err:?}"))
 }
