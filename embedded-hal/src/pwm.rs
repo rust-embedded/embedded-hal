@@ -95,8 +95,14 @@ pub trait SetDutyCycle: ErrorType {
     /// and that `denom` is not zero.
     #[inline]
     fn set_duty_cycle_fraction(&mut self, num: u16, denom: u16) -> Result<(), Self::Error> {
+        debug_assert!(num <= denom);
         let duty = u32::from(num) * u32::from(self.get_max_duty_cycle()) / u32::from(denom);
-        self.set_duty_cycle(duty as u16)
+
+        // This is safe because we know that `num <= denom`, so `duty <= self.get_max_duty_cycle()` (u16)
+        #[allow(clippy::cast_possible_truncation)]
+        {
+            self.set_duty_cycle(duty as u16)
+        }
     }
 
     /// Set the duty cycle to `percent / 100`
