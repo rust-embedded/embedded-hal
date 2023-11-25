@@ -51,7 +51,7 @@ impl<T: futures::io::AsyncBufRead + Unpin + ?Sized> embedded_io_async::BufRead f
     }
 
     fn consume(&mut self, amt: usize) {
-        Pin::new(&mut self.inner).consume(amt)
+        Pin::new(&mut self.inner).consume(amt);
     }
 }
 

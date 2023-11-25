@@ -18,7 +18,7 @@ impl<T: ?Sized + BufRead> BufRead for Box<T> {
 
     #[inline]
     fn consume(&mut self, amt: usize) {
-        T::consume(self, amt)
+        T::consume(self, amt);
     }
 }
 
