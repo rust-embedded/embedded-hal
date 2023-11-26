@@ -12,7 +12,7 @@ This project is developed and maintained by the [HAL team](https://github.com/ru
 
 ## Serial/UART traits
 
-There is no serial traits in `embedded-hal-async`. Instead, use [`embedded-io-async`](https://crates.io/crates/embedded-io).
+There is no serial traits in `embedded-hal-async`. Instead, use [`embedded-io-async`](https://crates.io/crates/embedded-io-async).
 A serial port is essentially a byte-oriented stream, and that's what `embedded-io-async` models. Sharing the traits
 with all byte streams has some advantages. For example, it allows generic code providing a command-line interface
 or a console to operate either on hardware serial ports or on virtual ones like Telnet or USB CDC-ACM.
