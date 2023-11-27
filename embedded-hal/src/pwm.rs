@@ -95,6 +95,7 @@ pub trait SetDutyCycle: ErrorType {
     /// and that `denom` is not zero.
     #[inline]
     fn set_duty_cycle_fraction(&mut self, num: u16, denom: u16) -> Result<(), Self::Error> {
+        debug_assert!(denom != 0);
         debug_assert!(num <= denom);
         let duty = u32::from(num) * u32::from(self.get_max_duty_cycle()) / u32::from(denom);
 
