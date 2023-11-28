@@ -2,6 +2,7 @@
 name = "embedded-hal-nb"
 version = "1.0.0-rc.1"
 edition = "2021"
+rust-version = "1.56"
 
 categories = ["embedded", "hardware-support", "no-std"]
 description = "Non-blocking Hardware Abstraction Layer (HAL) for embedded systems using the `nb` crate."
