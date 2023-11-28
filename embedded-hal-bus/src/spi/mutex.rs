@@ -1,4 +1,4 @@
-use embedded_hal::delay::DelayUs;
+use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::OutputPin;
 use embedded_hal::spi::{ErrorType, Operation, SpiBus, SpiDevice};
 use std::sync::Mutex;
@@ -58,7 +58,7 @@ impl<'a, Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for MutexDevice<'a, B
 where
     BUS: SpiBus<Word>,
     CS: OutputPin,
-    D: DelayUs,
+    D: DelayNs,
 {
     #[inline]
     fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {

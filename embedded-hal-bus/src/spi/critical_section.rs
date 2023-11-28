@@ -1,6 +1,6 @@
 use core::cell::RefCell;
 use critical_section::Mutex;
-use embedded_hal::delay::DelayUs;
+use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::OutputPin;
 use embedded_hal::spi::{ErrorType, Operation, SpiBus, SpiDevice};
 
@@ -60,7 +60,7 @@ impl<'a, Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for CriticalSectionDe
 where
     BUS: SpiBus<Word>,
     CS: OutputPin,
-    D: DelayUs,
+    D: DelayNs,
 {
     #[inline]
     fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {

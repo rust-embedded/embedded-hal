@@ -1,11 +1,11 @@
 //! SPI bus sharing mechanisms.
 
-use embedded_hal::delay::DelayUs;
+use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::OutputPin;
 use embedded_hal::spi::{ErrorType, Operation, SpiBus, SpiDevice};
 #[cfg(feature = "async")]
 use embedded_hal_async::{
-    delay::DelayUs as AsyncDelayUs,
+    delay::DelayNs as AsyncDelayUs,
     spi::{SpiBus as AsyncSpiBus, SpiDevice as AsyncSpiDevice},
 };
 
@@ -70,7 +70,7 @@ impl<Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for ExclusiveDevice<BUS, 
 where
     BUS: SpiBus<Word>,
     CS: OutputPin,
-    D: DelayUs,
+    D: DelayNs,
 {
     #[inline]
     fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {

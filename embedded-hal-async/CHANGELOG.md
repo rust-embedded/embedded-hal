@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Minor document fixes.
 - Add #[inline] hints to most of `embedded-hal-async` functions.
+- delay: Rename `DelayUs` to `DelayNs`
+- delay: Add `DelayNs::delay_ns()`
+- delay: Add default impls of `delay_ms` and `delay_us` based on `delay_ns`.
 
 ## [v1.0.0-rc.1] - 2023-08-15
 
