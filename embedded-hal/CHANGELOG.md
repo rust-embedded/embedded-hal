@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Minor document fixes.
 - Add #[inline] hints to most of `embedded-hal` functions.
+- pwm: rename `get_max_duty_cycle` to `max_duty_cycle`.
 
 ## [v1.0.0-rc.1] - 2023-08-15
 

@@ -69,7 +69,7 @@ pub trait SetDutyCycle: ErrorType {
     /// Get the maximum duty cycle value.
     ///
     /// This value corresponds to a 100% duty cycle.
-    fn get_max_duty_cycle(&self) -> u16;
+    fn max_duty_cycle(&self) -> u16;
 
     /// Set the duty cycle to `duty / max_duty`.
     ///
@@ -86,7 +86,7 @@ pub trait SetDutyCycle: ErrorType {
     /// Set the duty cycle to 100%, or always active.
     #[inline]
     fn set_duty_cycle_fully_on(&mut self) -> Result<(), Self::Error> {
-        self.set_duty_cycle(self.get_max_duty_cycle())
+        self.set_duty_cycle(self.max_duty_cycle())
     }
 
     /// Set the duty cycle to `num / denom`.
@@ -97,9 +97,9 @@ pub trait SetDutyCycle: ErrorType {
     fn set_duty_cycle_fraction(&mut self, num: u16, denom: u16) -> Result<(), Self::Error> {
         debug_assert!(denom != 0);
         debug_assert!(num <= denom);
-        let duty = u32::from(num) * u32::from(self.get_max_duty_cycle()) / u32::from(denom);
+        let duty = u32::from(num) * u32::from(self.max_duty_cycle()) / u32::from(denom);
 
-        // This is safe because we know that `num <= denom`, so `duty <= self.get_max_duty_cycle()` (u16)
+        // This is safe because we know that `num <= denom`, so `duty <= self.max_duty_cycle()` (u16)
         #[allow(clippy::cast_possible_truncation)]
         {
             self.set_duty_cycle(duty as u16)
@@ -117,8 +117,8 @@ pub trait SetDutyCycle: ErrorType {
 
 impl<T: SetDutyCycle + ?Sized> SetDutyCycle for &mut T {
     #[inline]
-    fn get_max_duty_cycle(&self) -> u16 {
-        T::get_max_duty_cycle(self)
+    fn max_duty_cycle(&self) -> u16 {
+        T::max_duty_cycle(self)
     }
 
     #[inline]
