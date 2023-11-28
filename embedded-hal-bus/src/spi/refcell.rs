@@ -1,5 +1,5 @@
 use core::cell::RefCell;
-use embedded_hal::delay::DelayUs;
+use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::OutputPin;
 use embedded_hal::spi::{ErrorType, Operation, SpiBus, SpiDevice};
 
@@ -34,7 +34,7 @@ impl<'a, BUS, CS> RefCellDevice<'a, BUS, CS, super::NoDelay> {
     /// # Panics
     ///
     /// The returned device will panic if you try to execute a transaction
-    /// that contains any operations of type `Operation::DelayUs`.
+    /// that contains any operations of type [`Operation::DelayNs`].
     #[inline]
     pub fn new_no_delay(bus: &'a RefCell<BUS>, cs: CS) -> Self {
         Self {
@@ -57,7 +57,7 @@ impl<'a, Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for RefCellDevice<'a,
 where
     BUS: SpiBus<Word>,
     CS: OutputPin,
-    D: DelayUs,
+    D: DelayNs,
 {
     #[inline]
     fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {

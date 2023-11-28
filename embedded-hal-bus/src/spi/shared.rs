@@ -1,4 +1,4 @@
-use embedded_hal::delay::DelayUs;
+use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::OutputPin;
 use embedded_hal::spi::{ErrorType, Operation, SpiBus};
 
@@ -15,7 +15,7 @@ pub fn transaction<Word, BUS, CS, D>(
 where
     BUS: SpiBus<Word> + ErrorType,
     CS: OutputPin,
-    D: DelayUs,
+    D: DelayNs,
     Word: Copy,
 {
     cs.set_low().map_err(DeviceError::Cs)?;
@@ -25,9 +25,9 @@ where
         Operation::Write(buf) => bus.write(buf),
         Operation::Transfer(read, write) => bus.transfer(read, write),
         Operation::TransferInPlace(buf) => bus.transfer_in_place(buf),
-        Operation::DelayUs(us) => {
+        Operation::DelayNs(ns) => {
             bus.flush()?;
-            delay.delay_us(*us);
+            delay.delay_ns(*ns);
             Ok(())
         }
     });

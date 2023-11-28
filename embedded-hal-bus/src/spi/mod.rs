@@ -43,33 +43,28 @@ where
     }
 }
 
-/// Dummy `DelayUs` implementation that panics on use.
+/// Dummy [`DelayNs`](embedded_hal::delay::DelayNs) implementation that panics on use.
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub struct NoDelay;
 
 #[cold]
 fn no_delay_panic() {
-    panic!("You've tried to execute a SPI transaction containing a `Operation::Delay` in a `SpiDevice` created with `new_no_delay()`. Create it with `new()` instead, passing a `DelayUs` implementation.");
+    panic!("You've tried to execute a SPI transaction containing a `Operation::DelayNs` in a `SpiDevice` created with `new_no_delay()`. Create it with `new()` instead, passing a `DelayNs` implementation.");
 }
 
-impl embedded_hal::delay::DelayUs for NoDelay {
+impl embedded_hal::delay::DelayNs for NoDelay {
     #[inline]
-    fn delay_us(&mut self, _us: u32) {
+    fn delay_ns(&mut self, _ns: u32) {
         no_delay_panic();
     }
 }
 
 #[cfg(feature = "async")]
 #[cfg_attr(docsrs, doc(cfg(feature = "async")))]
-impl embedded_hal_async::delay::DelayUs for NoDelay {
+impl embedded_hal_async::delay::DelayNs for NoDelay {
     #[inline]
-    async fn delay_us(&mut self, _us: u32) {
-        no_delay_panic();
-    }
-
-    #[inline]
-    async fn delay_ms(&mut self, _ms: u32) {
+    async fn delay_ns(&mut self, _ns: u32) {
         no_delay_panic();
     }
 }
