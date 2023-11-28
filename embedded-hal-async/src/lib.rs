@@ -5,10 +5,9 @@
 // Needed to pass CI, because we deny warnings.
 // We don't immediately remove them to not immediately break older nightlies.
 // When all features are stable, we'll remove them.
-#![allow(stable_features)]
-#![allow(unknown_lints)]
+#![cfg_attr(nightly, allow(stable_features, unknown_lints))]
+#![cfg_attr(nightly, feature(async_fn_in_trait, impl_trait_projections))]
 #![allow(async_fn_in_trait)]
-#![feature(async_fn_in_trait, impl_trait_projections)]
 
 pub mod delay;
 pub mod digital;

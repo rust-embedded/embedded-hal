@@ -6,8 +6,11 @@
 // Needed to pass CI, because we deny warnings.
 // We don't immediately remove them to not immediately break older nightlies.
 // When all features are stable, we'll remove them.
-#![cfg_attr(feature = "async", allow(stable_features))]
-#![cfg_attr(feature = "async", feature(async_fn_in_trait, impl_trait_projections))]
+#![cfg_attr(all(feature = "async", nightly), allow(stable_features))]
+#![cfg_attr(
+    all(feature = "async", nightly),
+    feature(async_fn_in_trait, impl_trait_projections)
+)]
 
 // needed to prevent defmt macros from breaking, since they emit code that does `defmt::blahblah`.
 #[cfg(feature = "defmt-03")]

@@ -7,11 +7,11 @@
 // We don't immediately remove them to not immediately break older nightlies.
 // When all features are stable, we'll remove them.
 #![cfg_attr(
-    any(feature = "tokio-1", feature = "futures-03"),
+    all(any(feature = "tokio-1", feature = "futures-03"), nightly),
     allow(stable_features)
 )]
 #![cfg_attr(
-    any(feature = "tokio-1", feature = "futures-03"),
+    all(any(feature = "tokio-1", feature = "futures-03"), nightly),
     feature(async_fn_in_trait, impl_trait_projections)
 )]
 
