@@ -5,10 +5,11 @@ use embedded_hal::digital::OutputPin;
 use embedded_hal::spi::{ErrorType, Operation, SpiBus, SpiDevice};
 #[cfg(feature = "async")]
 use embedded_hal_async::{
-    delay::DelayNs as AsyncDelayUs,
+    delay::DelayNs as AsyncDelayNs,
     spi::{SpiBus as AsyncSpiBus, SpiDevice as AsyncSpiDevice},
 };
 
+use super::shared::transaction;
 use super::DeviceError;
 
 /// [`SpiDevice`] implementation with exclusive access to the bus (not shared).
@@ -47,7 +48,7 @@ impl<BUS, CS> ExclusiveDevice<BUS, CS, super::NoDelay> {
     /// # Panics
     ///
     /// The returned device will panic if you try to execute a transaction
-    /// that contains any operations of type `Operation::DelayUs`.
+    /// that contains any operations of type [`Operation::DelayNs`].
     #[inline]
     pub fn new_no_delay(bus: BUS, cs: CS) -> Self {
         Self {
@@ -84,7 +85,7 @@ impl<Word: Copy + 'static, BUS, CS, D> AsyncSpiDevice<Word> for ExclusiveDevice<
 where
     BUS: AsyncSpiBus<Word>,
     CS: OutputPin,
-    D: AsyncDelayUs,
+    D: AsyncDelayNs,
 {
     #[inline]
     async fn transaction(
@@ -100,10 +101,10 @@ where
                     Operation::Write(buf) => self.bus.write(buf).await,
                     Operation::Transfer(read, write) => self.bus.transfer(read, write).await,
                     Operation::TransferInPlace(buf) => self.bus.transfer_in_place(buf).await,
-                    Operation::DelayUs(us) => match self.bus.flush().await {
+                    Operation::DelayNs(ns) => match self.bus.flush().await {
                         Err(e) => Err(e),
                         Ok(()) => {
-                            self.delay.delay_us(*us).await;
+                            self.delay.delay_ns(*ns).await;
                             Ok(())
                         }
                     },

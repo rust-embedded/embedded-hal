@@ -35,7 +35,7 @@ impl<'a, BUS, CS> MutexDevice<'a, BUS, CS, super::NoDelay> {
     /// # Panics
     ///
     /// The returned device will panic if you try to execute a transaction
-    /// that contains any operations of type `Operation::DelayUs`.
+    /// that contains any operations of type [`Operation::DelayNs`].
     #[inline]
     pub fn new_no_delay(bus: &'a Mutex<BUS>, cs: CS) -> Self {
         Self {

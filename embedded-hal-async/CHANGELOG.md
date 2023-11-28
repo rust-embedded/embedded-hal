@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - delay: Rename `DelayUs` to `DelayNs`
 - delay: Add `DelayNs::delay_ns()`
 - delay: Add default impls of `delay_ms` and `delay_us` based on `delay_ns`.
+- spi: Rename `Operation::DelayUs` to `Operation::DelayNs`, with nanosecond precision.
 
 ## [v1.0.0-rc.1] - 2023-08-15
 

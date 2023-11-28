@@ -43,14 +43,14 @@ where
     }
 }
 
-/// Dummy `DelayUs` implementation that panics on use.
+/// Dummy [`DelayNs`](embedded_hal::delay::DelayNs) implementation that panics on use.
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 pub struct NoDelay;
 
 #[cold]
 fn no_delay_panic() {
-    panic!("You've tried to execute a SPI transaction containing a `Operation::Delay` in a `SpiDevice` created with `new_no_delay()`. Create it with `new()` instead, passing a `DelayUs` implementation.");
+    panic!("You've tried to execute a SPI transaction containing a `Operation::DelayNs` in a `SpiDevice` created with `new_no_delay()`. Create it with `new()` instead, passing a `DelayNs` implementation.");
 }
 
 impl embedded_hal::delay::DelayNs for NoDelay {

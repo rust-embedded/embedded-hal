@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - delay: Add `DelayNs::delay_ns()`
 - delay: Add default impls of `delay_ms` and `delay_us` based on `delay_ns`.
 - delay: Make the default impl of `delay_ms` more efficient, it now does less calls to the underlying `delay_ns` (previously `delay_us`).
+- spi: Rename `Operation::DelayUs` to `Operation::DelayNs`, with nanosecond precision.
 
 ## [v1.0.0-rc.1] - 2023-08-15
 

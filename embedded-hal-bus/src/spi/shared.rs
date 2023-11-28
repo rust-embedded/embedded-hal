@@ -25,9 +25,9 @@ where
         Operation::Write(buf) => bus.write(buf),
         Operation::Transfer(read, write) => bus.transfer(read, write),
         Operation::TransferInPlace(buf) => bus.transfer_in_place(buf),
-        Operation::DelayUs(us) => {
+        Operation::DelayNs(ns) => {
             bus.flush()?;
-            delay.delay_us(*us);
+            delay.delay_ns(*ns);
             Ok(())
         }
     });
