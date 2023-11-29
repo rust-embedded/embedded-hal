@@ -7,8 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+No unreleased changes
+
+## [v1.0.0-rc.2] - 2023-11-28
+
+- Updated `embedded-hal(-async)` to version `1.0.0-rc.2`.
 - Minor document fixes.
 - Add #[inline] hints to most of `embedded-hal-bus` functions.
+- Use `feature()` on nightly toolchains only. This adds async support for 1.75 beta and stable.
 
 ## [v0.1.0-rc.1] - 2023-08-15
 
@@ -42,7 +48,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 First release to crates.io
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-rc.1...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-rc.2...HEAD
+[v0.1.0-rc.2]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-rc.1...embedded-hal-bus-v0.1.0-rc.2
 [v0.1.0-rc.1]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-alpha.3...embedded-hal-bus-v0.1.0-rc.1
 [v0.1.0-alpha.3]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-alpha.2...embedded-hal-bus-v0.1.0-alpha.3
 [v0.1.0-alpha.2]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-alpha.1...embedded-hal-bus-v0.1.0-alpha.2

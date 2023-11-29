@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+No unreleased changes
+
+## [v1.0.0-rc.2] - 2023-11-28
+
+- Updated `embedded-hal` to version `1.0.0-rc.2`.
 - Minor document fixes.
 - Add #[inline] hints to most of `embedded-hal-nb` functions.
 
@@ -35,7 +40,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 First release to crates.io
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-nb-v1.0.0-alpha.3...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-nb-v1.0.0-rc.2...HEAD
+[v1.0.0-rc.2]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-nb-v1.0.0-rc.1...embedded-hal-nb-v1.0.0-rc.2
+[v1.0.0-rc.1]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-nb-v1.0.0-alpha.3...embedded-hal-nb-v1.0.0-rc.1
 [v1.0.0-alpha.3]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-nb-v1.0.0-alpha.2...embedded-hal-nb-v1.0.0-alpha.3
 [v1.0.0-alpha.2]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-nb-v1.0.0-alpha.1...embedded-hal-nb-v1.0.0-alpha.2
 [v1.0.0-alpha.1]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-nb-v1.0.0-alpha.0...embedded-hal-nb-v1.0.0-alpha.1

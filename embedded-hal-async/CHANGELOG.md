@@ -7,12 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+No unreleased changes
+
+## [v1.0.0-rc.2] - 2023-11-28
+
+- Updated `embedded-hal` to version `1.0.0-rc.2`.
 - Minor document fixes.
 - Add #[inline] hints to most of `embedded-hal-async` functions.
 - delay: Rename `DelayUs` to `DelayNs`
 - delay: Add `DelayNs::delay_ns()`
 - delay: Add default impls of `delay_ms` and `delay_us` based on `delay_ns`.
 - spi: Rename `Operation::DelayUs` to `Operation::DelayNs`, with nanosecond precision.
+- Use `feature()` on nightly toolchains only. This adds support for 1.75 beta and stable.
 
 ## [v1.0.0-rc.1] - 2023-08-15
 
@@ -76,7 +82,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 First release to crates.io
 
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v1.0.0-rc.1...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v1.0.0-rc.2...HEAD
+[v1.0.0-rc.2]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v1.0.0-rc.1...embedded-hal-async-v1.0.0-rc.2
 [v1.0.0-rc.1]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.2.0-alpha.2...embedded-hal-async-v1.0.0-rc.1
 [v0.2.0-alpha.2]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.2.0-alpha.1...embedded-hal-async-v0.2.0-alpha.2
 [v0.2.0-alpha.1]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.2.0-alpha.0...embedded-hal-async-v0.2.0-alpha.1

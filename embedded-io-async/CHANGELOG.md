@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Add unreleased changes here
 
+## 0.6.1 - 2023-11-28
+
+- Use `feature()` on nightly toolchains only. This adds support for 1.75 beta and stable.
+
 ## 0.6.0 - 2023-10-02
 
 - Prohibit `Write::write` implementations returning `Ok(0)` unless there is no
