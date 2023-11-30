@@ -16,7 +16,7 @@ pub trait DelayNs {
     fn delay_us(&mut self, mut us: u32) {
         const MAX_MICROS: u32 = u32::MAX / NANOS_PER_MICRO;
 
-        // Avoid potential overflow if micro -> micro conversion is too large
+        // Avoid potential overflow if micro -> nano conversion is too large
         while us > MAX_MICROS {
             us -= MAX_MICROS;
             self.delay_ns(MAX_MICROS * NANOS_PER_MICRO);
@@ -31,7 +31,7 @@ pub trait DelayNs {
     fn delay_ms(&mut self, mut ms: u32) {
         const MAX_MILLIS: u32 = u32::MAX / NANOS_PER_MILLI;
 
-        // Avoid potential overflow if milli -> micro conversion is too large
+        // Avoid potential overflow if milli -> nano conversion is too large
         while ms > MAX_MILLIS {
             ms -= MAX_MILLIS;
             self.delay_ns(MAX_MILLIS * NANOS_PER_MILLI);
