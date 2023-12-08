@@ -268,6 +268,17 @@ impl<T: ErrorType + ?Sized> ErrorType for &mut T {
 pub trait AddressMode: private::Sealed + 'static {}
 
 /// 7-bit address mode type.
+///
+/// Note that 7-bit addresses defined by drivers should be specified in **right-aligned** form,
+/// e.g. in the range `0x00..=0x7F`.
+///
+/// For example, a device that has the seven bit address of `0b011_0010`, and therefore is addressed on the wire using:
+///
+/// * `0b0110010_0` or `0x64` for *writes*
+/// * `0b0110010_1` or `0x65` for *reads*
+///
+/// Should be specified as `0b0011_0010` or `0x32`, NOT `0x64` or `0x65`. Care should be taken by both HAL and driver
+/// crate writers to use this scheme consistently.
 pub type SevenBitAddress = u8;
 
 /// 10-bit address mode type.
