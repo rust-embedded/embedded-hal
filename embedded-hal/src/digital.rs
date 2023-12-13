@@ -169,22 +169,22 @@ pub trait StatefulOutputPin: OutputPin {
     /// Is the pin in drive high mode?
     ///
     /// *NOTE* this does *not* read the electrical state of the pin.
-    fn is_set_high(&self) -> Result<bool, Self::Error>;
+    fn is_set_high(&mut self) -> Result<bool, Self::Error>;
 
     /// Is the pin in drive low mode?
     ///
     /// *NOTE* this does *not* read the electrical state of the pin.
-    fn is_set_low(&self) -> Result<bool, Self::Error>;
+    fn is_set_low(&mut self) -> Result<bool, Self::Error>;
 }
 
 impl<T: StatefulOutputPin + ?Sized> StatefulOutputPin for &mut T {
     #[inline]
-    fn is_set_high(&self) -> Result<bool, Self::Error> {
+    fn is_set_high(&mut self) -> Result<bool, Self::Error> {
         T::is_set_high(self)
     }
 
     #[inline]
-    fn is_set_low(&self) -> Result<bool, Self::Error> {
+    fn is_set_low(&mut self) -> Result<bool, Self::Error> {
         T::is_set_low(self)
     }
 }
@@ -205,20 +205,20 @@ impl<T: ToggleableOutputPin + ?Sized> ToggleableOutputPin for &mut T {
 /// Single digital input pin.
 pub trait InputPin: ErrorType {
     /// Is the input pin high?
-    fn is_high(&self) -> Result<bool, Self::Error>;
+    fn is_high(&mut self) -> Result<bool, Self::Error>;
 
     /// Is the input pin low?
-    fn is_low(&self) -> Result<bool, Self::Error>;
+    fn is_low(&mut self) -> Result<bool, Self::Error>;
 }
 
-impl<T: InputPin + ?Sized> InputPin for &T {
+impl<T: InputPin + ?Sized> InputPin for &mut T {
     #[inline]
-    fn is_high(&self) -> Result<bool, Self::Error> {
+    fn is_high(&mut self) -> Result<bool, Self::Error> {
         T::is_high(self)
     }
 
     #[inline]
-    fn is_low(&self) -> Result<bool, Self::Error> {
+    fn is_low(&mut self) -> Result<bool, Self::Error> {
         T::is_low(self)
     }
 }
