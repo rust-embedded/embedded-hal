@@ -34,10 +34,7 @@ compile with older versions but that may change in any new patch release.
 
 See [here](../docs/msrv.md) for details on how the MSRV may be upgraded.
 
-Enabling any of the `tokio-*` or `futures-*` Cargo features requires Rust nightly newer than
-`nightly-2022-11-22`, due to requiring support for `async fn` in traits (AFIT),
-which is not stable yet. Keep in mind Rust nightlies can make backwards-incompatible
-changes to unstable features at any time.
+Enabling any of the `tokio-*` or `futures-*` Cargo features requires Rust 1.75 or higher.
 
 ## License
 

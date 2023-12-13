@@ -41,6 +41,8 @@ compile with older versions but that may change in any new patch release.
 
 See [here](../docs/msrv.md) for details on how the MSRV may be upgraded.
 
+Enabling the `async` Cargo features requires Rust 1.75 or higher.
+
 ## License
 
 Licensed under either of

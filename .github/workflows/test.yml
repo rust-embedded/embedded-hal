@@ -13,38 +13,48 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        rust:
-          - stable
-          - 1.60.0  # MSRV
-          - nightly
-        target:
-          - x86_64-unknown-linux-gnu
-          - thumbv7m-none-eabi
-        features:
-          - ''
-        include:
-          - rust: stable
-            target: x86_64-unknown-linux-gnu
-            features: std
-          - rust: stable
-            target: x86_64-unknown-linux-gnu
-            features: alloc
-          - rust: nightly
-            target: x86_64-unknown-linux-gnu
-            features: std,tokio-1,futures-03,defmt-03
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@master
+      - uses: dtolnay/rust-toolchain@beta
+      - run: cargo test --workspace
+  
+  test-all-features:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@beta
+      - run: cargo test --workspace --all-features
+
+  build-nostd:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@beta
         with:
-          toolchain: ${{ matrix.rust }}
-          target: ${{ matrix.target }}
+          target: thumbv7m-none-eabi
+      - run: >
+          cargo build
+          --workspace
+          --target thumbv7m-none-eabi
+          --features async,defmt-03
 
-      - run: mv Cargo.stable.toml Cargo.toml
-        if: matrix.rust != 'nightly'
+  msrv-1-60:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@1.60
+      - run: >
+          cargo test
+          -p embedded-hal:1.0.0-rc.2
+          -p embedded-hal-bus
+          -p embedded-hal-nb
+          -p embedded-io
+          -p embedded-io-adapters
+          -p embedded-can
 
-      - run: cargo check --target=${{ matrix.target }} --features=${{ matrix.features }}
-
-      - run: cargo test --target=${{ matrix.target }} --features=${{ matrix.features }}
-        if: contains(matrix.target, 'linux')
+  msrv-1-75:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dtolnay/rust-toolchain@beta
+      - run: cargo test --workspace --all-features
