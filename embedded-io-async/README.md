@@ -18,11 +18,10 @@ This project is developed and maintained by the [HAL team](https://github.com/ru
 
 ## Minimum Supported Rust Version (MSRV)
 
-This crate requires Rust nightly newer than `nightly-2022-11-22`, due to requiring support for
-`async fn` in traits (AFIT), which is not stable yet. 
+This crate is guaranteed to compile on stable Rust 1.75 and up. It *might*
+compile with older versions but that may change in any new patch release.
 
-Keep in mind Rust nightlies can make backwards-incompatible changes to unstable features
-at any time.
+See [here](../docs/msrv.md) for details on how the MSRV may be upgraded.
 
 ## License
 
