@@ -1,6 +1,6 @@
 [package]
 name = "embedded-hal-nb"
-version = "1.0.0-rc.2"
+version = "1.0.0-rc.3"
 edition = "2021"
 rust-version = "1.56"
 
@@ -13,7 +13,7 @@ readme = "README.md"
 repository = "https://github.com/rust-embedded/embedded-hal"
 
 [dependencies]
-embedded-hal = { version = "=1.0.0-rc.2", path = "../embedded-hal" }
+embedded-hal = { version = "=1.0.0-rc.3", path = "../embedded-hal" }
 nb = "1"
 
 [dev-dependencies]
