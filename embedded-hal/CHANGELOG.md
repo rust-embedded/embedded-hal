@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+No unreleased changes yet
+
+## [v1.0.0-rc.3] - 2023-12-14
+
 - gpio: require `&mut self` in `InputPin` and `StatefulOutputPin`.
 
 ## [v1.0.0-rc.2] - 2023-11-28
@@ -310,7 +314,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 Initial release
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-rc.2...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-rc.3...HEAD
+[v1.0.0-rc.3]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-rc.2...v1.0.0-rc.3
 [v1.0.0-rc.2]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-rc.1...v1.0.0-rc.2
 [v1.0.0-rc.1]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.11...v1.0.0-rc.1
 [v1.0.0-alpha.11]: https://github.com/rust-embedded/embedded-hal/compare/v1.0.0-alpha.10...v1.0.0-alpha.11
