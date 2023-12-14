@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-No unreleased changes
+- gpio: require `&mut self` in `InputPin` and `StatefulOutputPin`.
 
 ## [v1.0.0-rc.2] - 2023-11-28
 
