@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-No unreleased changes yet
+- gpio: remove `ToggleableOutputPin`, move `toggle()` to `StatefulOutputPin`.
 
 ## [v1.0.0-rc.3] - 2023-12-14
 

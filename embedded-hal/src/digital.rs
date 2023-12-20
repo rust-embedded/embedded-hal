@@ -175,6 +175,12 @@ pub trait StatefulOutputPin: OutputPin {
     ///
     /// *NOTE* this does *not* read the electrical state of the pin.
     fn is_set_low(&mut self) -> Result<bool, Self::Error>;
+
+    /// Toggle pin output.
+    fn toggle(&mut self) -> Result<(), Self::Error> {
+        let was_low: bool = self.is_set_low()?;
+        self.set_state(PinState::from(was_low))
+    }
 }
 
 impl<T: StatefulOutputPin + ?Sized> StatefulOutputPin for &mut T {
@@ -187,15 +193,7 @@ impl<T: StatefulOutputPin + ?Sized> StatefulOutputPin for &mut T {
     fn is_set_low(&mut self) -> Result<bool, Self::Error> {
         T::is_set_low(self)
     }
-}
 
-/// Output pin that can be toggled.
-pub trait ToggleableOutputPin: ErrorType {
-    /// Toggle pin output.
-    fn toggle(&mut self) -> Result<(), Self::Error>;
-}
-
-impl<T: ToggleableOutputPin + ?Sized> ToggleableOutputPin for &mut T {
     #[inline]
     fn toggle(&mut self) -> Result<(), Self::Error> {
         T::toggle(self)
