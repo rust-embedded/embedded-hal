@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 
 - gpio: remove `ToggleableOutputPin`, move `toggle()` to `StatefulOutputPin`.
+- gpio: *don't* require `&mut self` in `InputPin` and `StatefulOutputPin`.
 
 ## [v1.0.0-rc.3] - 2023-12-14
 
