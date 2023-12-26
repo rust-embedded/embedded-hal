@@ -9,13 +9,6 @@
 
 This project is developed and maintained by the [HAL team](https://github.com/rust-embedded/wg#the-hal-team).
 
-**NOTE** This HAL is still in active development. Expect the traits presented here to be
-tweaked, split or be replaced wholesale before being stabilized, i.e. before hitting the 1.0.0
-release.
-
-**NOTE** If you want to use an alpha release of the 1.0.0 version, use an exact version
-specifier in your `Cargo.toml` like: `embedded-hal = "=1.0.0-alpha.2"`.
-
 ## Companion crates
 
 The main `embedded-hal` crate contains only blocking traits, where the operation is done
@@ -30,6 +23,14 @@ SPI and I2C buses.
 
 Additionally, more domain-specific traits are available in separate crates:
 - [`embedded-can`](https://docs.rs/embedded-can): Controller Area Network (CAN)
+- [`embedded-io`](https://docs.rs/embedded-io): I/O byte streams (like `std::io`, but `no-std`-compatible).
+
+## Serial/UART traits
+
+There is no serial traits in `embedded-hal`. Instead, use [`embedded-io`](https://crates.io/crates/embedded-io).
+A serial port is essentially a byte-oriented stream, and that's what `embedded-io` models. Sharing the traits
+with all byte streams has some advantages. For example, it allows generic code providing a command-line interface
+or a console to operate either on hardware serial ports or on virtual ones like Telnet or USB CDC-ACM.
 
 ## Design goals
 
@@ -76,13 +77,6 @@ for the *embedded-hal* keyword](https://crates.io/keywords/embedded-hal).
 If you are writing a platform-agnostic driver yourself you are highly encouraged to [add the
 embedded-hal keyword](https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata)
 to your crate before publishing it!
-
-## Serial/UART traits
-
-There is no serial traits in `embedded-hal`. Instead, use [`embedded-io`](https://crates.io/crates/embedded-io).
-A serial port is essentially a byte-oriented stream, and that's what `embedded-io` models. Sharing the traits
-with all byte streams has some advantages. For example, it allows generic code providing a command-line interface
-or a console to operate either on hardware serial ports or on virtual ones like Telnet or USB CDC-ACM.
 
 ## Optional Cargo features
 
