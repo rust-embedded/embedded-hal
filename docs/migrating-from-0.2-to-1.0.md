@@ -19,6 +19,8 @@
 - [Removed blanket implementations](#removed-blanket-implementations)
 - [Cargo Features](#cargo-features)
 - [Companion crates](#companion-crates)
+- [Supporting both 0.2 and 1.0 in the same HAL](#supporting-both-02-and-10-in-the-same-hal)
+- [`embedded-hal-compat`](#embedded-hal-compat)
 
 ## Overview and reasoning
 
@@ -41,7 +43,7 @@ For `embedded-hal` 1.0, we decided to drop the first goal, targeting only the se
 - The second goal delivers much more value. Being able to use any driver together with any HAL crate, out of the box, and across the entire Rust Embedded ecosystem, is just plain awesome.
 
 This refocusing on drivers is the root cause of many of the changes between `embedded-hal` 0.2 and 1.0:
-- [Associated type compatibiilty](#removed-traits)
+- [Associated type compatibility](#removed-traits)
 - [Trait fragmentation](#trait-organization)
 - [Bus/device separation](#bus-device-separation)
 - [Fallibility](#fallibility)
@@ -91,7 +93,7 @@ These traits have been removed in the 1.0.0 release, with no replacement for now
 - [`watchdog::Watchdog`][watchdog]
 
 Please find a general [roadmap with further guidance here][roadmap-rm-traits] about
-whether and how to get these traits back in a future release
+whether and how to get these traits back in a future release.
 
 If you are a generic driver author and need one of them, we would like to hear from you. Please add your use case to the appropriate issue for the trait affected.
 
@@ -359,16 +361,76 @@ experiment externally, and merge when some kind of feasibility had been proven.
 
 ## Companion crates
 
-The `embedded-hal` project now spans several crates, where some functionality has been moved out from the main `embedded-hal` crate to separate crates as detailed above. Here is the full listing of crates:
+The `embedded-hal` project now spans several crates, where some functionality has been moved out from the main `embedded-hal` crate to separate crates as detailed above. 
+
+Different crates are released independently. The main `embedded-hal-*` trait crates have reached 1.0 maturity, others will become 1.0 as time passes.
+
+Here is the full listing of crates:
 
 | Crate | crates.io | Docs | |
 |-|-|-|-|
-| [embedded-hal](./embedded-hal)       | [![crates.io](https://img.shields.io/crates/v/embedded-hal.svg)](https://crates.io/crates/embedded-hal) | [![Documentation](https://docs.rs/embedded-hal/badge.svg)](https://docs.rs/embedded-hal) | Core traits, blocking version |
-| [embedded-hal-async](./embedded-hal-async) | [![crates.io](https://img.shields.io/crates/v/embedded-hal-async.svg)](https://crates.io/crates/embedded-hal-async) | [![Documentation](https://docs.rs/embedded-hal-async/badge.svg)](https://docs.rs/embedded-hal-async) | Core traits, async version |
-| [embedded-hal-nb](./embedded-hal-nb)    | [![crates.io](https://img.shields.io/crates/v/embedded-hal-nb.svg)](https://crates.io/crates/embedded-hal-nb) | [![Documentation](https://docs.rs/embedded-hal-nb/badge.svg)](https://docs.rs/embedded-hal-nb) | Core traits, polling version using the `nb` crate |
-| [embedded-hal-bus](./embedded-hal-bus)   | [![crates.io](https://img.shields.io/crates/v/embedded-hal-bus.svg)](https://crates.io/crates/embedded-hal-bus) | [![Documentation](https://docs.rs/embedded-hal-bus/badge.svg)](https://docs.rs/embedded-hal-bus) | Utilities for sharing SPI and I2C buses |
-| [embedded-can](./embedded-can)       | [![crates.io](https://img.shields.io/crates/v/embedded-can.svg)](https://crates.io/crates/embedded-can) | [![Documentation](https://docs.rs/embedded-can/badge.svg)](https://docs.rs/embedded-can) | Controller Area Network (CAN) traits |
-| [embedded-io](./embedded-io)       | [![crates.io](https://img.shields.io/crates/v/embedded-io.svg)](https://crates.io/crates/embedded-io) | [![Documentation](https://docs.rs/embedded-io/badge.svg)](https://docs.rs/embedded-io) | I/O traits (read, write, seek, etc.), blocking and nonblocking version. |
-| [embedded-io-async](./embedded-io-async)       | [![crates.io](https://img.shields.io/crates/v/embedded-io-async.svg)](https://crates.io/crates/embedded-io-async) | [![Documentation](https://docs.rs/embedded-io-async/badge.svg)](https://docs.rs/embedded-io-async) | I/O traits, async version  |
-| [embedded-io-adapters](./embedded-io-adapters)       | [![crates.io](https://img.shields.io/crates/v/embedded-io-adapters.svg)](https://crates.io/crates/embedded-io-adapters) | [![Documentation](https://docs.rs/embedded-io-adapters/badge.svg)](https://docs.rs/embedded-io-adapters) | Adapters between the [`embedded-io`](https://crates.io/crates/embedded-io) and [`embedded-io-async`](https://crates.io/crates/embedded-io-async) traits and other IO traits (`std`, `tokio`, `futures`...)  |
+| [embedded-hal](../embedded-hal)       | [![crates.io](https://img.shields.io/crates/v/embedded-hal.svg)](https://crates.io/crates/embedded-hal) | [![Documentation](https://docs.rs/embedded-hal/badge.svg)](https://docs.rs/embedded-hal) | Core traits, blocking version |
+| [embedded-hal-async](../embedded-hal-async) | [![crates.io](https://img.shields.io/crates/v/embedded-hal-async.svg)](https://crates.io/crates/embedded-hal-async) | [![Documentation](https://docs.rs/embedded-hal-async/badge.svg)](https://docs.rs/embedded-hal-async) | Core traits, async version |
+| [embedded-hal-nb](../embedded-hal-nb)    | [![crates.io](https://img.shields.io/crates/v/embedded-hal-nb.svg)](https://crates.io/crates/embedded-hal-nb) | [![Documentation](https://docs.rs/embedded-hal-nb/badge.svg)](https://docs.rs/embedded-hal-nb) | Core traits, polling version using the `nb` crate |
+| [embedded-hal-bus](../embedded-hal-bus)   | [![crates.io](https://img.shields.io/crates/v/embedded-hal-bus.svg)](https://crates.io/crates/embedded-hal-bus) | [![Documentation](https://docs.rs/embedded-hal-bus/badge.svg)](https://docs.rs/embedded-hal-bus) | Utilities for sharing SPI and I2C buses |
+| [embedded-can](../embedded-can)       | [![crates.io](https://img.shields.io/crates/v/embedded-can.svg)](https://crates.io/crates/embedded-can) | [![Documentation](https://docs.rs/embedded-can/badge.svg)](https://docs.rs/embedded-can) | Controller Area Network (CAN) traits |
+| [embedded-io](../embedded-io)       | [![crates.io](https://img.shields.io/crates/v/embedded-io.svg)](https://crates.io/crates/embedded-io) | [![Documentation](https://docs.rs/embedded-io/badge.svg)](https://docs.rs/embedded-io) | I/O traits (read, write, seek, etc.), blocking and nonblocking version. |
+| [embedded-io-async](../embedded-io-async)       | [![crates.io](https://img.shields.io/crates/v/embedded-io-async.svg)](https://crates.io/crates/embedded-io-async) | [![Documentation](https://docs.rs/embedded-io-async/badge.svg)](https://docs.rs/embedded-io-async) | I/O traits, async version  |
+| [embedded-io-adapters](../embedded-io-adapters)       | [![crates.io](https://img.shields.io/crates/v/embedded-io-adapters.svg)](https://crates.io/crates/embedded-io-adapters) | [![Documentation](https://docs.rs/embedded-io-adapters/badge.svg)](https://docs.rs/embedded-io-adapters) | Adapters between the [`embedded-io`](https://crates.io/crates/embedded-io) and [`embedded-io-async`](https://crates.io/crates/embedded-io-async) traits and other IO traits (`std`, `tokio`, `futures`...)  |
 
+## Supporting both 0.2 and 1.0 in the same HAL
+
+It is strongly recommended that HAL implementation crates provide implementations for both the `embedded-hal` v0.2 and v1.0 traits.
+This allows users to use drivers using either version seamlessly.
+
+The way you do it is adding a dependency on both versions in `Cargo.toml` like this:
+
+```toml
+[dependencies]
+embedded-hal-02 = { package = "embedded-hal", version = "0.2.7", features = ["unproven"] }
+embedded-hal-1 = { package = "embedded-hal", version = "1.0" }
+```
+
+This allows you to refer to the v0.2 traits under the `embedded_hal_02` name, and the v1.0 traits under
+`embedded_hal_1`. Implement both versions on the same struct. For example, for an input pin:
+
+```rust
+/// The HAL's input pin struct
+struct Input {...}
+
+/// Implement the v0.2 traits on the struct.
+impl embedded_hal_02::digital::v2::InputPin for Input {
+    type Error = Infallible;
+
+    fn is_high(&self) -> Result<bool, Self::Error> {
+        ...
+    }
+
+    fn is_low(&self) -> Result<bool, Self::Error> {
+        ...
+    }
+}
+
+/// ... and implement the v1.0 traits on the *same* struct.
+impl embedded_hal_1::digital::ErrorType for Input {
+    type Error = Infallible;
+}
+
+impl embedded_hal_1::digital::InputPin for Input {
+    fn is_high(&mut self) -> Result<bool, Self::Error> {
+        ...
+    }
+
+    fn is_low(&mut self) -> Result<bool, Self::Error> {
+        ...
+    }
+}
+```
+
+## `embedded-hal-compat`
+
+For HAL implementation crates that haven't been updated yet, [embedded-hal-compat](https://github.com/ryankurte/embedded-hal-compat)
+provides shims to support interoperability between `embedded-hal` v0.2 and v1.0.
+
+This allows using a driver requiring v1.0 with a HAL crate implementing only v0.2 or vice-versa, (generally) without alteration.
+See the [docs](https://docs.rs/embedded-hal-compat/) for examples.
