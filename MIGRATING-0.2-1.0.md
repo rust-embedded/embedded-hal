@@ -120,7 +120,7 @@ and we can add them back in a future 1.x release.
 ### Impractical traits
 
 The [`digital::IoPin` trait][iopin] and the [`adc` traits][adc] have been deemed impractical for use and have thus been removed.
-Please feel free to comment on the appropriate issue if you need any of these traitsk and propose a solution.
+Please feel free to comment on the appropriate issue if you need any of these traits and propose a solution.
 
 ### Serial traits
 
@@ -158,7 +158,7 @@ When upgrading code to `embedded-hal` 1.0, it is critical to implement/use the r
 - Optionally, if the API *does* manage a CS pin automatically, you may implement `SpiDevice`.
   - This is required if the underlying API requires it to manage the CS pin, like `spidev` on Linux.
 
-Do not implement `SpiBus` and `SpiDevice` on the same struct, since this is never correct. When there's no CS pin being controlled you must implement only `SpiBus`, and when there is, implement only `SpiDevice`. If you want to offer both APIs, implement them on separate structs so the user has to cohose one or the other.
+Do not implement `SpiBus` and `SpiDevice` on the same struct, since this is never correct. When there's no CS pin being controlled you must implement only `SpiBus`, and when there is, implement only `SpiDevice`. If you want to offer both APIs, implement them on separate structs so the user has to choose one or the other.
 
 ### For driver crates
 
@@ -335,7 +335,7 @@ the same across traits.
 To overcome this, please import the traits you wish to use individually.
 
 If you run into ambiguous method calls, you can disambiguate using the fully-qualified syntax (the error message
-from the compiler should already tell you how it should look like in your case) or tweak your trait imports or code
+from the compiler should already tell you how it should look in your case) or tweak your trait imports or code
 to limit the scope of the trait imports and thus avoid the ambiguity.
 Please note that it is also possible to import traits *inside a function*.
 
