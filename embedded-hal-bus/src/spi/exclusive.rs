@@ -45,6 +45,16 @@ impl<BUS, CS, D> ExclusiveDevice<BUS, CS, D> {
 impl<BUS, CS> ExclusiveDevice<BUS, CS, super::NoDelay> {
     /// Create a new [`ExclusiveDevice`] without support for in-transaction delays.
     ///
+    /// **Warning**: The returned instance *technically* doesn't comply with the `SpiDevice`
+    /// contract, which mandates delay support. It is relatively rare for drivers to use
+    /// in-transaction delays, so you might still want to use this method because it's more practical.
+    ///
+    /// Note that a future version of the driver might start using delays, causing your
+    /// code to panic. This wouldn't be considered a breaking change from the driver side, because
+    /// drivers are allowed to assume `SpiDevice` implementations comply with the contract.
+    /// If you feel this risk outweighs the convenience of having `cargo` automatically upgrade
+    /// the driver crate, you might want to pin the driver's version.
+    ///
     /// # Panics
     ///
     /// The returned device will panic if you try to execute a transaction
