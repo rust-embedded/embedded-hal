@@ -160,6 +160,16 @@
 //! why, because these methods can't return before receiving all the read data. However it's still technically possible
 //! for them to return before the bus is idle. For example, assuming SPI mode 0, the last bit is sampled on the first (rising) edge
 //! of SCK, at which point a method could return, but the second (falling) SCK edge still has to happen before the bus is idle.
+//!
+//! # CS-to-clock delays
+//!
+//! Many chips require a minimum delay between asserting CS and the first SCK edge, and the last SCK edge and deasserting CS.
+//! Drivers should *NOT* use [`Operation::DelayNs`] for this, they should instead document that the user should configure the
+//! delays when creating the `SpiDevice` instance, same as they have to configure the SPI frequency and mode. This has a few advantages:
+//!
+//! - Allows implementations that use hardware-managed CS to program the delay in hardware
+//! - Allows the end user more flexibility. For example, they can choose to not configure any delay if their MCU is slow
+//!   enough to "naturally" do the delay (very common if the delay is in the order of nanoseconds).
 
 use core::fmt::Debug;
 
