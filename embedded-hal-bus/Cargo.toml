@@ -12,7 +12,7 @@ license = "MIT OR Apache-2.0"
 name = "embedded-hal-bus"
 readme = "README.md"
 repository = "https://github.com/rust-embedded/embedded-hal"
-version = "0.1.0-rc.3"
+version = "0.1.0"
 
 [features]
 std = []
@@ -20,8 +20,8 @@ async = ["dep:embedded-hal-async"]
 defmt-03 = ["dep:defmt-03", "embedded-hal/defmt-03", "embedded-hal-async?/defmt-03"]
 
 [dependencies]
-embedded-hal = { version = "=1.0.0-rc.3", path = "../embedded-hal" }
-embedded-hal-async = { version = "=1.0.0-rc.3", path = "../embedded-hal-async", optional = true }
+embedded-hal = { version = "1.0.0", path = "../embedded-hal" }
+embedded-hal-async = { version = "1.0.0", path = "../embedded-hal-async", optional = true }
 critical-section = { version = "1.0" }
 defmt-03 = { package = "defmt", version = "0.3", optional = true }
 

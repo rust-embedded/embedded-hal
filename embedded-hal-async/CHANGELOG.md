@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-No unreleased changes
+No unreleased changes yet.
+
+## [v1.0.0] - 2023-12-28
+
+- Updated `embedded-hal` to version `1.0.0`.
 
 ## [v1.0.0-rc.3] - 2023-12-14
 
@@ -86,7 +90,8 @@ No unreleased changes
 First release to crates.io
 
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v1.0.0-rc.3...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v1.0.0...HEAD
+[v1.0.0]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v1.0.0-rc.3...embedded-hal-async-v1.0.0
 [v1.0.0-rc.3]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v1.0.0-rc.2...embedded-hal-async-v1.0.0-rc.3
 [v1.0.0-rc.2]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v1.0.0-rc.1...embedded-hal-async-v1.0.0-rc.2
 [v1.0.0-rc.1]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-async-v0.2.0-alpha.2...embedded-hal-async-v1.0.0-rc.1
