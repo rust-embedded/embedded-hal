@@ -74,7 +74,9 @@ pub trait SetDutyCycle: ErrorType {
     /// Set the duty cycle to `duty / max_duty`.
     ///
     /// The caller is responsible for ensuring that the duty cycle value is less than or equal to the maximum duty cycle value,
-    /// as reported by `get_max_duty`.
+    /// as reported by [`max_duty_cycle`].
+    ///
+    /// [`max_duty_cycle`]: SetDutyCycle::max_duty_cycle
     fn set_duty_cycle(&mut self, duty: u16) -> Result<(), Self::Error>;
 
     /// Set the duty cycle to 0%, or always inactive.
