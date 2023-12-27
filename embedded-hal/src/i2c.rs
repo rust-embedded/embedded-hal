@@ -38,6 +38,15 @@
 //! you've received from a HAL and "split" it into multiple shared ones, to instantiate
 //! several drivers on the same bus.
 //!
+//! # Flushing
+//!
+//! Implementations must flush the transfer, ensuring the bus has returned to an idle state before returning.
+//! No pipelining is allowed. Users must be able to shut down the I2C peripheral immediately after a transfer
+//! returns, without any risk of e.g. cutting short a stop condition.
+//!
+//! (Implementations must wait until the last ACK bit to report it as an error anyway. Therefore pipelining would only
+//! yield very small time savings, not worth the complexity)
+//!
 //! # For driver authors
 //!
 //! Drivers can select the adequate address length with `I2c<SevenBitAddress>` or `I2c<TenBitAddress>` depending
