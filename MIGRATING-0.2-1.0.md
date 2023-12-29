@@ -26,7 +26,7 @@ There have been _a lot_ of changes in `embedded_hal` between versions 0.2.x and 
 We understand the significance of `embedded-hal` in the Rust embedded
 ecosystem and thus intend to release a version that stays compatible for a long time.
 
-The main difference betewen `embedded-hal` 0.2 and 1.0 is the project is now focused
+The main difference between `embedded-hal` 0.2 and 1.0 is the project is now focused
 on a single goal: traits for writing drivers that work on any HAL.
 
 In `embedded-hal` 0.2, the traits had dual goals:
