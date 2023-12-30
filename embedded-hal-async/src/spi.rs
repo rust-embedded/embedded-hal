@@ -53,7 +53,7 @@ pub trait SpiDevice<Word: Copy + 'static = u8>: ErrorType {
 
     /// Do a transfer within a transaction.
     ///
-    /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer(read, write))`.
+    /// This is a convenience method equivalent to `device.transaction(&mut [Operation::Transfer(read, write)])`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer`]
     #[inline]
@@ -64,7 +64,7 @@ pub trait SpiDevice<Word: Copy + 'static = u8>: ErrorType {
 
     /// Do an in-place transfer within a transaction.
     ///
-    /// This is a convenience method equivalent to `device.transaction(|bus| bus.transfer_in_place(buf))`.
+    /// This is a convenience method equivalent to `device.transaction(&mut [Operation::TransferInPlace(buf)])`.
     ///
     /// See also: [`SpiDevice::transaction`], [`SpiBus::transfer_in_place`]
     #[inline]
