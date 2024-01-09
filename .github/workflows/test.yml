@@ -45,7 +45,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@1.60
       - run: >
           cargo test
-          -p embedded-hal:1.0.0-rc.3
+          -p embedded-hal:1.0.0
           -p embedded-hal-bus
           -p embedded-hal-nb
           -p embedded-io

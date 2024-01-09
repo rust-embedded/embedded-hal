@@ -4,6 +4,9 @@
 
 This project is developed and maintained by the [HAL team](https://github.com/rust-embedded/wg#the-hal-team).
 
+> [!IMPORTANT]
+> 📣 `embedded-hal` v1.0 is now released! Check out the [announcement blog post](https://blog.rust-embedded.org/embedded-hal-v1/), the [API documentation](https://docs.rs/embedded-hal) and the [migration guide](docs/migrating-from-0.2-to-1.0.md).
+
 ## Scope
 
 `embedded-hal` serves as a foundation for building an ecosystem of platform-agnostic drivers.
@@ -38,24 +41,10 @@ The main  `embedded-hal` project is not tied to a specific execution model like 
 | [embedded-io-async](./embedded-io-async)       | [![crates.io](https://img.shields.io/crates/v/embedded-io-async.svg)](https://crates.io/crates/embedded-io-async) | [![Documentation](https://docs.rs/embedded-io-async/badge.svg)](https://docs.rs/embedded-io-async) | I/O traits, async version  |
 | [embedded-io-adapters](./embedded-io-adapters)       | [![crates.io](https://img.shields.io/crates/v/embedded-io-adapters.svg)](https://crates.io/crates/embedded-io-adapters) | [![Documentation](https://docs.rs/embedded-io-adapters/badge.svg)](https://docs.rs/embedded-io-adapters) | Adapters between the [`embedded-io`](https://crates.io/crates/embedded-io) and [`embedded-io-async`](https://crates.io/crates/embedded-io-async) traits and other IO traits (`std`, `tokio`, `futures`...)  |
 
-## Releases
-
-At the moment we are working towards a `1.0.0` release (see [#177]). During this process we will
-release alpha versions like `1.0.0-alpha.1` and `1.0.0-alpha.2`.
-Alpha releases are **not guaranteed** to be compatible with each other.
-They are provided as early previews for community testing and preparation for the final release.
-If you use an alpha release, we recommend you choose an exact version specification in your
-`Cargo.toml` like: `embedded-hal = "=1.0.0-alpha.9"`
-
-See [this guide](docs/version-policy.md) for a way to implement both an `embedded-hal` `0.2.x`
-version and an `-alpha` version side by side in a HAL.
-
-[#177]: https://github.com/rust-embedded/embedded-hal/issues/177
-
 ## Documents
 
+- [Migrating from v0.2 to v1.0](docs/migrating-from-0.2-to-1.0.md).
 - [How-to: add a new trait](docs/how-to-add-a-new-trait.md)
-- [Version policy](docs/version-policy.md)
 - [MSRV](docs/msrv.md)
 
 ## Implementations and drivers

@@ -15,7 +15,7 @@ This project is developed and maintained by the [HAL team](https://github.com/ru
 
 To support bus sharing, `embedded-hal` provides the `SpiBus` and `SpiDevice` traits. `SpiBus` represents an entire bus,
 while `SpiDevice` represents a device on that bus. For further details on these traits, please consult the
-[`embedded-hal` documentation](https://docs.rs/embedded-hal/1.0.0-alpha.10/embedded_hal/spi/index.html).
+[`embedded-hal` documentation](https://docs.rs/embedded-hal/latest/embedded_hal/spi/index.html).
 
 `embedded-hal` trait implementations for microcontrollers should implement the `SpiBus` trait.
 However, device drivers should use the `SpiDevice` traits, _not the `SpiBus` traits_ if at all possible
