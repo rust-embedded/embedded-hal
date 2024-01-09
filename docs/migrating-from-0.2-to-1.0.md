@@ -15,6 +15,7 @@
 - [Fallibility](#fallibility)
 - [SPI transfer return type](#spi-transfer-return-type)
 - [Error type bounds](#error-type-bounds)
+- [GPIO traits now require `&mut self`](#gpio-traits-now-require-mut-self)
 - [Prelude](#prelude)
 - [Removed blanket implementations](#removed-blanket-implementations)
 - [Cargo Features](#cargo-features)
@@ -329,6 +330,95 @@ fn set_some_parameter(&mut self) -> Result<(), Self::Error> {
   }
 }
 ```
+
+## GPIO traits now require `&mut self`
+
+Methods on `InputPin` and `State` now take `&mut self` instead of `&self`, to allow implementations to
+have mutable state or access exclusive resources. 
+
+**For HAL implementors**: You should not need to do any changes, since `&mut self` is strictly more permissive
+for implementations.
+
+For ease of use, you might want to provide inherent methods that take `&self` if the hardware permits it. In this case,
+you might need to do `&*self` to call them from the trait methods. Otherwise Rust will resolve the
+method call to the trait method, causing infinite recursion.
+
+```rust
+struct HalPin;
+
+impl HalPin {
+    fn is_high(&self) -> bool {
+        true
+    }
+    
+    fn is_low(&self) -> bool {
+        true
+    }
+}
+
+impl InputPin for HalPin {
+    fn is_high(&mut self) -> Result<bool, Self::Error> {
+        // Needs `&*self` so that the inherent `is_high` is picked.
+        Ok((&*self).is_high())
+    }
+    
+    fn is_low(&mut self) -> Result<bool, Self::Error> {
+        Ok((&*self).is_low())
+    }
+}
+```
+
+**For driver authors**: If your driver does not need sharing input pins, you should be able to upgrade without any changes.
+If you do need to share input pins, the recommended solution is wrapping them with a `RefCell`.
+
+Note that if you need to share multiple objects, you should prefer using a single `RefCell` wherever possible to reduce RAM
+usage. Make an "inner" struct with all the objects that need sharing, and wrap it in a single `RefCell`. Below is an example
+skeleton of a keypad driver using row/column multiplexing, sharing multiple `InputPin`s and `OutputPin`s with a single `RefCell`:
+
+```rust
+use core::cell::RefCell;
+
+use embedded_hal::digital::{ErrorType, InputPin, OutputPin};
+
+pub struct Keypad<O: OutputPin, I: InputPin, const NCOLS: usize, const NROWS: usize> {
+    inner: RefCell<KeypadInner<O, I, NCOLS, NROWS>>,
+}
+
+struct KeypadInner<O: OutputPin, I: InputPin, const NCOLS: usize, const NROWS: usize> {
+    cols: [O; NCOLS],
+    rows: [I; NROWS],
+}
+
+pub struct KeypadInput<'a, O: OutputPin, I: InputPin, const NCOLS: usize, const NROWS: usize> {
+    inner: &'a RefCell<KeypadInner<O, I, NCOLS, NROWS>>,
+    row: usize,
+    col: usize,
+}
+
+impl<'a, O: OutputPin, I: InputPin, const NCOLS: usize, const NROWS: usize> ErrorType for KeypadInput<'a, O, I, NCOLS, NROWS> {
+    type Error = core::convert::Infallible;
+}
+
+impl<'a, O: OutputPin, I: InputPin, const NCOLS: usize, const NROWS: usize> InputPin for KeypadInput<'a, O, I, NCOLS, NROWS> {
+    fn is_high(&mut self) -> Result<bool, Self::Error> {
+        Ok(!self.is_low()?)
+    }
+
+    fn is_low(&mut self) -> Result<bool, Self::Error> {
+        let inner = &mut *self.inner.borrow_mut();
+        let row = &mut inner.rows[self.row];
+        let col = &mut inner.cols[self.col];
+
+        // using unwrap for demo purposes, you should propagate errors up instead.
+        col.set_low().unwrap();
+        let out = row.is_low().unwrap();
+        col.set_high().unwrap();
+
+        Ok(out)
+    }
+}
+```
+
 
 ## Prelude
 
