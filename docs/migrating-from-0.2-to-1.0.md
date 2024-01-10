@@ -340,7 +340,7 @@ have mutable state or access exclusive resources.
 for implementations.
 
 For ease of use, you might want to provide inherent methods that take `&self` if the hardware permits it. In this case,
-you might need to do `&*self` to call them from the trait methods. Otherwise Rust will resolve the
+you might need to do `*self` to call them from the trait methods. Otherwise Rust will resolve the
 method call to the trait method, causing infinite recursion.
 
 ```rust
@@ -358,12 +358,12 @@ impl HalPin {
 
 impl InputPin for HalPin {
     fn is_high(&mut self) -> Result<bool, Self::Error> {
-        // Needs `&*self` so that the inherent `is_high` is picked.
-        Ok((&*self).is_high())
+        // Needs `*self` so that the inherent `is_high` is picked.
+        Ok((*self).is_high())
     }
     
     fn is_low(&mut self) -> Result<bool, Self::Error> {
-        Ok((&*self).is_low())
+        Ok((*self).is_low())
     }
 }
 ```
