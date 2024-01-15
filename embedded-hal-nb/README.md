@@ -1,7 +1,7 @@
 [![crates.io](https://img.shields.io/crates/d/embedded-hal-nb.svg)](https://crates.io/crates/embedded-hal-nb)
 [![crates.io](https://img.shields.io/crates/v/embedded-hal-nb.svg)](https://crates.io/crates/embedded-hal-nb)
 [![Documentation](https://docs.rs/embedded-hal-nb/badge.svg)](https://docs.rs/embedded-hal-nb)
-![Minimum Supported Rust Version](https://img.shields.io/badge/rustc-1.60+-blue.svg)
+![Minimum Supported Rust Version](https://img.shields.io/crates/msrv/embedded-hal-nb.svg)
 
 # `embedded-hal-nb`
 
