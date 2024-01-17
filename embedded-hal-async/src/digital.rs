@@ -15,9 +15,10 @@
 //!         .expect("failed to await input pin")
 //! }
 //! ```
+pub use embedded_hal::digital::{Error, ErrorKind, ErrorType};
 
 /// Asynchronously wait for GPIO pin state.
-pub trait Wait: embedded_hal::digital::ErrorType {
+pub trait Wait: ErrorType {
     /// Wait until the pin is high. If it is already high, return immediately.
     ///
     /// # Note for implementers
