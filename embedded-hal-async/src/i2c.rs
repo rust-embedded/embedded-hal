@@ -16,9 +16,9 @@
 //! Since 7-bit addressing is the mode of the majority of I2C devices,
 //! `SevenBitAddress` has been set as default mode and thus can be omitted if desired.
 
-pub use embedded_hal::i2c::Operation;
 pub use embedded_hal::i2c::{
-    AddressMode, Error, ErrorKind, ErrorType, NoAcknowledgeSource, SevenBitAddress, TenBitAddress,
+    AddressMode, Error, ErrorKind, ErrorType, NoAcknowledgeSource, Operation, SevenBitAddress,
+    TenBitAddress,
 };
 
 /// Async I2c.
