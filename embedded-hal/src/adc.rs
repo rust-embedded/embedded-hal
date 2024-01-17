@@ -7,9 +7,13 @@ use crate::defmt;
 
 /// Read data from an ADC.
 ///
+/// # Note for Implementers
+///
+/// This should wait until data is ready and then read it.
+///
 /// # Examples
 ///
-/// In the first naive example, [`read`](crate::adc::AdcChannel::read) is implemented
+/// In the first naive example, [`AdcChannel`] is implemented
 /// using a spin loop and only returns once data is ready.
 ///
 /// ```
@@ -23,8 +27,8 @@ use crate::defmt;
 ///         true
 ///     }
 ///
-///     pub fn data(&mut self) -> u32 {
-///         42
+///     pub fn data(&mut self) -> u16 {
+///         3300
 ///     }
 /// }
 ///
@@ -33,23 +37,32 @@ use crate::defmt;
 /// }
 ///
 /// impl AdcChannel for MySpinningAdc {
-///     fn read(&mut self) -> Result<u32, Self::Error> {
+///     fn measure_nv(&mut self) -> Result<i64, Self::Error> {
+///         Ok(self.measure_mv()? as i64 * 1_000_000)
+///     }
+///
+///     fn measure_mv(&mut self) -> Result<i32, Self::Error> {
 ///         while !self.is_ready() {
 ///             core::hint::spin_loop();
 ///         }
 ///
-///         Ok(self.data())
+///         Ok(self.data() as i32)
 ///     }
 /// }
 /// ```
 pub trait AdcChannel: ErrorType {
-    /// Reads data from the ADC.
-    ///
-    /// # Note for Implementers
-    ///
-    /// This should wait until data is ready and then read it.
-    /// If the ADC's precision is less than 32 bits, the value must be scaled accordingly.
-    fn read(&mut self) -> Result<u32, Self::Error>;
+    /// Take a measurement in nV (nanovolts).
+    fn measure_nv(&mut self) -> Result<i64, Self::Error>;
+
+    /// Take a measurement in mV (microvolts).
+    fn measure_uv(&mut self) -> Result<i32, Self::Error> {
+        Ok((self.measure_nv()? / 1_000) as i32)
+    }
+
+    /// Take a measurement in mV (millivolts).
+    fn measure_mv(&mut self) -> Result<i32, Self::Error> {
+        Ok(self.measure_uv()? / 1_000)
+    }
 }
 
 impl<T> AdcChannel for &mut T
@@ -57,8 +70,18 @@ where
     T: AdcChannel + ?Sized,
 {
     #[inline]
-    fn read(&mut self) -> Result<u32, Self::Error> {
-        (*self).read()
+    fn measure_nv(&mut self) -> Result<i64, Self::Error> {
+        (*self).measure_nv()
+    }
+
+    #[inline]
+    fn measure_uv(&mut self) -> Result<i32, Self::Error> {
+        (*self).measure_uv()
+    }
+
+    #[inline]
+    fn measure_mv(&mut self) -> Result<i32, Self::Error> {
+        (*self).measure_mv()
     }
 }
 

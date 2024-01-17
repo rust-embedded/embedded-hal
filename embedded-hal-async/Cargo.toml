@@ -20,4 +20,3 @@ defmt-03 = ["dep:defmt-03", "embedded-hal/defmt-03"]
 [dependencies]
 embedded-hal = { version = "1.0.0", path = "../embedded-hal" }
 defmt-03 = { package = "defmt", version = "0.3", optional = true }
-tokio = {  version = "1", features = ["rt", "macros"] }
