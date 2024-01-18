@@ -1,6 +1,6 @@
 //! Blocking analog-digital conversion traits.
 
-use core::fmt::Debug;
+use core::fmt::{Debug, Display};
 
 #[cfg(feature = "defmt-03")]
 use crate::defmt;
@@ -111,8 +111,20 @@ impl Error for core::convert::Infallible {
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
 #[non_exhaustive]
 pub enum ErrorKind {
+    /// Measurement was clipped.
+    Clip(Clip),
     /// A different error occurred. The original error may contain more information.
     Other,
+}
+
+/// ADC clip error.
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
+pub enum Clip {
+    /// Measurement was clipped due to an undershoot of the measurement range.
+    Undershoot,
+    /// Measurement was clipped due to an overshoot of the measurement range.
+    Overshoot,
 }
 
 impl Error for ErrorKind {
@@ -122,15 +134,23 @@ impl Error for ErrorKind {
     }
 }
 
-impl core::fmt::Display for ErrorKind {
+impl Display for ErrorKind {
     #[inline]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        match self {
-            Self::Other => write!(
-                f,
-                "A different error occurred. The original error may contain more information"
-            ),
-        }
+        Display::fmt(
+            match self {
+                Self::Clip(Clip::Undershoot) => {
+                    "Measurement was clipped due to an undershoot of the measurement range."
+                }
+                Self::Clip(Clip::Overshoot) => {
+                    "Measurement was clipped due to an overshoot of the measurement range."
+                }
+                Self::Other => {
+                    "A different error occurred. The original error may contain more information."
+                }
+            },
+            f,
+        )
     }
 }
 
