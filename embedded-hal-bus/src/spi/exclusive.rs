@@ -1,5 +1,7 @@
 //! SPI bus sharing mechanisms.
 
+use core::convert::Infallible;
+
 use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::OutputPin;
 use embedded_hal::spi::{ErrorType, Operation, SpiBus, SpiDevice};
@@ -10,7 +12,6 @@ use embedded_hal_async::{
 };
 
 use super::shared::transaction;
-use super::DeviceError;
 
 /// [`SpiDevice`] implementation with exclusive access to the bus (not shared).
 ///
@@ -72,15 +73,15 @@ impl<BUS, CS> ExclusiveDevice<BUS, CS, super::NoDelay> {
 impl<BUS, CS, D> ErrorType for ExclusiveDevice<BUS, CS, D>
 where
     BUS: ErrorType,
-    CS: OutputPin,
+    CS: OutputPin<Error = Infallible>,
 {
-    type Error = DeviceError<BUS::Error, CS::Error>;
+    type Error = BUS::Error;
 }
 
 impl<Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for ExclusiveDevice<BUS, CS, D>
 where
     BUS: SpiBus<Word>,
-    CS: OutputPin,
+    CS: OutputPin<Error = Infallible>,
     D: DelayNs,
 {
     #[inline]
@@ -94,7 +95,7 @@ where
 impl<Word: Copy + 'static, BUS, CS, D> AsyncSpiDevice<Word> for ExclusiveDevice<BUS, CS, D>
 where
     BUS: AsyncSpiBus<Word>,
-    CS: OutputPin,
+    CS: OutputPin<Error = Infallible>,
     D: AsyncDelayNs,
 {
     #[inline]
@@ -102,7 +103,9 @@ where
         &mut self,
         operations: &mut [Operation<'_, Word>],
     ) -> Result<(), Self::Error> {
-        self.cs.set_low().map_err(DeviceError::Cs)?;
+        use crate::spi::shared::into_ok;
+
+        into_ok(self.cs.set_low());
 
         let op_res = 'ops: {
             for op in operations {
@@ -128,12 +131,8 @@ where
 
         // On failure, it's important to still flush and deassert CS.
         let flush_res = self.bus.flush().await;
-        let cs_res = self.cs.set_high();
+        into_ok(self.cs.set_high());
 
-        op_res.map_err(DeviceError::Spi)?;
-        flush_res.map_err(DeviceError::Spi)?;
-        cs_res.map_err(DeviceError::Cs)?;
-
-        Ok(())
+        op_res.and(flush_res)
     }
 }

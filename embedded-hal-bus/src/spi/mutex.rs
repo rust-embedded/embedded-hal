@@ -1,9 +1,10 @@
+use core::convert::Infallible;
+
 use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::OutputPin;
 use embedded_hal::spi::{ErrorType, Operation, SpiBus, SpiDevice};
 use std::sync::Mutex;
 
-use super::DeviceError;
 use crate::spi::shared::transaction;
 
 /// `std` `Mutex`-based shared bus [`SpiDevice`] implementation.
@@ -59,15 +60,15 @@ impl<'a, BUS, CS> MutexDevice<'a, BUS, CS, super::NoDelay> {
 impl<'a, BUS, CS, D> ErrorType for MutexDevice<'a, BUS, CS, D>
 where
     BUS: ErrorType,
-    CS: OutputPin,
+    CS: OutputPin<Error = Infallible>,
 {
-    type Error = DeviceError<BUS::Error, CS::Error>;
+    type Error = BUS::Error;
 }
 
 impl<'a, Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for MutexDevice<'a, BUS, CS, D>
 where
     BUS: SpiBus<Word>,
-    CS: OutputPin,
+    CS: OutputPin<Error = Infallible>,
     D: DelayNs,
 {
     #[inline]

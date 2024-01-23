@@ -1,9 +1,9 @@
 use core::cell::RefCell;
+use core::convert::Infallible;
 use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::OutputPin;
 use embedded_hal::spi::{ErrorType, Operation, SpiBus, SpiDevice};
 
-use super::DeviceError;
 use crate::spi::shared::transaction;
 
 /// `RefCell`-based shared bus [`SpiDevice`] implementation.
@@ -58,15 +58,15 @@ impl<'a, BUS, CS> RefCellDevice<'a, BUS, CS, super::NoDelay> {
 impl<'a, BUS, CS, D> ErrorType for RefCellDevice<'a, BUS, CS, D>
 where
     BUS: ErrorType,
-    CS: OutputPin,
+    CS: OutputPin<Error = Infallible>,
 {
-    type Error = DeviceError<BUS::Error, CS::Error>;
+    type Error = BUS::Error;
 }
 
 impl<'a, Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for RefCellDevice<'a, BUS, CS, D>
 where
     BUS: SpiBus<Word>,
-    CS: OutputPin,
+    CS: OutputPin<Error = Infallible>,
     D: DelayNs,
 {
     #[inline]

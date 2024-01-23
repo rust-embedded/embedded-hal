@@ -1,8 +1,8 @@
+use core::convert::Infallible;
+
 use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::OutputPin;
 use embedded_hal::spi::{ErrorType, Operation, SpiBus};
-
-use crate::spi::DeviceError;
 
 /// Common implementation to perform a transaction against the device.
 #[inline]
@@ -11,14 +11,14 @@ pub fn transaction<Word, BUS, CS, D>(
     bus: &mut BUS,
     delay: &mut D,
     cs: &mut CS,
-) -> Result<(), DeviceError<BUS::Error, CS::Error>>
+) -> Result<(), BUS::Error>
 where
     BUS: SpiBus<Word> + ErrorType,
-    CS: OutputPin,
+    CS: OutputPin<Error = Infallible>,
     D: DelayNs,
     Word: Copy,
 {
-    cs.set_low().map_err(DeviceError::Cs)?;
+    into_ok(cs.set_low());
 
     let op_res = operations.iter_mut().try_for_each(|op| match op {
         Operation::Read(buf) => bus.read(buf),
@@ -34,11 +34,15 @@ where
 
     // On failure, it's important to still flush and deassert CS.
     let flush_res = bus.flush();
-    let cs_res = cs.set_high();
+    into_ok(cs.set_high());
 
-    op_res.map_err(DeviceError::Spi)?;
-    flush_res.map_err(DeviceError::Spi)?;
-    cs_res.map_err(DeviceError::Cs)?;
+    op_res.and(flush_res)
+}
 
-    Ok(())
+/// see https://github.com/rust-lang/rust/issues/61695
+pub(crate) fn into_ok<T>(res: Result<T, Infallible>) -> T {
+    match res {
+        Ok(t) => t,
+        Err(infallible) => match infallible {},
+    }
 }
