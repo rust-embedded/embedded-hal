@@ -18,3 +18,38 @@ use defmt_03 as defmt;
 
 pub mod i2c;
 pub mod spi;
+
+/// This adapter will [panic] if the inner device encounters an error.
+///
+/// It currently supports [embedded_hal::digital::OutputPin], but other traits may be added in the future.
+///
+/// TODO: add usage example
+#[repr(transparent)]
+pub struct UnwrappingAdapter<T>(pub T);
+
+impl<T> embedded_hal::digital::ErrorType for UnwrappingAdapter<T> {
+    type Error = core::convert::Infallible;
+}
+
+impl<T> embedded_hal::digital::OutputPin for UnwrappingAdapter<T>
+where
+    T: embedded_hal::digital::OutputPin,
+{
+    #[inline]
+    fn set_low(&mut self) -> Result<(), Self::Error> {
+        self.0.set_low().unwrap();
+        Ok(())
+    }
+
+    #[inline]
+    fn set_high(&mut self) -> Result<(), Self::Error> {
+        self.0.set_high().unwrap();
+        Ok(())
+    }
+
+    #[inline]
+    fn set_state(&mut self, state: embedded_hal::digital::PinState) -> Result<(), Self::Error> {
+        self.0.set_state(state).unwrap();
+        Ok(())
+    }
+}
