@@ -17,6 +17,9 @@ use super::shared::transaction;
 ///
 /// This is the most straightforward way of obtaining an [`SpiDevice`] from an [`SpiBus`],
 /// ideal for when no sharing is required (only one SPI device is present on the bus).
+///
+/// The `CS` pin must be infallible (`CS: OutputPin<Error = Infallible>`) because proper error handling would be complicated
+/// and it's usually not needed. If you are using a fallible `CS` pin, you can use [UnwrappingAdapter](crate::UnwrappingAdapter).
 pub struct ExclusiveDevice<BUS, CS, D> {
     bus: BUS,
     cs: CS,

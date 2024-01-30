@@ -23,7 +23,24 @@ pub mod spi;
 ///
 /// It currently supports [embedded_hal::digital::OutputPin], but other traits may be added in the future.
 ///
-/// TODO: add usage example
+/// # Example
+///
+/// ```
+/// use core::convert::Infallible;
+/// use embedded_hal::digital::OutputPin;
+/// use embedded_hal_bus::UnwrappingAdapter;
+///
+/// /// This could be any function or struct that requires an infallible output pin
+/// fn requires_infallible(output: impl OutputPin<Error = Infallible>) { /* ... */ }
+///
+/// fn accepts_fallible(output: impl OutputPin) {
+///     // this wouldn't work:
+///     // requires_infallible(output);
+///
+///     let unwrapping_output = UnwrappingAdapter(output);
+///     requires_infallible(unwrapping_output);
+/// }
+/// ```
 #[repr(transparent)]
 pub struct UnwrappingAdapter<T>(pub T);
 

@@ -12,6 +12,9 @@ use crate::spi::shared::transaction;
 /// This allows for sharing an [`SpiBus`], obtaining multiple [`SpiDevice`] instances,
 /// each with its own `CS` pin.
 ///
+/// The `CS` pin must be infallible (`CS: OutputPin<Error = Infallible>`) because proper error handling would be complicated
+/// and it's usually not needed. If you are using a fallible `CS` pin, you can use [UnwrappingAdapter](crate::UnwrappingAdapter).
+///
 /// Sharing is implemented with a `std` [`Mutex`]. It allows a single bus across multiple threads,
 /// with finer-grained locking than [`CriticalSectionDevice`](super::CriticalSectionDevice). The downside is
 /// it is only available in `std` targets.
