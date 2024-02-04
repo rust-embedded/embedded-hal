@@ -1,6 +1,6 @@
 //! `SpiDevice` implementations.
 
-use core::fmt::Debug;
+use core::fmt::{self, Debug, Display, Formatter};
 use embedded_hal::spi::{Error, ErrorKind};
 
 mod exclusive;
@@ -28,6 +28,18 @@ pub enum DeviceError<BUS, CS> {
     /// Asserting or deasserting CS failed.
     Cs(CS),
 }
+
+impl<BUS: Display, CS: Display> Display for DeviceError<BUS, CS> {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match self {
+            Self::Spi(bus) => write!(f, "SPI bus error: {}", bus),
+            Self::Cs(cs) => write!(f, "SPI CS error: {}", cs),
+        }
+    }
+}
+
+#[cfg(feature = "std")]
+impl<BUS: Debug + Display, CS: Debug + Display> std::error::Error for DeviceError<BUS, CS> {}
 
 impl<BUS, CS> Error for DeviceError<BUS, CS>
 where
