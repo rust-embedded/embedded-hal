@@ -1,15 +1,19 @@
+use core::convert::Infallible;
+
 use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::OutputPin;
 use embedded_hal::spi::{ErrorType, Operation, SpiBus, SpiDevice};
 use std::sync::Mutex;
 
-use super::DeviceError;
 use crate::spi::shared::transaction;
 
 /// `std` `Mutex`-based shared bus [`SpiDevice`] implementation.
 ///
 /// This allows for sharing an [`SpiBus`], obtaining multiple [`SpiDevice`] instances,
 /// each with its own `CS` pin.
+///
+/// The `CS` pin must be infallible (`CS: OutputPin<Error = Infallible>`) because proper error handling would be complicated
+/// and it's usually not needed. If you are using a fallible `CS` pin, you can use [UnwrappingAdapter](crate::UnwrappingAdapter).
 ///
 /// Sharing is implemented with a `std` [`Mutex`]. It allows a single bus across multiple threads,
 /// with finer-grained locking than [`CriticalSectionDevice`](super::CriticalSectionDevice). The downside is
@@ -59,15 +63,15 @@ impl<'a, BUS, CS> MutexDevice<'a, BUS, CS, super::NoDelay> {
 impl<'a, BUS, CS, D> ErrorType for MutexDevice<'a, BUS, CS, D>
 where
     BUS: ErrorType,
-    CS: OutputPin,
+    CS: OutputPin<Error = Infallible>,
 {
-    type Error = DeviceError<BUS::Error, CS::Error>;
+    type Error = BUS::Error;
 }
 
 impl<'a, Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for MutexDevice<'a, BUS, CS, D>
 where
     BUS: SpiBus<Word>,
-    CS: OutputPin,
+    CS: OutputPin<Error = Infallible>,
     D: DelayNs,
 {
     #[inline]

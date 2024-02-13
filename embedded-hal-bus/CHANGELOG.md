@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-No unreleased changes
+- Require infallible chipselects for all spi utilities
+- Add `UnwrappingAdapter`
 
 ## [v0.1.0] - 2023-12-28
 
