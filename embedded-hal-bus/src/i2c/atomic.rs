@@ -1,5 +1,5 @@
-use embedded_hal::i2c::{Error, ErrorKind, ErrorType, I2c};
 use core::cell::UnsafeCell;
+use embedded_hal::i2c::{Error, ErrorKind, ErrorType, I2c};
 
 /// `UnsafeCell`-based shared bus [`I2c`] implementation.
 ///
@@ -71,7 +71,6 @@ pub struct AtomicDevice<'a, T> {
     busy: portable_atomic::AtomicBool,
 }
 
-
 #[derive(Debug, Copy, Clone)]
 /// Wrapper type for errors originating from the atomically-checked I2C bus manager.
 pub enum AtomicError<T: ErrorType> {
@@ -96,7 +95,8 @@ impl<T: ErrorType + core::fmt::Debug> Error for AtomicError<T> {
 unsafe impl<'a, T> Sync for AtomicDevice<'a, T> {}
 
 impl<'a, T> AtomicDevice<'a, T>
-where T: I2c + ErrorType
+where
+    T: I2c + ErrorType,
 {
     /// Create a new `AtomicDevice`.
     #[inline]
@@ -109,14 +109,16 @@ where T: I2c + ErrorType
 
     fn lock<R, F>(&self, f: F) -> Result<R, AtomicError<T>>
     where
-    F: FnOnce(&mut T) -> Result<R, <T as ErrorType>::Error>
+        F: FnOnce(&mut T) -> Result<R, <T as ErrorType>::Error>,
     {
-        self.busy.compare_exchange(
-            false,
-            true,
-            core::sync::atomic::Ordering::SeqCst,
-            core::sync::atomic::Ordering::SeqCst,
-            ).map_err(|_| AtomicError::<T>::Busy)?;
+        self.busy
+            .compare_exchange(
+                false,
+                true,
+                core::sync::atomic::Ordering::SeqCst,
+                core::sync::atomic::Ordering::SeqCst,
+            )
+            .map_err(|_| AtomicError::<T>::Busy)?;
 
         let result = f(unsafe { &mut *self.bus.get() });
 
