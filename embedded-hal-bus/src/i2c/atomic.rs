@@ -92,7 +92,7 @@ impl<T: Error> Error for AtomicError<T> {
     }
 }
 
-unsafe impl<'a, T> Sync for AtomicDevice<'a, T> {}
+unsafe impl<'a, T> Send for AtomicDevice<'a, T> {}
 
 impl<'a, T> AtomicDevice<'a, T>
 where
