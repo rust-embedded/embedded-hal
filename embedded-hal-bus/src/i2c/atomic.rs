@@ -31,7 +31,6 @@ use embedded_hal::i2c::{Error, ErrorKind, ErrorType, I2c};
 /// # }
 /// # type PressureSensor<I2C> = Sensor<I2C>;
 /// # type TemperatureSensor<I2C> = Sensor<I2C>;
-/// #[derive(Debug)]
 /// # pub struct I2c0;
 /// # #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 /// # pub enum Error { }
@@ -74,17 +73,17 @@ pub struct AtomicDevice<'a, T> {
 
 #[derive(Debug, Copy, Clone)]
 /// Wrapper type for errors originating from the atomically-checked I2C bus manager.
-pub enum AtomicError<T: ErrorType> {
+pub enum AtomicError<T: Error> {
     /// This error is returned if the I2C bus was already in use when an operation was attempted,
     /// which indicates that the driver requirements are not being met with regard to
     /// synchronization.
     Busy,
 
     /// An I2C-related error occurred, and the internal error should be inspected.
-    Other(T::Error),
+    Other(T),
 }
 
-impl<T: ErrorType + core::fmt::Debug> Error for AtomicError<T> {
+impl<T: Error> Error for AtomicError<T> {
     fn kind(&self) -> ErrorKind {
         match self {
             AtomicError::Other(e) => e.kind(),
@@ -97,7 +96,7 @@ unsafe impl<'a, T> Sync for AtomicDevice<'a, T> {}
 
 impl<'a, T> AtomicDevice<'a, T>
 where
-    T: I2c + ErrorType,
+    T: I2c,
 {
     /// Create a new `AtomicDevice`.
     #[inline]
@@ -108,7 +107,7 @@ where
         }
     }
 
-    fn lock<R, F>(&self, f: F) -> Result<R, AtomicError<T>>
+    fn lock<R, F>(&self, f: F) -> Result<R, AtomicError<T::Error>>
     where
         F: FnOnce(&mut T) -> Result<R, <T as ErrorType>::Error>,
     {
@@ -119,26 +118,26 @@ where
                 core::sync::atomic::Ordering::SeqCst,
                 core::sync::atomic::Ordering::SeqCst,
             )
-            .map_err(|_| AtomicError::<T>::Busy)?;
+            .map_err(|_| AtomicError::<T::Error>::Busy)?;
 
         let result = f(unsafe { &mut *self.bus.get() });
 
         self.busy.store(false, core::sync::atomic::Ordering::SeqCst);
 
-        result.map_err(|e| AtomicError::Other(e))
+        result.map_err(AtomicError::Other)
     }
 }
 
 impl<'a, T> ErrorType for AtomicDevice<'a, T>
 where
-    T: I2c + core::fmt::Debug,
+    T: I2c,
 {
-    type Error = AtomicError<T>;
+    type Error = AtomicError<T::Error>;
 }
 
 impl<'a, T> I2c for AtomicDevice<'a, T>
 where
-    T: I2c + core::fmt::Debug,
+    T: I2c,
 {
     #[inline]
     fn read(&mut self, address: u8, read: &mut [u8]) -> Result<(), Self::Error> {
