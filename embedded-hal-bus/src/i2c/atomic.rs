@@ -31,6 +31,7 @@ use embedded_hal::i2c::{Error, ErrorKind, ErrorType, I2c};
 /// # }
 /// # type PressureSensor<I2C> = Sensor<I2C>;
 /// # type TemperatureSensor<I2C> = Sensor<I2C>;
+/// #[derive(Debug)]
 /// # pub struct I2c0;
 /// # #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 /// # pub enum Error { }
