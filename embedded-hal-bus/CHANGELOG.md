@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-No unreleased changes
+### Added
+- Added a new `AtomicDevice` for I2C and SPI to enable bus sharing across multiple contexts.
 
 ## [v0.1.0] - 2023-12-28
 
