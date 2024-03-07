@@ -3,7 +3,7 @@ use embedded_hal::i2c::{Error, ErrorKind, ErrorType, I2c};
 
 /// `UnsafeCell`-based shared bus [`I2c`] implementation.
 ///
-/// Sharing is implemented with a `UnsafeCell`. This means it has low overhead, similar to `RefCellDevice` instances, but they are `Send`.
+/// Sharing is implemented with a `UnsafeCell`. This means it has low overhead, similar to [`crate::i2c::RefCellDevice`] instances, but they are `Send`.
 /// so it only allows sharing across multiple threads (interrupt priority levels). When attempting
 /// to preempt usage of the bus, a `AtomicError::Busy` error is returned.
 ///
@@ -13,7 +13,7 @@ use embedded_hal::i2c::{Error, ErrorKind, ErrorType, I2c};
 /// # Examples
 ///
 /// Assuming there is a pressure sensor with address `0x42` on the same bus as a temperature sensor
-/// with address `0x20`; [`RefCellDevice`] can be used to give access to both of these sensors
+/// with address `0x20`; [`AtomicDevice`] can be used to give access to both of these sensors
 /// from a single `i2c` instance.
 ///
 /// ```
