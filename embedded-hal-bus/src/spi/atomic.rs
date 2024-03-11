@@ -26,14 +26,14 @@ pub struct AtomicDevice<'a, BUS, CS, D> {
 }
 
 #[derive(Debug, Copy, Clone)]
-/// Wrapper type for errors originating from the atomically-checked I2C bus manager.
+/// Wrapper type for errors originating from the atomically-checked SPI bus manager.
 pub enum AtomicError<T: Error> {
-    /// This error is returned if the I2C bus was already in use when an operation was attempted,
+    /// This error is returned if the SPI bus was already in use when an operation was attempted,
     /// which indicates that the driver requirements are not being met with regard to
     /// synchronization.
     Busy,
 
-    /// An I2C-related error occurred, and the internal error should be inspected.
+    /// An SPI-related error occurred, and the internal error should be inspected.
     Other(T),
 }
 
