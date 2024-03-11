@@ -11,8 +11,10 @@ pub use refcell::*;
 mod mutex;
 #[cfg(feature = "std")]
 pub use mutex::*;
+mod atomic;
 mod critical_section;
 mod shared;
+pub use atomic::*;
 
 pub use self::critical_section::*;
 

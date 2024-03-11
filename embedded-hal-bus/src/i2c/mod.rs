@@ -8,3 +8,5 @@ mod mutex;
 pub use mutex::*;
 mod critical_section;
 pub use self::critical_section::*;
+mod atomic;
+pub use atomic::*;
