@@ -15,21 +15,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@beta
+      - uses: dtolnay/rust-toolchain@stable
       - run: cargo test --workspace
   
   test-all-features:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@beta
+      - uses: dtolnay/rust-toolchain@stable
       - run: cargo test --workspace --all-features
 
   build-nostd:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@beta
+      - uses: dtolnay/rust-toolchain@stable
         with:
           target: thumbv7m-none-eabi
       - run: >
