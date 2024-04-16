@@ -1,15 +1,18 @@
 use core::cell::RefCell;
+use core::convert::Infallible;
 use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::OutputPin;
 use embedded_hal::spi::{ErrorType, Operation, SpiBus, SpiDevice};
 
-use super::DeviceError;
 use crate::spi::shared::transaction;
 
 /// `RefCell`-based shared bus [`SpiDevice`] implementation.
 ///
 /// This allows for sharing an [`SpiBus`], obtaining multiple [`SpiDevice`] instances,
 /// each with its own `CS` pin.
+///
+/// The `CS` pin must be infallible (`CS: OutputPin<Error = Infallible>`) because proper error handling would be complicated
+/// and it's usually not needed. If you are using a fallible `CS` pin, you can use [UnwrappingAdapter](crate::UnwrappingAdapter).
 ///
 /// Sharing is implemented with a `RefCell`. This means it has low overhead, but `RefCellDevice` instances are not `Send`,
 /// so it only allows sharing within a single thread (interrupt priority level). If you need to share a bus across several
@@ -58,15 +61,15 @@ impl<'a, BUS, CS> RefCellDevice<'a, BUS, CS, super::NoDelay> {
 impl<'a, BUS, CS, D> ErrorType for RefCellDevice<'a, BUS, CS, D>
 where
     BUS: ErrorType,
-    CS: OutputPin,
+    CS: OutputPin<Error = Infallible>,
 {
-    type Error = DeviceError<BUS::Error, CS::Error>;
+    type Error = BUS::Error;
 }
 
 impl<'a, Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for RefCellDevice<'a, BUS, CS, D>
 where
     BUS: SpiBus<Word>,
-    CS: OutputPin,
+    CS: OutputPin<Error = Infallible>,
     D: DelayNs,
 {
     #[inline]

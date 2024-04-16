@@ -1,7 +1,6 @@
 //! `SpiDevice` implementations.
 
-use core::fmt::{self, Debug, Display, Formatter};
-use embedded_hal::spi::{Error, ErrorKind};
+use core::fmt::Debug;
 
 mod exclusive;
 pub use exclusive::*;
@@ -18,42 +17,6 @@ pub use self::critical_section::*;
 
 #[cfg(feature = "defmt-03")]
 use crate::defmt;
-
-/// Error type for [`ExclusiveDevice`] operations.
-#[derive(Copy, Clone, Eq, PartialEq, Debug)]
-#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
-pub enum DeviceError<BUS, CS> {
-    /// An inner SPI bus operation failed.
-    Spi(BUS),
-    /// Asserting or deasserting CS failed.
-    Cs(CS),
-}
-
-impl<BUS: Display, CS: Display> Display for DeviceError<BUS, CS> {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        match self {
-            Self::Spi(bus) => write!(f, "SPI bus error: {}", bus),
-            Self::Cs(cs) => write!(f, "SPI CS error: {}", cs),
-        }
-    }
-}
-
-#[cfg(feature = "std")]
-impl<BUS: Debug + Display, CS: Debug + Display> std::error::Error for DeviceError<BUS, CS> {}
-
-impl<BUS, CS> Error for DeviceError<BUS, CS>
-where
-    BUS: Error + Debug,
-    CS: Debug,
-{
-    #[inline]
-    fn kind(&self) -> ErrorKind {
-        match self {
-            Self::Spi(e) => e.kind(),
-            Self::Cs(_) => ErrorKind::ChipSelectFault,
-        }
-    }
-}
 
 /// Dummy [`DelayNs`](embedded_hal::delay::DelayNs) implementation that panics on use.
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
