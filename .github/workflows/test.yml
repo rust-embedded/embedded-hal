@@ -56,5 +56,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@beta
+      - uses: dtolnay/rust-toolchain@1.75
       - run: cargo test --workspace --all-features
