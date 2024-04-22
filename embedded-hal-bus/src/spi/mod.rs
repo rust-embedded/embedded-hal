@@ -3,6 +3,9 @@
 use core::fmt::{self, Debug, Display, Formatter};
 use embedded_hal::spi::{Error, ErrorKind};
 
+#[cfg(feature = "async")]
+use embedded_hal_async::spi::{Error as AsyncError, ErrorKind as AsyncErrorKind};
+
 mod exclusive;
 pub use exclusive::*;
 mod refcell;
@@ -53,6 +56,21 @@ where
         match self {
             Self::Spi(e) => e.kind(),
             Self::Cs(_) => ErrorKind::ChipSelectFault,
+        }
+    }
+}
+
+#[cfg(feature = "async")]
+impl<BUS, CS> AsyncError for DeviceError<BUS, CS>
+where
+    BUS: AsyncError + Debug,
+    CS: Debug,
+{
+    #[inline]
+    fn kind(&self) -> AsyncErrorKind {
+        match self {
+            Self::Spi(e) => e.kind(),
+            Self::Cs(_) => AsyncErrorKind::ChipSelectFault,
         }
     }
 }

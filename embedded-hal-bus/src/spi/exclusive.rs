@@ -6,7 +6,10 @@ use embedded_hal::spi::{ErrorType, Operation, SpiBus, SpiDevice};
 #[cfg(feature = "async")]
 use embedded_hal_async::{
     delay::DelayNs as AsyncDelayNs,
-    spi::{SpiBus as AsyncSpiBus, SpiDevice as AsyncSpiDevice},
+    spi::{
+        ErrorType as AsyncErrorType, Operation as AsyncOperation, SpiBus as AsyncSpiBus,
+        SpiDevice as AsyncSpiDevice,
+    },
 };
 
 use super::shared::transaction;
@@ -90,6 +93,15 @@ where
 }
 
 #[cfg(feature = "async")]
+impl<BUS, CS, D> AsyncErrorType for ExclusiveDevice<BUS, CS, D>
+where
+    BUS: AsyncErrorType,
+    CS: OutputPin,
+{
+    type Error = DeviceError<BUS::Error, CS::Error>;
+}
+
+#[cfg(feature = "async")]
 #[cfg_attr(docsrs, doc(cfg(feature = "async")))]
 impl<Word: Copy + 'static, BUS, CS, D> AsyncSpiDevice<Word> for ExclusiveDevice<BUS, CS, D>
 where
@@ -100,18 +112,18 @@ where
     #[inline]
     async fn transaction(
         &mut self,
-        operations: &mut [Operation<'_, Word>],
+        operations: &mut [AsyncOperation<'_, Word>],
     ) -> Result<(), Self::Error> {
         self.cs.set_low().map_err(DeviceError::Cs)?;
 
         let op_res = 'ops: {
             for op in operations {
                 let res = match op {
-                    Operation::Read(buf) => self.bus.read(buf).await,
-                    Operation::Write(buf) => self.bus.write(buf).await,
-                    Operation::Transfer(read, write) => self.bus.transfer(read, write).await,
-                    Operation::TransferInPlace(buf) => self.bus.transfer_in_place(buf).await,
-                    Operation::DelayNs(ns) => match self.bus.flush().await {
+                    AsyncOperation::Read(buf) => self.bus.read(buf).await,
+                    AsyncOperation::Write(buf) => self.bus.write(buf).await,
+                    AsyncOperation::Transfer(read, write) => self.bus.transfer(read, write).await,
+                    AsyncOperation::TransferInPlace(buf) => self.bus.transfer_in_place(buf).await,
+                    AsyncOperation::DelayNs(ns) => match self.bus.flush().await {
                         Err(e) => Err(e),
                         Ok(()) => {
                             self.delay.delay_ns(*ns).await;
