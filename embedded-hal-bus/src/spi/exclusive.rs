@@ -24,9 +24,16 @@ pub struct ExclusiveDevice<BUS, CS, D> {
 
 impl<BUS, CS, D> ExclusiveDevice<BUS, CS, D> {
     /// Create a new [`ExclusiveDevice`].
+    ///
+    /// This sets the `cs` pin high, and returns an error if that fails. It is recommended
+    /// to set the pin high the moment it's configured as an output, to avoid glitches.
     #[inline]
-    pub fn new(bus: BUS, cs: CS, delay: D) -> Self {
-        Self { bus, cs, delay }
+    pub fn new(bus: BUS, mut cs: CS, delay: D) -> Result<Self, CS::Error>
+    where
+        CS: OutputPin,
+    {
+        cs.set_high()?;
+        Ok(Self { bus, cs, delay })
     }
 
     /// Returns a reference to the underlying bus object.
@@ -45,6 +52,9 @@ impl<BUS, CS, D> ExclusiveDevice<BUS, CS, D> {
 impl<BUS, CS> ExclusiveDevice<BUS, CS, super::NoDelay> {
     /// Create a new [`ExclusiveDevice`] without support for in-transaction delays.
     ///
+    /// This sets the `cs` pin high, and returns an error if that fails. It is recommended
+    /// to set the pin high the moment it's configured as an output, to avoid glitches.
+    ///
     /// **Warning**: The returned instance *technically* doesn't comply with the `SpiDevice`
     /// contract, which mandates delay support. It is relatively rare for drivers to use
     /// in-transaction delays, so you might still want to use this method because it's more practical.
@@ -60,12 +70,16 @@ impl<BUS, CS> ExclusiveDevice<BUS, CS, super::NoDelay> {
     /// The returned device will panic if you try to execute a transaction
     /// that contains any operations of type [`Operation::DelayNs`].
     #[inline]
-    pub fn new_no_delay(bus: BUS, cs: CS) -> Self {
-        Self {
+    pub fn new_no_delay(bus: BUS, mut cs: CS) -> Result<Self, CS::Error>
+    where
+        CS: OutputPin,
+    {
+        cs.set_high()?;
+        Ok(Self {
             bus,
             cs,
             delay: super::NoDelay,
-        }
+        })
     }
 }
 

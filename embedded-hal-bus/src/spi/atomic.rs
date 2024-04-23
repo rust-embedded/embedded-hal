@@ -46,9 +46,16 @@ pub enum AtomicError<T: Error> {
 
 impl<'a, BUS, CS, D> AtomicDevice<'a, BUS, CS, D> {
     /// Create a new [`AtomicDevice`].
+    ///
+    /// This sets the `cs` pin high, and returns an error if that fails. It is recommended
+    /// to set the pin high the moment it's configured as an output, to avoid glitches.
     #[inline]
-    pub fn new(bus: &'a AtomicCell<BUS>, cs: CS, delay: D) -> Self {
-        Self { bus, cs, delay }
+    pub fn new(bus: &'a AtomicCell<BUS>, mut cs: CS, delay: D) -> Result<Self, CS::Error>
+    where
+        CS: OutputPin,
+    {
+        cs.set_high()?;
+        Ok(Self { bus, cs, delay })
     }
 }
 
@@ -58,6 +65,9 @@ where
     CS: OutputPin,
 {
     /// Create a new [`AtomicDevice`] without support for in-transaction delays.
+    ///
+    /// This sets the `cs` pin high, and returns an error if that fails. It is recommended
+    /// to set the pin high the moment it's configured as an output, to avoid glitches.
     ///
     /// **Warning**: The returned instance *technically* doesn't comply with the `SpiDevice`
     /// contract, which mandates delay support. It is relatively rare for drivers to use
@@ -74,12 +84,16 @@ where
     /// The returned device will panic if you try to execute a transaction
     /// that contains any operations of type [`Operation::DelayNs`].
     #[inline]
-    pub fn new_no_delay(bus: &'a AtomicCell<BUS>, cs: CS) -> Self {
-        Self {
+    pub fn new_no_delay(bus: &'a AtomicCell<BUS>, mut cs: CS) -> Result<Self, CS::Error>
+    where
+        CS: OutputPin,
+    {
+        cs.set_high()?;
+        Ok(Self {
             bus,
             cs,
             delay: super::NoDelay,
-        }
+        })
     }
 }
 
