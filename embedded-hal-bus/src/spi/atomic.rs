@@ -1,10 +1,10 @@
-use core::cell::UnsafeCell;
 use embedded_hal::delay::DelayNs;
 use embedded_hal::digital::OutputPin;
 use embedded_hal::spi::{Error, ErrorKind, ErrorType, Operation, SpiBus, SpiDevice};
 
 use super::DeviceError;
 use crate::spi::shared::transaction;
+use crate::util::AtomicCell;
 
 /// `UnsafeCell`-based shared bus [`SpiDevice`] implementation.
 ///
@@ -19,10 +19,9 @@ use crate::spi::shared::transaction;
 /// rules, such as the RTIC framework.
 ///
 pub struct AtomicDevice<'a, BUS, CS, D> {
-    bus: &'a UnsafeCell<BUS>,
+    bus: &'a AtomicCell<BUS>,
     cs: CS,
     delay: D,
-    busy: portable_atomic::AtomicBool,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -40,13 +39,8 @@ pub enum AtomicError<T: Error> {
 impl<'a, BUS, CS, D> AtomicDevice<'a, BUS, CS, D> {
     /// Create a new [`AtomicDevice`].
     #[inline]
-    pub fn new(bus: &'a UnsafeCell<BUS>, cs: CS, delay: D) -> Self {
-        Self {
-            bus,
-            cs,
-            delay,
-            busy: portable_atomic::AtomicBool::from(false),
-        }
+    pub fn new(bus: &'a AtomicCell<BUS>, cs: CS, delay: D) -> Self {
+        Self { bus, cs, delay }
     }
 }
 
@@ -72,17 +66,14 @@ where
     /// The returned device will panic if you try to execute a transaction
     /// that contains any operations of type [`Operation::DelayNs`].
     #[inline]
-    pub fn new_no_delay(bus: &'a UnsafeCell<BUS>, cs: CS) -> Self {
+    pub fn new_no_delay(bus: &'a AtomicCell<BUS>, cs: CS) -> Self {
         Self {
             bus,
             cs,
             delay: super::NoDelay,
-            busy: portable_atomic::AtomicBool::from(false),
         }
     }
 }
-
-unsafe impl<'a, BUS, CS, D> Send for AtomicDevice<'a, BUS, CS, D> {}
 
 impl<T: Error> Error for AtomicError<T> {
     fn kind(&self) -> ErrorKind {
@@ -109,7 +100,8 @@ where
 {
     #[inline]
     fn transaction(&mut self, operations: &mut [Operation<'_, Word>]) -> Result<(), Self::Error> {
-        self.busy
+        self.bus
+            .busy
             .compare_exchange(
                 false,
                 true,
@@ -118,11 +110,13 @@ where
             )
             .map_err(|_| AtomicError::Busy)?;
 
-        let bus = unsafe { &mut *self.bus.get() };
+        let bus = unsafe { &mut *self.bus.bus.get() };
 
         let result = transaction(operations, bus, &mut self.delay, &mut self.cs);
 
-        self.busy.store(false, core::sync::atomic::Ordering::SeqCst);
+        self.bus
+            .busy
+            .store(false, core::sync::atomic::Ordering::SeqCst);
 
         result.map_err(AtomicError::Other)
     }

@@ -1,5 +1,6 @@
-use core::cell::UnsafeCell;
 use embedded_hal::i2c::{Error, ErrorKind, ErrorType, I2c};
+
+use crate::util::AtomicCell;
 
 /// `UnsafeCell`-based shared bus [`I2c`] implementation.
 ///
@@ -18,7 +19,7 @@ use embedded_hal::i2c::{Error, ErrorKind, ErrorType, I2c};
 ///
 /// ```
 /// use embedded_hal_bus::i2c;
-/// use core::cell::UnsafeCell;
+/// use embedded_hal_bus::util::AtomicCell;
 /// # use embedded_hal::i2c::{self as hali2c, SevenBitAddress, TenBitAddress, I2c, Operation, ErrorKind};
 /// # pub struct Sensor<I2C> {
 /// #     i2c: I2C,
@@ -56,19 +57,18 @@ use embedded_hal::i2c::{Error, ErrorKind, ErrorType, I2c};
 /// # let hal = Hal;
 ///
 /// let i2c = hal.i2c();
-/// let i2c_unsafe_cell = UnsafeCell::new(i2c);
+/// let i2c_cell = AtomicCell::new(i2c);
 /// let mut temperature_sensor = TemperatureSensor::new(
-///   i2c::AtomicDevice::new(&i2c_unsafe_cell),
+///   i2c::AtomicDevice::new(&i2c_cell),
 ///   0x20,
 /// );
 /// let mut pressure_sensor = PressureSensor::new(
-///   i2c::AtomicDevice::new(&i2c_unsafe_cell),
+///   i2c::AtomicDevice::new(&i2c_cell),
 ///   0x42,
 /// );
 /// ```
 pub struct AtomicDevice<'a, T> {
-    bus: &'a UnsafeCell<T>,
-    busy: portable_atomic::AtomicBool,
+    bus: &'a AtomicCell<T>,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -100,18 +100,16 @@ where
 {
     /// Create a new `AtomicDevice`.
     #[inline]
-    pub fn new(bus: &'a UnsafeCell<T>) -> Self {
-        Self {
-            bus,
-            busy: portable_atomic::AtomicBool::from(false),
-        }
+    pub fn new(bus: &'a AtomicCell<T>) -> Self {
+        Self { bus }
     }
 
     fn lock<R, F>(&self, f: F) -> Result<R, AtomicError<T::Error>>
     where
         F: FnOnce(&mut T) -> Result<R, <T as ErrorType>::Error>,
     {
-        self.busy
+        self.bus
+            .busy
             .compare_exchange(
                 false,
                 true,
@@ -120,9 +118,11 @@ where
             )
             .map_err(|_| AtomicError::<T::Error>::Busy)?;
 
-        let result = f(unsafe { &mut *self.bus.get() });
+        let result = f(unsafe { &mut *self.bus.bus.get() });
 
-        self.busy.store(false, core::sync::atomic::Ordering::SeqCst);
+        self.bus
+            .busy
+            .store(false, core::sync::atomic::Ordering::SeqCst);
 
         result.map_err(AtomicError::Other)
     }
