@@ -6,18 +6,26 @@ use super::DeviceError;
 use crate::spi::shared::transaction;
 use crate::util::AtomicCell;
 
-/// `UnsafeCell`-based shared bus [`SpiDevice`] implementation.
+/// Atomics-based shared bus [`SpiDevice`] implementation.
 ///
 /// This allows for sharing an [`SpiBus`], obtaining multiple [`SpiDevice`] instances,
 /// each with its own `CS` pin.
 ///
-/// Sharing is implemented with a `UnsafeCell`. This means it has low overhead, and, unlike [`crate::spi::RefCellDevice`], instances are `Send`,
-/// so it only allows sharing across multiple threads (interrupt priority level). When attempting
-/// to preempt usage of the bus, a `AtomicError::Busy` error is returned.
+/// Sharing is implemented with a [`AtomicDevice`], which consists of an `UnsafeCell` and an `AtomicBool` "locked" flag.
+/// This means it has low overhead, like [`RefCellDevice`](crate::spi::RefCellDevice). Aditionally, it is `Send`,
+/// which allows sharing a single bus across multiple threads (interrupt priority level), like [`CriticalSectionDevice`](crate::spi::CriticalSectionDevice),
+/// while not using critical sections and therefore impacting real-time performance less.
+///
+/// The downside is using a simple `AtomicBool` for locking doesn't prevent two threads from trying to lock it at once.
+/// For example, the main thread can be doing a SPI transaction, and an interrupt fires and tries to do another. In this
+/// case, a `Busy` error is returned that must be handled somehow, usually dropping the data or trying again later.
+///
+/// Note that retrying in a loop on `Busy` errors usually leads to deadlocks. In the above example, it'll prevent the
+/// interrupt handler from returning, which will starve the main thread and prevent it from releasing the lock. If
+/// this is an issue for your use case, you most likely should use [`CriticalSectionDevice`](crate::spi::CriticalSectionDevice) instead.
 ///
 /// This primitive is particularly well-suited for applications that have external arbitration
-/// rules, such as the RTIC framework.
-///
+/// rules that prevent `Busy` errors in the first place, such as the RTIC framework.
 pub struct AtomicDevice<'a, BUS, CS, D> {
     bus: &'a AtomicCell<BUS>,
     cs: CS,
@@ -25,7 +33,7 @@ pub struct AtomicDevice<'a, BUS, CS, D> {
 }
 
 #[derive(Debug, Copy, Clone)]
-/// Wrapper type for errors originating from the atomically-checked SPI bus manager.
+/// Wrapper type for errors returned by [`AtomicDevice`].
 pub enum AtomicError<T: Error> {
     /// This error is returned if the SPI bus was already in use when an operation was attempted,
     /// which indicates that the driver requirements are not being met with regard to
