@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+(Add unreleased changes here)
+
+## [v0.2.0] - 2024-04-23
+
 - Added a new `AtomicDevice` for I2C and SPI to enable bus sharing across multiple contexts.
 - SPI shared bus constructors now set `CS` high, to prevent sharing issues if it was low.
 
@@ -57,7 +61,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 First release to crates.io
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.2.0...HEAD
+[v0.2.0]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0...embedded-hal-bus-v0.2.0
 [v0.1.0]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-rc.3...embedded-hal-bus-v0.1.0
 [v0.1.0-rc.3]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-rc.2...embedded-hal-bus-v0.1.0-rc.3
 [v0.1.0-rc.2]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-rc.1...embedded-hal-bus-v0.1.0-rc.2
