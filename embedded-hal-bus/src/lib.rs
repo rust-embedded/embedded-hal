@@ -18,3 +18,4 @@ use defmt_03 as defmt;
 
 pub mod i2c;
 pub mod spi;
+pub mod util;
