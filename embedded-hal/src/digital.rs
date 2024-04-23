@@ -1,6 +1,6 @@
 //! Digital I/O.
 
-use core::{convert::From, ops::Not};
+use core::ops::Not;
 
 #[cfg(feature = "defmt-03")]
 use crate::defmt;
