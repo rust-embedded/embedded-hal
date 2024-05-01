@@ -1,5 +1,7 @@
 use core::cell::RefCell;
 use embedded_hal::i2c::{ErrorType, I2c};
+#[cfg(feature = "async")]
+use embedded_hal_async::i2c::{ErrorType as AsyncErrorType, I2c as AsyncI2c};
 
 /// `RefCell`-based shared bus [`I2c`] implementation.
 ///
@@ -77,7 +79,7 @@ impl<'a, T> RefCellDevice<'a, T> {
 
 impl<'a, T> ErrorType for RefCellDevice<'a, T>
 where
-    T: I2c,
+    T: ErrorType,
 {
     type Error = T::Error;
 }
@@ -117,5 +119,45 @@ where
     ) -> Result<(), Self::Error> {
         let bus = &mut *self.bus.borrow_mut();
         bus.transaction(address, operations)
+    }
+}
+
+#[cfg(feature = "async")]
+#[cfg_attr(docsrs, doc(cfg(feature = "async")))]
+impl<'a, T> AsyncI2c for RefCellDevice<'a, T>
+where
+    T: AsyncI2c,
+{
+    #[inline]
+    async fn read(&mut self, address: u8, read: &mut [u8]) -> Result<(), Self::Error> {
+        let bus = &mut *self.bus.borrow_mut();
+        bus.read(address, read).await
+    }
+
+    #[inline]
+    async fn write(&mut self, address: u8, write: &[u8]) -> Result<(), Self::Error> {
+        let bus = &mut *self.bus.borrow_mut();
+        bus.write(address, write).await
+    }
+
+    #[inline]
+    async fn write_read(
+        &mut self,
+        address: u8,
+        write: &[u8],
+        read: &mut [u8],
+    ) -> Result<(), Self::Error> {
+        let bus = &mut *self.bus.borrow_mut();
+        bus.write_read(address, write, read).await
+    }
+
+    #[inline]
+    async fn transaction(
+        &mut self,
+        address: u8,
+        operations: &mut [embedded_hal::i2c::Operation<'_>],
+    ) -> Result<(), Self::Error> {
+        let bus = &mut *self.bus.borrow_mut();
+        bus.transaction(address, operations).await
     }
 }
