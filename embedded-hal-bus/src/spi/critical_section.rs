@@ -21,6 +21,9 @@ pub struct CriticalSectionDevice<'a, BUS, CS, D> {
     bus: &'a Mutex<RefCell<BUS>>,
     cs: CS,
     delay: D,
+    /// Implementation of <https://docs.rs/embedded-hal/latest/embedded_hal/spi/index.html#cs-to-clock-delays>
+    cs_to_clock_delay_ns: u32,
+    clock_to_cs_delay_ns: u32,
 }
 
 impl<'a, BUS, CS, D> CriticalSectionDevice<'a, BUS, CS, D> {
@@ -34,7 +37,23 @@ impl<'a, BUS, CS, D> CriticalSectionDevice<'a, BUS, CS, D> {
         CS: OutputPin,
     {
         cs.set_high()?;
-        Ok(Self { bus, cs, delay })
+        Ok(Self {
+            bus,
+            cs,
+            delay,
+            cs_to_clock_delay_ns: 0,
+            clock_to_cs_delay_ns: 0,
+        })
+    }
+
+    /// Set the delay between the CS pin toggle and the first clock
+    pub fn set_cs_to_clock_delay_ns(&mut self, delay_ns: u32) {
+        self.cs_to_clock_delay_ns = delay_ns;
+    }
+
+    /// Set the delay between the last clock and the CS pin reset
+    pub fn set_clock_to_cs_delay_ns(&mut self, delay_ns: u32) {
+        self.clock_to_cs_delay_ns = delay_ns;
     }
 }
 
@@ -68,6 +87,8 @@ impl<'a, BUS, CS> CriticalSectionDevice<'a, BUS, CS, super::NoDelay> {
             bus,
             cs,
             delay: super::NoDelay,
+            cs_to_clock_delay_ns: 0,
+            clock_to_cs_delay_ns: 0,
         })
     }
 }
@@ -91,7 +112,14 @@ where
         critical_section::with(|cs| {
             let bus = &mut *self.bus.borrow_ref_mut(cs);
 
-            transaction(operations, bus, &mut self.delay, &mut self.cs)
+            transaction(
+                operations,
+                bus,
+                &mut self.delay,
+                &mut self.cs,
+                self.cs_to_clock_delay_ns,
+                self.clock_to_cs_delay_ns,
+            )
         })
     }
 }

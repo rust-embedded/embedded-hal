@@ -11,6 +11,8 @@ pub fn transaction<Word, BUS, CS, D>(
     bus: &mut BUS,
     delay: &mut D,
     cs: &mut CS,
+    cs_to_clock_delay_ns: u32,
+    clock_to_cs_delay_ns: u32,
 ) -> Result<(), DeviceError<BUS::Error, CS::Error>>
 where
     BUS: SpiBus<Word> + ErrorType,
@@ -19,6 +21,9 @@ where
     Word: Copy,
 {
     cs.set_low().map_err(DeviceError::Cs)?;
+    if cs_to_clock_delay_ns > 0 {
+        delay.delay_ns(cs_to_clock_delay_ns);
+    }
 
     let op_res = operations.iter_mut().try_for_each(|op| match op {
         Operation::Read(buf) => bus.read(buf),
@@ -34,6 +39,9 @@ where
 
     // On failure, it's important to still flush and deassert CS.
     let flush_res = bus.flush();
+    if clock_to_cs_delay_ns > 0 {
+        delay.delay_ns(cs_to_clock_delay_ns);
+    }
     let cs_res = cs.set_high();
 
     op_res.map_err(DeviceError::Spi)?;
