@@ -40,7 +40,7 @@ where
     // On failure, it's important to still flush and deassert CS.
     let flush_res = bus.flush();
     if clock_to_cs_delay_ns > 0 {
-        delay.delay_ns(cs_to_clock_delay_ns);
+        delay.delay_ns(clock_to_cs_delay_ns);
     }
     let cs_res = cs.set_high();
 
