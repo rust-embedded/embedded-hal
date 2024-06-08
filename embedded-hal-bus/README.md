@@ -30,10 +30,20 @@ provides mechanisms to obtain multiple `I2c` instances out of a single `I2c` ins
 
 ## Optional Cargo features
 
+- **`async`**: enable `embedded-hal-async` support.
+- **`atomic-device`**: enable shared bus implementations that require Atomic CAS operations.
+- **`defmt-03`**: Derive `defmt::Format` from `defmt` 0.3 for enums and structs.
+- **`portable-atomic-critical-section`**: Enable critical-section feature in portable-atomic.
+
+  `portable-atomic` emulates atomic CAS functionality, allowing `embedded-hal-bus` to use `atomic-device` on hardware that does not natively support atomic CAS.
+  This feature requires a critical-section implementation, which is most often provided by your arch crate (cortex-m / riscv / msp430 / avr-device / etc) when the `critical-section-single-core` feature is enabled.
+  A list of critical-section impls is available [in the critical section docs](https://github.com/rust-embedded/critical-section?tab=readme-ov-file#usage-in-no-std-binaries)
+- **`portable-atomic-unsafe-assume-single-core`**: Enable unsafe-assume-single-core feature of portable-atomic.
+
+  `portable-atomic` emulates atomic CAS functionality, allowing `embedded-hal-bus` to use `atomic-device` on hardware that does not natively support atomic CAS.
+  This feature is only safe on single core systems
 - **`std`**: enable shared bus implementations using `std::sync::Mutex`, and implement
   `std::error::Error` for `DeviceError`.
-- **`async`**: enable `embedded-hal-async` support.
-- **`defmt-03`**: Derive `defmt::Format` from `defmt` 0.3 for enums and structs.
 
 ## Minimum Supported Rust Version (MSRV)
 
