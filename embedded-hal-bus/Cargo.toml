@@ -16,6 +16,7 @@ version = "0.2.0"
 
 [features]
 std = []
+atomic-device = []
 async = ["dep:embedded-hal-async"]
 defmt-03 = ["dep:defmt-03", "embedded-hal/defmt-03", "embedded-hal-async?/defmt-03"]
 
@@ -27,5 +28,5 @@ defmt-03 = { package = "defmt", version = "0.3", optional = true }
 portable-atomic = {version = "1", default-features = false}
 
 [package.metadata.docs.rs]
-features = ["std", "async"]
+features = ["std", "async", "atomic-device"]
 rustdoc-args = ["--cfg", "docsrs"]
