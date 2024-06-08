@@ -8,7 +8,7 @@ mod mutex;
 pub use mutex::*;
 mod critical_section;
 pub use self::critical_section::*;
-#[cfg(feature = "atomic-device")]
+#[cfg(any(feature = "atomic-device", target_has_atomic = "8"))]
 mod atomic;
-#[cfg(feature = "atomic-device")]
+#[cfg(any(feature = "atomic-device", target_has_atomic = "8"))]
 pub use atomic::*;
