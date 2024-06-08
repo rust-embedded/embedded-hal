@@ -19,6 +19,8 @@ std = []
 atomic-device = []
 async = ["dep:embedded-hal-async"]
 defmt-03 = ["dep:defmt-03", "embedded-hal/defmt-03", "embedded-hal-async?/defmt-03"]
+portable-atomic-critical-section = ["atomic-device", "portable-atomic/critical-section"]
+portable-atomic-unsafe-assume-single-core = ["atomic-device", "portable-atomic/unsafe-assume-single-core"]
 
 [dependencies]
 embedded-hal = { version = "1.0.0", path = "../embedded-hal" }
