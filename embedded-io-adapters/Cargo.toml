@@ -16,6 +16,9 @@ categories = [
 std = ["embedded-io/std"]
 tokio-1 = ["std", "dep:tokio", "dep:embedded-io-async", "embedded-io-async?/std"]
 futures-03 = ["std", "dep:futures", "dep:embedded-io-async", "embedded-io-async?/std"]
+embedded-storage = ["dep:embedded-storage"]
+embedded-storage-async = ["embedded-storage", "dep:embedded-storage-async", "dep:embedded-io-async"]
+defmt-03 = ["dep:defmt-03"]
 
 [dependencies]
 embedded-io = { version = "0.6", path = "../embedded-io" }
@@ -23,6 +26,9 @@ embedded-io-async = { version = "0.6.1", path = "../embedded-io-async", optional
 
 futures = { version = "0.3.21", features = ["std"], default-features = false, optional = true }
 tokio = { version = "1", features = ["io-util"], default-features = false, optional = true }
+embedded-storage = { version = "0.3.1", optional = true }
+embedded-storage-async = { version = "0.4.1", optional = true }
+defmt-03 = { package = "defmt", version = "0.3", optional = true }
 
 [package.metadata.docs.rs]
 features = ["std", "tokio-1", "futures-03"]

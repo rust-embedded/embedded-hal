@@ -21,11 +21,13 @@ This allows using these adapters when using combinations of traits, like `Read+W
 For `embedded-io`:
 
 - [`std::io`](https://doc.rust-lang.org/stable/std/io/index.html) traits. Needs the `std` feature.
+- [`embedded-storage`](https://crates.io/crates/embedded-storage) traits. Needs the `embedded-storage` feature.
 
 For `embedded-io-async`:
 
 - [`futures` 0.3](https://crates.io/crates/futures) traits. Needs the `futures-03` feature.
 - [`tokio` 1.x](https://crates.io/crates/tokio) traits. Needs the `tokio-1` feature.
+- [`embedded-storage-async`](https://crates.io/crates/embedded-storage-async) traits. Needs the `embedded-storage-async` feature.
 
 ## Minimum Supported Rust Version (MSRV)
 
@@ -34,7 +36,8 @@ compile with older versions but that may change in any new patch release.
 
 See [here](../docs/msrv.md) for details on how the MSRV may be upgraded.
 
-Enabling any of the `tokio-*` or `futures-*` Cargo features requires Rust 1.75 or higher.
+Enabling any of the `tokio-*`, `futures-*` or `embedded-storage-async` Cargo features
+requires Rust 1.75 or higher.
 
 ## License
 
