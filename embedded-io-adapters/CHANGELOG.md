@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-Add unreleased changes here
+- Add adapters for the `embedded-storage` and `embedded-storage-async` traits.
 
 ## 0.6.1 - 2023-11-28
 
