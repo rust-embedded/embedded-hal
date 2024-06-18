@@ -26,8 +26,8 @@ embedded-io-async = { version = "0.6.1", path = "../embedded-io-async", optional
 
 futures = { version = "0.3.21", features = ["std"], default-features = false, optional = true }
 tokio = { version = "1", features = ["io-util"], default-features = false, optional = true }
-embedded-storage = { version = "0.3.1", optional = true }
-embedded-storage-async = { version = "0.4.1", optional = true }
+embedded-storage = { git = "https://github.com/rust-embedded-community/embedded-storage.git", optional = true }
+embedded-storage-async = { git = "https://github.com/rust-embedded-community/embedded-storage.git", optional = true }
 defmt-03 = { package = "defmt", version = "0.3", optional = true }
 
 [package.metadata.docs.rs]
