@@ -12,14 +12,6 @@ pub trait Can {
     /// Awaits until space is available in the transmit buffer.
     async fn transmit(&mut self, frame: &Self::Frame) -> Result<(), Self::Error>;
 
-    /// Tries to put a frame in the transmit buffer.
-    /// If no space is available in the transmit buffer `None` is returned.
-    fn try_transmit(&mut self, frame: &Self::Frame) -> Option<Result<(), Self::Error>>;
-
     /// Awaits until a frame was received or an error occurred.
     async fn receive(&mut self) -> Result<Self::Frame, Self::Error>;
-
-    /// Tries to receive a frame from the receive buffer.
-    /// If no frame is available `None` is returned.
-    fn try_receive(&mut self) -> Option<Result<Self::Frame, Self::Error>>;
 }
