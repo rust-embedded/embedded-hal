@@ -16,8 +16,8 @@ use crate::spi::shared::transaction;
 /// Both of these mechanisms only allow sharing within a single thread (or interrupt priority level).
 /// For this reason, this does not implement [`Send`].
 ///
-/// When this structure is dropped, the reference count of the `Bus` will be decremented,
-/// and the bus driver will be cleaned up when that count reaches zero.
+/// When this structure is dropped, the reference count of the `Bus` instance will be decremented,
+/// and it will be cleaned up once the reference count reaches zero.
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
 pub struct RcDevice<Bus, Cs, Delay> {
     bus: Rc<RefCell<Bus>>,
@@ -32,7 +32,7 @@ impl<Bus, Cs, Delay> RcDevice<Bus, Cs, Delay> {
     /// It is recommended to have already set that pin high the moment it has been configured as an output, to avoid glitches.
     ///
     /// This function does not increment the reference count:
-    /// you will need to call `Rc::clone(&bus)` if you only have a `&RefCell<Bus>`.
+    /// you will need to call `Rc::clone(&bus)` if you only have a `&Rc<RefCell<Bus>>`.
     #[inline]
     pub fn new(bus: Rc<RefCell<Bus>>, mut cs: Cs, delay: Delay) -> Result<Self, Cs::Error>
     where
