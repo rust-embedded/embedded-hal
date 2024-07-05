@@ -10,3 +10,8 @@ mod critical_section;
 pub use self::critical_section::*;
 mod atomic;
 pub use atomic::*;
+
+#[cfg(feature = "alloc")]
+mod rc;
+#[cfg(feature = "alloc")]
+pub use rc::*;
