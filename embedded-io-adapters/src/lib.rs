@@ -15,6 +15,8 @@
     feature(async_fn_in_trait, impl_trait_projections)
 )]
 
+pub mod fmt;
+
 #[cfg(feature = "std")]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 pub mod std;
