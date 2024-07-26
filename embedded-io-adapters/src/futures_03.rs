@@ -1,5 +1,10 @@
 //! Adapters to/from `futures::io` traits.
 
+// MSRV is 1.60 if you don't enable async, 1.80 if you do.
+// Cargo.toml has 1.60, which makes Clippy complain that `poll_fn` was introduced
+// in 1.64. So, just silence it for this file.
+#![allow(clippy::incompatible_msrv)]
+
 use core::future::poll_fn;
 use core::pin::Pin;
 
