@@ -15,9 +15,9 @@ targets.
 ## Differences with `std::io`
 
 - `Error` is an associated type. This allows each implementor to return its own error type,
-while avoiding `dyn` or `Box`. This is consistent with how errors are handled in [`embedded-hal`](https://github.com/rust-embedded/embedded-hal/).
+  while avoiding `dyn` or `Box`. This is consistent with how errors are handled in [`embedded-hal`](https://github.com/rust-embedded/embedded-hal/).
 - In `std::io`, the `Read`/`Write` traits might be blocking or non-blocking (i.e. returning `WouldBlock` errors) depending on the file descriptor's mode, which is only known at run-time. This allows passing a non-blocking stream to code that expects a blocking
-stream, causing unexpected errors. To solve this, `embedded-io` specifies `Read`/`Write` are always blocking, and adds new `ReadReady`/`WriteReady` traits to allow using streams in a non-blocking way.
+  stream, causing unexpected errors. To solve this, `embedded-io` specifies `Read`/`Write` are always blocking, and adds new `ReadReady`/`WriteReady` traits to allow using streams in a non-blocking way.
 
 ## Optional Cargo features
 

@@ -37,37 +37,37 @@ or a console to operate either on hardware serial ports or on virtual ones like 
 The HAL
 
 - Must *erase* device specific details. Neither register, register blocks, nor magic values should
-appear in the API.
+  appear in the API.
 
 - Must be generic *within* a device and *across* devices. The API to use a serial interface must
-be the same regardless of whether the implementation uses the USART1 or UART4 peripheral of a
-device or the UART0 peripheral of another device.
+  be the same regardless of whether the implementation uses the USART1 or UART4 peripheral of a
+  device or the UART0 peripheral of another device.
 
 - Where possible must *not* be tied to a specific asynchronous model. The API should be usable
-in blocking mode, with the `futures` model, with an async/await model or with a callback model.
-(cf. the [`nb`](https://docs.rs/nb) crate)
+  in blocking mode, with the `futures` model, with an async/await model or with a callback model.
+  (cf. the [`nb`](https://docs.rs/nb) crate)
 
 - Must be minimal, and thus easy to implement and zero cost, yet highly composable. People that
-want higher level abstraction should *prefer to use this HAL* rather than *re-implement*
-register manipulation code.
+  want higher level abstraction should *prefer to use this HAL* rather than *re-implement*
+  register manipulation code.
 
 - Serve as a foundation for building an ecosystem of platform-agnostic drivers. Here driver
-means a library crate that lets a target platform interface an external device like a digital
-sensor or a wireless transceiver. The advantage of this system is that by writing the driver as
-a generic library on top of `embedded-hal` driver authors can support any number of target
-platforms (e.g. Cortex-M microcontrollers, AVR microcontrollers, embedded Linux, etc.). The
-advantage for application developers is that by adopting `embedded-hal` they can unlock all
-these drivers for their platform.
+  means a library crate that lets a target platform interface an external device like a digital
+  sensor or a wireless transceiver. The advantage of this system is that by writing the driver as
+  a generic library on top of `embedded-hal` driver authors can support any number of target
+  platforms (e.g. Cortex-M microcontrollers, AVR microcontrollers, embedded Linux, etc.). The
+  advantage for application developers is that by adopting `embedded-hal` they can unlock all
+  these drivers for their platform.
 
 - Trait methods must be fallible so that they can be used in any possible situation.
-Nevertheless, HAL implementations can additionally provide infallible versions of the same methods
-if they can never fail in their platform. This way, generic code can use the fallible abstractions
-provided here but platform-specific code can avoid fallibility-related boilerplate if possible.
+  Nevertheless, HAL implementations can additionally provide infallible versions of the same methods
+  if they can never fail in their platform. This way, generic code can use the fallible abstractions
+  provided here but platform-specific code can avoid fallibility-related boilerplate if possible.
 
 ## Out of scope
 
 - Initialization and configuration stuff like "ensure this serial interface and that SPI
-interface are not using the same pins". The HAL will focus on *doing I/O*.
+  interface are not using the same pins". The HAL will focus on *doing I/O*.
 
 ## Platform agnostic drivers
 
