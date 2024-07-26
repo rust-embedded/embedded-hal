@@ -20,8 +20,6 @@ async = ["dep:embedded-hal-async"]
 defmt-03 = ["dep:defmt-03", "embedded-hal/defmt-03", "embedded-hal-async?/defmt-03"]
 # Enables additional utilities requiring a global allocator.
 alloc = []
-# TODO: remove this
-default = ["alloc"]
 
 [dependencies]
 embedded-hal = { version = "1.0.0", path = "../embedded-hal" }
