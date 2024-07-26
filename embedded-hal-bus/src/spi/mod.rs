@@ -16,6 +16,11 @@ mod critical_section;
 mod shared;
 pub use atomic::*;
 
+#[cfg(feature = "alloc")]
+mod rc;
+#[cfg(feature = "alloc")]
+pub use rc::*;
+
 pub use self::critical_section::*;
 
 #[cfg(feature = "defmt-03")]
