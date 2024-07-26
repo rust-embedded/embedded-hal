@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-(Add unreleased changes here)
+- Added the `alloc` feature.
+- Added a new `RcDevice` for I2C and SPI, a reference-counting equivalent to `RefCellDevice`.
 
 ## [v0.2.0] - 2024-04-23
 
