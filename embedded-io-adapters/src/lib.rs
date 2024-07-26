@@ -3,6 +3,8 @@
 #![warn(missing_docs)]
 #![doc = include_str!("../README.md")]
 
+pub mod fmt;
+
 #[cfg(feature = "std")]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
 pub mod std;
