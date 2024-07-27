@@ -14,3 +14,7 @@ repository = "https://github.com/rust-embedded/embedded-hal"
 
 [dependencies]
 nb = "1"
+defmt = { version = "0.3", optional = true }
+
+[features]
+defmt-03 = ["dep:defmt"]

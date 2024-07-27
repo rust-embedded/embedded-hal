@@ -18,7 +18,7 @@ alloc = ["embedded-io/alloc"]
 defmt-03 = ["dep:defmt-03", "embedded-io/defmt-03"]
 
 [dependencies]
-embedded-io = { version = "0.6", path = "../embedded-io" }
+embedded-io = { version = "0.6.1", path = "../embedded-io" }
 defmt-03 = { package = "defmt", version = "0.3", optional = true }
 
 [package.metadata.docs.rs]

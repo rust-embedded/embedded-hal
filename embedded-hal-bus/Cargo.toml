@@ -16,7 +16,7 @@ version = "0.2.0"
 
 [features]
 # Enable shared bus implementations using `std::sync::Mutex`, and implement `std::error::Error` for `DeviceError`
-std = []
+std = ["alloc"]
 # Use `portable-atomic` to enable `atomic-device` on devices without native atomic CAS
 #
 # `portable-atomic` emulates atomic CAS functionality, allowing `embedded-hal-bus` to use `atomic-device` on hardware
@@ -28,6 +28,8 @@ portable-atomic = []
 async = ["dep:embedded-hal-async"]
 # Derive `defmt::Format` from `defmt` 0.3 for enums and structs. See https://github.com/knurling-rs/defmt for more info
 defmt-03 = ["dep:defmt-03", "embedded-hal/defmt-03", "embedded-hal-async?/defmt-03"]
+# Enables additional utilities requiring a global allocator.
+alloc = []
 
 [dependencies]
 embedded-hal = { version = "1.0.0", path = "../embedded-hal" }

@@ -13,6 +13,10 @@ This project is developed and maintained by the [HAL team](https://github.com/ru
 
 [API reference]: https://docs.rs/embedded-can
 
+## Optional features
+
+- **`defmt-03`**: Derive `defmt::Format` from `defmt` 0.3 for enums and structs.
+
 ## Minimum Supported Rust Version (MSRV)
 
 This crate is guaranteed to compile on stable Rust 1.60 and up. It *might*

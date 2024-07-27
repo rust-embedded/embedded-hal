@@ -11,10 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@master
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          # embedded-hal-async needs nightly.
-          # Use a pinned version to avoid spontaneous breakages (new clippy lints are added often)
-          toolchain: nightly-2023-10-14
           components: clippy
       - run: cargo clippy --all-features -- --deny=warnings

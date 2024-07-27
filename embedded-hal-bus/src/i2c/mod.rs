@@ -12,3 +12,8 @@ pub use self::critical_section::*;
 mod atomic;
 #[cfg(any(feature = "portable-atomic", target_has_atomic = "8"))]
 pub use atomic::*;
+
+#[cfg(feature = "alloc")]
+mod rc;
+#[cfg(feature = "alloc")]
+pub use rc::*;
