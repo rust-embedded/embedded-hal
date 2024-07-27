@@ -11,11 +11,11 @@ pub use refcell::*;
 mod mutex;
 #[cfg(feature = "std")]
 pub use mutex::*;
-#[cfg(any(feature = "atomic-device", target_has_atomic = "8"))]
+#[cfg(any(feature = "portable-atomic", target_has_atomic = "8"))]
 mod atomic;
 mod critical_section;
 mod shared;
-#[cfg(any(feature = "atomic-device", target_has_atomic = "8"))]
+#[cfg(any(feature = "portable-atomic", target_has_atomic = "8"))]
 pub use atomic::*;
 
 pub use self::critical_section::*;
