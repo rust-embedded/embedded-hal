@@ -30,11 +30,17 @@ provides mechanisms to obtain multiple `I2c` instances out of a single `I2c` ins
 
 ## Optional Cargo features
 
-- **`std`**: enable shared bus implementations using `std::sync::Mutex`, and implement
-  `std::error::Error` for `DeviceError`.
 - **`async`**: enable `embedded-hal-async` support.
 - **`defmt-03`**: Derive `defmt::Format` from `defmt` 0.3 for enums and structs.
 - **`alloc`**: enable implementations using `alloc` (for instance, `spi::RcDevice`, which makes use of `alloc::rc::Rc`)
+- **`portable-atomic`**: Use `portable-atomic` to enable `atomic-device` on devices without native atomic CAS
+
+  `portable-atomic` emulates atomic CAS functionality, allowing `embedded-hal-bus` to use `atomic-device` on hardware
+  that does not natively support atomic CAS. If you enable this, you must also add `portable-atomic` to your crate with
+  a feature flag such as `unsafe-assume-single-core` or `critical-section` to choose how atomic CAS is implemented.
+  See <https://docs.rs/portable-atomic/1.7.0/portable_atomic/#optional-features> for more info.
+- **`std`**: enable shared bus implementations using `std::sync::Mutex`, and implement
+  `std::error::Error` for `DeviceError`.
 
 ## Minimum Supported Rust Version (MSRV)
 
