@@ -392,7 +392,7 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// - Data from adjacent operations of the same type are sent after each other without an SP or SR.
     /// - Between adjacent operations of a different type an SR and SAD+R/W is sent.
     /// - After executing the last operation an SP is sent automatically.
-    /// - If the last operation is a `Read` the master does not send an acknowledge for the last byte.
+    /// - At the end of each read operation (before SP or SR), the master does not send an acknowledge for the last byte.
     ///
     /// - `ST` = start condition
     /// - `SAD+R/W` = slave address followed by bit 1 to indicate reading or 0 to indicate writing
