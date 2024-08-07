@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-...
+- Add async API.
 
 ## [v0.4.1] - 2022-09-28
 
