@@ -302,7 +302,7 @@ pub trait Read: ErrorType {
     ///
     /// If no bytes are currently available to read:
     /// - The method blocks until at least one byte becomes available;
-    /// - Once at least one (or more) bytes become available, a non-zero amount of those is read to the
+    /// - Once at least one (or more) bytes become available, a non-zero amount of those is copied to the
     ///   beginning of `buf`, and the amount is returned, *without waiting or blocking any further for
     ///   more bytes to become available*.
     ///
