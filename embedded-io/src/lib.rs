@@ -318,6 +318,10 @@ pub trait Read: ErrorType {
     /// to become available, before the peer represented by `Read` would stop sending bytes due to
     /// application-specific reasons (as in the peer waiting for a response to the data it had sent so far).
     ///
+    /// If the reader is at end-of-file (EOF), `Ok(0)` is returned. There is no guarantee that a reader at EOF
+    /// will always be so in the future, for example a reader can stop being at EOF if another process appends
+    /// more bytes to the underlying file.
+    ///
     /// If `buf.len() == 0`, `read` returns without blocking, with either `Ok(0)` or an error.
     /// The `Ok(0)` doesn't indicate EOF, unlike when called with a non-empty buffer.
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error>;
