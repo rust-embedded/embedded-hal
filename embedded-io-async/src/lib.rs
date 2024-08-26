@@ -19,12 +19,23 @@ pub use embedded_io::{
 pub trait Read: ErrorType {
     /// Read some bytes from this source into the specified buffer, returning how many bytes were read.
     ///
-    /// If no bytes are currently available to read, this function waits until at least one byte is available.
+    /// If no bytes are currently available to read:
+    /// - The method waits until at least one byte becomes available;
+    /// - Once at least one (or more) bytes become available, a non-zero amount of those is copied to the
+    ///   beginning of `buf`, and the amount is returned, *without waiting any further for more bytes to
+    ///   become available*.
     ///
-    /// If bytes are available, a non-zero amount of bytes is read to the beginning of `buf`, and the amount
-    /// is returned. It is not guaranteed that *all* available bytes are returned, it is possible for the
-    /// implementation to read an amount of bytes less than `buf.len()` while there are more bytes immediately
-    /// available.
+    /// If bytes are available to read:
+    /// - A non-zero amount of bytes is read to the beginning of `buf`, and the amount is returned immediately,
+    ///   *without waiting for more bytes to become available*;
+    /// - It is not guaranteed that *all* available bytes are returned, it is possible for the implementation to
+    ///   read an amount of bytes less than `buf.len()` while there are more bytes immediately available.
+    ///
+    /// This waiting behavior is important for the cases where `Read` represents the "read" leg of a pipe-like
+    /// protocol (a socket, a pipe, a serial line etc.). The semantics is that the caller - by passing a non-empty
+    /// buffer - does expect _some_ data (one or more bytes) - but _not necessarily `buf.len()` or more bytes_ -
+    /// to become available, before the peer represented by `Read` would stop sending bytes due to
+    /// application-specific reasons (as in the peer waiting for a response to the data it had sent so far).
     ///
     /// If the reader is at end-of-file (EOF), `Ok(0)` is returned. There is no guarantee that a reader at EOF
     /// will always be so in the future, for example a reader can stop being at EOF if another process appends
