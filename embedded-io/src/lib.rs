@@ -372,27 +372,29 @@ impl<const N: usize, R: ?Sized> BufReader<N, R> {
         &self.inner
     }
 
+    /// Gets a mutable reference to the underlying reader.
     pub fn get_mut(&mut self) -> &mut R {
         &mut self.inner
     }
 
+    /// Returns a reference to the internally buffered data.
+    ///
+    /// Unlike `fill_buff` this will not attempt to fill the buffer it if is empty.
     pub fn buffer(&self) -> &[u8] {
         &self.buff
     }
 
+    /// Returns the number of bytes the internal buffer can hold at once.
     pub fn capacity(&self) -> usize {
         N
     }
 
+    /// Unwraps this [BufReader<N,R>], returning the underlying reader.
     pub fn into_inner(self) -> R
     where
         R: Sized,
     {
         self.inner
-    }
-
-    pub fn discard_buffer(&mut self) {
-        self.pos = 0;
     }
 }
 
