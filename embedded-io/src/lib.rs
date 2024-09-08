@@ -309,8 +309,10 @@ pub trait Read: ErrorType {
     /// If bytes are available to read:
     /// - A non-zero amount of bytes is read to the beginning of `buf`, and the amount is returned immediately,
     ///   *without blocking and waiting for more bytes to become available*;
-    /// - It is not guaranteed that *all* available bytes are returned, it is possible for the implementation to
-    ///   read an amount of bytes less than `buf.len()` while there are more bytes immediately available.
+    ///
+    /// Note that once some bytes are available to read, it is *not* guaranteed that all available bytes are returned.
+    /// It is possible for the implementation to read an amount of bytes less than `buf.len()` while there are more
+    /// bytes immediately available.
     ///
     /// This blocking behavior is important for the cases where `Read` represents the "read" leg of a pipe-like
     /// protocol (a socket, a pipe, a serial line etc.). The semantics is that the caller - by passing a non-empty
