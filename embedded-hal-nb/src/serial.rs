@@ -10,6 +10,14 @@ pub trait Error: core::fmt::Debug {
     fn kind(&self) -> ErrorKind;
 }
 
+impl core::fmt::Display for dyn Error {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl core::error::Error for dyn Error {}
+
 impl Error for core::convert::Infallible {
     #[inline]
     fn kind(&self) -> ErrorKind {

@@ -181,6 +181,14 @@ pub trait Error: fmt::Debug {
     fn kind(&self) -> ErrorKind;
 }
 
+impl fmt::Display for dyn Error {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl core::error::Error for dyn Error {}
+
 impl Error for core::convert::Infallible {
     fn kind(&self) -> ErrorKind {
         match *self {}
@@ -255,9 +263,7 @@ impl<E: fmt::Debug> fmt::Display for ReadExactError<E> {
     }
 }
 
-#[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
-impl<E: fmt::Debug> std::error::Error for ReadExactError<E> {}
+impl<E: fmt::Debug> core::error::Error for ReadExactError<E> {}
 
 /// Errors that could be returned by `Write` on `&mut [u8]`.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -290,9 +296,7 @@ impl<E: fmt::Debug> fmt::Display for WriteFmtError<E> {
     }
 }
 
-#[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
-impl<E: fmt::Debug> std::error::Error for WriteFmtError<E> {}
+impl<E: fmt::Debug> core::error::Error for WriteFmtError<E> {}
 
 /// Blocking reader.
 ///

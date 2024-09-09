@@ -19,10 +19,6 @@ impl core::fmt::Display for SliceWriteError {
     }
 }
 
-#[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
-impl std::error::Error for SliceWriteError {}
-
 /// Write is implemented for `&mut [u8]` by copying into the slice, overwriting
 /// its data.
 ///

@@ -47,8 +47,7 @@ impl<BUS: Display, CS: Display> Display for DeviceError<BUS, CS> {
     }
 }
 
-#[cfg(feature = "std")]
-impl<BUS: Debug + Display, CS: Debug + Display> std::error::Error for DeviceError<BUS, CS> {}
+impl<BUS: Debug + Display, CS: Debug + Display> core::error::Error for DeviceError<BUS, CS> {}
 
 impl<BUS, CS> Error for DeviceError<BUS, CS>
 where

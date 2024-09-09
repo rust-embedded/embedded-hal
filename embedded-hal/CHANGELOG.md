@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-No unreleased changes yet.
+- Added blanket `core::error::Error` and `core::fmt::Display` implementations for the custom `Error` traits
+- Increased MSRV to 1.81 due to `core::error::Error`
 
 ## [v1.0.0] - 2023-12-28
 

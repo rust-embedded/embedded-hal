@@ -2,7 +2,7 @@
 name = "embedded-io"
 version = "0.6.1"
 edition = "2021"
-rust-version = "1.60"
+rust-version = "1.81"
 description = "Embedded IO traits"
 repository = "https://github.com/rust-embedded/embedded-hal"
 readme = "README.md"

@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Added the `alloc` feature.
 - Added a new `RcDevice` for I2C and SPI, a reference-counting equivalent to `RefCellDevice`.
+- Migrated `std` feature-gated `std::error::Error` implementations to `core::error::Error`
+- Increased MSRV to 1.81 due to `core::error::Error`
 
 ## [v0.2.0] - 2024-04-23
 
