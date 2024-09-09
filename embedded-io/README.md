@@ -21,7 +21,7 @@ targets.
 
 ## Optional Cargo features
 
-- **`std`**: Adds `From` impls to convert to/from `std::io` structs, adds `std::error::Error` impls.
+- **`std`**: Adds `From` impls to convert to/from `std::io` structs.
 - **`alloc`**: Adds blanket impls for `Box`, adds `Write` impl to `Vec`.
 - **`defmt-03`**: Derive `defmt::Format` from `defmt` 0.3 for enums and structs.
 

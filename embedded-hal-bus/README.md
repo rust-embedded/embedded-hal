@@ -39,8 +39,7 @@ provides mechanisms to obtain multiple `I2c` instances out of a single `I2c` ins
   that does not natively support atomic CAS. If you enable this, you must also add `portable-atomic` to your crate with
   a feature flag such as `unsafe-assume-single-core` or `critical-section` to choose how atomic CAS is implemented.
   See <https://docs.rs/portable-atomic/1.7.0/portable_atomic/#optional-features> for more info.
-- **`std`**: enable shared bus implementations using `std::sync::Mutex`, and implement
-  `std::error::Error` for `DeviceError`.
+- **`std`**: enable shared bus implementations using `std::sync::Mutex`.
 
 ## Minimum Supported Rust Version (MSRV)
 

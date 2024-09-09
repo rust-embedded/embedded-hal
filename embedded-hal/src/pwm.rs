@@ -40,6 +40,8 @@ impl Error for ErrorKind {
     }
 }
 
+impl core::error::Error for ErrorKind {}
+
 impl core::fmt::Display for ErrorKind {
     #[inline]
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {

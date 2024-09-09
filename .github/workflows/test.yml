@@ -38,23 +38,9 @@ jobs:
           --target thumbv7m-none-eabi
           --features async,defmt-03
 
-  msrv-1-60:
+  msrv-1-81:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.60
-      - run: >
-          cargo test
-          -p embedded-hal:1.0.0
-          -p embedded-hal-bus
-          -p embedded-hal-nb
-          -p embedded-io
-          -p embedded-io-adapters
-          -p embedded-can
-
-  msrv-1-75:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.75
+      - uses: dtolnay/rust-toolchain@1.81
       - run: cargo test --workspace --all-features

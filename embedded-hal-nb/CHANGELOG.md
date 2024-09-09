@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-No unreleased changes
+- Added `core::error::Error` implementations for every custom `impl Error`
+- Increased MSRV to 1.81 due to `core::error::Error`
 
 ## [v1.0.0] - 2023-12-28
 

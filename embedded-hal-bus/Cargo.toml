@@ -6,7 +6,7 @@ categories = ["embedded", "hardware-support", "no-std"]
 description = "Bus/Device connection mechanisms for embedded-hal, a Hardware Abstraction Layer (HAL) for embedded systems"
 documentation = "https://docs.rs/embedded-hal-bus"
 edition = "2021"
-rust-version = "1.60"
+rust-version = "1.81"
 keywords = ["hal", "IO"]
 license = "MIT OR Apache-2.0"
 name = "embedded-hal-bus"
@@ -15,7 +15,7 @@ repository = "https://github.com/rust-embedded/embedded-hal"
 version = "0.2.0"
 
 [features]
-# Enable shared bus implementations using `std::sync::Mutex`, and implement `std::error::Error` for `DeviceError`
+# Enable shared bus implementations using `std::sync::Mutex`
 std = ["alloc"]
 # Use `portable-atomic` to enable `atomic-device` on devices without native atomic CAS
 #
