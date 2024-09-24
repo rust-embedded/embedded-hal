@@ -110,6 +110,8 @@ impl Error for ErrorKind {
     }
 }
 
+impl core::error::Error for ErrorKind {}
+
 impl core::fmt::Display for ErrorKind {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {

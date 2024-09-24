@@ -2,7 +2,7 @@
 name = "embedded-can"
 version = "0.4.1"
 edition = "2021"
-rust-version = "1.56"
+rust-version = "1.81"
 
 description = "HAL traits for Controller Area Network (CAN) devices."
 categories = ["embedded", "hardware-support", "no-std"]
