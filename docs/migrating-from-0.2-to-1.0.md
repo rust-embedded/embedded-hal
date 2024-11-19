@@ -470,14 +470,15 @@ Here is the full listing of crates:
 
 ## Supporting both 0.2 and 1.0 in the same HAL
 
-It is strongly recommended that HAL implementation crates provide implementations for both the `embedded-hal` v0.2 and v1.0 traits.
-This allows users to use drivers using either version seamlessly.
+It is not recommended to support 0.2 version of the HAL. Many of the traits are not fit for purpose which is already discussed in this document.
+
+If you wish to support both the 0.2 and 1.0 release it is recommended to support embedded-hal version 0.2 behind a feature flag named `embedded-hal-02`.
 
 The way you do it is adding a dependency on both versions in `Cargo.toml` like this:
 
 ```toml
 [dependencies]
-embedded-hal-02 = { package = "embedded-hal", version = "0.2.7", features = ["unproven"] }
+embedded-hal-02 = { package = "embedded-hal", version = "0.2.7", features = ["unproven"], optional = true }
 embedded-hal-1 = { package = "embedded-hal", version = "1.0" }
 ```
 
@@ -489,6 +490,7 @@ This allows you to refer to the v0.2 traits under the `embedded_hal_02` name, an
 struct Input {...}
 
 /// Implement the v0.2 traits on the struct.
+#[cfg(feature = "embedded-hal-02")]
 impl embedded_hal_02::digital::v2::InputPin for Input {
     type Error = Infallible;
 
