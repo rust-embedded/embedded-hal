@@ -118,7 +118,6 @@ impl<T: Write<Word> + ?Sized, Word: Copy> Write<Word> for &mut T {
 /// Implementation of `core::fmt::Write` for the HAL's `serial::Write`.
 ///
 /// TODO write example of usage
-
 impl<Word, Error: self::Error> core::fmt::Write for dyn Write<Word, Error = Error> + '_
 where
     Word: Copy + From<u8>,

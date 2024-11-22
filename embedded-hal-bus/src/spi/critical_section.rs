@@ -72,7 +72,7 @@ impl<'a, BUS, CS> CriticalSectionDevice<'a, BUS, CS, super::NoDelay> {
     }
 }
 
-impl<'a, BUS, CS, D> ErrorType for CriticalSectionDevice<'a, BUS, CS, D>
+impl<BUS, CS, D> ErrorType for CriticalSectionDevice<'_, BUS, CS, D>
 where
     BUS: ErrorType,
     CS: OutputPin,
@@ -80,7 +80,7 @@ where
     type Error = DeviceError<BUS::Error, CS::Error>;
 }
 
-impl<'a, Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for CriticalSectionDevice<'a, BUS, CS, D>
+impl<Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for CriticalSectionDevice<'_, BUS, CS, D>
 where
     BUS: SpiBus<Word>,
     CS: OutputPin,

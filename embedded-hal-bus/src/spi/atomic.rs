@@ -106,7 +106,7 @@ impl<T: Error> Error for AtomicError<T> {
     }
 }
 
-impl<'a, BUS, CS, D> ErrorType for AtomicDevice<'a, BUS, CS, D>
+impl<BUS, CS, D> ErrorType for AtomicDevice<'_, BUS, CS, D>
 where
     BUS: ErrorType,
     CS: OutputPin,
@@ -114,7 +114,7 @@ where
     type Error = AtomicError<DeviceError<BUS::Error, CS::Error>>;
 }
 
-impl<'a, Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for AtomicDevice<'a, BUS, CS, D>
+impl<Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for AtomicDevice<'_, BUS, CS, D>
 where
     BUS: SpiBus<Word>,
     CS: OutputPin,

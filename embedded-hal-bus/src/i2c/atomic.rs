@@ -101,7 +101,7 @@ impl<T: Error> Error for AtomicError<T> {
     }
 }
 
-unsafe impl<'a, T> Send for AtomicDevice<'a, T> {}
+unsafe impl<T> Send for AtomicDevice<'_, T> {}
 
 impl<'a, T> AtomicDevice<'a, T>
 where
@@ -137,14 +137,14 @@ where
     }
 }
 
-impl<'a, T> ErrorType for AtomicDevice<'a, T>
+impl<T> ErrorType for AtomicDevice<'_, T>
 where
     T: I2c,
 {
     type Error = AtomicError<T::Error>;
 }
 
-impl<'a, T> I2c for AtomicDevice<'a, T>
+impl<T> I2c for AtomicDevice<'_, T>
 where
     T: I2c,
 {

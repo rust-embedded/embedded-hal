@@ -75,14 +75,14 @@ impl<'a, T> RefCellDevice<'a, T> {
     }
 }
 
-impl<'a, T> ErrorType for RefCellDevice<'a, T>
+impl<T> ErrorType for RefCellDevice<'_, T>
 where
     T: I2c,
 {
     type Error = T::Error;
 }
 
-impl<'a, T> I2c for RefCellDevice<'a, T>
+impl<T> I2c for RefCellDevice<'_, T>
 where
     T: I2c,
 {
