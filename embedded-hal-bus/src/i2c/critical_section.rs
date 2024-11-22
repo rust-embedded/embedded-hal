@@ -21,14 +21,14 @@ impl<'a, T> CriticalSectionDevice<'a, T> {
     }
 }
 
-impl<'a, T> ErrorType for CriticalSectionDevice<'a, T>
+impl<T> ErrorType for CriticalSectionDevice<'_, T>
 where
     T: I2c,
 {
     type Error = T::Error;
 }
 
-impl<'a, T> I2c for CriticalSectionDevice<'a, T>
+impl<T> I2c for CriticalSectionDevice<'_, T>
 where
     T: I2c,
 {

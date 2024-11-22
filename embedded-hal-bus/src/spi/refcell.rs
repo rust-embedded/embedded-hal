@@ -69,7 +69,7 @@ impl<'a, BUS, CS> RefCellDevice<'a, BUS, CS, super::NoDelay> {
     }
 }
 
-impl<'a, BUS, CS, D> ErrorType for RefCellDevice<'a, BUS, CS, D>
+impl<BUS, CS, D> ErrorType for RefCellDevice<'_, BUS, CS, D>
 where
     BUS: ErrorType,
     CS: OutputPin,
@@ -77,7 +77,7 @@ where
     type Error = DeviceError<BUS::Error, CS::Error>;
 }
 
-impl<'a, Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for RefCellDevice<'a, BUS, CS, D>
+impl<Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for RefCellDevice<'_, BUS, CS, D>
 where
     BUS: SpiBus<Word>,
     CS: OutputPin,
