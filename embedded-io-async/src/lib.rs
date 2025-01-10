@@ -205,3 +205,57 @@ impl<T: ?Sized + Seek> Seek for &mut T {
         T::seek(self, pos).await
     }
 }
+
+/// A trait for bidirectional communication interfaces that can be split into
+/// separate read and write halves.
+///
+/// This trait is useful for scenarios where you want to handle reading and
+/// writing operations independently, possibly in different tasks or threads.
+///
+/// # Associated Types
+///
+/// - `ReadHalf`: The type of the read half, which must implement the `Read` trait.
+/// - `WriteHalf`: The type of the write half, which must implement the `Write` trait.
+///
+/// # Required Methods
+///
+/// ## `split`
+///
+/// Splits the bidirectional interface into separate read and write halves.
+///
+/// ```rust
+/// fn split(self) -> (Self::ReadHalf, Self::WriteHalf);
+/// ```
+///
+/// # Examples
+///
+/// ```rust
+/// use embedded_io_async::Splittable;
+///
+/// async fn use_split_interface<T>(interface: T)
+/// where
+///     T: Splittable,
+/// {
+///     let (read_half, write_half) = interface.split();
+///
+///     // Use `read_half` and `write_half` independently.
+/// }
+/// ```
+///
+/// # Notes
+///
+/// - Implementors of this trait must ensure that the split operation correctly
+///   separates the read and write functionalities without interfering with each other.
+/// - The `split` method consumes the original interface, transferring ownership
+///   of the read and write halves to the caller.
+
+pub trait Splittable: Read + Write {
+    /// Type representing the read half
+    type ReadHalf: Read<Error = Self::Error>;
+    /// Type representing the write half
+    type WriteHalf: Write<Error = Self::Error>;
+
+    /// Splits the bidirectional interface into separate unidirectional read and write halves.
+    fn split(self) -> (Self::ReadHalf, Self::WriteHalf);
+}
+
