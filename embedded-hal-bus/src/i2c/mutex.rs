@@ -19,14 +19,14 @@ impl<'a, T> MutexDevice<'a, T> {
     }
 }
 
-impl<'a, T> ErrorType for MutexDevice<'a, T>
+impl<T> ErrorType for MutexDevice<'_, T>
 where
     T: I2c,
 {
     type Error = T::Error;
 }
 
-impl<'a, T> I2c for MutexDevice<'a, T>
+impl<T> I2c for MutexDevice<'_, T>
 where
     T: I2c,
 {
