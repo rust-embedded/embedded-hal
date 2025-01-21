@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+- Your change here!
+
+## [v0.3.0] - 2025-01-21
+
+- `AtomicDevice` now requires enabling feature `portable-atomic` on `thumbv6m-none-eabi` and other targets that don't have atomic CAS.
 - Added the `alloc` feature.
 - Added a new `RcDevice` for I2C and SPI, a reference-counting equivalent to `RefCellDevice`.
 - Migrated `std` feature-gated `std::error::Error` implementations to `core::error::Error`
@@ -64,7 +69,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 First release to crates.io
 
-[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.2.0...HEAD
+[Unreleased]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.3.0...HEAD
+[v0.3.0]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.2.0...embedded-hal-bus-v0.3.0
 [v0.2.0]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0...embedded-hal-bus-v0.2.0
 [v0.1.0]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-rc.3...embedded-hal-bus-v0.1.0
 [v0.1.0-rc.3]: https://github.com/rust-embedded/embedded-hal/compare/embedded-hal-bus-v0.1.0-rc.2...embedded-hal-bus-v0.1.0-rc.3

@@ -70,7 +70,7 @@ impl<'a, BUS, CS> MutexDevice<'a, BUS, CS, super::NoDelay> {
     }
 }
 
-impl<'a, BUS, CS, D> ErrorType for MutexDevice<'a, BUS, CS, D>
+impl<BUS, CS, D> ErrorType for MutexDevice<'_, BUS, CS, D>
 where
     BUS: ErrorType,
     CS: OutputPin,
@@ -78,7 +78,7 @@ where
     type Error = DeviceError<BUS::Error, CS::Error>;
 }
 
-impl<'a, Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for MutexDevice<'a, BUS, CS, D>
+impl<Word: Copy + 'static, BUS, CS, D> SpiDevice<Word> for MutexDevice<'_, BUS, CS, D>
 where
     BUS: SpiBus<Word>,
     CS: OutputPin,
