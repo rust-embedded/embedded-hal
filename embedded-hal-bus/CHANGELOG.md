@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [v0.3.0] - 2025-01-21
 
+- `AtomicDevice` now requires enabling feature `portable-atomic` on `thumbv6m-none-eabi` and other targets that don't have atomic CAS.
 - Added the `alloc` feature.
 - Added a new `RcDevice` for I2C and SPI, a reference-counting equivalent to `RefCellDevice`.
 - Migrated `std` feature-gated `std::error::Error` implementations to `core::error::Error`
