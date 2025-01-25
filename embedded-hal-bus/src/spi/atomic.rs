@@ -26,6 +26,10 @@ use crate::util::AtomicCell;
 ///
 /// This primitive is particularly well-suited for applications that have external arbitration
 /// rules that prevent `Busy` errors in the first place, such as the RTIC framework.
+#[cfg_attr(
+    docsrs,
+    doc(cfg(any(feature = "portable-atomic", target_has_atomic = "8")))
+)]
 pub struct AtomicDevice<'a, BUS, CS, D> {
     bus: &'a AtomicCell<BUS>,
     cs: CS,
@@ -34,6 +38,10 @@ pub struct AtomicDevice<'a, BUS, CS, D> {
 
 #[derive(Debug, Copy, Clone)]
 /// Wrapper type for errors returned by [`AtomicDevice`].
+#[cfg_attr(
+    docsrs,
+    doc(cfg(any(feature = "portable-atomic", target_has_atomic = "8")))
+)]
 pub enum AtomicError<T: Error> {
     /// This error is returned if the SPI bus was already in use when an operation was attempted,
     /// which indicates that the driver requirements are not being met with regard to
