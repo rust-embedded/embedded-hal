@@ -90,3 +90,14 @@ dual licensed as above, without any additional terms or conditions.
 Contribution to this repository is organized under the terms of the [Rust Code of
 Conduct](CODE_OF_CONDUCT.md), the maintainers of this repository, the [HAL team](https://github.com/rust-embedded/wg#the-hal-team), promise
 to intervene to uphold that code of conduct.
+## AI-generated ProductMaps
+
+
+
+| Github file | ProductMap |
+|-------------|------------|
+| [lib.rs](https://github.com/rust-embedded/embedded-hal/blob/master/embedded-io/src/lib.rs) | [Link to Map](https://product-map.ai/app/public?url=https://github.com/rust-embedded/embedded-hal/blob/master/embedded-io/src/lib.rs) |
+
+Contact ProductMap if you have any questions at [juan@product-map.ai](juan@product-map.ai).
+
+Last updated on Mon Feb 03 22:58:21 UTC 2025.
