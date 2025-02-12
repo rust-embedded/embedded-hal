@@ -1,4 +1,4 @@
-//! Digital I/O.
+//! Blocking Digital I/O.
 
 use core::ops::Not;
 
