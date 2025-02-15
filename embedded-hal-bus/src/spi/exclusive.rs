@@ -1,7 +1,7 @@
 //! SPI bus sharing mechanisms.
 
 use embedded_hal::delay::DelayNs;
-use embedded_hal::digital::OutputPin;
+use embedded_hal::digital::{NoPin, OutputPin};
 use embedded_hal::spi::{ErrorType, Operation, SpiBus, SpiDevice};
 #[cfg(feature = "async")]
 use embedded_hal_async::{
@@ -49,6 +49,15 @@ impl<BUS, CS, D> ExclusiveDevice<BUS, CS, D> {
     }
 }
 
+use unwrap_infallible::UnwrapInfallible;
+
+impl<BUS, D> ExclusiveDevice<BUS, NoPin, D> {
+    /// Create a new [`ExclusiveDevice`] without a Chip Select (CS) pin.
+    pub fn new_no_cs(bus: BUS, delay: D) -> Self {
+        ExclusiveDevice::new(bus, NoPin, delay).unwrap_infallible()
+    }
+}
+
 impl<BUS, CS> ExclusiveDevice<BUS, CS, super::NoDelay> {
     /// Create a new [`ExclusiveDevice`] without support for in-transaction delays.
     ///
@@ -80,6 +89,13 @@ impl<BUS, CS> ExclusiveDevice<BUS, CS, super::NoDelay> {
             cs,
             delay: super::NoDelay,
         })
+    }
+}
+
+impl<BUS> ExclusiveDevice<BUS, NoPin, super::NoDelay> {
+    /// Create a new [`ExclusiveDevice`] without a Chip Select (CS) pin.
+    pub fn new_no_cs_no_delay(bus: BUS) -> Self {
+        ExclusiveDevice::new_no_delay(bus, NoPin).unwrap_infallible()
     }
 }
 

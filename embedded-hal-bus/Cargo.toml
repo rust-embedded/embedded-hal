@@ -37,6 +37,7 @@ embedded-hal-async = { version = "1.0.0", path = "../embedded-hal-async", option
 critical-section = { version = "1.0" }
 defmt-03 = { package = "defmt", version = "0.3", optional = true }
 portable-atomic = {version = "1.3", default-features = false, optional = true, features = ["require-cas"]}
+unwrap-infallible = "0.1.5"
 
 [package.metadata.docs.rs]
 features = ["std", "async"]
