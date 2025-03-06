@@ -16,3 +16,7 @@ pub mod futures_03;
 #[cfg(feature = "tokio-1")]
 #[cfg_attr(docsrs, doc(cfg(feature = "tokio-1")))]
 pub mod tokio_1;
+
+#[cfg(feature = "unblock")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+pub mod unblock;
