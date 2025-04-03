@@ -124,6 +124,9 @@ where
 {
     #[inline]
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
+        // The iteration has side-effects so using
+        // `next_back()` instead of `last()` would be wrong
+        #[allow(clippy::double_ended_iterator_last)]
         let _ = s
             .bytes()
             .map(|c| nb::block!(self.write(Word::from(c))))
