@@ -124,10 +124,9 @@ where
 {
     #[inline]
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
-        let _ = s
-            .bytes()
-            .map(|c| nb::block!(self.write(Word::from(c))))
-            .next_back();
+        for c in s.bytes() {
+            nb::block!(self.write(Word::from(c))).map_err(|_| core::fmt::Error)?;
+        }
         Ok(())
     }
 }
