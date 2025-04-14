@@ -1,4 +1,4 @@
-use crate::{Error, ErrorKind, ErrorType, SliceWriteError, Write};
+use crate::{Error, ErrorKind, ErrorType, SliceWriteError, Write, WriteReady};
 use core::mem;
 
 impl Error for SliceWriteError {
@@ -45,5 +45,12 @@ impl Write for &mut [u8] {
     #[inline]
     fn flush(&mut self) -> Result<(), Self::Error> {
         Ok(())
+    }
+}
+
+impl WriteReady for &mut [u8] {
+    #[inline]
+    fn write_ready(&mut self) -> Result<bool, Self::Error> {
+        Ok(true)
     }
 }

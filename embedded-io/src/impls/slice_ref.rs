@@ -1,4 +1,4 @@
-use crate::{BufRead, ErrorType, Read};
+use crate::{BufRead, ErrorType, Read, ReadReady};
 
 impl ErrorType for &[u8] {
     type Error = core::convert::Infallible;
@@ -37,5 +37,12 @@ impl BufRead for &[u8] {
     #[inline]
     fn consume(&mut self, amt: usize) {
         *self = &self[amt..];
+    }
+}
+
+impl ReadReady for &[u8] {
+    #[inline]
+    fn read_ready(&mut self) -> Result<bool, Self::Error> {
+        Ok(true)
     }
 }
