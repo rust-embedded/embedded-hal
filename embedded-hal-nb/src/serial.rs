@@ -127,7 +127,7 @@ where
         let _ = s
             .bytes()
             .map(|c| nb::block!(self.write(Word::from(c))))
-            .last();
+            .next_back();
         Ok(())
     }
 }
