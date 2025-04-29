@@ -23,7 +23,12 @@ pub trait Frame: Sized {
     fn new_remote(id: impl Into<Id>, dlc: usize) -> Option<Self>;
 
     /// Returns true if this frame is an extended frame.
-    fn is_extended(&self) -> bool;
+    fn is_extended(&self) -> bool {
+        match self.id() {
+            Id::Standard(_) => false,
+            Id::Extended(_) => true,
+        }
+    }
 
     /// Returns true if this frame is a standard frame.
     fn is_standard(&self) -> bool {
