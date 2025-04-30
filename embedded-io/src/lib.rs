@@ -118,6 +118,16 @@ pub enum ErrorKind {
     OutOfMemory,
     /// An attempted write could not write any data.
     WriteZero,
+
+    /// The peripheral receive buffer was overrun.
+    Overrun,
+    /// Received data does not conform to the peripheral configuration.
+    /// Can be caused by a misconfigured device on either end of the serial line.
+    FrameFormat,
+    /// Parity check failed.
+    Parity,
+    /// Serial line is too noisy to read valid data.
+    Noise,
 }
 
 #[cfg(feature = "std")]
