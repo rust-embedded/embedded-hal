@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Migrated `std` feature-gated `std::error::Error` implementations to `core::error::Error`
 - Increased MSRV to 1.81 due to `core::error::Error`
 - Implemented `ReadReady` for `&[u8]` and `WriteReady` for `&mut [u8]`
+- Added UART error variants `Overrun`, `FrameFormat`, `Parity` and `Noise`
 
 ## 0.6.1 - 2023-10-22
 
