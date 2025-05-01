@@ -1,6 +1,7 @@
 //! Types and traits for SD/MMC peripherals.
 
 mod bus_width;
+mod card_mode;
 mod card_type;
 mod fifo_status;
 mod reset;
@@ -10,6 +11,7 @@ pub mod response;
 pub mod tuning;
 
 pub use bus_width::BusWidth;
+pub use card_mode::CardMode;
 pub use card_type::CardType;
 pub use fifo_status::FifoStatus;
 pub use reset::Reset;
@@ -23,11 +25,11 @@ pub trait MmcOps {
     /// Associated error type for the SD/MMC trait.
     type Error;
 
-    /// Gets whether the device [CardType].
+    /// Gets the device [CardType].
     fn card_type(&self) -> CardType;
 
-    /// Gets whether the device is configured for SPI mode.
-    fn is_spi(&self) -> bool;
+    /// Gets the device [CardMode].
+    fn card_mode(&self) -> CardMode;
 
     /// Performs bus setup for the SD/MMC device.
     fn setup_bus(&mut self) -> Result<(), Self::Error>;
