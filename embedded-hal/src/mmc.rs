@@ -77,9 +77,6 @@ pub trait MmcOps {
     /// Requests the card to send a tuning block.
     fn send_tuning(&mut self, mode: TuningMode, width: TuningWidth) -> Result<(), Self::Error>;
 
-    /// Executes MMC tuning.
-    fn execute_tuning(&mut self, mode: TuningMode, width: TuningWidth) -> Result<(), Self::Error>;
-
     /// Gets the interrupts status as a 32-bit bitfield.
     fn interrupt(&self) -> u32;
 
