@@ -18,7 +18,7 @@ pub use reset::Reset;
 
 use command::MmcCommand;
 use response::MmcResponse;
-use tuning::TuningMode;
+use tuning::{TuningMode, TuningWidth};
 
 /// Common operations for DesignWare MMC controllers on JH7110 SoCs.
 pub trait MmcOps {
@@ -75,10 +75,10 @@ pub trait MmcOps {
     fn write_data(&mut self, data: &[u8]) -> Result<(), Self::Error>;
 
     /// Requests the card to send a tuning block.
-    fn send_tuning(&mut self, bus_width: BusWidth, mode: TuningMode) -> Result<(), Self::Error>;
+    fn send_tuning(&mut self, mode: TuningMode, width: TuningWidth) -> Result<(), Self::Error>;
 
     /// Executes MMC tuning.
-    fn execute_tuning(&mut self, bus_width: BusWidth, mode: TuningMode) -> Result<(), Self::Error>;
+    fn execute_tuning(&mut self, mode: TuningMode, width: TuningWidth) -> Result<(), Self::Error>;
 
     /// Gets the interrupts status as a 32-bit bitfield.
     fn interrupt(&self) -> u32;

@@ -1,13 +1,25 @@
 //! Tuning data for SD/MMC peripherals.
 
-/// Represents the tuning mode for the SD/MMC device.
+/// Represents the tuning width for the SD/MMC device.
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum TuningWidth {
+    /// Represents a 4-bit tuning block.
+    Bits4 = 0,
+    /// Represents a 8-bit tuning block.
+    Bits8 = 1,
+}
+
+/// Represents the tuning speed mode for the SD/MMC device.
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum TuningMode {
-    /// Represents a 4-bit tuning block.
-    Block4bit = 0,
-    /// Represents a 8-bit tuning block.
-    Block8bit = 1,
+    /// Represents a standard tuning mode.
+    Standard = 0,
+    /// Represents a high-speed HS200 tuning mode.
+    Hs200 = 1,
+    /// Represents a high-speed HS400 tuning mode.
+    Hs400 = 2,
 }
 
 /// Represents the byte length of the 4-bit tuning block.
