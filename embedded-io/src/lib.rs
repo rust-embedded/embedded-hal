@@ -386,7 +386,7 @@ pub trait BufRead: ErrorType {
                 let available = self.fill_buf()?;
 
                 if available.is_empty() {
-                    return Err(OperationError::UnexpectedEof)
+                    return Err(OperationError::UnexpectedEof);
                 }
 
                 match available.iter().position(|p| *p == delim) {
