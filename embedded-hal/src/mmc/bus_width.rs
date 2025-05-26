@@ -1,4 +1,4 @@
-/// Represents the variants of the `bus width` field of the [Argument](super::Argument).
+/// Represents the variants of the `bus width` configuration for the SD/MMC peripheral.
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum BusWidth {

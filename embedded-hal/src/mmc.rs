@@ -20,8 +20,8 @@ use command::MmcCommand;
 use response::MmcResponse;
 use tuning::{TuningMode, TuningWidth};
 
-/// Common operations for DesignWare MMC controllers on JH7110 SoCs.
-pub trait MmcOps {
+/// Common operations for SD/MMC peripherals.
+pub trait MmcCommon {
     /// Associated error type for the SD/MMC trait.
     type Error;
 
@@ -37,36 +37,11 @@ pub trait MmcOps {
     /// Performs device initialization sequence.
     fn init(&mut self) -> Result<(), Self::Error>;
 
-    /// Sets the sample phase for the MMC controller.
-    fn set_sample_phase(&mut self, sample_phase: u8);
-
-    /// Waits for the FIFO to indicate readiness for read/write operations.
-    fn fifo_ready(&self, fifo_status: FifoStatus) -> Result<(), Self::Error>;
-
     /// Waits for the CMD line to reset (usually during power-up).
     fn wait_for_reset(&mut self, reset: Reset, timeout: u64) -> Result<(), Self::Error>;
 
     /// Waits for the busy signal to clear for maximum `timeout_us` microseconds.
     fn wait_while_busy(&mut self, timout_us: u64) -> Result<(), Self::Error>;
-
-    /// Writes a SD/MMC command to the card.
-    fn write_command<C: MmcCommand>(&mut self, cmd: &C) -> Result<(), Self::Error>;
-
-    /// Reads a SD/MMC response based on the provided command argument.
-    ///
-    /// # Note
-    ///
-    /// `cmd` should match the last call to `write_command`.
-    fn read_response<C: MmcCommand, R: MmcResponse>(&mut self, cmd: &C) -> Result<R, Self::Error>;
-
-    /// Reads the raw response bytes from the MMC controller.
-    ///
-    /// # Note
-    ///
-    /// Set `exp_crc` to true if a CRC checksum is expected in the response.
-    ///
-    /// The generic `N` parameter is for the expected length (in bytes) of the response.
-    fn response_bytes<const N: usize>(&mut self, exp_crc: bool) -> Result<[u8; N], Self::Error>;
 
     /// Reads data from the MMC data lines.
     fn read_data(&mut self, data: &mut [u8]) -> Result<(), Self::Error>;
@@ -74,7 +49,21 @@ pub trait MmcOps {
     /// Writes data to the MMC data lines.
     fn write_data(&mut self, data: &[u8]) -> Result<(), Self::Error>;
 
-    /// Requests the card to send a tuning block.
+    /// Sets the sample phase for the MMC controller.
+    fn set_sample_phase(&mut self, sample_phase: u8);
+
+    /// Waits for the FIFO to indicate readiness for read/write operations.
+    fn fifo_ready(&self, fifo_status: FifoStatus) -> Result<(), Self::Error>;
+
+    /// Handles tuning block requests.
+    ///
+    /// For hosts:
+    ///
+    /// - requests the device to send a tuning block
+    ///
+    /// For devices:
+    ///
+    /// - sends the host the requested tuning block
     fn send_tuning(&mut self, mode: TuningMode, width: TuningWidth) -> Result<(), Self::Error>;
 
     /// Gets the interrupts status as a 32-bit bitfield.
@@ -94,4 +83,26 @@ pub trait MmcOps {
 
     /// Clear all interrupts.
     fn clear_all_response_interrupt(&mut self);
+}
+
+/// Common operations for SD/MMC host peripherals.
+pub trait MmcHost: MmcCommon {
+    /// Writes a SD/MMC command to the card.
+    fn write_command<C: MmcCommand>(&mut self, cmd: &C) -> Result<(), Self::Error>;
+
+    /// Reads a SD/MMC response based on the provided command argument.
+    ///
+    /// # Note
+    ///
+    /// `cmd` should match the last call to `write_command`.
+    fn read_response<C: MmcCommand, R: MmcResponse>(&mut self, cmd: &C) -> Result<R, Self::Error>;
+}
+
+/// Common operations for SD/MMC device peripherals.
+pub trait MmcDevice: MmcCommon {
+    /// Reads a SD/MMC command sent from the host.
+    fn read_command<C: MmcCommand>(&mut self) -> Result<C, Self::Error>;
+
+    /// Writes a SD/MMC response based on the previous command.
+    fn write_response<R: MmcResponse>(&mut self, response: &R) -> Result<(), Self::Error>;
 }
