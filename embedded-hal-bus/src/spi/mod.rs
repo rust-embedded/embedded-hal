@@ -41,8 +41,8 @@ pub enum DeviceError<BUS, CS> {
 impl<BUS: Display, CS: Display> Display for DeviceError<BUS, CS> {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         match self {
-            Self::Spi(bus) => write!(f, "SPI bus error: {}", bus),
-            Self::Cs(cs) => write!(f, "SPI CS error: {}", cs),
+            Self::Spi(bus) => write!(f, "SPI bus error: {bus}"),
+            Self::Cs(cs) => write!(f, "SPI CS error: {cs}"),
         }
     }
 }
