@@ -227,17 +227,17 @@ impl<T: ?Sized + ErrorType> ErrorType for &mut T {
     type Error = T::Error;
 }
 
-/// Error returned by [`Read::read_exact`]
+/// Error returned by [`Read::read_exact`] and [`BufRead::skip_until`]
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 #[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
-pub enum ReadExactError<E> {
-    /// An EOF error was encountered before reading the exact amount of requested bytes.
+pub enum OperationError<E> {
+    /// An EOF error was encountered before the operation could complete.
     UnexpectedEof,
     /// Error returned by the inner Read.
     Other(E),
 }
 
-impl<E> From<E> for ReadExactError<E> {
+impl<E> From<E> for OperationError<E> {
     fn from(err: E) -> Self {
         Self::Other(err)
     }
@@ -245,25 +245,25 @@ impl<E> From<E> for ReadExactError<E> {
 
 #[cfg(feature = "std")]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
-impl From<ReadExactError<std::io::Error>> for std::io::Error {
-    fn from(err: ReadExactError<std::io::Error>) -> Self {
+impl From<OperationError<std::io::Error>> for std::io::Error {
+    fn from(err: OperationError<std::io::Error>) -> Self {
         match err {
-            ReadExactError::UnexpectedEof => std::io::Error::new(
+            OperationError::UnexpectedEof => std::io::Error::new(
                 std::io::ErrorKind::UnexpectedEof,
                 "UnexpectedEof".to_owned(),
             ),
-            ReadExactError::Other(e) => std::io::Error::new(e.kind(), format!("{e:?}")),
+            OperationError::Other(e) => std::io::Error::new(e.kind(), format!("{e:?}")),
         }
     }
 }
 
-impl<E: fmt::Debug> fmt::Display for ReadExactError<E> {
+impl<E: fmt::Debug> fmt::Display for OperationError<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{self:?}")
     }
 }
 
-impl<E: fmt::Debug> core::error::Error for ReadExactError<E> {}
+impl<E: fmt::Debug> core::error::Error for OperationError<E> {}
 
 /// Errors that could be returned by `Write` on `&mut [u8]`.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -340,18 +340,18 @@ pub trait Read: ErrorType {
     /// If you are using [`ReadReady`] to avoid blocking, you should not use this function.
     /// `ReadReady::read_ready()` returning true only guarantees the first call to `read()` will
     /// not block, so this function may still block in subsequent calls.
-    fn read_exact(&mut self, mut buf: &mut [u8]) -> Result<(), ReadExactError<Self::Error>> {
+    fn read_exact(&mut self, mut buf: &mut [u8]) -> Result<(), OperationError<Self::Error>> {
         while !buf.is_empty() {
             match self.read(buf) {
                 Ok(0) => break,
                 Ok(n) => buf = &mut buf[n..],
-                Err(e) => return Err(ReadExactError::Other(e)),
+                Err(e) => return Err(OperationError::Other(e)),
             }
         }
         if buf.is_empty() {
             Ok(())
         } else {
-            Err(ReadExactError::UnexpectedEof)
+            Err(OperationError::UnexpectedEof)
         }
     }
 }
@@ -371,6 +371,36 @@ pub trait BufRead: ErrorType {
 
     /// Tell this buffer that `amt` bytes have been consumed from the buffer, so they should no longer be returned in calls to `fill_buf`.
     fn consume(&mut self, amt: usize);
+
+    /// Skips all bytes until the delimiter `byte` or EOF is reached.
+    ///
+    /// This function will read (and discard) bytes from the underlying stream, blocking until the
+    /// delimiter is found, or an EOF condition is reached.
+    ///
+    /// If successful, this function will return the total number of bytes read,
+    /// including the delimiter byte.
+    fn skip_until(&mut self, delim: u8) -> Result<usize, OperationError<Self::Error>> {
+        let mut read: usize = 0;
+        loop {
+            let (done, used) = {
+                let available = self.fill_buf()?;
+
+                if available.is_empty() {
+                    return Err(OperationError::UnexpectedEof);
+                }
+
+                match available.iter().position(|p| *p == delim) {
+                    Some(i) => (true, i + 1),
+                    None => (false, available.len()),
+                }
+            };
+            self.consume(used);
+            read += used;
+            if done || used == 0 {
+                return Ok(read);
+            }
+        }
+    }
 }
 
 /// Blocking writer.

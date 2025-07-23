@@ -10,7 +10,7 @@ extern crate alloc;
 mod impls;
 
 pub use embedded_io::{
-    Error, ErrorKind, ErrorType, ReadExactError, ReadReady, SeekFrom, WriteReady,
+    Error, ErrorKind, ErrorType, OperationError, ReadReady, SeekFrom, WriteReady,
 };
 
 /// Async reader.
@@ -63,18 +63,18 @@ pub trait Read: ErrorType {
     ///
     /// This function is not side-effect-free on cancel (AKA "cancel-safe"), i.e. if you cancel (drop) a returned
     /// future that hasn't completed yet, some bytes might have already been read, which will get lost.
-    async fn read_exact(&mut self, mut buf: &mut [u8]) -> Result<(), ReadExactError<Self::Error>> {
+    async fn read_exact(&mut self, mut buf: &mut [u8]) -> Result<(), OperationError<Self::Error>> {
         while !buf.is_empty() {
             match self.read(buf).await {
                 Ok(0) => break,
                 Ok(n) => buf = &mut buf[n..],
-                Err(e) => return Err(ReadExactError::Other(e)),
+                Err(e) => return Err(OperationError::Other(e)),
             }
         }
         if buf.is_empty() {
             Ok(())
         } else {
-            Err(ReadExactError::UnexpectedEof)
+            Err(OperationError::UnexpectedEof)
         }
     }
 }
@@ -94,6 +94,36 @@ pub trait BufRead: ErrorType {
 
     /// Tell this buffer that `amt` bytes have been consumed from the buffer, so they should no longer be returned in calls to `fill_buf`.
     fn consume(&mut self, amt: usize);
+
+    /// Skips all bytes until the delimiter `byte` or EOF is reached.
+    ///
+    /// This function will read (and discard) bytes from the underlying stream, waiting until the
+    /// delimiter is found, or an EOF condition is reached.
+    ///
+    /// If successful, this function will return the total number of bytes read,
+    /// including the delimiter byte.
+    async fn skip_until(&mut self, delim: u8) -> Result<usize, OperationError<Self::Error>> {
+        let mut read: usize = 0;
+        loop {
+            let (done, used) = {
+                let available = self.fill_buf().await?;
+
+                if available.is_empty() {
+                    return Err(OperationError::UnexpectedEof);
+                }
+
+                match available.iter().position(|p| *p == delim) {
+                    Some(i) => (true, i + 1),
+                    None => (false, available.len()),
+                }
+            };
+            self.consume(used);
+            read += used;
+            if done || used == 0 {
+                return Ok(read);
+            }
+        }
+    }
 }
 
 /// Async writer.
