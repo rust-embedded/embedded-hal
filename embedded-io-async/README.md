@@ -14,7 +14,7 @@ This project is developed and maintained by the [HAL team](https://github.com/ru
 
 - **`std`**: Adds `From` impls to convert to/from `std::io` structs.
 - **`alloc`**: Adds blanket impls for `Box`, adds `Write` impl to `Vec`.
-- **`defmt-03`**: Derive `defmt::Format` from `defmt` 0.3 for enums and structs.
+- **`defmt`**: Derive `defmt::Format` from `defmt` 1.0 for enums and structs.
 
 ## Minimum Supported Rust Version (MSRV)
 
