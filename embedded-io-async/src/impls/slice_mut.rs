@@ -26,7 +26,7 @@ impl Write for &mut [u8] {
     }
 }
 
-/// Write is implemented for `&mut [u8]` by copying into the slice, overwriting
+/// Write is implemented for `&mut [MaybeUninit<u8>]` by copying into the slice, initializing & overwriting
 /// its data.
 ///
 /// Note that writing updates the slice to point to the yet unwritten part.
