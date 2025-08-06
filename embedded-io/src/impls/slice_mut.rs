@@ -75,13 +75,9 @@ impl Write for &mut [MaybeUninit<u8>] {
             return Err(SliceWriteError::Full);
         }
         let (a, b) = mem::take(self).split_at_mut(amt);
-        buf.split_at(amt)
-            .0
-            .iter()
-            .enumerate()
-            .for_each(|(index, byte)| {
-                a[index].write(*byte);
-            });
+        unsafe {
+            core::ptr::copy_nonoverlapping(buf.as_ptr(), a.as_mut_ptr() as *mut u8, amt);
+        }
         *self = b;
         Ok(amt)
     }
