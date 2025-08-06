@@ -27,6 +27,9 @@ For `embedded-io-async`:
 - [`futures` 0.3](https://crates.io/crates/futures) traits. Needs the `futures-03` feature.
 - [`tokio` 1.x](https://crates.io/crates/tokio) traits. Needs the `tokio-1` feature.
 
+As a rule of thumb, this crate will generally provide adapters for crates that are more stable and general-purpose than embedded-io,
+provided those crates implement the corresponding std traits.
+
 ## Minimum Supported Rust Version (MSRV)
 
 This crate is guaranteed to compile on stable Rust 1.60 and up. It *might*
