@@ -43,9 +43,13 @@ impl Write for &mut [MaybeUninit<u8>] {
             return Err(SliceWriteError::Full);
         }
         let (a, b) = mem::take(self).split_at_mut(amt);
-        buf.split_at(amt).0.iter().enumerate().for_each(|(index,byte)| {
-            a[index].write(*byte);
-        });
+        buf.split_at(amt)
+            .0
+            .iter()
+            .enumerate()
+            .for_each(|(index, byte)| {
+                a[index].write(*byte);
+            });
         *self = b;
         Ok(amt)
     }
