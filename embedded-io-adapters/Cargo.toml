@@ -1,6 +1,6 @@
 [package]
 name = "embedded-io-adapters"
-version = "0.6.1"
+version = "0.6.2"
 edition = "2021"
 rust-version = "1.60"
 description = "Adapters between the `embedded-io` traits and other I/O traits"
