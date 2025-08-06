@@ -20,7 +20,7 @@ impl Write for &mut [u8] {
             return Err(SliceWriteError::Full);
         }
         let (a, b) = mem::take(self).split_at_mut(amt);
-        a.copy_from_slice(&buf[..amt]);
+        a.copy_from_slice(buf.split_at(amt).0);
         *self = b;
         Ok(amt)
     }
