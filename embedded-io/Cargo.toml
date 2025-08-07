@@ -15,10 +15,10 @@ categories = [
 [features]
 std = ["alloc"]
 alloc = []
-defmt-03 = ["dep:defmt-03"]
+defmt = ["dep:defmt"]
 
 [dependencies]
-defmt-03 = { package = "defmt", version = "0.3", optional = true }
+defmt = { version = "1", optional = true }
 
 [package.metadata.docs.rs]
 features = ["std"]
