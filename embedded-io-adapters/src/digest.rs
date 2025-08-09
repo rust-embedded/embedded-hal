@@ -48,7 +48,7 @@ impl<T: Update> Write for FromDigest<T> {
     }
 }
 
-impl<T: Default + ?Sized> Default for FromDigest<T> {
+impl<T: Default> Default for FromDigest<T> {
     fn default() -> Self {
         Self {
             inner: T::default(),
@@ -86,7 +86,7 @@ impl<T: ?Sized> ToDigest<T> {
     }
 }
 
-impl<T: Default + ?Sized> Default for ToDigest<T> {
+impl<T: Default> Default for ToDigest<T> {
     fn default() -> Self {
         Self {
             inner: T::default(),
