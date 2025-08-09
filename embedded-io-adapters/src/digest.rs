@@ -100,5 +100,9 @@ impl<T: ErrorType<Error = Infallible> + Write> Update for ToDigest<T> {
             Ok(()) => {}
             Err(_) => unreachable!(),
         }
+        match self.inner.flush() {
+            Ok(()) => {}
+            Err(_) => unreachable!(),
+        }
     }
 }
