@@ -16,3 +16,6 @@ pub mod futures_03;
 #[cfg(feature = "tokio-1")]
 #[cfg_attr(docsrs, doc(cfg(feature = "tokio-1")))]
 pub mod tokio_1;
+
+#[cfg(feature = "digest")]
+pub mod digest;
