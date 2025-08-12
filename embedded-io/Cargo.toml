@@ -1,6 +1,6 @@
 [package]
 name = "embedded-io"
-version = "0.6.1"
+version = "0.7.0"
 edition = "2021"
 rust-version = "1.81"
 description = "Embedded IO traits"
