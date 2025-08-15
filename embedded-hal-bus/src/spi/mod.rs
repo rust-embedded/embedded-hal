@@ -11,6 +11,8 @@ pub use refcell::*;
 mod mutex;
 #[cfg(feature = "std")]
 pub use mutex::*;
+mod mutex_trait;
+pub use mutex_trait::*;
 #[cfg(any(feature = "portable-atomic", target_has_atomic = "8"))]
 mod atomic;
 mod critical_section;
