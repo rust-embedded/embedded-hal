@@ -16,7 +16,7 @@ version = "0.3.0"
 
 [features]
 # Enable shared bus implementations using `std::sync::Mutex`
-std = ["alloc"]
+std = ["alloc", "mutex/std"]
 # Use `portable-atomic` to enable `atomic-device` on devices without native atomic CAS
 #
 # `portable-atomic` emulates atomic CAS functionality, allowing `embedded-hal-bus` to use `atomic-device` on hardware
@@ -37,6 +37,7 @@ embedded-hal-async = { version = "1.0.0", path = "../embedded-hal-async", option
 critical-section = { version = "1.0" }
 defmt-03 = { package = "defmt", version = "0.3", optional = true }
 portable-atomic = {version = "1.3", default-features = false, optional = true, features = ["require-cas"]}
+mutex = "1.0"
 
 [package.metadata.docs.rs]
 features = ["std", "async"]
