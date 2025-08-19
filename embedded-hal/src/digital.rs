@@ -222,3 +222,155 @@ impl<T: InputPin + ?Sized> InputPin for &mut T {
         T::is_low(self)
     }
 }
+
+/// Convert (some kind of pin) into an InputPin.
+///
+/// This allow going back and forth between input and output in a typestate fashion.
+pub trait TryIntoInputPin<I:InputPin> {
+    /// Error produced during conversion
+    type Error;
+    /// In case of error the pin object has disapeared
+    fn try_into_input_pin(self) -> Result<I, Self::Error>;
+}
+
+/// Convert (some kind of pin) into an OutputPin.
+///
+/// This allow going back and forth between input and output in a typestate fashion.
+pub trait TryIntoOutputPin<O:OutputPin> {
+    /// Error produced during conversion
+    type Error;
+    /// In case of error the pin object has disapeared
+    fn try_into_output_pin(self, state: PinState) -> Result<O, Self::Error>;
+}
+
+/// Single pin that can switch from input to output mode, and vice-versa.
+///
+/// Implementor can implement `TryIntoInputPin` and `TryIntoOutputPin`
+/// to automatically get an implementation of `IoPin`.
+///
+/// Example Usage :
+/// ```
+/// let pin = MyGenericPin::new();              // implementor specific new
+/// let input = pin.as_input()?;                // get a temporary input pin
+/// input.is_low()?;                            // use it
+/// let output = pin.as_output(PinState::Low)?  // get a temporary output pin
+/// output.set_high()?;                         // use it
+/// // this is a compile error because input has been dropped when we called as_output()
+/// input.is_high()?;
+/// ```
+pub trait IoPin<I:InputPin,O:OutputPin> {
+    /// Error type.
+    type Error;
+
+    /// Tries to convert this pin to input mode.
+    ///
+    /// If the pin is already in input mode, this method should succeed.
+    ///
+    /// After this call (and after the the result has been dropped),
+    /// this pin is not anymore in the original state.
+    fn as_input_pin(&mut self) -> Result<&I, Self::Error>;
+
+    /// Tries to convert this pin to output mode.
+    ///
+    /// If the pin is already in output mode, this method should succeed.
+    ///
+    /// After this call (and after the the result has been dropped),
+    /// this pin is not anymore in the original state.
+    fn as_output_pin(&mut self, state: PinState) -> Result<&mut O, Self::Error>;
+}
+
+/// Generic implemnation of an IoPin.
+/// An `IoPin`implementation is automatically provided if there is a way to
+/// convert back and forth between `InputPin` and `OutputPin`
+///
+/// Implementors of specific Pins shoud provide a type alias
+/// `type MyIoPin<I,O> = GenericIoPin<I,O>` to signal this is the prefered
+/// way to get an `IoPin`
+pub struct GenericIoPin<I,O> {
+    // we use an option here to be able to take out the pin and convert it
+    // before putting it back
+    pin: Option<RealGenericIoPin<I,O>>
+}
+
+// GenericIoPin sub type
+enum RealGenericIoPin<I,O> {
+    Input(I),
+    Output(O),
+}
+
+impl<I,O> GenericIoPin<I,O> {
+    /// Create a new `GenericIoPin` from an `InputPin`
+    pub fn from_input(pin: I) -> Self {
+        GenericIoPin { pin: Some(RealGenericIoPin::Input(pin)) }
+    }
+
+    /// Create a new `GenericIoPin` from an `OutputPin`
+    pub fn from_output(pin: O) -> Self {
+        GenericIoPin { pin: Some(RealGenericIoPin::Output(pin)) }
+    }
+}
+
+/// Error for GenericIoPin
+#[derive(Debug)]
+pub enum GenericIoPinError<E> {
+    /// Happens if the pin is reused after an error
+    MissingPin,
+    /// Original error from Pin conversion
+    IntoError(E),
+}
+impl<E> From<E> for GenericIoPinError<E> {
+    fn from(e: E) -> Self { GenericIoPinError::IntoError(e) }
+}
+
+// This implementation uses `Option::take` to take out the stored pin
+// and converts it before putting it back.
+// This is why in case of error, `GenericIoPin` is in an invalid state.
+impl<I,O,E> IoPin<I,O> for GenericIoPin<I,O>
+where I: InputPin + TryIntoOutputPin<O,Error=E>,
+      O: OutputPin + TryIntoInputPin<I,Error=E>,
+{
+    type Error=GenericIoPinError<E>;
+
+    fn as_input_pin(&mut self) -> Result<&I, Self::Error> {
+        if self.pin.is_none() {
+            return Err(GenericIoPinError::MissingPin);
+        }
+        if let Some(RealGenericIoPin::Input(ref i)) = self.pin {
+            return Ok(i);
+        }
+        // easy cases done let's convert
+        let pin = self.pin.take();
+        let input = match pin {
+            Some(RealGenericIoPin::Output(p)) => p.try_into_input_pin()?,
+            _ => return Err(GenericIoPinError::MissingPin), // cannot happen
+        };
+        self.pin = Some(RealGenericIoPin::Input(input));
+        if let Some(RealGenericIoPin::Input(ref i)) = self.pin {
+            return Ok(i);
+        }
+        // cannot happen
+        Err(GenericIoPinError::MissingPin)
+    }
+
+    fn as_output_pin(&mut self, state: PinState) -> Result<&mut O, Self::Error> {
+        if self.pin.is_none() {
+            return Err(GenericIoPinError::MissingPin);
+        }
+        if let Some(RealGenericIoPin::Output(ref mut o)) = self.pin {
+            return Ok(o);
+        }
+        // easy cases done let's convert
+        let pin = self.pin.take();
+        let output = match pin {
+            Some(RealGenericIoPin::Input(p)) => p.try_into_output_pin(state)?,
+            _ => return Err(GenericIoPinError::MissingPin), // cannot happen
+        };
+        self.pin = Some(RealGenericIoPin::Output(output));
+        if let Some(RealGenericIoPin::Output(ref mut o)) = self.pin {
+            return Ok(o);
+        }
+        // cannot happen
+        Err(GenericIoPinError::MissingPin)
+    }
+}
+
