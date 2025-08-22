@@ -5,7 +5,7 @@ use crate::util::AtomicCell;
 /// Atomics-based shared bus [`I2c`] implementation.
 ///
 /// Sharing is implemented with a [`AtomicDevice`], which consists of an `UnsafeCell` and an `AtomicBool` "locked" flag.
-/// This means it has low overhead, like [`RefCellDevice`](crate::i2c::RefCellDevice). Aditionally, it is `Send`,
+/// This means it has low overhead, like [`RefCellDevice`](crate::i2c::RefCellDevice). Additionally, it is `Send`,
 /// which allows sharing a single bus across multiple threads (interrupt priority level), like [`CriticalSectionDevice`](crate::i2c::CriticalSectionDevice),
 /// while not using critical sections and therefore impacting real-time performance less.
 ///
