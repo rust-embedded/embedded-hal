@@ -469,22 +469,58 @@ pub trait Write: ErrorType {
     }
 }
 
-/// Blocking seek within streams.
+/// Blocking seek within streams.\
+///
+/// The `Seek` trait provides a cursor which can be moved within a stream of
+/// bytes.
+///
+/// The stream typically has a fixed size, allowing seeking relative to either
+/// end or the current offset.
 ///
 /// This trait is the `embedded-io` equivalent of [`std::io::Seek`].
 pub trait Seek: ErrorType {
     /// Seek to an offset, in bytes, in a stream.
+    /// A seek beyond the end of a stream is allowed, but behavior is defined
+    /// by the implementation.
+    ///
+    /// If the seek operation completed successfully,
+    /// this method returns the new position from the start of the stream.
+    /// That position can be used later with [`SeekFrom::Start`].
+    ///
+    /// # Errors
+    ///
+    /// Seeking can fail, for example because it might involve flushing a buffer.
+    ///
+    /// Seeking to a negative offset is considered an error.
     fn seek(&mut self, pos: SeekFrom) -> Result<u64, Self::Error>;
 
     /// Rewind to the beginning of a stream.
+    ///
+    /// This is a convenience method, equivalent to `seek(SeekFrom::Start(0))`.
+    ///
+    /// # Errors
+    ///
+    /// Rewinding can fail, for example because it might involve flushing a buffer.
     fn rewind(&mut self) -> Result<(), Self::Error> {
         self.seek(SeekFrom::Start(0))?;
         Ok(())
     }
 
     /// Returns the current seek position from the start of the stream.
+    ///
+    /// This is equivalent to `self.seek(SeekFrom::Current(0))`.
     fn stream_position(&mut self) -> Result<u64, Self::Error> {
         self.seek(SeekFrom::Current(0))
+    }
+
+    /// Seeks relative to the current position.
+    ///
+    /// This is equivalent to `self.seek(SeekFrom::Current(offset))` but
+    /// doesn't return the new position which can allow some implementations
+    /// to perform more efficient seeks.
+    fn seek_relative(&mut self, offset: i64) -> Result<(), Self::Error> {
+        self.seek(SeekFrom::Current(offset))?;
+        Ok(())
     }
 }
 
