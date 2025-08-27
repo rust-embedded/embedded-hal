@@ -1,9 +1,9 @@
-use crate::{ErrorType, Write};
+use crate::{ErrorKind, ErrorType, Write};
 use alloc::vec::Vec;
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
 impl ErrorType for Vec<u8> {
-    type Error = core::convert::Infallible;
+    type Error = ErrorKind;
 }
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]

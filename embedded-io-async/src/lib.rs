@@ -9,9 +9,7 @@ extern crate alloc;
 
 mod impls;
 
-pub use embedded_io::{
-    Error, ErrorKind, ErrorType, ReadExactError, ReadReady, SeekFrom, WriteReady,
-};
+pub use embedded_io::{Error, ErrorKind, ErrorType, ReadReady, SeekFrom, WriteReady};
 
 /// Async reader.
 ///
@@ -54,6 +52,15 @@ pub trait Read: ErrorType {
     /// the hardware with e.g. DMA.
     ///
     /// Implementations should document whether they're actually side-effect-free on cancel or not.
+    ///
+    /// # Errors
+    ///
+    /// If this function encounters any form of I/O or other error, an error
+    /// variant will be returned. If an error is returned then it must be
+    /// guaranteed that no bytes were read.
+    ///
+    /// An error of the [`ErrorKind::Interrupted`] kind is non-fatal and the read
+    /// operation should be retried if there is nothing else to do.
     async fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error>;
 
     /// Read the exact number of bytes required to fill `buf`.
@@ -63,18 +70,31 @@ pub trait Read: ErrorType {
     ///
     /// This function is not side-effect-free on cancel (AKA "cancel-safe"), i.e. if you cancel (drop) a returned
     /// future that hasn't completed yet, some bytes might have already been read, which will get lost.
-    async fn read_exact(&mut self, mut buf: &mut [u8]) -> Result<(), ReadExactError<Self::Error>> {
+    ////
+    /// /// # Errors
+    ///
+    /// If this function encounters an "end of file" before completely filling
+    /// the buffer, it returns an error of the kind [`ErrorKind::UnexpectedEof`].
+    /// The contents of `buf` are unspecified in this case.
+    ///
+    /// If any other read error is encountered then this function immediately
+    /// returns. The contents of `buf` are unspecified in this case.
+    ///
+    /// If this function returns an error, it is unspecified how many bytes it
+    /// has read, but it will never read more than would be necessary to
+    /// completely fill the buffer.
+    async fn read_exact(&mut self, mut buf: &mut [u8]) -> Result<(), Self::Error> {
         while !buf.is_empty() {
             match self.read(buf).await {
                 Ok(0) => break,
                 Ok(n) => buf = &mut buf[n..],
-                Err(e) => return Err(ReadExactError::Other(e)),
+                Err(e) => return Err(e),
             }
         }
         if buf.is_empty() {
             Ok(())
         } else {
-            Err(ReadExactError::UnexpectedEof)
+            Err(ErrorKind::UnexpectedEof.into())
         }
     }
 }

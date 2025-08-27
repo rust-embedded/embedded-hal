@@ -99,6 +99,10 @@ pub enum ErrorKind {
     ///
     /// [`InvalidInput`]: ErrorKind::InvalidInput
     InvalidData,
+    /// The underlying storage (typically, a filesystem) is full.
+    ///
+    /// This does not include out of quota errors.
+    StorageFull,
     /// The I/O operation's timeout expired, causing it to be canceled.
     TimedOut,
     /// This operation was interrupted.
@@ -109,6 +113,13 @@ pub enum ErrorKind {
     ///
     /// This means that the operation can never succeed.
     Unsupported,
+    /// An error returned when an operation could not be completed because an
+    /// "end of file" was reached prematurely.
+    ///
+    /// This typically means that an operation could only succeed if it read a
+    /// particular number of bytes but only a smaller number of bytes could be
+    /// read.
+    UnexpectedEof,
     /// An operation could not be completed, because it failed
     /// to allocate enough memory.
     OutOfMemory,
@@ -133,9 +144,11 @@ impl From<ErrorKind> for std::io::ErrorKind {
             ErrorKind::AlreadyExists => std::io::ErrorKind::AlreadyExists,
             ErrorKind::InvalidInput => std::io::ErrorKind::InvalidInput,
             ErrorKind::InvalidData => std::io::ErrorKind::InvalidData,
+            ErrorKind::StorageFull => std::io::ErrorKind::StorageFull,
             ErrorKind::TimedOut => std::io::ErrorKind::TimedOut,
             ErrorKind::Interrupted => std::io::ErrorKind::Interrupted,
             ErrorKind::Unsupported => std::io::ErrorKind::Unsupported,
+            ErrorKind::UnexpectedEof => std::io::ErrorKind::UnexpectedEof,
             ErrorKind::OutOfMemory => std::io::ErrorKind::OutOfMemory,
             _ => std::io::ErrorKind::Other,
         }
@@ -159,9 +172,11 @@ impl From<std::io::ErrorKind> for ErrorKind {
             std::io::ErrorKind::AlreadyExists => ErrorKind::AlreadyExists,
             std::io::ErrorKind::InvalidInput => ErrorKind::InvalidInput,
             std::io::ErrorKind::InvalidData => ErrorKind::InvalidData,
+            std::io::ErrorKind::StorageFull => ErrorKind::StorageFull,
             std::io::ErrorKind::TimedOut => ErrorKind::TimedOut,
             std::io::ErrorKind::Interrupted => ErrorKind::Interrupted,
             std::io::ErrorKind::Unsupported => ErrorKind::Unsupported,
+            std::io::ErrorKind::UnexpectedEof => ErrorKind::UnexpectedEof,
             std::io::ErrorKind::OutOfMemory => ErrorKind::OutOfMemory,
             _ => ErrorKind::Other,
         }
@@ -172,15 +187,9 @@ impl From<std::io::ErrorKind> for ErrorKind {
 ///
 /// This trait allows generic code to do limited inspecting of errors,
 /// to react differently to different kinds.
-pub trait Error: core::error::Error {
+pub trait Error: core::error::Error + From<ErrorKind> {
     /// Get the kind of this error.
     fn kind(&self) -> ErrorKind;
-}
-
-impl Error for core::convert::Infallible {
-    fn kind(&self) -> ErrorKind {
-        match *self {}
-    }
 }
 
 impl Error for ErrorKind {
@@ -205,6 +214,14 @@ impl Error for std::io::Error {
     }
 }
 
+#[cfg(feature = "std")]
+#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
+impl From<ErrorKind> for std::io::Error {
+    fn from(value: ErrorKind) -> Self {
+        std::io::ErrorKind::from(value).into()
+    }
+}
+
 /// Base trait for all IO traits, defining the error type.
 ///
 /// All IO operations of all traits return the error defined in this trait.
@@ -222,44 +239,6 @@ pub trait ErrorType {
 impl<T: ?Sized + ErrorType> ErrorType for &mut T {
     type Error = T::Error;
 }
-
-/// Error returned by [`Read::read_exact`]
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-#[cfg_attr(feature = "defmt", derive(defmt::Format))]
-pub enum ReadExactError<E> {
-    /// An EOF error was encountered before reading the exact amount of requested bytes.
-    UnexpectedEof,
-    /// Error returned by the inner Read.
-    Other(E),
-}
-
-impl<E> From<E> for ReadExactError<E> {
-    fn from(err: E) -> Self {
-        Self::Other(err)
-    }
-}
-
-#[cfg(feature = "std")]
-#[cfg_attr(docsrs, doc(cfg(feature = "std")))]
-impl From<ReadExactError<std::io::Error>> for std::io::Error {
-    fn from(err: ReadExactError<std::io::Error>) -> Self {
-        match err {
-            ReadExactError::UnexpectedEof => std::io::Error::new(
-                std::io::ErrorKind::UnexpectedEof,
-                "UnexpectedEof".to_owned(),
-            ),
-            ReadExactError::Other(e) => std::io::Error::new(e.kind(), format!("{e:?}")),
-        }
-    }
-}
-
-impl<E: fmt::Debug> fmt::Display for ReadExactError<E> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{self:?}")
-    }
-}
-
-impl<E: fmt::Debug> core::error::Error for ReadExactError<E> {}
 
 /// Errors that could be returned by `Write` on `&mut [u8]`.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -326,6 +305,15 @@ pub trait Read: ErrorType {
     ///
     /// If `buf.len() == 0`, `read` returns without blocking, with either `Ok(0)` or an error.
     /// The `Ok(0)` doesn't indicate EOF, unlike when called with a non-empty buffer.
+    ///
+    /// # Errors
+    ///
+    /// If this function encounters any form of I/O or other error, an error
+    /// variant will be returned. If an error is returned then it must be
+    /// guaranteed that no bytes were read.
+    ///
+    /// An error of the [`ErrorKind::Interrupted`] kind is non-fatal and the read
+    /// operation should be retried if there is nothing else to do.
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error>;
 
     /// Read the exact number of bytes required to fill `buf`.
@@ -336,18 +324,31 @@ pub trait Read: ErrorType {
     /// If you are using [`ReadReady`] to avoid blocking, you should not use this function.
     /// `ReadReady::read_ready()` returning true only guarantees the first call to `read()` will
     /// not block, so this function may still block in subsequent calls.
-    fn read_exact(&mut self, mut buf: &mut [u8]) -> Result<(), ReadExactError<Self::Error>> {
+    ////
+    /// /// # Errors
+    ///
+    /// If this function encounters an "end of file" before completely filling
+    /// the buffer, it returns an error of the kind [`ErrorKind::UnexpectedEof`].
+    /// The contents of `buf` are unspecified in this case.
+    ///
+    /// If any other read error is encountered then this function immediately
+    /// returns. The contents of `buf` are unspecified in this case.
+    ///
+    /// If this function returns an error, it is unspecified how many bytes it
+    /// has read, but it will never read more than would be necessary to
+    /// completely fill the buffer.
+    fn read_exact(&mut self, mut buf: &mut [u8]) -> Result<(), Self::Error> {
         while !buf.is_empty() {
             match self.read(buf) {
                 Ok(0) => break,
                 Ok(n) => buf = &mut buf[n..],
-                Err(e) => return Err(ReadExactError::Other(e)),
+                Err(e) => return Err(e),
             }
         }
         if buf.is_empty() {
             Ok(())
         } else {
-            Err(ReadExactError::UnexpectedEof)
+            Err(ErrorKind::UnexpectedEof.into())
         }
     }
 }

@@ -1,16 +1,8 @@
-use crate::{Error, ErrorKind, ErrorType, SliceWriteError, Write, WriteReady};
+use crate::{ErrorKind, ErrorType, SliceWriteError, Write, WriteReady};
 use core::mem;
 
-impl Error for SliceWriteError {
-    fn kind(&self) -> ErrorKind {
-        match self {
-            SliceWriteError::Full => ErrorKind::WriteZero,
-        }
-    }
-}
-
 impl ErrorType for &mut [u8] {
-    type Error = SliceWriteError;
+    type Error = ErrorKind;
 }
 
 impl core::fmt::Display for SliceWriteError {
@@ -34,7 +26,7 @@ impl Write for &mut [u8] {
     fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
         let amt = core::cmp::min(buf.len(), self.len());
         if !buf.is_empty() && amt == 0 {
-            return Err(SliceWriteError::Full);
+            return Err(ErrorKind::StorageFull);
         }
         let (a, b) = mem::take(self).split_at_mut(amt);
         a.copy_from_slice(&buf[..amt]);

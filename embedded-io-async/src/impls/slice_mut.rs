@@ -1,5 +1,5 @@
 use core::mem;
-use embedded_io::SliceWriteError;
+use embedded_io::ErrorKind;
 
 use crate::Write;
 
@@ -17,7 +17,7 @@ impl Write for &mut [u8] {
     async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
         let amt = core::cmp::min(buf.len(), self.len());
         if !buf.is_empty() && amt == 0 {
-            return Err(SliceWriteError::Full);
+            return Err(ErrorKind::StorageFull);
         }
         let (a, b) = mem::take(self).split_at_mut(amt);
         a.copy_from_slice(&buf[..amt]);

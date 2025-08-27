@@ -1,7 +1,7 @@
-use crate::{BufRead, ErrorType, Read, ReadReady};
+use crate::{BufRead, ErrorKind, ErrorType, Read, ReadReady};
 
 impl ErrorType for &[u8] {
-    type Error = core::convert::Infallible;
+    type Error = ErrorKind;
 }
 
 /// Read is implemented for `&[u8]` by copying from the slice.
