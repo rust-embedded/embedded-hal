@@ -355,7 +355,7 @@ pub trait Read: ErrorType {
 /// Blocking buffered reader.
 ///
 /// This trait is the `embedded-io` equivalent of [`std::io::BufRead`].
-pub trait BufRead: ErrorType {
+pub trait BufRead: Read {
     /// Return the contents of the internal buffer, filling it with more data from the inner reader if it is empty.
     ///
     /// If no bytes are currently available to read, this function blocks until at least one byte is available.
