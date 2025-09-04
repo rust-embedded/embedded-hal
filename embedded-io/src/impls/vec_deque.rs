@@ -4,7 +4,7 @@ use core::convert::Infallible;
 
 use alloc::collections::vec_deque::VecDeque;
 
-use crate::{BufRead, ErrorType, Read, ReadExactError, Write};
+use crate::{BufRead, ErrorType, Read, ReadExactError, ReadReady, Write, WriteReady};
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
 impl ErrorType for VecDeque<u8> {
@@ -86,5 +86,21 @@ impl Write for VecDeque<u8> {
     #[inline]
     fn flush(&mut self) -> Result<(), Self::Error> {
         Ok(())
+    }
+}
+
+#[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
+impl ReadReady for VecDeque<u8> {
+    #[inline]
+    fn read_ready(&mut self) -> Result<bool, Self::Error> {
+        Ok(true)
+    }
+}
+
+#[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
+impl WriteReady for VecDeque<u8> {
+    #[inline]
+    fn write_ready(&mut self) -> Result<bool, Self::Error> {
+        Ok(true)
     }
 }
