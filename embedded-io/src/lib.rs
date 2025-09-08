@@ -137,6 +137,7 @@ impl From<ErrorKind> for std::io::ErrorKind {
             ErrorKind::Interrupted => std::io::ErrorKind::Interrupted,
             ErrorKind::Unsupported => std::io::ErrorKind::Unsupported,
             ErrorKind::OutOfMemory => std::io::ErrorKind::OutOfMemory,
+            ErrorKind::WriteZero => std::io::ErrorKind::WriteZero,
             _ => std::io::ErrorKind::Other,
         }
     }
@@ -163,6 +164,7 @@ impl From<std::io::ErrorKind> for ErrorKind {
             std::io::ErrorKind::Interrupted => ErrorKind::Interrupted,
             std::io::ErrorKind::Unsupported => ErrorKind::Unsupported,
             std::io::ErrorKind::OutOfMemory => ErrorKind::OutOfMemory,
+            std::io::ErrorKind::WriteZero => ErrorKind::WriteZero,
             _ => ErrorKind::Other,
         }
     }
