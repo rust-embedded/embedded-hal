@@ -114,6 +114,26 @@ pub enum ErrorKind {
     OutOfMemory,
     /// An attempted write could not write any data.
     WriteZero,
+    /// The filesystem or storage medium is read-only,
+    /// but a write operation was attempted.
+    ReadOnlyFilesystem,
+    /// The underlying storage (typically, a filesystem) is full.
+    ///
+    /// This does not include out of quota errors.
+    StorageFull,
+    /// Seek on unseekable file.
+    ///
+    /// Seeking was attempted on an open file handle
+    /// which is not suitable for seeking
+    NotSeekable,
+    /// Filesystem quota or some other kind of quota was exceeded.
+    QuotaExceeded,
+    /// File larger than allowed or supported.
+    ///
+    /// This might arise from a hard limit of the underlying filesystem or
+    /// file access API, or from an administratively imposed resource limitation.
+    /// Simple disk full, and out of quota, have their own errors.
+    FileTooLarge,
 }
 
 #[cfg(feature = "std")]
@@ -137,6 +157,11 @@ impl From<ErrorKind> for std::io::ErrorKind {
             ErrorKind::Interrupted => std::io::ErrorKind::Interrupted,
             ErrorKind::Unsupported => std::io::ErrorKind::Unsupported,
             ErrorKind::OutOfMemory => std::io::ErrorKind::OutOfMemory,
+            ErrorKind::ReadOnlyFilesystem => std::io::ErrorKind::ReadOnlyFilesystem,
+            ErrorKind::StorageFull => std::io::ErrorKind::StorageFull,
+            ErrorKind::NotSeekable => std::io::ErrorKind::NotSeekable,
+            ErrorKind::QuotaExceeded => std::io::ErrorKind::QuotaExceeded,
+            ErrorKind::FileTooLarge => std::io::ErrorKind::FileTooLarge,
             _ => std::io::ErrorKind::Other,
         }
     }
@@ -163,6 +188,11 @@ impl From<std::io::ErrorKind> for ErrorKind {
             std::io::ErrorKind::Interrupted => ErrorKind::Interrupted,
             std::io::ErrorKind::Unsupported => ErrorKind::Unsupported,
             std::io::ErrorKind::OutOfMemory => ErrorKind::OutOfMemory,
+            std::io::ErrorKind::ReadOnlyFilesystem => ErrorKind::ReadOnlyFilesystem,
+            std::io::ErrorKind::StorageFull => ErrorKind::StorageFull,
+            std::io::ErrorKind::NotSeekable => ErrorKind::NotSeekable,
+            std::io::ErrorKind::QuotaExceeded => ErrorKind::QuotaExceeded,
+            std::io::ErrorKind::FileTooLarge => ErrorKind::FileTooLarge,
             _ => ErrorKind::Other,
         }
     }
