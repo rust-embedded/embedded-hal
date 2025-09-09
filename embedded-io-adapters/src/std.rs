@@ -60,6 +60,18 @@ impl<T: std::io::Write + ?Sized> embedded_io::Write for FromStd<T> {
             Err(e) => Err(e),
         }
     }
+
+    fn write_all(&mut self, buf: &[u8]) -> Result<(), Self::Error> {
+        self.inner.write_all(buf)
+    }
+
+    fn write_fmt(
+        &mut self,
+        fmt: core::fmt::Arguments<'_>,
+    ) -> Result<(), embedded_io::WriteFmtError<Self::Error>> {
+        Ok(self.inner.write_fmt(fmt)?)
+    }
+
     fn flush(&mut self) -> Result<(), Self::Error> {
         self.inner.flush()
     }
@@ -68,6 +80,14 @@ impl<T: std::io::Write + ?Sized> embedded_io::Write for FromStd<T> {
 impl<T: std::io::Seek + ?Sized> embedded_io::Seek for FromStd<T> {
     fn seek(&mut self, pos: embedded_io::SeekFrom) -> Result<u64, Self::Error> {
         self.inner.seek(pos.into())
+    }
+
+    fn rewind(&mut self) -> Result<(), Self::Error> {
+        self.inner.rewind()
+    }
+
+    fn stream_position(&mut self) -> Result<u64, Self::Error> {
+        self.inner.stream_position()
     }
 }
 
@@ -115,6 +135,22 @@ impl<T: embedded_io::Write + ?Sized> std::io::Write for ToStd<T> {
             Err(e) => Err(to_std_error(e)),
         }
     }
+
+    fn write_all(&mut self, buf: &[u8]) -> Result<(), std::io::Error> {
+        self.inner.write_all(buf).map_err(to_std_error)
+    }
+
+    fn write_fmt(&mut self, fmt: core::fmt::Arguments<'_>) -> Result<(), std::io::Error> {
+        match self.inner.write_fmt(fmt) {
+            Ok(()) => Ok(()),
+            Err(e @ embedded_io::WriteFmtError::FmtError) => Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                format!("{e:?}"),
+            )),
+            Err(embedded_io::WriteFmtError::Other(e)) => Err(to_std_error(e)),
+        }
+    }
+
     fn flush(&mut self) -> Result<(), std::io::Error> {
         self.inner.flush().map_err(to_std_error)
     }
@@ -123,6 +159,14 @@ impl<T: embedded_io::Write + ?Sized> std::io::Write for ToStd<T> {
 impl<T: embedded_io::Seek + ?Sized> std::io::Seek for ToStd<T> {
     fn seek(&mut self, pos: std::io::SeekFrom) -> Result<u64, std::io::Error> {
         self.inner.seek(pos.into()).map_err(to_std_error)
+    }
+
+    fn rewind(&mut self) -> Result<(), std::io::Error> {
+        self.inner.rewind().map_err(to_std_error)
+    }
+
+    fn stream_position(&mut self) -> Result<u64, std::io::Error> {
+        self.inner.stream_position().map_err(to_std_error)
     }
 }
 
