@@ -18,7 +18,7 @@ tokio-1 = ["std", "dep:tokio", "dep:embedded-io-async", "embedded-io-async?/std"
 futures-03 = ["std", "dep:futures", "dep:embedded-io-async", "embedded-io-async?/std"]
 
 [dependencies]
-embedded-io = { version = "0.6", path = "../embedded-io" }
+embedded-io = { version = "0.7", path = "../embedded-io" }
 embedded-io-async = { version = "0.6.1", path = "../embedded-io-async", optional = true }
 
 futures = { version = "0.3.21", features = ["std"], default-features = false, optional = true }
