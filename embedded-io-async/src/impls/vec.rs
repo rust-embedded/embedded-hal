@@ -9,4 +9,9 @@ impl Write for Vec<u8> {
         self.extend_from_slice(buf);
         Ok(buf.len())
     }
+
+    #[inline]
+    async fn flush(&mut self) -> Result<(), Self::Error> {
+        Ok(())
+    }
 }

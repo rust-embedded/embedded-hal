@@ -24,4 +24,9 @@ impl Write for &mut [u8] {
         *self = b;
         Ok(amt)
     }
+
+    #[inline]
+    async fn flush(&mut self) -> Result<(), Self::Error> {
+        Ok(())
+    }
 }
