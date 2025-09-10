@@ -102,6 +102,10 @@ impl<T: std::io::Seek + ?Sized> embedded_io::Seek for FromStd<T> {
     fn stream_position(&mut self) -> Result<u64, Self::Error> {
         self.inner.stream_position()
     }
+
+    fn seek_relative(&mut self, offset: i64) -> Result<(), Self::Error> {
+        self.inner.seek_relative(offset)
+    }
 }
 
 /// Adapter to `std::io` traits.
@@ -167,10 +171,9 @@ impl<T: embedded_io::Write + ?Sized> std::io::Write for ToStd<T> {
     fn write_fmt(&mut self, fmt: core::fmt::Arguments<'_>) -> Result<(), std::io::Error> {
         match self.inner.write_fmt(fmt) {
             Ok(()) => Ok(()),
-            Err(e @ embedded_io::WriteFmtError::FmtError) => Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                format!("{e:?}"),
-            )),
+            Err(e @ embedded_io::WriteFmtError::FmtError) => {
+                Err(std::io::Error::other(format!("{e:?}")))
+            }
             Err(embedded_io::WriteFmtError::Other(e)) => Err(to_std_error(e)),
         }
     }
@@ -191,6 +194,10 @@ impl<T: embedded_io::Seek + ?Sized> std::io::Seek for ToStd<T> {
 
     fn stream_position(&mut self) -> Result<u64, std::io::Error> {
         self.inner.stream_position().map_err(to_std_error)
+    }
+
+    fn seek_relative(&mut self, offset: i64) -> std::io::Result<()> {
+        self.inner.seek_relative(offset).map_err(to_std_error)
     }
 }
 
