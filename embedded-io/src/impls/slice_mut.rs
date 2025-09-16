@@ -43,6 +43,15 @@ impl Write for &mut [u8] {
     }
 
     #[inline]
+    fn write_all(&mut self, buf: &[u8]) -> Result<(), Self::Error> {
+        if self.len() < buf.len() {
+            return Err(SliceWriteError::Full);
+        }
+        self.write(buf)?;
+        Ok(())
+    }
+
+    #[inline]
     fn flush(&mut self) -> Result<(), Self::Error> {
         Ok(())
     }
