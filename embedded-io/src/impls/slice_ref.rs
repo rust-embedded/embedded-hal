@@ -26,6 +26,15 @@ impl Read for &[u8] {
         *self = b;
         Ok(amt)
     }
+
+    #[inline]
+    fn read_exact(&mut self, buf: &mut [u8]) -> Result<(), crate::ReadExactError<Self::Error>> {
+        if self.len() < buf.len() {
+            return Err(crate::ReadExactError::UnexpectedEof);
+        }
+        self.read(buf)?;
+        Ok(())
+    }
 }
 
 impl BufRead for &[u8] {

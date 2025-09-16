@@ -15,6 +15,12 @@ impl Write for Vec<u8> {
     }
 
     #[inline]
+    fn write_all(&mut self, buf: &[u8]) -> Result<(), Self::Error> {
+        self.write(buf)?;
+        Ok(())
+    }
+
+    #[inline]
     fn flush(&mut self) -> Result<(), Self::Error> {
         Ok(())
     }

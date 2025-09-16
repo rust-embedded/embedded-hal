@@ -22,6 +22,17 @@ impl Read for &[u8] {
         *self = b;
         Ok(amt)
     }
+
+    async fn read_exact(
+        &mut self,
+        buf: &mut [u8],
+    ) -> Result<(), embedded_io::ReadExactError<Self::Error>> {
+        if self.len() < buf.len() {
+            return Err(crate::ReadExactError::UnexpectedEof);
+        }
+        self.read(buf).await?;
+        Ok(())
+    }
 }
 
 impl BufRead for &[u8] {
