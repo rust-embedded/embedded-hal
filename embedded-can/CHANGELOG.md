@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `core::error::Error` implementations for every custom `impl Error`
 - Increased MSRV to 1.81 due to `core::error::Error`
 
+### Added
+
+- `as_raw_unchecked` getter function for `Id`
+
 ## [v0.4.1] - 2022-09-28
 
 ### Removed
