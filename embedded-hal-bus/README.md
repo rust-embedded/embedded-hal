@@ -21,7 +21,9 @@ while `SpiDevice` represents a device on that bus. For further details on these 
 However, device drivers should use the `SpiDevice` traits, _not the `SpiBus` traits_ if at all possible
 in order to allow for sharing of the bus they are connected to.
 
-This crate provides mechanisms to connect a `SpiBus` and a `SpiDevice`.
+This crate provides mechanisms to connect a `SpiBus` and a `SpiDevice`.  See for instance `ExclusiveDevice::new_no_delay`
+or `ExclusiveDevice::new`, or similarly for `CriticalSectionDevice`, `AtomicDevice`, `RefCellDevice`, etc., which wrap an
+`SpiBus` and provide an `SpiDevice` with differing access semantics.
 
 ## I2C
 
