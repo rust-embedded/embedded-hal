@@ -11,6 +11,11 @@ impl Write for Vec<u8> {
     }
 
     #[inline]
+    async fn flush(&mut self) -> Result<(), Self::Error> {
+        Ok(())
+    }
+
+    #[inline]
     async fn write_all(&mut self, buf: &[u8]) -> Result<(), Self::Error> {
         self.write(buf).await?;
         Ok(())

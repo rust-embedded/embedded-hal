@@ -26,6 +26,11 @@ impl Write for &mut [u8] {
     }
 
     #[inline]
+    async fn flush(&mut self) -> Result<(), Self::Error> {
+        Ok(())
+    }
+
+    #[inline]
     async fn write_all(&mut self, buf: &[u8]) -> Result<(), Self::Error> {
         if self.len() < buf.len() {
             return Err(SliceWriteError::Full);

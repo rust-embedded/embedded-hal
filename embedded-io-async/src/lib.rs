@@ -127,9 +127,7 @@ pub trait Write: ErrorType {
     async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error>;
 
     /// Flush this output stream, ensuring that all intermediately buffered contents reach their destination.
-    async fn flush(&mut self) -> Result<(), Self::Error> {
-        Ok(())
-    }
+    async fn flush(&mut self) -> Result<(), Self::Error>;
 
     /// Write an entire buffer into this writer.
     ///
