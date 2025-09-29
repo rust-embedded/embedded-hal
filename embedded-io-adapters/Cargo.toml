@@ -13,11 +13,13 @@ categories = [
 ]
 
 [features]
+default = ["digest"]
 std = ["embedded-io/std"]
 tokio-1 = ["std", "dep:tokio", "dep:embedded-io-async", "embedded-io-async?/std"]
 futures-03 = ["std", "dep:futures", "dep:embedded-io-async", "embedded-io-async?/std"]
 
 [dependencies]
+digest = { version = "0.10.7", default-features = false, optional = true }
 embedded-io = { version = "0.6", path = "../embedded-io" }
 embedded-io-async = { version = "0.6.1", path = "../embedded-io-async", optional = true }
 
