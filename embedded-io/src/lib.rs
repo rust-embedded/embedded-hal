@@ -354,6 +354,109 @@ pub trait Read: ErrorType {
     }
 }
 
+/// The [BufReader] adds buffering to any reader, analogous to [`std::io::BufReader`]
+///
+/// This [BufReader] allocates it's own internal buffer of size [N].
+///
+/// # Examples
+///
+/// ```
+/// use embedded_io::BufReader;
+///
+/// fn main()-> Result<(),>
+/// {
+///     let reader = [0,1,2,3];
+///     let mut buf_reader: BufReader<4,&[u8]> = BufReader::new(&reader);
+///     
+///     let current_buff = buf_reader.fill_buff()?;
+///
+///     buf_reader.consume(4);
+///     
+/// }
+///
+/// ```
+pub struct BufReader<const N: usize, R: ?Sized> {
+    buff: [u8; N],
+    pos: usize,
+    inner: R,
+}
+
+impl<const N: usize, R: ?Sized> BufReader<N, R> {
+    /// Gets a reference to the underlying reader.
+    pub fn get_ref(&self) -> &R {
+        &self.inner
+    }
+
+    /// Gets a mutable reference to the underlying reader.
+    pub fn get_mut(&mut self) -> &mut R {
+        &mut self.inner
+    }
+
+    /// Returns a reference to the internally buffered data.
+    ///
+    /// Unlike `fill_buff` this will not attempt to fill the buffer it if is empty.
+    pub fn buffer(&self) -> &[u8] {
+        &self.buff
+    }
+
+    /// Returns the number of bytes the internal buffer can hold at once.
+    pub fn capacity(&self) -> usize {
+        N
+    }
+
+    /// Unwraps this [BufReader<N,R>], returning the underlying reader.
+    pub fn into_inner(self) -> R
+    where
+        R: Sized,
+    {
+        self.inner
+    }
+}
+
+impl<const N: usize, R: Read> BufReader<N, R> {
+    /// Creates a new [BufReader<N,R>] with a buffer capacity of `N`.
+    pub fn new(reader: R) -> Self {
+        Self {
+            buff: [0u8; N],
+            pos: 0,
+            inner: reader,
+        }
+    }
+}
+
+impl<const N: usize, R: Read> ErrorType for BufReader<N, R> {
+    type Error = R::Error;
+}
+
+impl<const N: usize, R: Read> BufRead for BufReader<N, R> {
+    fn consume(&mut self, amt: usize) {
+        // remove amt bytes from the front of the buffer
+        // imagine the buffer is [0,1,2,3,4]
+        // consume(2)
+        // the buffer is now [2,3,4]
+        self.buff.copy_within(amt..self.pos, 0);
+        self.pos -= amt;
+    }
+
+    fn fill_buf(&mut self) -> Result<&[u8], Self::Error> {
+        // fill the inner buffer
+        let read_count = self.inner.read(&mut self.buff[self.pos..])?;
+        self.pos += read_count;
+
+        Ok(&self.buff[..self.pos])
+    }
+}
+
+impl<const N: usize, R: Read> Read for BufReader<N, R> {
+    fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
+        let mut rem = self.fill_buf()?;
+        let nread = rem.read(buf).unwrap(); // infallible
+
+        self.consume(nread);
+        Ok(nread)
+    }
+}
+
 /// Blocking buffered reader.
 ///
 /// This trait is the `embedded-io` equivalent of [`std::io::BufRead`].
@@ -627,5 +730,47 @@ impl<T: ?Sized + WriteReady> WriteReady for &mut T {
     #[inline]
     fn write_ready(&mut self) -> Result<bool, Self::Error> {
         T::write_ready(self)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn bufread_consume_removes_bytes() {
+        let reader = [0, 1, 2, 3];
+
+        let mut buf_read: BufReader<4, &[u8]> = BufReader::new(&reader);
+
+        // read bytes
+        let current_buff = buf_read.fill_buf().unwrap();
+
+        assert_eq!(current_buff, [0, 1, 2, 3]);
+
+        // consume bytes
+        buf_read.consume(2);
+
+        assert_eq!(buf_read.fill_buf().unwrap(), [2, 3]);
+    }
+
+    #[test]
+    #[should_panic]
+    fn bufread_panics_if_consume_more_than_n_bytes() {
+        let reader = [0, 1, 2, 3];
+
+        let mut buf_read: BufReader<4, &[u8]> = BufReader::new(&reader);
+
+        buf_read.consume(5);
+    }
+
+    #[test]
+    #[should_panic]
+    fn bufread_panics_if_consume_more_bytes_than_filled() {
+        let reader = [0, 1, 2, 3];
+
+        let mut buf_read: BufReader<4, &[u8]> = BufReader::new(&reader);
+
+        buf_read.consume(4);
     }
 }
