@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.7.1 - 2025-09-30
+
+- Do not require `Read` and `Write` to be implemented for `ReadReady` and `WriteReady`.
+
 ## 0.7.0 - 2025-09-30
 
 - Add trait dependency on `core::error::Error` to this crate's `Error` trait
@@ -17,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add provided `.seek_relative()` method to Seek
 - Fix missing method forwardings for blanket implementations
 - Specialize `.read_exact()` and `.write_all()` for slices
+- Implement `Read`, `ReadReady`, `BufRead`, `Write`, and `WriteReady` for `VecDeque<u8>`
 
 ## 0.6.1 - 2023-10-22
 
