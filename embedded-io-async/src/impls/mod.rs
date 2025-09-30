@@ -5,3 +5,5 @@ mod slice_ref;
 mod boxx;
 #[cfg(feature = "alloc")]
 mod vec;
+#[cfg(feature = "alloc")]
+mod vec_deque;
