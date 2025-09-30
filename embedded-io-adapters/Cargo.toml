@@ -1,6 +1,6 @@
 [package]
 name = "embedded-io-adapters"
-version = "0.6.2"
+version = "0.7.0"
 edition = "2021"
 rust-version = "1.81"
 description = "Adapters between the `embedded-io` traits and other I/O traits"
@@ -18,8 +18,8 @@ tokio-1 = ["std", "dep:tokio", "dep:embedded-io-async", "embedded-io-async?/std"
 futures-03 = ["std", "dep:futures", "dep:embedded-io-async", "embedded-io-async?/std"]
 
 [dependencies]
-embedded-io = { version = "0.6", path = "../embedded-io" }
-embedded-io-async = { version = "0.6.1", path = "../embedded-io-async", optional = true }
+embedded-io = { version = "0.7", path = "../embedded-io" }
+embedded-io-async = { version = "0.7", path = "../embedded-io-async", optional = true }
 
 futures = { version = "0.3.21", features = ["std"], default-features = false, optional = true }
 tokio = { version = "1", features = ["io-util"], default-features = false, optional = true }

@@ -5,12 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 0.7.0 - 2025-09-30
 
-- Added `core::error::Error` implementations for every custom `impl Error`
-- Migrated `std` feature-gated `std::error::Error` implementations to `core::error::Error`
-- Increased MSRV to 1.81 due to `core::error::Error`
-- Implemented `ReadReady` for `&[u8]` and `WriteReady` for `&mut [u8]`
+- Add trait dependency on `core::error::Error` to this crate's `Error` trait
+  - Implement the trait on all provided implementations
+  - Migrate `std` feature-gated `std::error::Error` implementations to `core::error::Error`
+- Updat `defmt` dependency to 1.0; rename feature from `defmt_03` to `defmt`
+- Increase MSRV to 1.81 due to `core::error::Error`
+- Implement `ReadReady` for `&[u8]` and `WriteReady` for `&mut [u8]`
+- Require `Read` and `Write` to be implemented for various Read and Write traits
+- Add provided `.seek_relative()` method to Seek
+- Fix missing method forwardings for blanket implementations
+- Specialize `.read_exact()` and `.write_all()` for slices
 
 ## 0.6.1 - 2023-10-22
 
