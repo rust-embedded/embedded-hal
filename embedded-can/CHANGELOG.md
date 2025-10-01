@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Added `core::error::Error` implementations for every custom `impl Error`
 - Increased MSRV to 1.81 due to `core::error::Error`
+- Bumped `defmt` to v1
+- `defmt-03` feature is now named `defmt`
 
 ## [v0.4.1] - 2022-09-28
 
