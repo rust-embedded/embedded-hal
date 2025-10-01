@@ -9,10 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Make `Write::flush()` a required method, aligning with std and embedded-io
 - Update to and align with embedded-io 0.7:
+  - Increase MSRV to 1.81
   - Error type is updated to include core::Error
   - Update `defmt` dependency to 1.0; rename feature from `defmt_03` to `defmt`
   - Require `Read` and `Write` to be implemented for various Read and Write traits
   - Fix missing method forwardings for blanket implementations
+  - Implement `Read`, `ReadReady`, `BufRead`, `Write`, and `WriteReady` for `VecDeque<u8>`
   - Documentation updates
 
 ## 0.6.1 - 2023-11-28

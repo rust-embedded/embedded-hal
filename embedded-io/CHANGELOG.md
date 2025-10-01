@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add provided `.seek_relative()` method to Seek
 - Fix missing method forwardings for blanket implementations
 - Specialize `.read_exact()` and `.write_all()` for slices
+- Implement `Read`, `ReadReady`, `BufRead`, `Write`, and `WriteReady` for `VecDeque<u8>`
 
 ## 0.6.1 - 2023-10-22
 
