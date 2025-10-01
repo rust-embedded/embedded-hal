@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Require `Read` and `Write` to be implemented for various Read and Write traits
   - Fix missing method forwardings for blanket implementations
   - Documentation updates
+- Implement `Read`, `ReadReady`, `BufRead`, `Write`, and `WriteReady` for `VecDeque<u8>`
 
 ## 0.6.1 - 2023-11-28
 

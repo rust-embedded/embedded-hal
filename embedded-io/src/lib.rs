@@ -530,7 +530,7 @@ pub trait Seek: ErrorType {
 ///
 /// This allows using a [`Read`] or [`BufRead`] in a nonblocking fashion, i.e. trying to read
 /// only when it is ready.
-pub trait ReadReady: Read {
+pub trait ReadReady: ErrorType {
     /// Get whether the reader is ready for immediately reading.
     ///
     /// This usually means that there is either some bytes have been received and are buffered and ready to be read,
@@ -544,7 +544,7 @@ pub trait ReadReady: Read {
 ///
 /// This allows using a [`Write`] in a nonblocking fashion, i.e. trying to write
 /// only when it is ready.
-pub trait WriteReady: Write {
+pub trait WriteReady: ErrorType {
     /// Get whether the writer is ready for immediately writing.
     ///
     /// This usually means that there is free space in the internal transmit buffer.
