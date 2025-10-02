@@ -36,6 +36,10 @@ impl<T: ?Sized> embedded_io::ErrorType for FromStd<T> {
     type Error = std::io::Error;
 }
 
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: std::io::Read + ?Sized> embedded_io::Read for FromStd<T> {
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
         self.inner.read(buf)
@@ -55,6 +59,10 @@ impl<T: std::io::Read + ?Sized> embedded_io::Read for FromStd<T> {
     }
 }
 
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: std::io::BufRead + ?Sized> embedded_io::BufRead for FromStd<T> {
     fn fill_buf(&mut self) -> Result<&[u8], Self::Error> {
         self.inner.fill_buf()
@@ -65,6 +73,10 @@ impl<T: std::io::BufRead + ?Sized> embedded_io::BufRead for FromStd<T> {
     }
 }
 
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: std::io::Write + ?Sized> embedded_io::Write for FromStd<T> {
     fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
         match self.inner.write(buf) {
@@ -90,6 +102,10 @@ impl<T: std::io::Write + ?Sized> embedded_io::Write for FromStd<T> {
     }
 }
 
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: std::io::Seek + ?Sized> embedded_io::Seek for FromStd<T> {
     fn seek(&mut self, pos: embedded_io::SeekFrom) -> Result<u64, Self::Error> {
         self.inner.seek(pos.into())
