@@ -553,6 +553,10 @@ pub trait WriteReady: ErrorType {
     fn write_ready(&mut self) -> Result<bool, Self::Error>;
 }
 
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: ?Sized + Read> Read for &mut T {
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
@@ -565,6 +569,10 @@ impl<T: ?Sized + Read> Read for &mut T {
     }
 }
 
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: ?Sized + BufRead> BufRead for &mut T {
     #[inline]
     fn fill_buf(&mut self) -> Result<&[u8], Self::Error> {
@@ -577,6 +585,10 @@ impl<T: ?Sized + BufRead> BufRead for &mut T {
     }
 }
 
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: ?Sized + Write> Write for &mut T {
     #[inline]
     fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
@@ -592,8 +604,17 @@ impl<T: ?Sized + Write> Write for &mut T {
     fn write_all(&mut self, buf: &[u8]) -> Result<(), Self::Error> {
         T::write_all(self, buf)
     }
+
+    #[inline]
+    fn write_fmt(&mut self, fmt: fmt::Arguments<'_>) -> Result<(), WriteFmtError<Self::Error>> {
+        T::write_fmt(self, fmt)
+    }
 }
 
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: ?Sized + Seek> Seek for &mut T {
     #[inline]
     fn seek(&mut self, pos: SeekFrom) -> Result<u64, Self::Error> {
@@ -616,6 +637,10 @@ impl<T: ?Sized + Seek> Seek for &mut T {
     }
 }
 
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: ?Sized + ReadReady> ReadReady for &mut T {
     #[inline]
     fn read_ready(&mut self) -> Result<bool, Self::Error> {
@@ -623,6 +648,10 @@ impl<T: ?Sized + ReadReady> ReadReady for &mut T {
     }
 }
 
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: ?Sized + WriteReady> WriteReady for &mut T {
     #[inline]
     fn write_ready(&mut self) -> Result<bool, Self::Error> {

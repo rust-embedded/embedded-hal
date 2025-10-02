@@ -168,6 +168,10 @@ pub trait Seek: ErrorType {
     }
 }
 
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: ?Sized + Read> Read for &mut T {
     #[inline]
     async fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
@@ -180,6 +184,10 @@ impl<T: ?Sized + Read> Read for &mut T {
     }
 }
 
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: ?Sized + BufRead> BufRead for &mut T {
     #[inline]
     async fn fill_buf(&mut self) -> Result<&[u8], Self::Error> {
@@ -192,6 +200,10 @@ impl<T: ?Sized + BufRead> BufRead for &mut T {
     }
 }
 
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: ?Sized + Write> Write for &mut T {
     #[inline]
     async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
@@ -209,6 +221,10 @@ impl<T: ?Sized + Write> Write for &mut T {
     }
 }
 
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: ?Sized + Seek> Seek for &mut T {
     #[inline]
     async fn seek(&mut self, pos: SeekFrom) -> Result<u64, Self::Error> {

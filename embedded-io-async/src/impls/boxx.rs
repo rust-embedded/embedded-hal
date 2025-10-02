@@ -2,6 +2,10 @@ use crate::{BufRead, Read, Seek, SeekFrom, Write};
 use alloc::boxed::Box;
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: ?Sized + Read> Read for Box<T> {
     #[inline]
     async fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
@@ -18,6 +22,10 @@ impl<T: ?Sized + Read> Read for Box<T> {
 }
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: ?Sized + BufRead> BufRead for Box<T> {
     #[inline]
     async fn fill_buf(&mut self) -> Result<&[u8], Self::Error> {
@@ -31,6 +39,10 @@ impl<T: ?Sized + BufRead> BufRead for Box<T> {
 }
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: ?Sized + Write> Write for Box<T> {
     #[inline]
     async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
@@ -49,6 +61,10 @@ impl<T: ?Sized + Write> Write for Box<T> {
 }
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
+#[deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
 impl<T: ?Sized + Seek> Seek for Box<T> {
     #[inline]
     async fn seek(&mut self, pos: SeekFrom) -> Result<u64, Self::Error> {
