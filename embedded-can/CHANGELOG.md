@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Bumped `defmt` to v1
 - `defmt-03` feature is now named `defmt`
 
+### Added
+
+- `as_raw_unchecked` getter function for `Id`
+
 ## [v0.4.1] - 2022-09-28
 
 ### Removed

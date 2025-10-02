@@ -104,6 +104,24 @@ pub enum Id {
     Extended(ExtendedId),
 }
 
+impl Id {
+    /// Returns the CAN Identifier as a raw 32-bit integer, ignoring the distinction between
+    /// standard ID and extended ID.
+    ///
+    /// This function ignores that a standard ID and an extended ID are different IDs, even
+    /// if their numerical values are the same. It should only be used if the raw numerical value
+    /// is required and the distinction between standard ID and extended ID is irrelevant.
+    ///
+    /// In all other cases, it is recommended to de-structure the ID with a match statement.
+    #[inline]
+    pub const fn as_raw_unchecked(&self) -> u32 {
+        match self {
+            Id::Standard(id) => id.as_raw() as u32,
+            Id::Extended(id) => id.as_raw(),
+        }
+    }
+}
+
 /// Implement `Ord` according to the CAN arbitration rules
 ///
 /// When performing arbitration, frames are looked at bit for bit starting
