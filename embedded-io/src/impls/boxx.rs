@@ -1,20 +1,17 @@
+#![deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
+
 use crate::{BufRead, ErrorType, Read, ReadReady, Seek, Write, WriteReady};
 use alloc::boxed::Box;
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
-#[deny(
-    clippy::missing_trait_methods,
-    reason = "Methods should be forwarded to the underlying type"
-)]
 impl<T: ?Sized + ErrorType> ErrorType for Box<T> {
     type Error = T::Error;
 }
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
-#[deny(
-    clippy::missing_trait_methods,
-    reason = "Methods should be forwarded to the underlying type"
-)]
 impl<T: ?Sized + Read> Read for Box<T> {
     #[inline]
     fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error> {
@@ -28,10 +25,6 @@ impl<T: ?Sized + Read> Read for Box<T> {
 }
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
-#[deny(
-    clippy::missing_trait_methods,
-    reason = "Methods should be forwarded to the underlying type"
-)]
 impl<T: ?Sized + BufRead> BufRead for Box<T> {
     fn fill_buf(&mut self) -> Result<&[u8], Self::Error> {
         T::fill_buf(self)
@@ -44,10 +37,6 @@ impl<T: ?Sized + BufRead> BufRead for Box<T> {
 }
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
-#[deny(
-    clippy::missing_trait_methods,
-    reason = "Methods should be forwarded to the underlying type"
-)]
 impl<T: ?Sized + Write> Write for Box<T> {
     #[inline]
     fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error> {
@@ -74,10 +63,6 @@ impl<T: ?Sized + Write> Write for Box<T> {
 }
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
-#[deny(
-    clippy::missing_trait_methods,
-    reason = "Methods should be forwarded to the underlying type"
-)]
 impl<T: ?Sized + Seek> Seek for Box<T> {
     #[inline]
     fn seek(&mut self, pos: crate::SeekFrom) -> Result<u64, Self::Error> {
@@ -101,10 +86,6 @@ impl<T: ?Sized + Seek> Seek for Box<T> {
 }
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
-#[deny(
-    clippy::missing_trait_methods,
-    reason = "Methods should be forwarded to the underlying type"
-)]
 impl<T: ?Sized + ReadReady> ReadReady for Box<T> {
     #[inline]
     fn read_ready(&mut self) -> Result<bool, Self::Error> {
@@ -113,10 +94,6 @@ impl<T: ?Sized + ReadReady> ReadReady for Box<T> {
 }
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
-#[deny(
-    clippy::missing_trait_methods,
-    reason = "Methods should be forwarded to the underlying type"
-)]
 impl<T: ?Sized + WriteReady> WriteReady for Box<T> {
     #[inline]
     fn write_ready(&mut self) -> Result<bool, Self::Error> {
