@@ -2,6 +2,7 @@
 #![warn(missing_docs)]
 #![no_std]
 
+pub mod adc;
 pub mod delay;
 pub mod digital;
 pub mod i2c;
