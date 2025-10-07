@@ -261,7 +261,14 @@ impl<E: fmt::Debug> fmt::Display for ReadExactError<E> {
     }
 }
 
-impl<E: fmt::Debug> core::error::Error for ReadExactError<E> {}
+impl<E: core::error::Error + 'static> core::error::Error for ReadExactError<E> {
+    fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
+        match self {
+            Self::UnexpectedEof => None,
+            Self::Other(error) => Some(error),
+        }
+    }
+}
 
 /// Errors that could be returned by `Write` on `&mut [u8]`.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -294,7 +301,14 @@ impl<E: fmt::Debug> fmt::Display for WriteFmtError<E> {
     }
 }
 
-impl<E: fmt::Debug> core::error::Error for WriteFmtError<E> {}
+impl<E: core::error::Error + 'static> core::error::Error for WriteFmtError<E> {
+    fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
+        match self {
+            Self::FmtError => None,
+            Self::Other(error) => Some(error),
+        }
+    }
+}
 
 /// Blocking reader.
 ///
