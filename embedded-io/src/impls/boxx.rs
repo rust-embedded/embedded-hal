@@ -1,3 +1,8 @@
+#![deny(
+    clippy::missing_trait_methods,
+    reason = "Methods should be forwarded to the underlying type"
+)]
+
 use crate::{BufRead, ErrorType, Read, ReadReady, Seek, Write, WriteReady};
 use alloc::boxed::Box;
 
@@ -21,6 +26,7 @@ impl<T: ?Sized + Read> Read for Box<T> {
 
 #[cfg_attr(docsrs, doc(cfg(any(feature = "std", feature = "alloc"))))]
 impl<T: ?Sized + BufRead> BufRead for Box<T> {
+    #[inline]
     fn fill_buf(&mut self) -> Result<&[u8], Self::Error> {
         T::fill_buf(self)
     }
