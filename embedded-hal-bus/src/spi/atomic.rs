@@ -12,7 +12,7 @@ use crate::util::AtomicCell;
 /// each with its own `CS` pin.
 ///
 /// Sharing is implemented with a [`AtomicDevice`], which consists of an `UnsafeCell` and an `AtomicBool` "locked" flag.
-/// This means it has low overhead, like [`RefCellDevice`](crate::spi::RefCellDevice). Aditionally, it is `Send`,
+/// This means it has low overhead, like [`RefCellDevice`](crate::spi::RefCellDevice). Additionally, it is `Send`,
 /// which allows sharing a single bus across multiple threads (interrupt priority level), like [`CriticalSectionDevice`](crate::spi::CriticalSectionDevice),
 /// while not using critical sections and therefore impacting real-time performance less.
 ///
