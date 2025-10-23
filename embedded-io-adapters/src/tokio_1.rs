@@ -96,7 +96,7 @@ impl<T: tokio::io::AsyncWrite + Unpin + ?Sized> embedded_io_async::Write for Fro
 impl<T: tokio::io::AsyncSeek + Unpin + ?Sized> embedded_io_async::Seek for FromTokio<T> {
     async fn seek(&mut self, pos: embedded_io::SeekFrom) -> Result<u64, Self::Error> {
         // Note: `start_seek` can return an error if there is another seek in progress.
-        // Therefor it is recommended to call `poll_complete` before any call to `start_seek`.
+        // Therefore it is recommended to call `poll_complete` before any call to `start_seek`.
         poll_fn(|cx| Pin::new(&mut self.inner).poll_complete(cx)).await?;
         Pin::new(&mut self.inner).start_seek(pos.into())?;
         poll_fn(|cx| Pin::new(&mut self.inner).poll_complete(cx)).await
