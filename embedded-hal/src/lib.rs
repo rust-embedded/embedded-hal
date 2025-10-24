@@ -5,6 +5,7 @@
 pub mod delay;
 pub mod digital;
 pub mod i2c;
+pub mod mmc;
 pub mod pwm;
 pub mod spi;
 
