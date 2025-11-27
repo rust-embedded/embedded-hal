@@ -163,7 +163,7 @@
 
 use crate::private;
 
-#[cfg(feature = "defmt-03")]
+#[cfg(feature = "defmt")]
 use crate::defmt;
 
 /// I2C error.
@@ -189,7 +189,7 @@ impl Error for core::convert::Infallible {
 /// free to define more specific or additional error types. However, by providing
 /// a mapping to these common I2C errors, generic code can still react to them.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
-#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[non_exhaustive]
 pub enum ErrorKind {
     /// Bus error occurred. e.g. A START or a STOP condition is detected and is not
@@ -213,7 +213,7 @@ pub enum ErrorKind {
 /// response was received to an address versus a no acknowledge to a data byte.
 /// Where it is not possible to differentiate, `Unknown` should be indicated.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
-#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum NoAcknowledgeSource {
     /// The device did not acknowledge its address. The device may be missing.
     Address,
@@ -303,7 +303,7 @@ impl AddressMode for TenBitAddress {}
 ///
 /// Several operations can be combined as part of a transaction.
 #[derive(Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum Operation<'a> {
     /// Read data into the provided buffer.
     Read(&'a mut [u8]),

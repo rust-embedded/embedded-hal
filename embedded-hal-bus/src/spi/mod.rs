@@ -25,12 +25,12 @@ pub use rc::*;
 
 pub use self::critical_section::*;
 
-#[cfg(feature = "defmt-03")]
+#[cfg(feature = "defmt")]
 use crate::defmt;
 
 /// Error type for [`ExclusiveDevice`] operations.
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
-#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum DeviceError<BUS, CS> {
     /// An inner SPI bus operation failed.
     Spi(BUS),
@@ -65,7 +65,7 @@ where
 
 /// Dummy [`DelayNs`](embedded_hal::delay::DelayNs) implementation that panics on use.
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
-#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub struct NoDelay;
 
 #[cold]
