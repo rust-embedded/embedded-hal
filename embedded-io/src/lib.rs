@@ -8,7 +8,10 @@ use core::fmt;
 #[cfg(feature = "alloc")]
 extern crate alloc;
 
+mod cursor;
 mod impls;
+
+pub use cursor::{Cursor, CursorError};
 
 /// Enumeration of possible methods to seek within an I/O object.
 ///
