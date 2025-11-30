@@ -3,7 +3,7 @@
 use core::ops::Not;
 
 #[cfg(feature = "defmt")]
-use crate::defmt;
+use defmt;
 
 /// Error.
 pub trait Error: core::fmt::Debug {

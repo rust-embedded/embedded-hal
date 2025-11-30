@@ -164,7 +164,7 @@
 use crate::private;
 
 #[cfg(feature = "defmt")]
-use crate::defmt;
+use defmt;
 
 /// I2C error.
 pub trait Error: core::fmt::Debug {

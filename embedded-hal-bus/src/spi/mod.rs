@@ -26,7 +26,7 @@ pub use rc::*;
 pub use self::critical_section::*;
 
 #[cfg(feature = "defmt")]
-use crate::defmt;
+use defmt;
 
 /// Error type for [`ExclusiveDevice`] operations.
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]

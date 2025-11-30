@@ -174,7 +174,7 @@
 use core::fmt::Debug;
 
 #[cfg(feature = "defmt")]
-use crate::defmt;
+use defmt;
 
 /// Clock polarity.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
