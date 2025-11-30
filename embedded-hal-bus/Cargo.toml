@@ -27,7 +27,7 @@ portable-atomic = ["dep:portable-atomic"]
 # Enable `embedded-hal-async` support.
 async = ["dep:embedded-hal-async"]
 # Derive `defmt::Format` from `defmt` 0.3 for enums and structs. See https://github.com/knurling-rs/defmt for more info
-defmt-03 = ["dep:defmt-03", "embedded-hal/defmt-03", "embedded-hal-async?/defmt-03"]
+defmt = ["dep:defmt", "embedded-hal/defmt", "embedded-hal-async?/defmt"]
 # Enables additional utilities requiring a global allocator.
 alloc = []
 
@@ -35,7 +35,7 @@ alloc = []
 embedded-hal = { version = "1.0.0", path = "../embedded-hal" }
 embedded-hal-async = { version = "1.0.0", path = "../embedded-hal-async", optional = true }
 critical-section = { version = "1.0" }
-defmt-03 = { package = "defmt", version = "0.3", optional = true }
+defmt = { package = "defmt", version = "1", optional = true }
 portable-atomic = {version = "1.3", default-features = false, optional = true, features = ["require-cas"]}
 
 [package.metadata.docs.rs]

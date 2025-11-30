@@ -1,7 +1,7 @@
 //! Pulse Width Modulation (PWM) traits.
 
-#[cfg(feature = "defmt-03")]
-use crate::defmt;
+#[cfg(feature = "defmt")]
+use defmt;
 
 /// Error
 pub trait Error: core::fmt::Debug {
@@ -26,7 +26,7 @@ impl Error for core::convert::Infallible {
 /// free to define more specific or additional error types. However, by providing
 /// a mapping to these common errors, generic code can still react to them.
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
-#[cfg_attr(feature = "defmt-03", derive(defmt::Format))]
+#[cfg_attr(feature = "defmt", derive(defmt::Format))]
 #[non_exhaustive]
 pub enum ErrorKind {
     /// A different error occurred. The original error may contain more information.
