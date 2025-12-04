@@ -3,6 +3,7 @@
 #![no_std]
 #![allow(async_fn_in_trait)]
 
+pub mod adc;
 pub mod delay;
 pub mod digital;
 pub mod i2c;
