@@ -1,5 +1,6 @@
 //! `SpiDevice` implementations.
 
+use core::convert::Infallible;
 use core::fmt::{self, Debug, Display, Formatter};
 use embedded_hal::spi::{Error, ErrorKind};
 
@@ -59,6 +60,15 @@ where
         match self {
             Self::Spi(e) => e.kind(),
             Self::Cs(_) => ErrorKind::ChipSelectFault,
+        }
+    }
+}
+
+impl From<DeviceError<Infallible, Infallible>> for Infallible {
+    fn from(value: DeviceError<Infallible, Infallible>) -> Self {
+        match value {
+            DeviceError::Spi(e) => e,
+            DeviceError::Cs(e) => e,
         }
     }
 }
