@@ -313,43 +313,43 @@ pub enum Operation<'a> {
 
 /// Blocking I2C.
 pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
-    /// Reads enough bytes from slave with `address` to fill `read`.
+    /// Reads enough bytes from target with `address` to fill `read`.
     ///
     /// # I2C Events (contract)
     ///
     /// ``` text
-    /// Master: ST SAD+R        MAK    MAK ...    NMAK SP
-    /// Slave:           SAK B0     B1     ... BN
+    /// Controller: ST TAD+R        CAK    CAK ...    NCAK SP
+    /// Target:              TAK B0     B1     ... BN
     /// ```
     ///
     /// Where
     ///
     /// - `ST` = start condition
-    /// - `SAD+R` = slave address followed by bit 1 to indicate reading
-    /// - `SAK` = slave acknowledge
+    /// - `TAD+R` = target address followed by bit 1 to indicate reading
+    /// - `TAK` = target acknowledge
     /// - `Bi` = ith byte of data
-    /// - `MAK` = master acknowledge
-    /// - `NMAK` = master no acknowledge
+    /// - `CAK` = controller acknowledge
+    /// - `NCAK` = controller no acknowledge
     /// - `SP` = stop condition
     #[inline]
     fn read(&mut self, address: A, read: &mut [u8]) -> Result<(), Self::Error> {
         self.transaction(address, &mut [Operation::Read(read)])
     }
 
-    /// Writes bytes to slave with address `address`.
+    /// Writes bytes to target with address `address`.
     ///
     /// # I2C Events (contract)
     ///
     /// ``` text
-    /// Master: ST SAD+W     B0     B1     ... BN     SP
-    /// Slave:           SAK    SAK    SAK ...    SAK
+    /// Controller: ST TAD+W     B0     B1     ... BN     SP
+    /// Target:              TAK    TAK    TAK ...    TAK
     /// ```
     ///
     /// Where
     ///
     /// - `ST` = start condition
-    /// - `SAD+W` = slave address followed by bit 0 to indicate writing
-    /// - `SAK` = slave acknowledge
+    /// - `TAD+W` = target address followed by bit 0 to indicate writing
+    /// - `TAK` = target acknowledge
     /// - `Bi` = ith byte of data
     /// - `SP` = stop condition
     #[inline]
@@ -357,27 +357,27 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
         self.transaction(address, &mut [Operation::Write(write)])
     }
 
-    /// Writes bytes to slave with address `address` and then reads enough bytes to fill `read` *in a
+    /// Writes bytes to target with address `address` and then reads enough bytes to fill `read` *in a
     /// single transaction*.
     ///
     /// # I2C Events (contract)
     ///
     /// ``` text
-    /// Master: ST SAD+W     O0     O1     ... OM     SR SAD+R        MAK    MAK ...    NMAK SP
-    /// Slave:           SAK    SAK    SAK ...    SAK          SAK I0     I1     ... IN
+    /// Controller: ST TAD+W     O0     O1     ... OM     SR TAD+R        CAK    CAK ...    NCAK SP
+    /// Target:              TAK    TAK    TAK ...    TAK          TAK I0     I1     ... IN
     /// ```
     ///
     /// Where
     ///
     /// - `ST` = start condition
-    /// - `SAD+W` = slave address followed by bit 0 to indicate writing
-    /// - `SAK` = slave acknowledge
+    /// - `TAD+W` = target address followed by bit 0 to indicate writing
+    /// - `TAK` = target acknowledge
     /// - `Oi` = ith outgoing byte of data
     /// - `SR` = repeated start condition
-    /// - `SAD+R` = slave address followed by bit 1 to indicate reading
+    /// - `TAD+R` = target address followed by bit 1 to indicate reading
     /// - `Ii` = ith incoming byte of data
-    /// - `MAK` = master acknowledge
-    /// - `NMAK` = master no acknowledge
+    /// - `CAK` = controller acknowledge
+    /// - `NCAK` = controller no acknowledge
     /// - `SP` = stop condition
     #[inline]
     fn write_read(&mut self, address: A, write: &[u8], read: &mut [u8]) -> Result<(), Self::Error> {
@@ -390,14 +390,14 @@ pub trait I2c<A: AddressMode = SevenBitAddress>: ErrorType {
     /// Execute the provided operations on the I2C bus.
     ///
     /// Transaction contract:
-    /// - Before executing the first operation an ST is sent automatically. This is followed by SAD+R/W as appropriate.
+    /// - Before executing the first operation an ST is sent automatically. This is followed by TAD+R/W as appropriate.
     /// - Data from adjacent operations of the same type are sent after each other without an SP or SR.
-    /// - Between adjacent operations of a different type an SR and SAD+R/W is sent.
+    /// - Between adjacent operations of a different type an SR and TAD+R/W is sent.
     /// - After executing the last operation an SP is sent automatically.
-    /// - At the end of each read operation (before SP or SR), the master does not send an acknowledge for the last byte.
+    /// - At the end of each read operation (before SP or SR), the controller does not send an acknowledge for the last byte.
     ///
     /// - `ST` = start condition
-    /// - `SAD+R/W` = slave address followed by bit 1 to indicate reading or 0 to indicate writing
+    /// - `TAD+R/W` = target address followed by bit 1 to indicate reading or 0 to indicate writing
     /// - `SR` = repeated start condition
     /// - `SP` = stop condition
     fn transaction(
