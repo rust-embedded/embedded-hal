@@ -203,6 +203,8 @@ pub enum ErrorKind {
     NoAcknowledge(NoAcknowledgeSource),
     /// The peripheral receive buffer was overrun.
     Overrun,
+    /// A clock low timeout occured.
+    ClkLowTimeout,
     /// A different error occurred. The original error may contain more information.
     Other,
 }
@@ -242,6 +244,7 @@ impl core::fmt::Display for ErrorKind {
             Self::ArbitrationLoss => write!(f, "The arbitration was lost"),
             Self::NoAcknowledge(s) => s.fmt(f),
             Self::Overrun => write!(f, "The peripheral receive buffer was overrun"),
+            Self::ClkLowTimeout => write!(f, "The peripheral had a clock low timeout"),
             Self::Other => write!(
                 f,
                 "A different error occurred. The original error may contain more information"

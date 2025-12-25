@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added `core::error::Error` implementations for every custom `impl Error`
 - Increased MSRV to 1.81 due to `core::error::Error`
 
+## Added
+
+- `i2c::ErrorKind::ClkLowTimeout` error kind.
+
 ## [v1.0.0] - 2023-12-28
 
 Check out the [announcement blog post](https://blog.rust-embedded.org/embedded-hal-v1/) and the [migration guide](../docs/migrating-from-0.2-to-1.0.md) for help with migrating from v0.2 to v1.0.
