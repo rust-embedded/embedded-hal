@@ -51,6 +51,59 @@ pub trait Frame: Sized {
     fn data(&self) -> &[u8];
 }
 
+/// A CAN FD Frame
+pub trait FdFrame: Sized {
+    /// Creates a new fd frame.
+    ///
+    /// This will return `None` if the data slice is not 0-8, 12, 16, 20, 24, 32, 48, or 64 bytes long.
+    fn new(id: impl Into<Id>, brs: bool, data: &[u8]) -> Option<Self>;
+
+    /// Returns true if this frame uses bit rate switching (BRS).
+    fn is_brs(&self) -> bool;
+
+    /// Returns true if this frame is an extended frame.
+    fn is_extended(&self) -> bool;
+
+    /// Returns true if this frame is a standard frame.
+    fn is_standard(&self) -> bool {
+        !self.is_extended()
+    }
+
+    /// Returns the frame identifier.
+    fn id(&self) -> Id;
+
+    /// Returns the data length code (DLC) which is in the range 0..15.
+    ///
+    /// For frame lengths:
+    /// - 0..8 bytes: DLC = length
+    /// - 12 bytes: DLC = 9
+    /// - 16 bytes: DLC = 10
+    /// - 20 bytes: DLC = 11
+    /// - 24 bytes: DLC = 12
+    /// - 32 bytes: DLC = 13
+    /// - 48 bytes: DLC = 14
+    /// - 64 bytes: DLC = 15
+    fn dlc(&self) -> usize;
+
+    /// Returns the length of the frame data in bytes.
+    fn length(&self) -> usize {
+        match self.dlc() {
+            0..=8 => self.dlc(),
+            9 => 12,
+            10 => 16,
+            11 => 20,
+            12 => 24,
+            13 => 32,
+            14 => 48,
+            15 => 64,
+            _ => 0, // Should never happen
+        }
+    }
+
+    /// Returns the frame data (0..64 bytes in length).
+    fn data(&self) -> &[u8];
+}
+
 /// CAN error
 pub trait Error: core::fmt::Debug {
     /// Convert error to a generic CAN error kind
