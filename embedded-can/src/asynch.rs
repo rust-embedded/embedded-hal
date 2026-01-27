@@ -1,5 +1,7 @@
 //! Async CAN API
 
+use core::future::Future;
+
 /// An async CAN interface that is able to transmit frames.
 pub trait CanTx {
     /// Associated frame type.
@@ -10,7 +12,7 @@ pub trait CanTx {
 
     /// Puts a frame in the transmit buffer or awaits until space is available
     /// in the transmit buffer.
-    async fn transmit(&mut self, frame: &Self::Frame) -> Result<(), Self::Error>;
+    fn transmit(&mut self, frame: &Self::Frame) -> impl Future<Output = Result<(), Self::Error>>;
 }
 
 /// An async CAN interface that is able to receive frames.
@@ -22,5 +24,5 @@ pub trait CanRx {
     type Error: crate::Error;
 
     /// Awaits until a frame was received or an error occurs.
-    async fn receive(&mut self) -> Result<Self::Frame, Self::Error>;
+    fn receive(&mut self) -> impl Future<Output = Result<Self::Frame, Self::Error>>;
 }
