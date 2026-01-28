@@ -12,7 +12,15 @@ pub trait CanTx {
 
     /// Puts a frame in the transmit buffer or awaits until space is available
     /// in the transmit buffer.
-    fn transmit(&mut self, frame: &Self::Frame) -> impl Future<Output = Result<(), Self::Error>>;
+    ///
+    /// If the transmit buffer is full, this function will try to replace a
+    /// pending lower priority frame and return the frame that was replaced. If
+    /// no lower-priority frames can be replaced, this call should wait for a
+    /// frame to be transmitted and then try again.
+    fn transmit(
+        &mut self,
+        frame: &Self::Frame,
+    ) -> impl Future<Output = Result<Option<Self::Frame>, Self::Error>>;
 }
 
 /// An async CAN interface that is able to receive frames.
