@@ -1,0 +1,30 @@
+
+[package]
+authors = [
+  "The Embedded HAL Team and Contributors <embedded-hal@teams.rust-embedded.org>",
+]
+categories = ["embedded", "hardware-support", "no-std"]
+description = "Traits for abstracting I3C Databusses"
+documentation = "https://docs.rs/embedded-hal-i3c"
+edition = "2021"
+rust-version = "1.81"
+keywords = ["hal", "IO"]
+license = "MIT OR Apache-2.0"
+name = "embedded-hal-i3c"
+readme = "README.md"
+repository = "https://github.com/rust-embedded/embedded-hal"
+version = "0.1.0"
+
+[features]
+async = ["dep:embedded-hal-async"]
+# Derive `defmt::Format` from `defmt` 0.3 for enums and structs. See https://github.com/knurling-rs/defmt for more info
+defmt-03 = ["dep:defmt-03", "embedded-hal/defmt-03", "embedded-hal-async?/defmt-03"]
+
+[dependencies]
+embedded-hal = { version = "1.0.0", path = "../embedded-hal" }
+embedded-hal-async = { version = "1.0.0", path = "../embedded-hal-async", optional = true }
+defmt-03 = { package = "defmt", version = "0.3", optional = true }
+
+[package.metadata.docs.rs]
+features = ["async"]
+rustdoc-args = ["--cfg", "docsrs"]

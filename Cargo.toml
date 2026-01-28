@@ -6,6 +6,7 @@ members = [
     "embedded-hal-async",
     "embedded-hal-nb",
     "embedded-hal-bus",
+    "embedded-hal-i3c",
     "embedded-can",
     "embedded-io",
     "embedded-io-async",
