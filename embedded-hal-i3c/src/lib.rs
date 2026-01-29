@@ -1,5 +1,42 @@
 #![no_std]
 
+//! Blocking I3C Trait.
+//!
+//! # For driver authors
+//!
+//! Drivers should take all speed variant which they support
+//! ```
+//! use embedded_hal_i3c::I3c;
+//!
+//! pub struct TemperaturSensorDriver<I3C> {
+//!     i3c: I3C,
+//! }
+//!
+//! impl <I3C: I2c<Sdr>> TemperaturSensorDriver<I3C> {
+//!     pub fn new(i3c: I3C) -> Self {
+//!         Self { i3c }
+//!     }
+//! }
+//!
+//! impl <I3C: I2c<Hdr>> TemperaturSensorDriver<I3C> {
+//!     pub fn new(i3c: I3C) -> Self {
+//!         Self { i3c }
+//!     }
+//! }
+//!
+//! impl <I3C: I2c<_>> TemperaturSensorDriver<I3C> {
+//!     pub fn read_temperatur(&mut self) -> Result<u8, I3C::Error> {
+//!         let mut temp = [0];
+//!         self.i2c.write_read(ADDR, &[TEMP_REGISTER], &mut temp)?;
+//!         Ok(temp[0])
+//!     }
+//! }
+//! ```
+//!
+//! # For HAL authors
+//!
+//! HALs should implement all supported high speed modes on the same struct.
+
 /// I3C error.
 pub trait Error: core::fmt::Debug {
     /// Convert error to a generic I3C error kind.
@@ -19,9 +56,15 @@ impl Error for core::convert::Infallible {
 
 #[non_exhaustive]
 pub enum ErrorKind {
+    /// Bus error occurred. e.g. A START or a STOP condition is detected and is not located after a multiple of 9 SCL clock pulses.
     Bus,
+    /// The arbitration was lost, e.g. electrical problems with the clock signal.
     ArbitrationLoss,
+    /// The peripheral receive buffer was overrun.
     Overrun,
+    /// The client terminated the read transaction before the buffer was completely filled.
+    Underrun,
+    /// A different error occurred. The original error may contain more info
     Other,
 }
 
@@ -90,3 +133,17 @@ pub struct Ddr {}
 impl Sealed for Ddr {}
 
 impl SpeedMode for Ddr {}
+
+/// Ternary Symbol for Pure Bus
+pub struct Tsp {}
+
+impl Sealed for Tsp {}
+
+impl SpeedMode for Tsp {}
+
+/// Ternary Symbol Legacy
+pub struct TSL {}
+
+impl Sealed for TSL {}
+
+impl SpeedMode for TSL {}
