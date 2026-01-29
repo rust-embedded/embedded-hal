@@ -1,3 +1,4 @@
+#![no_std]
 pub use embedded_hal::i2c::Operation;
 
 /// I3C error.
@@ -21,7 +22,7 @@ impl Error for core::convert::Infallible {
 pub enum ErrorKind {
     Bus,
     ArbitrationLoss,
-    Ovverun,
+    Overrun,
     Other,
 }
 
