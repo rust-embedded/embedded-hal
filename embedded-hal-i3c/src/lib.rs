@@ -1,5 +1,4 @@
 #![no_std]
-pub use embedded_hal::i2c::Operation;
 
 /// I3C error.
 pub trait Error: core::fmt::Debug {
@@ -59,6 +58,18 @@ pub trait I3c<S: SpeedMode = Sdr>: ErrorType {
         address: u8,
         operations: &mut [Operation<'_>],
     ) -> Result<(), Self::Error>;
+}
+
+/// I3C opeation.
+///
+/// Several operations can be combined as part of a transaction.
+pub enum Operation<'a> {
+    /// Read data into the provided buffer.
+    Read(&'a mut [u8]),
+    /// Write data from the provided buffer.
+    Write(&'a [u8]),
+    /// Enable and disable highspeed mode.
+    HighSpeed(bool),
 }
 
 trait Sealed {}
