@@ -6,28 +6,31 @@
 //!
 //! Drivers should take all speed variant which they support
 //! ```
-//! use embedded_hal_i3c::I3c;
+//! use embedded_hal_i3c::{I3c, Sdr, Ddr, SpeedMode};
+//!
+//! const ADDR: u8 = 0x158;
+//! # const TEMP_REGISTER: u8 = 0x1;
 //!
 //! pub struct TemperaturSensorDriver<I3C> {
 //!     i3c: I3C,
 //! }
 //!
-//! impl <I3C: I2c<Sdr>> TemperaturSensorDriver<I3C> {
+//! impl <I3C: I3c<Sdr>> TemperaturSensorDriver<I3C> {
 //!     pub fn new(i3c: I3C) -> Self {
 //!         Self { i3c }
 //!     }
 //! }
 //!
-//! impl <I3C: I2c<Hdr>> TemperaturSensorDriver<I3C> {
+//! impl <I3C: I3c<Ddr>> TemperaturSensorDriver<I3C> {
 //!     pub fn new(i3c: I3C) -> Self {
 //!         Self { i3c }
 //!     }
 //! }
 //!
-//! impl <I3C: I2c<_>> TemperaturSensorDriver<I3C> {
+//! impl <S: SpeedMode, I3C: I3c<S>> TemperaturSensorDriver<I3C> where S: SpeedMode {
 //!     pub fn read_temperatur(&mut self) -> Result<u8, I3C::Error> {
 //!         let mut temp = [0];
-//!         self.i2c.write_read(ADDR, &[TEMP_REGISTER], &mut temp)?;
+//!         self.i3c.write_read(ADDR, &[TEMP_REGISTER], &mut temp)?;
 //!         Ok(temp[0])
 //!     }
 //! }
@@ -82,6 +85,18 @@ impl<T: ErrorType + ?Sized> ErrorType for &mut T {
 pub trait I3c<S: SpeedMode = Sdr>: ErrorType {
     // Here we also add read, write read_write like I2C removed for brevity
 
+    #[inline]
+    fn write_read(
+        &mut self,
+        address: u8,
+        write: &[u8],
+        read: &mut [u8],
+    ) -> Result<(), Self::Error> {
+        self.transaction(
+            address,
+            &mut [Operation::Write(write), Operation::Read(read)],
+        )
+    }
     /// Execute the provided operations on the I3C bus.
     ///
     /// Transaction contract:
