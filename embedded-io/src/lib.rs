@@ -174,7 +174,7 @@ impl From<std::io::ErrorKind> for ErrorKind {
 ///
 /// This trait allows generic code to do limited inspecting of errors,
 /// to react differently to different kinds.
-pub trait Error: core::error::Error {
+pub trait Error: core::error::Error + 'static {
     /// Get the kind of this error.
     fn kind(&self) -> ErrorKind;
 }
