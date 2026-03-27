@@ -8,6 +8,8 @@ members = [
     "embedded-hal-bus",
     "embedded-can",
     "embedded-io",
+    "embedded-storage",
+    "embedded-storage-async",
     "embedded-io-async",
     "embedded-io-adapters",
 ]

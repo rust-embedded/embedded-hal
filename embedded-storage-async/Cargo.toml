@@ -1,0 +1,16 @@
+[package]
+name = "embedded-storage-async"
+version = "0.4.1"
+edition = "2021"
+rust-version = "1.75"
+description = "A Storage Abstraction Layer for Embedded Systems"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/rust-embedded/embedded-hal"
+homepage = "https://github.com/rust-embedded/embedded-hal"
+documentation = "https://docs.rs/embedded-storage-async"
+readme = "README.md"
+keywords = ["storage"]
+categories = ["embedded", "hardware-support", "no-std"]
+
+[dependencies]
+embedded-storage = { version = "0.3.1", path = "../embedded-storage" }
