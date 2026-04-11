@@ -46,14 +46,24 @@ pub trait Read: ErrorType {
     /// If `buf.len() == 0`, `read` returns without waiting, with either `Ok(0)` or an error.
     /// The `Ok(0)` doesn't indicate EOF, unlike when called with a non-empty buffer.
     ///
-    /// Implementations are encouraged to make this function side-effect-free on cancel (AKA "cancel-safe"), i.e.
-    /// guarantee that if you cancel (drop) a `read()` future that hasn't completed yet, the stream's
-    /// state hasn't changed (no bytes have been read).
+    /// # Cancel Safety
     ///
-    /// This is not a requirement to allow implementations that read into the user's buffer straight from
-    /// the hardware with e.g. DMA.
+    /// **This method is NOT guaranteed to be cancel-safe.**
     ///
-    /// Implementations should document whether they're actually side-effect-free on cancel or not.
+    /// If a `read()` future is dropped before it completes, bytes that have already been transferred
+    /// from the hardware FIFO or DMA buffer may be silently discarded — no error is returned, and
+    /// no indication is given to the caller that data was lost. The next call to `read()` will return
+    /// bytes received *after* the cancellation point, not the discarded bytes.
+    ///
+    /// Implementations that are able to guarantee cancel safety (i.e. that dropping a pending future
+    /// leaves the stream state unchanged — no bytes consumed) SHOULD document this explicitly and
+    /// MAY implement the `CancelSafeRead` marker trait when it becomes available.
+    ///
+    /// Implementations that cannot guarantee cancel safety (e.g. those that use DMA to write
+    /// directly into the caller's buffer) MUST document this limitation.
+    ///
+    /// Callers that require cancel-safe reads SHOULD use a pattern that ensures the future runs to
+    /// completion (e.g. a dedicated read task) rather than relying on cancel safety.
     async fn read(&mut self, buf: &mut [u8]) -> Result<usize, Self::Error>;
 
     /// Read the exact number of bytes required to fill `buf`.
@@ -116,14 +126,19 @@ pub trait Write: ErrorType {
     /// If `buf.len() == 0`, `write` returns without waiting, with either `Ok(0)` or an error.
     /// The `Ok(0)` doesn't indicate an error.
     ///
-    /// Implementations are encouraged to make this function side-effect-free on cancel (AKA "cancel-safe"), i.e.
-    /// guarantee that if you cancel (drop) a `write()` future that hasn't completed yet, the stream's
-    /// state hasn't changed (no bytes have been written).
+    /// # Cancel Safety
     ///
-    /// This is not a requirement to allow implementations that write from the user's buffer straight to
-    /// the hardware with e.g. DMA.
+    /// **This method is NOT guaranteed to be cancel-safe.**
     ///
-    /// Implementations should document whether they're actually side-effect-free on cancel or not.
+    /// If a `write()` future is dropped before it completes, bytes may have already been submitted
+    /// to the hardware without the caller's knowledge — no error is returned. The number of bytes
+    /// actually written is unknown.
+    ///
+    /// Implementations that are able to guarantee cancel safety (i.e. that dropping a pending future
+    /// leaves the stream state unchanged — no bytes written) SHOULD document this explicitly.
+    ///
+    /// Implementations that cannot guarantee cancel safety (e.g. those that use DMA directly from
+    /// the caller's buffer) MUST document this limitation.
     async fn write(&mut self, buf: &[u8]) -> Result<usize, Self::Error>;
 
     /// Flush this output stream, ensuring that all intermediately buffered contents reach their destination.
