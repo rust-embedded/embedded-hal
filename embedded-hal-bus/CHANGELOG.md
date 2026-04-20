@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-- Your change here!
+- Increased MSRV to 1.83 due to mutable reference in const context.
 
 ## [v0.3.0] - 2025-01-21
 
