@@ -38,7 +38,7 @@ jobs:
           --target thumbv7m-none-eabi
           --features async,defmt-03,embedded-io/defmt,embedded-io-async/defmt
 
-  msrv-1-83:
+  msrv:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
