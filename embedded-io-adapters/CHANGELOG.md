@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+- Add `Cursor` type, an `embedded-io` equivalent of `std::io::Cursor`.
+- Add `alloc` and `defmt` Cargo features.
+- Increased MSRV to 1.83 due to `core::error::Error` & mutable reference in const context.
+
 ## 0.7.0 - 2025-09-30
 
 - Update to embedded-io and embedded-io-async 0.7

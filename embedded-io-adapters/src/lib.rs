@@ -3,7 +3,13 @@
 #![warn(missing_docs)]
 #![doc = include_str!("../README.md")]
 
+#[cfg(feature = "alloc")]
+extern crate alloc;
+
+mod cursor;
 pub mod fmt;
+
+pub use cursor::{Cursor, CursorError};
 
 #[cfg(feature = "std")]
 #[cfg_attr(docsrs, doc(cfg(feature = "std")))]
