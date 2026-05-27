@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - `as_raw_unchecked` getter function for `Id`
+- Add async API.
 
 ## [v0.4.1] - 2022-09-28
 

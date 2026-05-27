@@ -3,6 +3,7 @@
 #![warn(missing_docs)]
 #![no_std]
 
+pub mod asynch;
 pub mod blocking;
 pub mod nb;
 
