@@ -1,0 +1,12 @@
+[package]
+name = "embedded-storage"
+version = "0.3.1"
+edition = "2018"
+description = "A Storage Abstraction Layer for Embedded Systems"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/rust-embedded/embedded-hal"
+homepage = "https://github.com/rust-embedded/embedded-hal"
+documentation = "https://docs.rs/embedded-storage"
+readme = "README.md"
+keywords = ["storage"]
+categories = ["embedded", "hardware-support", "no-std"]
