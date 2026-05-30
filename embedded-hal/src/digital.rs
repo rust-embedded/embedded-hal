@@ -222,3 +222,27 @@ impl<T: InputPin + ?Sized> InputPin for &mut T {
         T::is_low(self)
     }
 }
+
+use core::convert::Infallible;
+use ErrorType as NoPinErrorType;
+
+/// A dummy pin that does nothing.
+/// This can be used for devices that do not require a Chip Select (CS) pin.
+#[derive(Debug, Default, Copy, Clone)]
+pub struct NoPin;
+
+// Implement `ErrorType` for NoPin (Explicitly Using `digital::ErrorType`)
+impl NoPinErrorType for NoPin {
+    type Error = Infallible;
+}
+
+// Implement `OutputPin`
+impl OutputPin for NoPin {
+    fn set_low(&mut self) -> Result<(), Infallible> {
+        Ok(())
+    }
+
+    fn set_high(&mut self) -> Result<(), Infallible> {
+        Ok(())
+    }
+}
