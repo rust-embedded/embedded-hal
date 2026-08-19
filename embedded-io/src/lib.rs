@@ -566,3 +566,15 @@ pub trait WriteReady: ErrorType {
     /// If this returns `true`, it's guaranteed that the next call to [`Write::write`] will not block.
     fn write_ready(&mut self) -> Result<bool, Self::Error>;
 }
+
+/// Split a stream in a reader and writer, which are independent
+pub trait SplitRW {
+    /// Reader type of the split stream
+    type Reader: Read;
+
+    /// Writer type of the split stream
+    type Writer: Write;
+
+    /// Split a stream in a independent reader and writer
+    fn split_rw(&mut self) -> (Self::Reader, Self::Writer);
+}
