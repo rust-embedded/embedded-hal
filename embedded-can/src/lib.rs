@@ -14,13 +14,13 @@ pub use id::*;
 pub trait Frame: Sized {
     /// Creates a new frame.
     ///
-    /// This will return `None` if the data slice is too long.
-    fn new(id: impl Into<Id>, data: &[u8]) -> Option<Self>;
+    /// This will return an error if the data slice is too long.
+    fn new(id: impl Into<Id>, data: &[u8]) -> Result<Self, ErrorKind>;
 
     /// Creates a new remote frame (RTR bit set).
     ///
-    /// This will return `None` if the data length code (DLC) is not valid.
-    fn new_remote(id: impl Into<Id>, dlc: usize) -> Option<Self>;
+    /// This will return an error if the data length code (DLC) is not valid.
+    fn new_remote(id: impl Into<Id>, dlc: usize) -> Result<Self, ErrorKind>;
 
     /// Returns true if this frame is an extended frame.
     fn is_extended(&self) -> bool;
@@ -102,6 +102,12 @@ pub enum ErrorKind {
 
     /// A different error occurred. The original error may contain more information.
     Other,
+
+    /// The provided identifier is invalid or out of range.
+    InvalidId,
+
+    /// The data slice or DLC is too long or invalid.
+    DataTooLong,
 }
 
 impl Error for ErrorKind {
@@ -115,6 +121,10 @@ impl core::error::Error for ErrorKind {}
 impl core::fmt::Display for ErrorKind {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
+            // The provided identifier is invalid or out of range
+            Self::InvalidId => write!(f, "The provided identifier is invalid or out of range"),
+            // The data slice or DLC is too long or invalid
+            Self::DataTooLong => write!(f, "The data slice or DLC is too long or invalid"),
             Self::Overrun => write!(f, "The peripheral receive buffer was overrun"),
             Self::Bit => write!(
                 f,
